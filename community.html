@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Innovexa Hub — Community</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase compat SDKs (v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg2: #f1f5f9;
+      --sidebar-bg: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --accent: #6366f1;
+      --accent-bg: #eef2ff;
+      --accent-light: #818cf8;
+      --text: #1e293b;
+      --text2: #475569;
+      --text3: #94a3b8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); }
+    body { overflow:hidden; }
+
+    /* ── Login ── */
+    #loginScreen {
+      display:flex; align-items:center; justify-content:center;
+      height:100vh; padding:20px;
+      background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 50%,#e0e7ff 100%);
+    }
+    .login-card {
+      width:420px; max-width:100%;
+      background:#fff; border:1px solid var(--border);
+      border-radius:20px; padding:40px 32px;
+      box-shadow:0 20px 60px rgba(99,102,241,0.1);
+    }
+    .login-brand {
+      display:flex; align-items:center; gap:8px; margin-bottom:20px;
+    }
+    .login-brand-dot {
+      width:32px; height:32px; border-radius:8px;
+      background:linear-gradient(135deg,#6366f1,#818cf8);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .login-brand-dot svg { width:16px; height:16px; color:white; }
+    .login-brand span {
+      font-weight:800; font-size:15px; color:var(--text);
+    }
+    .login-title { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .login-sub { font-size:13px; color:var(--text2); margin-bottom:24px; line-height:1.6; }
+    .login-field { margin-bottom:14px; }
+    .login-field label {
+      display:block; font-size:11px; font-weight:600; color:var(--text2);
+      margin-bottom:5px; letter-spacing:.3px;
+    }
+    .login-field input {
+      width:100%; padding:11px 14px; border-radius:10px;
+      border:1.5px solid var(--border); background:#fff;
+      color:var(--text); font-size:14px; outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .login-field input:focus {
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.12);
+    }
+    .login-field input::placeholder { color:var(--text3); }
+    .login-btn {
+      width:100%; padding:13px; border-radius:12px; margin-top:8px;
+      background:linear-gradient(135deg,#6366f1,#4f46e5);
+      color:white; border:none; font-size:14px; font-weight:700;
+      cursor:pointer; transition:all .2s;
+    }
+    .login-btn:hover { box-shadow:0 8px 24px rgba(99,102,241,0.35); transform:translateY(-1px); }
+    .login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+    .login-error {
+      color:var(--red); font-size:12px; margin-top:10px;
+      display:none; padding:10px 14px;
+      background:#fef2f2; border-radius:8px; border:1px solid #fecaca;
+      line-height:1.5;
+    }
+    .login-back {
+      display:block; text-align:center; margin-top:18px;
+      color:var(--text3); font-size:12px; text-decoration:none;
+    }
+    .login-back:hover { color:var(--accent); }
+
+    /* ── Chat App ── */
+    #chatApp { display:none; height:100vh; flex-direction:column; }
+    #chatApp.active { display:flex; }
+
+    /* Topbar */
+    .topbar {
+      height:56px; padding:0 20px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:space-between;
+      background:white; border-bottom:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+    .topbar-left { display:flex; align-items:center; gap:12px; }
+    .topbar-logo {
+      width:30px; height:30px; border-radius:8px;
+      background:linear-gradient(135deg,#6366f1,#818cf8);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .topbar-logo svg { width:14px; height:14px; color:white; }
+    .topbar-title { font-size:14px; font-weight:700; color:var(--text); }
+    .topbar-badge {
+      font-size:10px; font-weight:600; color:var(--accent);
+      background:var(--accent-bg); padding:2px 8px; border-radius:20px;
+    }
+    .topbar-right { display:flex; align-items:center; gap:12px; }
+    .topbar-user {
+      display:flex; align-items:center; gap:8px;
+      font-size:12px; color:var(--text2); font-weight:500;
+    }
+    .topbar-avatar {
+      width:30px; height:30px; border-radius:8px;
+      background:linear-gradient(135deg,#6366f1,#3b82f6);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:800; color:white;
+    }
+    .topbar-portal {
+      font-size:12px; color:var(--text2); text-decoration:none;
+      font-weight:500; padding:6px 12px; border-radius:8px;
+      border:1px solid var(--border);
+      transition:all .2s;
+    }
+    .topbar-portal:hover { background:var(--bg2); color:var(--text); }
+    .topbar-logout {
+      font-size:12px; font-weight:600; color:var(--red);
+      background:none; border:1px solid #fee2e2; border-radius:8px;
+      padding:6px 12px; cursor:pointer; transition:all .2s;
+    }
+    .topbar-logout:hover { background:#fef2f2; }
+    .sidebar-toggle {
+      display:none; background:none; border:none;
+      color:var(--text2); cursor:pointer; padding:4px;
+    }
+
+    /* Main layout */
+    .chat-main { display:flex; flex:1; overflow:hidden; }
+
+    /* Sidebar */
+    .sidebar {
+      width:220px; background:var(--sidebar-bg);
+      border-right:1px solid var(--border);
+      display:flex; flex-direction:column; flex-shrink:0;
+    }
+    .sidebar-section { padding:16px 12px; }
+    .sidebar-label {
+      font-size:10px; font-weight:700; color:var(--text3);
+      text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;
+      padding:0 8px;
+    }
+    .channel-list { list-style:none; }
+    .channel-item {
+      display:flex; align-items:center; gap:6px;
+      padding:8px 10px; border-radius:8px;
+      color:var(--text2); font-size:13px; font-weight:500;
+      cursor:pointer; transition:all .15s; margin-bottom:1px;
+    }
+    .channel-item:hover { background:var(--bg2); color:var(--text); }
+    .channel-item.active { background:var(--accent-bg); color:var(--accent); font-weight:600; }
+    .channel-hash { font-size:14px; color:var(--text3); font-family:'JetBrains Mono',monospace; font-weight:600; }
+    .channel-item.active .channel-hash { color:var(--accent); }
+
+    .sidebar-divider { height:1px; background:var(--border); margin:8px 12px; }
+
+    .online-list { list-style:none; }
+    .online-item {
+      display:flex; align-items:center; gap:8px;
+      padding:5px 8px; font-size:12px; color:var(--text2);
+      border-radius:6px;
+    }
+    .online-dot { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; }
+
+    /* Chat area */
+    .chat-area { flex:1; display:flex; flex-direction:column; background:var(--bg); overflow:hidden; }
+
+    .chat-header {
+      padding:12px 20px; background:white;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:8px;
+      flex-shrink:0;
+    }
+    .chat-header-hash { font-size:18px; color:var(--text3); font-family:'JetBrains Mono',monospace; font-weight:700; }
+    .chat-header-name { font-size:15px; font-weight:700; }
+    .chat-header-desc { font-size:12px; color:var(--text3); margin-left:8px; }
+
+    /* Messages */
+    .messages {
+      flex:1; overflow-y:auto; padding:20px;
+      display:flex; flex-direction:column;
+    }
+    .messages::-webkit-scrollbar { width:5px; }
+    .messages::-webkit-scrollbar-track { background:transparent; }
+    .messages::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+
+    .msg-welcome { text-align:center; padding:60px 20px; color:var(--text3); }
+    .msg-welcome-icon { font-size:48px; margin-bottom:12px; }
+    .msg-welcome h3 { font-size:18px; font-weight:700; color:var(--text2); margin-bottom:4px; }
+    .msg-welcome p { font-size:13px; }
+
+    .msg-group {
+      display:flex; gap:12px; margin-bottom:4px;
+      padding:6px 8px; border-radius:10px; transition:background .1s;
+    }
+    .msg-group:hover { background:var(--bg2); }
+    .msg-avatar {
+      width:36px; height:36px; border-radius:10px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:800; color:white;
+      font-family:'JetBrains Mono',monospace;
+      margin-top:2px;
+    }
+    .msg-body { flex:1; min-width:0; }
+    .msg-meta { display:flex; align-items:baseline; gap:8px; margin-bottom:3px; }
+    .msg-name { font-size:13px; font-weight:700; color:var(--text); }
+    .msg-id { font-size:10px; color:var(--accent); font-family:'JetBrains Mono',monospace; }
+    .msg-time { font-size:10px; color:var(--text3); margin-left:4px; }
+    .msg-text { font-size:14px; color:var(--text2); line-height:1.65; word-break:break-word; }
+
+    /* Role badge */
+    .role-badge {
+      display:inline-flex; align-items:center;
+      font-size:9px; font-weight:700; letter-spacing:.4px;
+      text-transform:uppercase; padding:1px 6px 1px 5px;
+      border-radius:20px; vertical-align:middle;
+      margin-left:2px;
+    }
+
+    /* Delete button */
+    .msg-actions {
+      margin-left:auto; opacity:0; transition:opacity .15s;
+      display:flex; align-items:center; gap:4px;
+    }
+    .msg-group:hover .msg-actions { opacity:1; }
+    .msg-del {
+      background:none; border:none; cursor:pointer;
+      color:var(--text3); padding:3px 6px; border-radius:6px;
+      font-size:11px; font-weight:600;
+      transition:all .15s; display:flex; align-items:center; gap:3px;
+    }
+    .msg-del:hover { background:#fef2f2; color:var(--red); }
+    .msg-del svg { width:12px; height:12px; }
+
+    /* Delete confirmation toast */
+    .del-confirm {
+      position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+      background:#1e293b; color:white; border-radius:12px;
+      padding:12px 20px; display:flex; align-items:center; gap:12px;
+      font-size:13px; font-weight:500; z-index:100;
+      box-shadow:0 8px 32px rgba(0,0,0,0.2);
+      animation:slideUp .2s ease;
+    }
+    @keyframes slideUp { from{transform:translateX(-50%) translateY(10px);opacity:0} to{transform:translateX(-50%);opacity:1} }
+    .del-confirm-yes {
+      background:var(--red); color:white; border:none;
+      padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;
+      cursor:pointer;
+    }
+    .del-confirm-no {
+      background:none; color:#94a3b8; border:none;
+      padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;
+    }
+
+    .msg-system {
+      text-align:center; font-size:11px; color:var(--text3);
+      padding:4px 0; font-family:'JetBrains Mono',monospace;
+    }
+
+    /* Date divider */
+    .msg-date {
+      display:flex; align-items:center; gap:12px;
+      margin:16px 0 8px; color:var(--text3); font-size:11px; font-weight:600;
+    }
+    .msg-date::before,.msg-date::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Input */
+    .chat-input-wrap {
+      padding:12px 20px 16px;
+      background:white; border-top:1px solid var(--border);
+      flex-shrink:0;
+    }
+    .chat-input-box {
+      display:flex; align-items:center; gap:8px;
+      background:var(--bg2); border:1.5px solid var(--border);
+      border-radius:12px; padding:6px 6px 6px 16px;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .chat-input-box:focus-within {
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(99,102,241,0.1);
+      background:white;
+    }
+    .chat-input {
+      flex:1; background:none; border:none; outline:none;
+      color:var(--text); font-size:14px; font-family:'Inter',sans-serif;
+      padding:6px 0;
+    }
+    .chat-input::placeholder { color:var(--text3); }
+    .chat-send {
+      padding:9px 18px; border-radius:9px;
+      background:var(--accent); color:white;
+      border:none; font-size:13px; font-weight:700;
+      cursor:pointer; transition:all .15s;
+    }
+    .chat-send:hover { background:#4f46e5; }
+    .chat-send:disabled { opacity:0.4; cursor:not-allowed; }
+
+    .typing-bar {
+      padding:2px 20px 0; font-size:11px; color:var(--text3);
+      min-height:18px; font-style:italic;
+    }
+
+    /* Error banner */
+    .error-banner {
+      display:none; padding:12px 20px;
+      background:#fef2f2; border-bottom:1px solid #fecaca;
+      font-size:13px; color:#b91c1c; font-weight:500;
+    }
+
+    @media(max-width:768px) {
+      .sidebar { position:fixed; left:-240px; top:56px; bottom:0; z-index:50; transition:left .25s; box-shadow:none; }
+      .sidebar.open { left:0; box-shadow:var(--shadow-md); }
+      .sidebar-toggle { display:block; }
+      .overlay { display:none; position:fixed; inset:0; top:56px; background:rgba(0,0,0,0.3); z-index:40; }
+      .overlay.active { display:block; }
+      .chat-header-desc { display:none; }
+      .topbar-portal { display:none; }
+
+      /* Topbar compact */
+      .topbar { padding:0 12px; }
+      .topbar-user { display:none; }
+      .topbar-title { font-size:13px; }
+
+      /* Login card */
+      .login-card { padding:28px 20px; }
+
+      /* Chat area full width */
+      .chat-area { min-width:0; }
+
+      /* Messages */
+      .messages { padding:12px 8px; }
+      .msg-avatar { width:30px; height:30px; font-size:10px; }
+      .msg-group { gap:8px; padding:4px 4px; }
+      .msg-text { font-size:13px; }
+
+      /* Input bar */
+      .chat-input { padding:8px 10px; }
+      .chat-input input { font-size:14px; padding:10px 12px; }
+      .chat-input button { padding:10px 14px; font-size:12px; }
+    }
+
+    @media(max-width:480px) {
+      .topbar-badge { display:none; }
+      .topbar-logout { font-size:11px; padding:4px 8px; }
+      .login-title { font-size:18px; }
+      .login-sub { font-size:12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="login-brand-dot">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </div>
+        <span>Innovexa Hub</span>
+      </div>
+      <h1 class="login-title">Join the Community</h1>
+      <p class="login-sub">Verify your identity using your registration credentials to access the community chat.</p>
+
+      <div class="login-field">
+        <label>Operative ID</label>
+        <input type="text" id="loginId" placeholder="INVX-01" autocomplete="off" />
+      </div>
+      <div class="login-field">
+        <label>Registered Email</label>
+        <input type="email" id="loginEmail" placeholder="you@email.com" />
+      </div>
+      <div class="login-field">
+        <label>Last 5 Digits of Phone</label>
+        <input type="text" id="loginPhone" placeholder="e.g. 45678" maxlength="5" inputmode="numeric" />
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="verifyAndLogin()">Verify &amp; Enter Community</button>
+      <div class="login-error" id="loginError"></div>
+      <a href="index.html" class="login-back">← Back to Portal</a>
+    </div>
+  </div>
+
+  <!-- CHAT APP -->
+  <div id="chatApp">
+    <div class="error-banner" id="errorBanner"></div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="topbar-logo">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </div>
+        <span class="topbar-title">Community</span>
+        <span class="topbar-badge" id="onlineBadge">0 online</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="topbar-avatar" id="userAvatar"></div>
+          <span id="userName"></span>
+        </div>
+        <a href="index.html" class="topbar-portal">← Portal</a>
+        <button class="topbar-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="chat-main">
+      <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-label">Channels</div>
+          <ul class="channel-list">
+            <li class="channel-item active" data-ch="general"       onclick="switchCh('general')"><span class="channel-hash">#</span>general</li>
+            <li class="channel-item"        data-ch="announcements" onclick="switchCh('announcements')"><span class="channel-hash">#</span>announcements</li>
+            <li class="channel-item"        data-ch="projects"      onclick="switchCh('projects')"><span class="channel-hash">#</span>projects</li>
+            <li class="channel-item"        data-ch="help"          onclick="switchCh('help')"><span class="channel-hash">#</span>help</li>
+            <li class="channel-item"        data-ch="random"        onclick="switchCh('random')"><span class="channel-hash">#</span>random</li>
+          </ul>
+        </div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section" style="flex:1;overflow-y:auto;">
+          <div class="sidebar-label">Online — <span id="onlineCount">0</span></div>
+          <ul class="online-list" id="onlineList"></ul>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-area">
+        <div class="chat-header">
+          <span class="chat-header-hash">#</span>
+          <span class="chat-header-name" id="chName">general</span>
+          <span class="chat-header-desc" id="chDesc">General discussion</span>
+        </div>
+
+        <div class="messages" id="messages">
+          <div class="msg-welcome">
+            <div class="msg-welcome-icon">💬</div>
+            <h3>Welcome to #general</h3>
+            <p>Be respectful and have fun!</p>
+          </div>
+        </div>
+
+        <div class="typing-bar" id="typingBar"></div>
+
+        <div class="chat-input-wrap">
+          <div class="chat-input-box">
+            <input class="chat-input" id="msgInput" type="text"
+              placeholder="Message #general…"
+              autocomplete="off"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendMsg();event.preventDefault()}" />
+            <button class="chat-send" onclick="sendMsg()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ═══════════════════════════════════════════════════════════
+  //  CONFIG — update SCRIPT_URL if you redeploy Apps Script
+  // ═══════════════════════════════════════════════════════════
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyG6lvw90hgxPYXm0Fx-Ci0qxklvec9K-PPGOMVBSZTOCNDnZiOYjGicwuBHNOIksm2/exec';
+
+  const FB_CONFIG = {
+    apiKey:            "AIzaSyAufdQ8b5wktFuRFvtDERnjanJ-9b-sv3U",
+    authDomain:        "innovexa-hub-77b97.firebaseapp.com",
+    // Try both common regional URLs — the app will use whichever works
+    databaseURL:       "https://innovexa-hub-77b97-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "innovexa-hub-77b97",
+    storageBucket:     "innovexa-hub-77b97.firebasestorage.app",
+    messagingSenderId: "991543548798",
+    appId:             "1:991543548798:web:6a654997b53fc255d4b12f"
+  };
+
+  const CH_INFO = {
+    general:       'General discussion for all members',
+    announcements: 'Official announcements from Core Team',
+    projects:      'Showcase and discuss your projects',
+    help:          'Ask questions, get community help',
+    random:        'Off-topic conversations and fun'
+  };
+
+  const CH_EMOJI = { general:'💬', announcements:'📢', projects:'🚀', help:'🤝', random:'🎲' };
+
+  // Core Team Roles
+  const ROLES = {
+    'INVX-01': { label:'President',         color:'#7c3aed', bg:'#ede9fe' },
+    'INVX-02': { label:'CTO',               color:'#0369a1', bg:'#e0f2fe' },
+    'INVX-03': { label:'General Secretary', color:'#065f46', bg:'#d1fae5' },
+  };
+  function getRoleBadge(id) {
+    const r = ROLES[(id||'').toUpperCase()];
+    if (!r) return '';
+    return `<span class="role-badge" style="background:${r.bg};color:${r.color}">${r.label}</span>`;
+  }
+  const STORE_KEY = 'invx_v3_user';
+
+  // ── State ──
+  let me = null, db = null, ch = 'general', prevListener = null, typingTimer = null, lastTyped = 0;
+
+  // ── Init ──
+  (function init() {
+    // Clear ALL old session keys from previous versions
+    ['innovexa_chat_user','invx_chat_user','invx_v2_user'].forEach(k => localStorage.removeItem(k));
+
+    try {
+      firebase.initializeApp(FB_CONFIG);
+      db = firebase.database();
+      db.ref('.info/connected').on('value', snap => {
+        snap.val() ? hideBanner() : showBanner('Connecting to chat…');
+      });
+    } catch(e) { console.error('Firebase init error:', e); }
+
+    const saved = localStorage.getItem(STORE_KEY);
+    console.log('[INVX] Saved session:', saved);
+    if (saved) {
+      try {
+        me = JSON.parse(saved);
+        console.log('[INVX] Loaded me:', me);
+        if (me && me.id && me.name) {
+          showChat();
+        } else {
+          console.warn('[INVX] Invalid session, clearing');
+          localStorage.removeItem(STORE_KEY);
+        }
+      } catch(e) { localStorage.removeItem(STORE_KEY); }
+    }
+  })();
+
+  // ── Login ──
+  async function verifyAndLogin() {
+    const btn  = document.getElementById('loginBtn');
+    const err  = document.getElementById('loginError');
+    const opId = document.getElementById('loginId').value.trim().toUpperCase();
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const phone = document.getElementById('loginPhone').value.trim().replace(/\D/g,'');
+
+    err.style.display = 'none';
+
+    if (!opId || !email || !phone) {
+      return showErr('Please fill in all 3 fields.');
+    }
+    if (!/^INVX-\d{2,}$/.test(opId)) {
+      return showErr('Operative ID should be in format INVX-01');
+    }
+    if (phone.length !== 5) {
+      return showErr('Enter exactly 5 digits of your phone number.');
+    }
+
+    btn.textContent = 'Verifying…'; btn.disabled = true;
+
+    try {
+      // Use existing email-lookup endpoint (no redeploy needed)
+      const url = `${SCRIPT_URL}?email=${encodeURIComponent(email)}`;
+      const res  = await fetch(url, { method:'GET', redirect:'follow' });
+      const data = await res.json();
+
+      console.log('[INVX] API response:', JSON.stringify(data));
+
+      if (!data.success || !data.id) {
+        showErr('Email not found in our records.');
+        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        return;
+      }
+
+      // Verify Operative ID matches
+      if (data.id.toUpperCase() !== opId) {
+        showErr('Operative ID does not match this email.');
+        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        return;
+      }
+
+      // Verify phone last 5 digits
+      const regPhone = (data.phone || '').toString().replace(/\D/g, '');
+      const regLast5 = regPhone.slice(-5);
+      if (regLast5 !== phone) {
+        showErr('Phone number does not match our records.');
+        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        return;
+      }
+
+      me = {
+        name: data.name,
+        id:   data.id,       // data.id is the operative ID from this endpoint
+        init: data.name ? data.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '??'
+      };
+      console.log('[INVX] me object set to:', JSON.stringify(me));
+      localStorage.setItem(STORE_KEY, JSON.stringify(me));
+      showChat();
+
+    } catch(e) {
+      showErr('Network error — please check your connection and try again.');
+      btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+    }
+    function showErr(msg) {
+      err.textContent = msg; err.style.display = 'block';
+    }
+  }
+
+  function logout() {
+    if (me && db) db.ref('presence/'+me.id).remove();
+    localStorage.removeItem(STORE_KEY);
+    window.location.reload();
+  }
+
+  // ── Show Chat ──
+  function showChat() {
+    document.getElementById('loginScreen').style.display = 'none';
+    const app = document.getElementById('chatApp');
+    app.style.display = 'flex'; app.style.flexDirection = 'column'; app.style.height = '100vh';
+
+    document.getElementById('userAvatar').textContent = me.init;
+    document.getElementById('userName').textContent   = me.id + (me.id ? '' : ' (ID missing!)');
+    // Add role badge next to name in topbar if applicable
+    const roleEl = document.getElementById('userName');
+    const badge  = getRoleBadge(me.id);
+    if (badge) roleEl.innerHTML = (me.id||'') + ' ' + badge;
+
+    // Presence
+    if (db) {
+      const pRef = db.ref('presence/'+me.id);
+      pRef.set({ name:me.name, ts: firebase.database.ServerValue.TIMESTAMP });
+      pRef.onDisconnect().remove();
+
+      db.ref('presence').on('value', snap => {
+        const users = snap.val() || {};
+        const keys  = Object.keys(users);
+        document.getElementById('onlineCount').textContent = keys.length;
+        document.getElementById('onlineBadge').textContent = keys.length + ' online';
+        document.getElementById('onlineList').innerHTML = keys.map(id => {
+          const n = users[id].name || id;
+          return `<li class="online-item"><span class="online-dot"></span><span style="font-weight:600">${escHtml(n)}</span><span style="color:var(--text-muted);font-size:10px;margin-left:4px">${escHtml(id)}</span>${getRoleBadge(id)}</li>`;
+        }).join('');
+      });
+
+      switchCh('general');
+    }
+  }
+
+  // ── Switch Channel ──
+  function switchCh(channel) {
+    const oldCh = ch;  // save BEFORE updating ch
+    ch = channel;
+    if (db && prevListener) {
+      db.ref('channels/'+oldCh+'/messages').off('child_added', prevListener);
+      db.ref('channels/'+oldCh+'/typing').off();
+    }
+
+    // Update sidebar
+    document.querySelectorAll('.channel-item').forEach(el =>
+      el.classList.toggle('active', el.dataset.ch === channel)
+    );
+    document.getElementById('chName').textContent = channel;
+    document.getElementById('chDesc').textContent = CH_INFO[channel] || '';
+    document.getElementById('msgInput').placeholder = `Message #${channel}…`;
+
+    // Clear messages
+    const box = document.getElementById('messages');
+    box.innerHTML = `<div class="msg-welcome">
+      <div class="msg-welcome-icon">${CH_EMOJI[channel]||'💬'}</div>
+      <h3>Welcome to #${channel}</h3>
+      <p>${CH_INFO[channel]||''}</p>
+    </div>`;
+
+    if (!db) return;
+
+    // Load last 80 messages (no orderByChild — avoids needing a Firebase index)
+    const ref = db.ref('channels/'+channel+'/messages').limitToLast(80);
+    prevListener = ref.on('child_added', snap => {
+      appendMsg(snap.val(), snap.key);  // pass Firebase key for delete
+      box.scrollTop = box.scrollHeight;
+    });
+
+    // Listen for removals (so UI updates when message deleted)
+    db.ref('channels/'+channel+'/messages').on('child_removed', snap => {
+      const el = document.querySelector(`[data-key="${snap.key}"]`);
+      if (el) {
+        el.style.transition = 'opacity .2s, transform .2s';
+        el.style.opacity = '0'; el.style.transform = 'scale(0.95)';
+        setTimeout(() => el.remove(), 200);
+      }
+    });
+
+    // Typing
+    db.ref('channels/'+channel+'/typing').on('value', snap => {
+      const typists = snap.val() || {};
+      const others  = Object.keys(typists).filter(id => id !== me.id);
+      const bar     = document.getElementById('typingBar');
+      bar.textContent = others.length === 1 ? `${others[0]} is typing…`
+                      : others.length  > 1 ? `${others.length} people typing…` : '';
+    });
+
+    // Mobile
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('active');
+  }
+
+  // ── Render Message ──
+  function appendMsg(msg, key) {
+    const box = document.getElementById('messages');
+    const wc  = box.querySelector('.msg-welcome');
+    if (wc) wc.remove();
+
+    if (msg.type === 'system') {
+      const d = document.createElement('div');
+      d.className = 'msg-system';
+      d.textContent = '⚡ ' + (msg.text || '');
+      box.appendChild(d);
+      return;
+    }
+
+    const ts   = msg.timestamp ? new Date(msg.timestamp) : new Date();
+    const time = ts.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    const init = (msg.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const hue  = hashStr(msg.uid||'') % 360;
+    const c1   = `hsl(${hue},65%,55%)`, c2 = `hsl(${(hue+40)%360},65%,45%)`;
+    const isOwn = me && msg.uid === me.id;
+
+    const d = document.createElement('div');
+    d.className = 'msg-group';
+    if (key) d.dataset.key = key;
+    d.innerHTML = `
+      <div class="msg-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${escHtml(init)}</div>
+      <div class="msg-body">
+        <div class="msg-meta">
+          <span class="msg-name">${escHtml(msg.name||'Unknown')}</span>
+          <span class="msg-id">${escHtml(msg.uid||'')}</span>
+          ${getRoleBadge(msg.uid)}
+          <span class="msg-time">${time}</span>
+          ${isOwn && key ? `
+          <div class="msg-actions">
+            <button class="msg-del" onclick="deleteMsg('${escHtml(key)}', this)" title="Delete message">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Delete
+            </button>
+          </div>` : ''}
+        </div>
+        <div class="msg-text">${escHtml(msg.text||'')}</div>
+      </div>`;
+    box.appendChild(d);
+  }
+
+  // ── Delete Message ──
+  function deleteMsg(key, btnEl) {
+    // Remove any existing confirmation
+    const existing = document.querySelector('.del-confirm');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'del-confirm';
+    toast.innerHTML = `
+      <span>🗑️ Delete this message?</span>
+      <button class="del-confirm-yes" id="delYes">Delete</button>
+      <button class="del-confirm-no" id="delNo">Cancel</button>`;
+    document.body.appendChild(toast);
+
+    document.getElementById('delNo').onclick  = () => toast.remove();
+    document.getElementById('delYes').onclick = () => {
+      toast.remove();
+      db.ref('channels/'+ch+'/messages/'+key).remove(err => {
+        if (err) showBanner('Delete failed: ' + err.message);
+      });
+    };
+
+    // Auto-dismiss after 5s
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+  }
+
+  // ── Send ──
+  function sendMsg() {
+    const input = document.getElementById('msgInput');
+    const text  = input.value.trim();
+    if (!text) return;
+    if (!me)   { showBanner('You are not logged in. Please refresh.'); return; }
+    if (!db)   { showBanner('Firebase not connected. Please refresh.'); return; }
+
+    const btn = document.querySelector('.chat-send');
+    btn.disabled = true;
+
+    db.ref('channels/'+ch+'/messages').push({
+      type:'user', uid:me.id, name:me.name,
+      text: text,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    }, function(err) {
+      btn.disabled = false;
+      if (err) {
+        showBanner('Send failed: ' + err.message + ' — Check Firebase rules allow read/write.');
+      } else {
+        hideBanner();
+        input.value = '';
+        input.focus();
+        db.ref('channels/'+ch+'/typing/'+me.id).remove();
+        // Flash send button green briefly
+        btn.style.background = '#16a34a';
+        btn.textContent = '✓ Sent';
+        setTimeout(() => { btn.style.background = ''; btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send'; }, 1000);
+      }
+    });
+  }
+
+  // ── Typing indicator ──
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('msgInput').addEventListener('input', () => {
+      if (!me || !db) return;
+      const now = Date.now();
+      if (now - lastTyped > 2000) {
+        lastTyped = now;
+        db.ref('channels/'+ch+'/typing/'+me.id).set({ ts: firebase.database.ServerValue.TIMESTAMP });
+      }
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        if (db) db.ref('channels/'+ch+'/typing/'+me.id).remove();
+      }, 3000);
+    });
+  });
+
+  // ── Helpers ──
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+  }
+  function showBanner(msg) {
+    const b = document.getElementById('errorBanner');
+    b.textContent = msg; b.style.display = 'block';
+  }
+  function hideBanner() { document.getElementById('errorBanner').style.display = 'none'; }
+  function escHtml(s) {
+    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
+  function hashStr(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) { h = ((h<<5)-h)+s.charCodeAt(i); h|=0; }
+    return Math.abs(h);
+  }
+  </script>
+</body>
+</html>

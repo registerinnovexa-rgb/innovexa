@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Innovexa Hub — Admin Console</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg: #0a0f1c; --bg2: #111827; --bg3: #1a2234;
+      --border: #1e293b; --border2: #334155;
+      --text: #f1f5f9; --text2: #94a3b8; --text3: #64748b;
+      --accent: #6366f1; --accent2: #818cf8;
+      --green: #22c55e; --green-bg: rgba(34,197,94,.15);
+      --red: #ef4444; --red-bg: rgba(239,68,68,.15);
+      --yellow: #eab308; --yellow-bg: rgba(234,179,8,.15);
+      --blue: #3b82f6; --blue-bg: rgba(59,130,246,.15);
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── Login Screen ── */
+    #loginScreen {
+      display:flex; align-items:center; justify-content:center; min-height:100vh;
+      background: radial-gradient(ellipse at 30% 20%, rgba(99,102,241,.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(34,197,94,.05) 0%, transparent 50%), var(--bg);
+    }
+    .login-card {
+      background: var(--bg2); border:1px solid var(--border); border-radius:20px;
+      padding:40px; width:100%; max-width:420px; box-shadow: 0 25px 50px rgba(0,0,0,.4);
+    }
+    .login-card h1 { font-size:22px; font-weight:800; margin-bottom:6px; }
+    .login-card p { font-size:13px; color:var(--text3); margin-bottom:28px; }
+    .login-card .logo-row { display:flex; align-items:center; gap:10px; margin-bottom:24px; }
+    .login-card .logo-icon {
+      width:40px; height:40px; background:linear-gradient(135deg, var(--accent), #a78bfa);
+      border-radius:10px; display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:16px; color:#fff;
+    }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:11px; font-weight:600; color:var(--text3); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+    .form-group input {
+      width:100%; padding:10px 14px; background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--radius-sm); color:var(--text); font-size:14px; font-family:'Inter',sans-serif;
+      transition: border-color .2s;
+    }
+    .form-group input:focus { outline:none; border-color:var(--accent); }
+    .btn-primary {
+      width:100%; padding:12px; background:var(--accent); color:#fff; border:none;
+      border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer;
+      transition: background .2s, transform .1s; font-family:'Inter',sans-serif;
+    }
+    .btn-primary:hover { background:var(--accent2); }
+    .btn-primary:active { transform:scale(.98); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .login-error { color:var(--red); font-size:12px; margin-top:12px; text-align:center; min-height:18px; }
+
+    /* ── Dashboard Layout ── */
+    #dashboard { display:none; min-height:100vh; }
+    .topbar {
+      position:fixed; top:0; left:0; right:0; height:56px; background:var(--bg2);
+      border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px; z-index:100;
+    }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .topbar-left .logo { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),#a78bfa); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; }
+    .topbar-left span { font-weight:700; font-size:15px; }
+    .topbar-right { display:flex; align-items:center; gap:14px; }
+    .topbar-badge { font-size:11px; background:var(--green-bg); color:var(--green); padding:4px 10px; border-radius:20px; font-weight:600; }
+    .topbar-user { font-size:12px; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+    .btn-logout { padding:6px 14px; font-size:12px; background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--text3); cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s; }
+    .btn-logout:hover { border-color:var(--red); color:var(--red); }
+
+    .sidebar {
+      position:fixed; top:56px; left:0; bottom:0; width:220px; background:var(--bg2);
+      border-right:1px solid var(--border); padding:16px 12px; overflow-y:auto; z-index:90;
+    }
+    .sidebar-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; padding:12px 8px 6px; }
+    .sidebar-btn {
+      display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px;
+      background:transparent; border:none; border-radius:var(--radius-sm); color:var(--text2);
+      font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; text-align:left;
+      font-family:'Inter',sans-serif;
+    }
+    .sidebar-btn:hover { background:var(--bg3); color:var(--text); }
+    .sidebar-btn.active { background:rgba(99,102,241,.15); color:var(--accent2); font-weight:600; }
+    .sidebar-btn svg { width:18px; height:18px; flex-shrink:0; }
+
+    .main-content { margin-left:220px; margin-top:56px; padding:28px; min-height:calc(100vh - 56px); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    /* ── Stats Cards ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px; transition:border-color .2s;
+    }
+    .stat-card:hover { border-color:var(--border2); }
+    .stat-card .stat-label { font-size:11px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .stat-card .stat-value { font-size:32px; font-weight:800; margin-top:4px; }
+    .stat-card .stat-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+
+    /* ── Table ── */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:12px; }
+    .section-title { font-size:20px; font-weight:700; }
+    .search-box {
+      padding:8px 14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
+      color:var(--text); font-size:13px; width:260px; font-family:'Inter',sans-serif;
+    }
+    .search-box:focus { outline:none; border-color:var(--accent); }
+    .btn-add {
+      padding:8px 18px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm);
+      font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .btn-add:hover { background:var(--accent2); }
+
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th {
+      text-align:left; padding:10px 14px; font-size:11px; font-weight:600; color:var(--text3);
+      text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border);
+      background:var(--bg2); position:sticky; top:0;
+    }
+    .data-table td {
+      padding:12px 14px; font-size:13px; border-bottom:1px solid var(--border);
+      color:var(--text2); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .data-table tr:hover td { background:rgba(255,255,255,.02); }
+    .table-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:auto; max-height:60vh; }
+
+    /* ── Status Badges ── */
+    .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; display:inline-block; }
+    .badge-pending { background:var(--yellow-bg); color:var(--yellow); }
+    .badge-confirmed { background:var(--green-bg); color:var(--green); }
+    .badge-rejected { background:var(--red-bg); color:var(--red); }
+
+    /* ── Action Buttons ── */
+    .btn-sm {
+      padding:5px 12px; border:none; border-radius:6px; font-size:11px; font-weight:600;
+      cursor:pointer; font-family:'Inter',sans-serif; transition:all .15s; display:inline-flex; align-items:center; gap:4px;
+    }
+    .btn-approve { background:var(--green-bg); color:var(--green); }
+    .btn-approve:hover { background:var(--green); color:#fff; }
+    .btn-reject { background:var(--red-bg); color:var(--red); }
+    .btn-reject:hover { background:var(--red); color:#fff; }
+    .btn-edit { background:var(--blue-bg); color:var(--blue); }
+    .btn-edit:hover { background:var(--blue); color:#fff; }
+    .btn-delete { background:var(--red-bg); color:var(--red); }
+    .btn-delete:hover { background:var(--red); color:#fff; }
+    .btn-actions { display:flex; gap:6px; }
+
+    /* ── Card Grid ── */
+    .card-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px; }
+    .admin-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px; transition:all .2s;
+    }
+    .admin-card:hover { border-color:var(--border2); transform:translateY(-1px); }
+    .admin-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; }
+    .admin-card p { font-size:12px; color:var(--text3); margin-bottom:12px; line-height:1.5; }
+    .admin-card .card-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+    .admin-card .meta-tag { font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; background:var(--bg3); color:var(--text3); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.7);
+      backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:var(--bg2); border:1px solid var(--border); border-radius:16px;
+      width:100%; max-width:520px; max-height:85vh; overflow-y:auto; padding:28px;
+    }
+    .modal-box h2 { font-size:18px; font-weight:700; margin-bottom:20px; }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .btn-cancel {
+      padding:10px 20px; background:transparent; border:1px solid var(--border); border-radius:var(--radius-sm);
+      color:var(--text3); font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+    }
+    .btn-cancel:hover { border-color:var(--text3); color:var(--text); }
+    .btn-save {
+      padding:10px 20px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm);
+      font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;
+    }
+    .btn-save:hover { background:var(--accent2); }
+    .btn-save:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* ── Toast ── */
+    .toast {
+      position:fixed; bottom:24px; right:24px; padding:14px 24px; border-radius:var(--radius);
+      font-size:13px; font-weight:600; z-index:999; transform:translateY(100px); opacity:0;
+      transition:all .3s ease; pointer-events:none;
+    }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { background:var(--green); color:#fff; }
+    .toast.error { background:var(--red); color:#fff; }
+
+    /* ── Hamburger ── */
+    .hamburger { display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:4px; }
+    .hamburger svg { width:22px; height:22px; }
+    .admin-overlay { display:none; position:fixed; inset:0; top:56px; background:rgba(0,0,0,.4); z-index:80; }
+    .admin-overlay.active { display:block; }
+
+    /* ── Responsive ── */
+    @media (max-width:768px) {
+      .sidebar { position:fixed; left:-240px; transition:left .25s ease; z-index:90; }
+      .sidebar.open { left:0; box-shadow:0 0 30px rgba(0,0,0,.5); }
+      .main-content { margin-left:0; padding:16px; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .hamburger { display:block; }
+      .topbar-user { display:none; }
+      .topbar-badge { font-size:9px; padding:3px 8px; }
+      .topbar { padding:0 14px; }
+      .card-grid { grid-template-columns:1fr; }
+      .table-wrap { max-height:50vh; }
+      .section-header { flex-direction:column; align-items:flex-start; }
+      .search-box { width:100%; }
+      .modal-box { padding:20px; }
+    }
+    @media (max-width:480px) {
+      .stats-grid { grid-template-columns:1fr; }
+      .stat-card .stat-value { font-size:24px; }
+      .topbar-badge { display:none; }
+      .btn-logout { font-size:10px; padding:4px 8px; }
+      .data-table td, .data-table th { padding:8px 8px; font-size:11px; }
+    }
+
+    /* ── Loading Spinner ── */
+    .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--text3); font-size:13px; gap:8px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; }
+  </style>
+</head>
+<body>
+
+<!-- ════════ LOGIN SCREEN ════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="logo-row">
+      <div class="logo-icon">IX</div>
+      <div>
+        <h1>Admin Console</h1>
+        <p style="margin-bottom:0">Innovexa Hub — President Access Only</p>
+      </div>
+    </div>
+    <p>Verify your identity to access the admin dashboard. Only INVX-01 is authorized.</p>
+    <div class="form-group">
+      <label>Operative ID</label>
+      <input type="text" id="loginId" value="INVX-01" readonly style="opacity:.6">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="loginEmail" placeholder="Your registered email">
+    </div>
+    <div class="form-group">
+      <label>Last 5 Digits of Phone</label>
+      <input type="text" id="loginPhone" maxlength="5" placeholder="e.g. 12345">
+    </div>
+    <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+      Verify & Access Dashboard
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ════════ DASHBOARD ════════ -->
+<div id="dashboard">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleAdminSidebar()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="logo">IX</div>
+      <span>Admin Console</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-badge">INVX-01 · President</span>
+      <span class="topbar-user" id="adminName"></span>
+      <a href="index.html" class="btn-logout">← Portal</a>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="admin-overlay" id="adminOverlay" onclick="toggleAdminSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-label">Navigation</div>
+    <button class="sidebar-btn active" onclick="switchAdminTab('overview')" id="navOverview">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+      Overview
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('members')" id="navMembers">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Members
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('events')" id="navEvents">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Events
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('resources')" id="navResources">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Resources
+    </button>
+      Team
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('attendance')" id="navAttendance">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+      Attendance
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- ── OVERVIEW TAB ── -->
+    <div class="tab-content active" id="tabOverview">
+      <h2 style="font-size:24px;font-weight:800;margin-bottom:20px">Dashboard</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Operatives</div>
+          <div class="stat-value" id="statMembers" style="color:var(--accent2)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Approvals</div>
+          <div class="stat-value" id="statPending" style="color:var(--yellow)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="statEvents" style="color:var(--green)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Resources</div>
+          <div class="stat-value" id="statResources" style="color:var(--blue)">—</div>
+        </div>
+      </div>
+      <div class="admin-card" style="max-width:500px">
+        <h3>Quick Actions</h3>
+        <p>Manage your hub directly from here.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-add" onclick="switchAdminTab('members')">👥 Manage Members</button>
+          <button class="btn-add" onclick="switchAdminTab('events')" style="background:var(--green)">📅 Add Event</button>
+          <button class="btn-add" onclick="switchAdminTab('resources')" style="background:var(--blue)">📚 Add Resource</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MEMBERS TAB ── -->
+    <div class="tab-content" id="tabMembers">
+      <div class="section-header">
+        <h2 class="section-title">Members</h2>
+        <input type="text" class="search-box" placeholder="Search by name or email..." oninput="filterMembers(this.value)">
+      </div>
+      <div id="membersLoading" class="loading"><div class="spinner"></div> Loading members...</div>
+      <div class="table-wrap" id="membersTable" style="display:none">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="membersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── EVENTS TAB ── -->
+    <div class="tab-content" id="tabEvents">
+      <div class="section-header">
+        <h2 class="section-title">Events</h2>
+        <button class="btn-add" onclick="openModal('event')">+ Add Event</button>
+      </div>
+      <div id="eventsLoading" class="loading"><div class="spinner"></div> Loading events...</div>
+      <div class="card-grid" id="eventsGrid"></div>
+    </div>
+
+    <!-- ── RESOURCES TAB ── -->
+    <div class="tab-content" id="tabResources">
+      <div class="section-header">
+        <h2 class="section-title">Resources</h2>
+        <button class="btn-add" onclick="openModal('resource')">+ Add Resource</button>
+      </div>
+      <div id="resourcesLoading" class="loading"><div class="spinner"></div> Loading resources...</div>
+      <div class="table-wrap" id="resourcesTable" style="display:none">
+        <table class="data-table">
+          <thead>
+            <tr><th>Stack</th><th>Title</th><th>Category</th><th>Link</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="resourcesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TEAM TAB ── -->
+    <div class="tab-content" id="tabTeam">
+      <div class="section-header">
+        <h2 class="section-title">Core Team</h2>
+        <button class="btn-add" onclick="openModal('team')">+ Add Member</button>
+      </div>
+      <div id="teamLoading" class="loading"><div class="spinner"></div> Loading team...</div>
+      <div class="card-grid" id="teamGrid"></div>
+    </div>
+
+    <!-- ── ATTENDANCE TAB ── -->
+    <div class="tab-content" id="tabAttendance">
+      <div class="section-header">
+        <h2 class="section-title">Attendance Scanner</h2>
+        <select id="attendance-event-select" class="search-box" style="width:220px">
+          <option value="">Select Event First</option>
+        </select>
+      </div>
+      <div class="admin-card" style="max-width:480px; margin:0 auto; text-align:center;">
+        <div id="reader" style="width:100%; border-radius:12px; overflow:hidden; background:#000; aspect-ratio:1;"></div>
+        <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+          <button class="btn-add" onclick="startScanner()" style="background:var(--accent)">Start Scanner</button>
+          <button class="btn-add" onclick="stopScanner()" style="background:var(--bg3); color:var(--text3)">Stop</button>
+        </div>
+        <div id="scan-result" style="margin-top:20px; padding:15px; border-radius:10px; font-family:monospace; font-size:12px; display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODAL ════════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box" id="modalBox">
+    <h2 id="modalTitle">Add Item</h2>
+    <div id="modalFields"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="modalSave" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyG6lvw90hgxPYXm0Fx-Ci0qxklvec9K-PPGOMVBSZTOCNDnZiOYjGicwuBHNOIksm2/exec';
+const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrgutbhHdHkoeRPuK89okkH4urhmUVIB78Ai_CQke9bAHL7jPwxKybFYT9u137KfU/exec';
+const ADMIN_KEY = 'innovexa2025admin';
+
+let adminSession = null;
+let cachedMembers = [];
+let cachedEvents = [];
+let cachedResources = [];
+let cachedTeam = [];
+let currentModal = null;
+let editingIndex = null;
+
+// ══════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════
+function escHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Formatting helpers for description toolbar
+function fmtInsert(id, before, after) {
+  const ta = document.getElementById(id);
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const selected = ta.value.substring(start, end) || 'text';
+  ta.value = ta.value.substring(0, start) + before + selected + after + ta.value.substring(end);
+  ta.focus();
+  ta.selectionStart = start + before.length;
+  ta.selectionEnd = start + before.length + selected.length;
+}
+function fmtLine(id, prefix) {
+  const ta = document.getElementById(id);
+  const start = ta.selectionStart;
+  const lineStart = ta.value.lastIndexOf('\n', start - 1) + 1;
+  const selected = ta.value.substring(ta.selectionStart, ta.selectionEnd) || 'text';
+  const insert = (start === 0 || ta.value[start-1] === '\n' ? '' : '\n') + prefix + selected;
+  ta.value = ta.value.substring(0, start) + insert + ta.value.substring(ta.selectionEnd);
+  ta.focus();
+}
+function fmtInsertAt(id, text) {
+  const ta = document.getElementById(id);
+  const start = ta.selectionStart;
+  ta.value = ta.value.substring(0, start) + text + ta.value.substring(ta.selectionEnd);
+  ta.focus();
+}
+async function apiGet(action) {
+  // Events go through Code1.gs to get requiresReg/regFee; everything else through original
+  const baseUrl = (action === 'events') ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
+  const r = await fetch(`${baseUrl}?action=${action}`, { method:'GET', redirect:'follow' });
+  return r.json();
+}
+
+async function apiWrite(op, payload) {
+  payload.op = op;
+  payload.adminKey = ADMIN_KEY;
+  payload.adminId = adminSession.id;
+  payload.adminEmail = adminSession.email;
+  payload.adminPhone = adminSession.phone;
+  // Event writes go through Code1.gs (supports requiresReg + regFee columns)
+  const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus'].includes(op);
+  const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
+  const url = `${baseUrl}?action=adminWrite&data=${encodeURIComponent(JSON.stringify(payload))}`;
+  const r = await fetch(url, { method: 'GET', redirect: 'follow' });
+  return r.json();
+}
+
+function statusBadge(s) {
+  const st = (s||'').toLowerCase();
+  if (st.includes('confirmed')) return `<span class="badge badge-confirmed">Confirmed</span>`;
+  if (st.includes('reject'))    return `<span class="badge badge-rejected">Rejected</span>`;
+  return `<span class="badge badge-pending">${escHtml(s||'Pending')}</span>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════════════════════
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const phone = document.getElementById('loginPhone').value.trim();
+  const err = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!email || !phone) { err.textContent = 'Please fill all fields.'; return; }
+  if (phone.length !== 5) { err.textContent = 'Enter exactly 5 digits.'; return; }
+
+  btn.disabled = true; btn.textContent = 'Verifying...'; err.textContent = '';
+
+  try {
+    const data = await apiGet(`verifyChat&id=INVX-01&email=${encodeURIComponent(email)}&phone=${phone}`);
+    if (!data.success) { err.textContent = data.message || 'Verification failed.'; btn.disabled = false; btn.textContent = 'Verify & Access Dashboard'; return; }
+
+    adminSession = { id: 'INVX-01', email: email, phone: phone, name: data.name || 'President' };
+    sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+    showDashboard();
+  } catch(e) {
+    err.textContent = 'Network error.';
+    btn.disabled = false; btn.textContent = 'Verify & Access Dashboard';
+  }
+}
+
+function showDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('adminName').textContent = adminSession.name;
+  loadOverview();
+}
+
+function logout() {
+  sessionStorage.removeItem('adminSession');
+  adminSession = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+// Auto-restore session
+(function() {
+  const saved = sessionStorage.getItem('adminSession');
+  if (saved) {
+    adminSession = JSON.parse(saved);
+    showDashboard();
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════════════
+function switchAdminTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+  if (tab === 'attendance') populateAttendanceEvents();
+  else stopScanner();
+
+  if (tab === 'overview') loadOverview();
+  if (tab === 'members') loadMembers();
+  if (tab === 'events') loadEvents();
+  if (tab === 'resources') loadResources();
+  if (tab === 'team') loadTeam();
+}
+
+let html5QrCode = null;
+
+function populateAttendanceEvents() {
+  const sel = document.getElementById('attendance-event-select');
+  sel.innerHTML = '<option value="">Select Event First</option>';
+  cachedEvents.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.name;
+    opt.textContent = e.name;
+    sel.appendChild(opt);
+  });
+}
+
+function startScanner() {
+  const ev = document.getElementById('attendance-event-select').value;
+  if (!ev) return showToast('Please select an event first!', 'error');
+
+  if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+  
+  const res = document.getElementById('scan-result');
+  res.style.display = 'block';
+  res.style.background = 'var(--bg3)';
+  res.style.color = 'var(--text3)';
+  res.textContent = 'Initializing camera...';
+
+  const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+  html5QrCode.start({ facingMode: "environment" }, config, (text) => onScanSuccess(text, ev))
+    .catch(err => {
+      res.style.background = 'var(--red-bg)';
+      res.style.color = 'var(--red)';
+      res.textContent = 'Camera error: ' + err;
+    });
+}
+
+function stopScanner() {
+  if (html5QrCode && html5QrCode.isScanning) {
+    html5QrCode.stop().then(() => {
+      document.getElementById('scan-result').style.display = 'none';
+    });
+  }
+}
+
+async function onScanSuccess(decodedText, eventName) {
+  const res = document.getElementById('scan-result');
+  res.style.background = 'var(--blue-bg)';
+  res.style.color = 'var(--blue)';
+  res.textContent = `Verifying: ${decodedText}...`;
+
+  try {
+    const data = await apiWrite('markAttendance', { eventName, operativeId: decodedText });
+    if (data.success) {
+      res.style.background = 'var(--green-bg)';
+      res.style.color = 'var(--green)';
+      res.textContent = `✅ ${data.message}`;
+      if (navigator.vibrate) navigator.vibrate(100);
+    } else {
+      res.style.background = 'var(--red-bg)';
+      res.style.color = 'var(--red)';
+      res.textContent = `❌ ${data.message}`;
+    }
+  } catch(e) {
+    res.style.background = 'var(--red-bg)';
+    res.style.color = 'var(--red)';
+    res.textContent = 'Network error.';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  OVERVIEW
+// ══════════════════════════════════════════════════════════════
+async function loadOverview() {
+  try {
+    const [membersData, eventsData, resourcesData] = await Promise.all([
+      apiGet('adminMembers'), apiGet('events'), apiGet('resources')
+    ]);
+    const members = membersData.members || [];
+    const pending = members.filter(m => (m.status||'').toLowerCase().includes('pending')).length;
+    document.getElementById('statMembers').textContent = members.length;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statEvents').textContent = (eventsData.events || []).length;
+    document.getElementById('statResources').textContent = (resourcesData.resources || []).length;
+  } catch(e) { console.error(e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MEMBERS
+// ══════════════════════════════════════════════════════════════
+async function loadMembers() {
+  document.getElementById('membersLoading').style.display = 'flex';
+  document.getElementById('membersTable').style.display = 'none';
+  try {
+    const data = await apiGet('adminMembers');
+    cachedMembers = data.members || [];
+    renderMembers(cachedMembers);
+  } catch(e) { showToast('Failed to load members', 'error'); }
+}
+
+function renderMembers(members) {
+  document.getElementById('membersLoading').style.display = 'none';
+  document.getElementById('membersTable').style.display = 'block';
+  const tbody = document.getElementById('membersBody');
+  tbody.innerHTML = members.map(m => `
+    <tr>
+      <td><strong style="color:var(--accent2)">${escHtml(m.operativeId)}</strong></td>
+      <td style="color:var(--text)">${escHtml(m.name)}</td>
+      <td>${escHtml(m.email)}</td>
+      <td>${escHtml(m.phone)}</td>
+      <td>${statusBadge(m.status)}</td>
+      <td>
+        <div class="btn-actions">
+          ${!(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.rowIndex},'Confirmed ')">✓ Approve</button>` : ''}
+          ${(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterMembers(q) {
+  q = q.toLowerCase();
+  renderMembers(cachedMembers.filter(m =>
+    (m.name||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q) || (m.operativeId||'').toLowerCase().includes(q)
+  ));
+}
+
+async function updateStatus(rowIndex, status) {
+  try {
+    const data = await apiWrite('updateStatus', { rowIndex, status });
+    if (data.success) { showToast(data.message); loadMembers(); loadOverview(); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════════════════════════
+async function loadEvents() {
+  document.getElementById('eventsLoading').style.display = 'flex';
+  document.getElementById('eventsGrid').innerHTML = '';
+  try {
+    const data = await apiGet('events');
+    cachedEvents = (data.events || []).map((ev, i) => ({ ...ev, rowIndex: i + 2 }));
+    renderEventCards();
+  } catch(e) { showToast('Failed to load events', 'error'); }
+}
+
+function renderEventCards() {
+  document.getElementById('eventsLoading').style.display = 'none';
+  const grid = document.getElementById('eventsGrid');
+  grid.innerHTML = cachedEvents.map((ev, i) => `
+    <div class="admin-card">
+      <div class="card-meta">
+        <span class="meta-tag">${escHtml(ev.date)}</span>
+        <span class="meta-tag">${escHtml(ev.type)}</span>
+        <span class="meta-tag">${escHtml(ev.mode)}</span>
+        <span class="meta-tag" style="background:${(ev.status||'').toLowerCase().includes('upcoming')?'var(--blue-bg)':'var(--green-bg)'};color:${(ev.status||'').toLowerCase().includes('upcoming')?'var(--blue)':'var(--green)'}">${escHtml(ev.status)}</span>
+        ${ev.requiresReg === 'yes' ? `<span class="meta-tag" style="background:rgba(255,107,0,0.1);color:#ff6b00">Reg Req (₹${ev.regFee || 0})</span>` : ''}
+      </div>
+      <h3>${escHtml(ev.name)}</h3>
+      <p>${escHtml(ev.description||'').slice(0,120)}${(ev.description||'').length>120?'...':''}</p>
+      <div class="btn-actions">
+        ${ev.requiresReg === 'yes' ? `<button class="btn-sm" style="background:rgba(255,107,0,0.1);color:#ff6b00;border:1px solid rgba(255,107,0,0.2)" onclick="viewEventRegs('${escHtml(ev.name)}')">📋 Registrations</button>` : ''}
+        <button class="btn-sm btn-edit" onclick="editEvent(${i})">✎ Edit</button>
+        <button class="btn-sm btn-delete" onclick="deleteEvent(${ev.rowIndex})">✕ Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editEvent(i) {
+  editingIndex = cachedEvents[i].rowIndex;
+  openModal('event', cachedEvents[i]);
+}
+
+async function viewEventRegs(eventName) {
+  const grid = document.getElementById('eventsGrid');
+  grid.innerHTML = '<div class="loading-state" style="display:flex"><div class="spinner"></div><p>Loading registrations...</p></div>';
+  try {
+    const data = await apiWrite('getEventRegs', { eventName });
+    const regs = data.registrations || [];
+    let html = `<div style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
+      <button class="btn-sm" onclick="loadEvents()" style="background:var(--bg);border:1px solid var(--border);color:var(--text)">← Back</button>
+      <h3 style="color:var(--text);margin:0">Registrations: ${escHtml(eventName)} (${regs.length})</h3>
+    </div>`;
+    if (regs.length === 0) {
+      html += '<p style="color:var(--text-muted);text-align:center;padding:40px">No registrations yet.</p>';
+    } else {
+      html += '<div style="overflow-x:auto"><table class="data-table" style="width:100%"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Dept</th><th>Fee</th><th>UTR</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      regs.forEach(r => {
+        const isPending = (r.status||'').toLowerCase().includes('pending');
+        const isConfirmed = (r.status||'').toLowerCase().includes('confirmed');
+        html += `<tr>
+          <td style="color:var(--text)">${escHtml(r.name)}</td>
+          <td>${escHtml(r.email)}</td>
+          <td>${escHtml(r.phone)}</td>
+          <td>${escHtml(r.roleYear)}</td>
+          <td>${escHtml(r.department)}</td>
+          <td>${r.fee ? '₹'+r.fee : 'Free'}</td>
+          <td style="font-family:monospace;font-size:11px">${escHtml(r.utr||'-')}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td><div class="btn-actions">
+            ${isPending ? `<button class="btn-sm btn-approve" onclick="confirmReg('${escHtml(eventName)}',${r.rowIndex},'${escHtml(r.email)}','${escHtml(r.name)}')">✓</button>` : ''}
+            ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="rejectReg('${escHtml(eventName)}',${r.rowIndex})">↩</button>` : ''}
+          </div></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    grid.innerHTML = html;
+  } catch(e) { showToast('Failed to load registrations', 'error'); loadEvents(); }
+}
+
+async function confirmReg(eventName, rowIndex, email, name) {
+  try {
+    const data = await apiWrite('updateRegStatus', { eventName, rowIndex, status: 'Confirmed', email, registrantName: name });
+    if (data.success) { showToast('✅ Confirmed & email sent!'); viewEventRegs(eventName); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+async function rejectReg(eventName, rowIndex) {
+  try {
+    const data = await apiWrite('updateRegStatus', { eventName, rowIndex, status: 'Pending' });
+    if (data.success) { showToast('Reverted to Pending'); viewEventRegs(eventName); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+async function deleteEvent(rowIndex) {
+  if (!confirm('Delete this event?')) return;
+  try {
+    const data = await apiWrite('deleteEvent', { rowIndex });
+    if (data.success) { showToast('Event deleted'); loadEvents(); loadOverview(); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RESOURCES
+// ══════════════════════════════════════════════════════════════
+async function loadResources() {
+  document.getElementById('resourcesLoading').style.display = 'flex';
+  document.getElementById('resourcesTable').style.display = 'none';
+  try {
+    const data = await apiGet('resources');
+    cachedResources = (data.resources || []).map((r, i) => ({ ...r, rowIndex: i + 2 }));
+    renderResources();
+  } catch(e) { showToast('Failed to load resources', 'error'); }
+}
+
+function renderResources() {
+  document.getElementById('resourcesLoading').style.display = 'none';
+  document.getElementById('resourcesTable').style.display = 'block';
+  const tbody = document.getElementById('resourcesBody');
+  tbody.innerHTML = cachedResources.map((r, i) => `
+    <tr>
+      <td><span class="meta-tag">${escHtml(r.stack)}</span></td>
+      <td style="color:var(--text)">${escHtml(r.title)}</td>
+      <td>${escHtml(r.category)}</td>
+      <td><a href="${escHtml(r.link)}" target="_blank" style="color:var(--accent2);text-decoration:none;font-size:12px">Open →</a></td>
+      <td>
+        <div class="btn-actions">
+          <button class="btn-sm btn-edit" onclick="editResource(${i})">✎</button>
+          <button class="btn-sm btn-delete" onclick="deleteResource(${r.rowIndex})">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function editResource(i) {
+  editingIndex = cachedResources[i].rowIndex;
+  openModal('resource', cachedResources[i]);
+}
+
+async function deleteResource(rowIndex) {
+  if (!confirm('Delete this resource?')) return;
+  try {
+    const data = await apiWrite('deleteResource', { rowIndex });
+    if (data.success) { showToast('Resource deleted'); loadResources(); loadOverview(); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TEAM
+// ══════════════════════════════════════════════════════════════
+async function loadTeam() {
+  document.getElementById('teamLoading').style.display = 'flex';
+  document.getElementById('teamGrid').innerHTML = '';
+  try {
+    const data = await apiGet('team');
+    cachedTeam = (data.team || []).map((t, i) => ({ ...t, rowIndex: i + 2 }));
+    renderTeamCards();
+  } catch(e) { showToast('Failed to load team', 'error'); }
+}
+
+function renderTeamCards() {
+  document.getElementById('teamLoading').style.display = 'none';
+  const grid = document.getElementById('teamGrid');
+  grid.innerHTML = cachedTeam.map((t, i) => `
+    <div class="admin-card" style="display:flex;gap:14px;align-items:flex-start">
+      <div style="width:48px;height:48px;border-radius:12px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--accent2);flex-shrink:0;overflow:hidden">
+        ${t.avatar ? `<img src="${escHtml(t.avatar)}" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='${escHtml((t.name||'?')[0])}'">` : escHtml((t.name||'?')[0])}
+      </div>
+      <div style="flex:1;min-width:0">
+        <h3 style="font-size:14px">${escHtml(t.name)}</h3>
+        <p style="margin-bottom:4px;color:var(--accent2);font-size:12px;font-weight:600">${escHtml(t.role)}</p>
+        <p style="font-size:11px">${escHtml((t.bio||'').slice(0,80))}</p>
+        <div class="btn-actions" style="margin-top:8px">
+          <button class="btn-sm btn-edit" onclick="editTeam(${i})">✎ Edit</button>
+          <button class="btn-sm btn-delete" onclick="deleteTeam(${t.rowIndex})">✕ Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editTeam(i) {
+  editingIndex = cachedTeam[i].rowIndex;
+  openModal('team', cachedTeam[i]);
+}
+
+async function deleteTeam(rowIndex) {
+  if (!confirm('Remove this team member?')) return;
+  try {
+    const data = await apiWrite('deleteTeam', { rowIndex });
+    if (data.success) { showToast('Team member removed'); loadTeam(); }
+    else showToast(data.message, 'error');
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAL SYSTEM
+// ══════════════════════════════════════════════════════════════
+const modalConfigs = {
+  event: {
+    title: 'Event',
+    fields: [
+      { key:'date', label:'Date', placeholder:'e.g. 25/4/2026' },
+      { key:'name', label:'Event Name', placeholder:'e.g. Hack Fusion 2026' },
+      { key:'type', label:'Type', placeholder:'e.g. Hackathon, Workshop' },
+      { key:'mode', label:'Mode', placeholder:'Online / Offline / Hybrid' },
+      { key:'description', label:'Description (supports formatting)', placeholder:'Use **bold**, *italic*, - bullets, ## headings, --- for divider. Press Enter for new lines.', textarea:true },
+      { key:'eventStatus', label:'Status', placeholder:'Upcoming / Live / Completed' },
+      { key:'requiresReg', label:'Requires Registration?', type:'checkbox' },
+      { key:'regFee', label:'Registration Fee (₹)', placeholder:'0 for free', type:'number' },
+      { key:'photos', label:'Photos (comma-separated URLs)', placeholder:'https://drive.google.com/...', textarea:true },
+      { key:'report', label:'Report Link', placeholder:'Google Doc / PDF URL' }
+    ]
+  },
+  resource: {
+    title: 'Resource',
+    fields: [
+      { key:'stack', label:'Stack', placeholder:'e.g. Python, JavaScript' },
+      { key:'title', label:'Title', placeholder:'Resource title' },
+      { key:'category', label:'Category', placeholder:'e.g. Tutorial, Documentation' },
+      { key:'link', label:'Link', placeholder:'https://...' },
+      { key:'description', label:'Description', placeholder:'Brief description', textarea:true }
+    ]
+  },
+  team: {
+    title: 'Team Member',
+    fields: [
+      { key:'name', label:'Name', placeholder:'Full name' },
+      { key:'role', label:'Role', placeholder:'e.g. President, CTO' },
+      { key:'bio', label:'Bio', placeholder:'Short bio...', textarea:true },
+      { key:'avatar', label:'Avatar URL', placeholder:'Image URL (optional)' }
+    ]
+  }
+};
+
+function openModal(type, prefill) {
+  currentModal = type;
+  if (!prefill) editingIndex = null;
+  const config = modalConfigs[type];
+  document.getElementById('modalTitle').textContent = (editingIndex ? 'Edit ' : 'Add ') + config.title;
+
+  const fieldsEl = document.getElementById('modalFields');
+  fieldsEl.innerHTML = config.fields.map(f => {
+    const val = (prefill && prefill[f.key]) || '';
+    let inputHtml = '';
+    
+    if (f.type === 'checkbox') {
+      const checked = val === 'yes' || val === true ? 'checked' : '';
+      inputHtml = `<input type="checkbox" id="mf_${f.key}" ${checked} style="width:auto;margin-top:10px">`;
+    } else if (f.textarea) {
+      const isDesc = f.key === 'description';
+      const toolbar = isDesc ? `<div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
+        <button type="button" onclick="fmtInsert('mf_${f.key}','**','**')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-weight:800;font-size:13px;cursor:pointer" title="Bold"><b>B</b></button>
+        <button type="button" onclick="fmtInsert('mf_${f.key}','*','*')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-style:italic;font-size:13px;cursor:pointer" title="Italic"><i>I</i></button>
+        <button type="button" onclick="fmtLine('mf_${f.key}','## ')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer" title="Heading">H</button>
+        <button type="button" onclick="fmtLine('mf_${f.key}','### ')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-weight:600;cursor:pointer" title="Subheading">H₂</button>
+        <button type="button" onclick="fmtLine('mf_${f.key}','- ')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer" title="Bullet Point">• List</button>
+        <button type="button" onclick="fmtInsertAt('mf_${f.key}','\\n---\\n')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer" title="Divider">― Line</button>
+      </div>` : '';
+      inputHtml = `${toolbar}<textarea id="mf_${f.key}" placeholder="${f.placeholder}" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;min-height:${isDesc ? '160' : '80'}px;resize:vertical">${escHtml(val)}</textarea>`;
+    } else {
+      inputHtml = `<input type="${f.type || 'text'}" id="mf_${f.key}" placeholder="${f.placeholder}" value="${escHtml(val)}">`;
+    }
+
+    return `
+      <div class="form-group" style="${f.type === 'checkbox' ? 'flex-direction:row;align-items:center;gap:10px' : ''}">
+        <label>${f.label}</label>
+        ${inputHtml}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentModal = null;
+  editingIndex = null;
+}
+
+async function saveModal() {
+  const config = modalConfigs[currentModal];
+  const opMap = { event: editingIndex ? 'editEvent' : 'addEvent', resource: editingIndex ? 'editResource' : 'addResource', team: editingIndex ? 'editTeam' : 'addTeam' };
+  const op = opMap[currentModal];
+  const payload = {};
+  if (editingIndex) payload.rowIndex = editingIndex;
+
+  config.fields.forEach(f => {
+    const el = document.getElementById('mf_' + f.key);
+    if (f.type === 'checkbox') {
+      payload[f.key] = el.checked ? 'yes' : '';
+    } else {
+      payload[f.key] = el ? (el.value || '') : '';
+    }
+  });
+
+  const btn = document.getElementById('modalSave');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const savedModal = currentModal;
+
+  try {
+    const data = await apiWrite(op, payload);
+    if (data.success) {
+      showToast(data.message);
+      closeModal();
+      if (savedModal === 'event') loadEvents();
+      if (savedModal === 'resource') loadResources();
+      if (savedModal === 'team') loadTeam();
+      loadOverview();
+    } else { showToast(data.message, 'error'); }
+  } catch(e) { showToast('Network error', 'error'); }
+
+  btn.disabled = false; btn.textContent = 'Save';
+}
+
+// Close modal on backdrop click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Mobile sidebar toggle
+function toggleAdminSidebar() {
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('adminOverlay').classList.toggle('active');
+}
+// Close sidebar on nav click (mobile)
+document.querySelectorAll('.sidebar-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.getElementById('adminOverlay').classList.remove('active');
+    }
+  });
+});
+</script>
+</body>
+</html>

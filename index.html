@@ -341,6 +341,55 @@
         content: '...';
       }
     }
+    /* ── Mobile Responsive ────────────────────────────────── */
+    @media (max-width: 640px) {
+      /* Tab bar: horizontal scroll */
+      .tab-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+      .tab-scroll-wrap > div { flex-wrap: nowrap; min-width: max-content; }
+      .tab-scroll-wrap .tab-btn { padding: 8px 14px; font-size: 12px; gap: 4px; white-space: nowrap; }
+      .tab-scroll-wrap .tab-btn span { display: none; }
+      .tab-scroll-wrap .tab-btn svg { width: 18px; height: 18px; }
+
+      /* Hero */
+      header .max-w-6xl { padding-left: 16px; padding-right: 16px; padding-top: 48px; padding-bottom: 48px; }
+      
+      /* Form grid: single column */
+      .form-grid-2col { grid-template-columns: 1fr !important; }
+
+      /* Partnership / footer */
+      .partner-row { flex-direction: column; gap: 16px; }
+      .partner-row img { height: 40px; }
+
+      /* Footer columns */
+      footer .grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+
+      /* Team grid */
+      .team-grid { grid-template-columns: 1fr !important; }
+
+      /* Event Modal */
+      .event-modal-box { width: 95vw !important; max-height: 90vh !important; padding: 16px !important; }
+
+      /* Section padding */
+      main .max-w-3xl { padding-left: 12px; padding-right: 12px; }
+
+      /* Stats row in hero */
+      #stats-counter-grid { gap: 16px !important; }
+      #stats-counter-grid p:first-child { font-size: 20px !important; }
+
+      /* Nav */
+      #navbar .max-w-6xl { padding-left: 12px; padding-right: 12px; }
+      #navbar .font-bold { font-size: 14px; }
+
+      /* Profile modal */
+      .p-modal-box { width: 95vw !important; padding: 16px !important; }
+    }
+
+    @media (max-width: 480px) {
+      /* Even smaller screens */
+      h1 { font-size: 28px !important; line-height: 1.15 !important; }
+      h1 .text-neutral-400 { font-size: 20px !important; }
+      .tab-scroll-wrap .tab-btn { padding: 8px 10px; }
+    }
   </style>
 </head>
 
@@ -368,6 +417,15 @@
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           registration.open
         </span>
+        <a href="community.html"
+          class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-accent-500/30 hover:-translate-y-0.5"
+          id="community-nav-btn">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          Community
+        </a>
       </div>
     </div>
   </nav>
@@ -385,7 +443,7 @@
         class="animate-fade-in inline-flex items-center gap-2 bg-white border border-neutral-200 rounded-full px-4 py-1.5 mb-8 shadow-soft">
         <span class="w-2 h-2 rounded-full bg-accent-500 animate-pulse-slow"></span>
         <span class="text-xs font-mono font-medium text-neutral-500 tracking-wide uppercase">Innovexa Hub · Est.
-          2025</span>
+          2026</span>
       </div>
 
       <h1
@@ -414,13 +472,13 @@
         </svg>
       </a>
 
-      <div class="animate-slide-up stagger-4 mt-14 grid grid-cols-3 gap-8 md:gap-16">
+      <div class="animate-slide-up stagger-4 mt-14 grid grid-cols-3 gap-8 md:gap-16" id="stats-counter-grid">
         <div class="text-center">
           <p class="text-2xl md:text-3xl font-bold text-neutral-800" id="member-count">--</p>
           <p class="text-xs font-mono text-neutral-400 mt-1">operatives</p>
         </div>
         <div class="text-center">
-          <p class="text-2xl md:text-3xl font-bold text-neutral-800">20+</p>
+          <p class="text-2xl md:text-3xl font-bold text-neutral-800" id="stat-events">0</p>
           <p class="text-xs font-mono text-neutral-400 mt-1">events.log</p>
         </div>
         <div class="text-center">
@@ -440,7 +498,7 @@
     <div class="max-w-3xl mx-auto px-6">
 
       <!-- ── Tab Navigation ──────────────────────────────── -->
-      <div class="flex items-center justify-center mb-12">
+      <div class="tab-scroll-wrap flex items-center justify-center mb-12">
         <div class="inline-flex bg-white border border-neutral-200 rounded-2xl p-1.5 shadow-soft">
           <button type="button" id="tab-register"
             class="tab-btn active flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-accent-600 cursor-pointer transition-all">
@@ -448,7 +506,15 @@
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
-            Register
+            <span>Register</span>
+          </button>
+          <button type="button" id="tab-events"
+            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>Event Log</span>
           </button>
           <button type="button" id="tab-status"
             class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
@@ -456,7 +522,15 @@
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            Check Status
+            <span>Status</span>
+          </button>
+          <button type="button" id="tab-resources"
+            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Resources</span>
           </button>
         </div>
       </div>
@@ -572,6 +646,20 @@
               <input type="date" id="dob" name="dob" required
                 class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm text-neutral-700 outline-none transition-all duration-200" />
             </div>
+
+            <!-- Professional Photo Upload -->
+            <div class="col-span-full">
+              <label class="block text-sm font-medium text-neutral-600 mb-1.5">
+                Professional Photo <span class="text-xs text-neutral-400 font-normal">(For ID Card)</span> <span class="text-red-400">*</span>
+              </label>
+              <div class="relative group">
+                <input type="file" id="photo-input" accept="image/*" class="hidden" onchange="updateFileLabel('photo-input', 'photo-label')" />
+                <label for="photo-input" id="photo-label" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neutral-200 rounded-2xl bg-surface-50/50 hover:bg-white hover:border-accent-300 transition-all cursor-pointer group">
+                  <svg class="w-8 h-8 text-neutral-400 group-hover:text-accent-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                  <span class="text-xs font-medium text-neutral-500">Tap to upload professional photo</span>
+                </label>
+              </div>
+            </div>
           </fieldset>
 
           <!-- SECTION 2: Tech Stack Interests -->
@@ -597,10 +685,10 @@
                     class="flex items-center justify-center w-6 h-6 rounded-lg bg-accent-50 text-accent-600 text-xs font-mono font-bold">03</span>
                   Registration Fee
                 </p>
-                <p class="text-xs text-neutral-400 mt-1 ml-8">One-time membership fee via UPI</p>
+                <p class="text-xs text-neutral-400 mt-1 ml-8">Yearly membership fee via UPI</p>
               </div>
               <div class="ml-8 sm:ml-0">
-                <span class="text-3xl font-bold text-neutral-800">₹1</span>
+                <span class="text-3xl font-bold text-neutral-800">₹499</span>
                 <span class="text-sm text-neutral-400 ml-1">/Year</span>
               </div>
             </div>
@@ -613,7 +701,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span>Proceed to Pay ₹1</span>
+              <span>Proceed to Pay ₹499</span>
             </button>
 
             <p class="text-center text-[11px] text-neutral-300 mt-4 flex items-center justify-center gap-1.5">
@@ -651,7 +739,7 @@
                   <h3 class="text-lg font-bold mt-0.5">Complete Payment</h3>
                 </div>
                 <div class="text-right">
-                  <p class="text-3xl font-bold">₹1</p>
+                  <p class="text-3xl font-bold">₹499</p>
                   <p class="text-xs text-white/60">Registration Fee</p>
                 </div>
               </div>
@@ -717,6 +805,20 @@
                 </details>
               </div>
 
+              <!-- Payment Proof Upload -->
+              <div>
+                <label class="block text-sm font-medium text-neutral-600 mb-1.5">
+                  Upload Payment Proof <span class="text-red-400">*</span>
+                </label>
+                <div class="relative group">
+                  <input type="file" id="payment-input" accept="image/*" class="hidden" onchange="updateFileLabel('payment-input', 'payment-label')" />
+                  <label for="payment-input" id="payment-label" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neutral-200 rounded-2xl bg-surface-50/50 hover:bg-white hover:border-accent-300 transition-all cursor-pointer group">
+                    <svg class="w-8 h-8 text-neutral-400 group-hover:text-accent-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    <span class="text-xs font-medium text-neutral-500">Upload transaction screenshot</span>
+                  </label>
+                </div>
+              </div>
+
               <!-- Submit Registration Button -->
               <button type="button" id="btn-submit-registration"
                 class="btn-deploy w-full flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm py-3.5 rounded-xl shadow-glow hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
@@ -740,6 +842,49 @@
              ═══════════════════════════════════════════════════ -->
         <div id="success-section" class="hidden view-enter"></div>
 
+      </div>
+
+      <!-- ════════════════════════════════════════════════════
+           VIEW: EVENT LOG
+           ════════════════════════════════════════════════════ -->
+      <div id="view-events" class="hidden view-enter">
+        <div class="text-center mb-12">
+          <span
+            class="inline-block font-mono text-xs text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
+            &gt;_ events.log
+          </span>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
+            Event Log
+          </h2>
+          <p class="mt-3 text-neutral-500 text-sm max-w-md mx-auto">
+            A comprehensive history of Innovexa Hub workshops, hackathons, and core network meetups.
+          </p>
+        </div>
+
+        <div id="events-loading" class="flex flex-col items-center py-12">
+          <svg class="animate-spin h-8 w-8 text-accent-500 mb-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <p class="text-sm text-neutral-400 font-mono">fetching_operative_logs...</p>
+        </div>
+
+        <div id="events-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+          <!-- Event cards will be injected here -->
+        </div>
+
+        <div id="events-empty" class="hidden flex flex-col items-center py-12 text-center">
+          <div
+            class="w-16 h-16 bg-neutral-50 rounded-2xl flex items-center justify-center mb-4 border border-neutral-100">
+            <svg class="w-8 h-8 text-neutral-300" fill="none" stroke="currentColor" stroke-width="1.5"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <p class="text-neutral-500 font-medium font-mono text-sm">No events found in the database.</p>
+          <p class="text-neutral-400 text-xs mt-1">Check back later for new mission updates.</p>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════════
@@ -798,8 +943,154 @@
         </div>
       </div>
 
+      <!-- ════════════════════════════════════════════════════
+           VIEW: RESOURCE HUB
+           ════════════════════════════════════════════════════ -->
+      <div id="view-resources" class="hidden view-enter">
+        <div class="text-center mb-12">
+          <span
+            class="inline-block font-mono text-xs text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
+            &gt;_ resources.load()
+          </span>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Tech Resource Hub</h2>
+          <p class="mt-3 text-neutral-500 text-sm max-w-md mx-auto">
+            Curated roadmaps, cheat sheets, and tools for every tech stack .
+          </p>
+        </div>
+
+        <!-- Filter Chips -->
+        <div id="resource-filters" class="flex flex-wrap gap-2 mb-8 justify-center"></div>
+
+        <!-- Loading -->
+        <div id="resources-loading" class="flex flex-col items-center py-12">
+          <svg class="animate-spin h-8 w-8 text-accent-500 mb-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <p class="text-sm text-neutral-400 font-mono">loading_resources...</p>
+        </div>
+
+        <!-- Grid -->
+        <div id="resources-container" class="grid grid-cols-1 md:grid-cols-2 gap-5 hidden"></div>
+
+        <!-- Empty -->
+        <div id="resources-empty" class="hidden text-center py-12">
+          <p class="text-neutral-500 font-mono text-sm">No resources found. Add rows to Sheet3.</p>
+        </div>
+      </div>
+
     </div>
   </main>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       CORE NETWORK TEAM SECTION
+       ════════════════════════════════════════════════════════ -->
+  <section class="py-16 bg-surface-50 border-t border-neutral-100" id="core-network-section">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <span
+          class="inline-block font-mono text-xs text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full tracking-wider uppercase mb-3">
+          &gt;_ team.config
+        </span>
+        <h2 class="text-3xl font-bold tracking-tight">Core Network</h2>
+        <p class="mt-3 text-neutral-500 text-sm max-w-md mx-auto">The operatives steering Innovexa Hub's mission.</p>
+      </div>
+      <!-- Loading -->
+      <div id="team-loading" class="flex flex-col items-center py-8">
+        <svg class="animate-spin h-7 w-7 text-accent-500 mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <p class="text-xs text-neutral-400 font-mono">loading_team...</p>
+      </div>
+      <!-- Grid -->
+      <div id="team-grid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"></div>
+      <!-- Fallback if Sheet4 empty -->
+      <div id="team-empty" class="hidden text-center py-8">
+        <p class="text-neutral-400 font-mono text-sm">Add members to Sheet4 to populate this section.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+       FAQ ACCORDION
+       ════════════════════════════════════════════════════════ -->
+  <section class="py-16 bg-white border-t border-neutral-100">
+    <div class="max-w-2xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <span
+          class="inline-block font-mono text-xs text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full tracking-wider uppercase mb-3">
+          &gt;_ faq.resolve()
+        </span>
+        <h2 class="text-3xl font-bold tracking-tight">Frequently Asked</h2>
+        <p class="mt-3 text-neutral-500 text-sm">Everything you need to know before joining.</p>
+      </div>
+      <div id="faq-list" class="space-y-3"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════
+       PARTNERED UNIVERSITY SHOWCASE
+       ════════════════════════════════════════════════════════ -->
+  <section class="py-14 bg-white border-t border-neutral-100">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-10">
+        <span
+          class="inline-block font-mono text-xs text-neutral-400 bg-neutral-50 border border-neutral-200 px-3 py-1 rounded-full tracking-wider uppercase mb-3">
+          Academic Partners
+        </span>
+        <h2 class="text-xl font-bold text-neutral-700 tracking-tight">Proudly Associated With</h2>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-6">
+
+        <!-- Yenepoya University -->
+        <a href="https://www.yenepoya.edu.in" target="_blank" rel="noopener noreferrer"
+          class="group flex flex-col items-center gap-5 bg-white border border-neutral-200 hover:border-accent-300 rounded-2xl px-10 py-8 shadow-soft hover:shadow-card transition-all duration-300 hover:-translate-y-1 max-w-xs w-full">
+          <div class="w-40 h-40 flex items-center justify-center rounded-2xl overflow-hidden bg-white p-2">
+            <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" class="w-full h-full object-contain" />
+          </div>
+          <div class="text-center">
+            <p class="text-base font-bold text-neutral-800 leading-tight group-hover:text-accent-600 transition-colors">
+              Yenepoya University</p>
+            <p class="text-xs text-neutral-400 mt-1">Deemed to be University · Bangalore</p>
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 text-xs font-medium text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full group-hover:bg-accent-100 transition-colors">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            Visit University →
+          </span>
+        </a>
+
+        <!-- Kalvium -->
+        <a href="https://kalvium.com/" target="_blank" rel="noopener noreferrer"
+          class="group flex flex-col items-center gap-5 bg-white border border-neutral-200 hover:border-accent-300 rounded-2xl px-10 py-8 shadow-soft hover:shadow-card transition-all duration-300 hover:-translate-y-1 max-w-xs w-full">
+          <div class="w-40 h-40 flex items-center justify-center rounded-2xl overflow-hidden bg-white p-4">
+            <img src="assets/kalvium-logo.png" alt="Kalvium" class="w-full h-full object-contain"
+              style="filter:contrast(1.1)" />
+          </div>
+          <div class="text-center">
+            <p class="text-base font-bold text-neutral-800 leading-tight group-hover:text-accent-600 transition-colors">
+              Kalvium</p>
+            <p class="text-xs text-neutral-400 mt-1">Associated with Yenepoya University · Bangalore</p>
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 text-xs font-medium text-accent-600 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full group-hover:bg-accent-100 transition-colors">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            Visit Kalvium →
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </section>
 
   <!-- ════════════════════════════════════════════════════════
        FOOTER
@@ -809,7 +1100,7 @@
       <div class="flex items-center gap-3">
         <img src="assets/logo.png" alt="Innovexa Hub" class="h-7 w-7 rounded-lg object-contain" />
         <span class="text-sm font-semibold text-neutral-700">Innovexa Hub</span>
-        <span class="text-xs text-neutral-300 font-mono">© 2025</span>
+        <span class="text-xs text-neutral-300 font-mono">© 2026</span>
       </div>
       <div class="flex items-center gap-6 text-xs text-neutral-400">
         <span class="font-mono">Innovexa Hub</span>
@@ -829,8 +1120,8 @@
 
     const UPI_ID = 'gpay-12200845070@okbizaxis';       // ← Your UPI ID
     const UPI_NAME = 'Jaiakash S';       // ← Payee display name
-    const FEE = 1;                  // ← Amount in ₹
-    const FEE_LABEL = '₹1';
+    const FEE = 499;                  // ← Amount in ₹
+    const FEE_LABEL = '₹499';
 
     /**
      * 📋 GOOGLE APPS SCRIPT WEB APP URL
@@ -844,7 +1135,10 @@
      *    Execute as: Me | Who has access: Anyone
      * 6. Copy the URL and paste it below:
      */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdaI62hVPl6wSqUjPbEKtGSo9dptgcoFXM7WTnsH4QYssfUbTiSCsAvC2oPheYAK-E-Q/exec';  // ← 🔗 Paste URL here
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyG6lvw90hgxPYXm0Fx-Ci0qxklvec9K-PPGOMVBSZTOCNDnZiOYjGicwuBHNOIksm2/exec';  // ← 🔗 Main API
+
+    // Event Registration API (Code1.gs — separate deployment)
+    const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrgutbhHdHkoeRPuK89okkH4urhmUVIB78Ai_CQke9bAHL7jPwxKybFYT9u137KfU/exec';
 
     // ═══════════════════════════════════════════════════════════
     //  FETCH LIVE MEMBER COUNT FROM GOOGLE SHEETS
@@ -887,26 +1181,435 @@
     // ═══════════════════════════════════════════════════════════
 
     const tabRegister = document.getElementById('tab-register');
+    const tabEvents = document.getElementById('tab-events');
     const tabStatus = document.getElementById('tab-status');
+    const tabResources = document.getElementById('tab-resources');
     const viewRegister = document.getElementById('view-register');
+    const viewEvents = document.getElementById('view-events');
     const viewStatus = document.getElementById('view-status');
+    const viewResources = document.getElementById('view-resources');
 
     function switchTab(tab) {
+      // Remove active class from all tabs
+      [tabRegister, tabEvents, tabStatus, tabResources].forEach(t => t.classList.remove('active', 'text-accent-600'));
+      [tabRegister, tabEvents, tabStatus, tabResources].forEach(t => t.classList.add('text-neutral-400'));
+
+      // Hide all views
+      [viewRegister, viewEvents, viewStatus, viewResources].forEach(v => v.classList.add('hidden'));
+
       if (tab === 'register') {
-        tabRegister.classList.add('active');
-        tabStatus.classList.remove('active');
+        tabRegister.classList.add('active', 'text-accent-600');
+        tabRegister.classList.remove('text-neutral-400');
         viewRegister.classList.remove('hidden');
-        viewStatus.classList.add('hidden');
-      } else {
-        tabStatus.classList.add('active');
-        tabRegister.classList.remove('active');
+      } else if (tab === 'events') {
+        tabEvents.classList.add('active', 'text-accent-600');
+        tabEvents.classList.remove('text-neutral-400');
+        viewEvents.classList.remove('hidden');
+        fetchEvents();
+      } else if (tab === 'status') {
+        tabStatus.classList.add('active', 'text-accent-600');
+        tabStatus.classList.remove('text-neutral-400');
         viewStatus.classList.remove('hidden');
-        viewRegister.classList.add('hidden');
+      } else if (tab === 'resources') {
+        tabResources.classList.add('active', 'text-accent-600');
+        tabResources.classList.remove('text-neutral-400');
+        viewResources.classList.remove('hidden');
+        fetchResources();
+      }
+
+      // Update URL hash for deep linking (shareable URLs)
+      if (tab !== 'register') {
+        history.replaceState(null, '', '#' + tab);
+      } else {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
       }
     }
 
     tabRegister.addEventListener('click', () => switchTab('register'));
+    tabEvents.addEventListener('click', () => switchTab('events'));
     tabStatus.addEventListener('click', () => switchTab('status'));
+    tabResources.addEventListener('click', () => switchTab('resources'));
+
+    // Deep linking: check URL hash on page load and switch to that tab
+    (function initHashRouting() {
+      const hash = window.location.hash.replace('#', '');
+      if (['events', 'status', 'resources'].includes(hash)) {
+        switchTab(hash);
+        // Scroll to the main section after a short delay
+        setTimeout(() => {
+          const main = document.getElementById('main-section');
+          if (main) main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+      }
+    })();
+
+    // ═══════════════════════════════════════════════════════════
+    //  EVENT LOG FETCHING
+    // ═══════════════════════════════════════════════════════════
+
+    async function fetchEvents() {
+      const container = document.getElementById('events-container');
+      const loading = document.getElementById('events-loading');
+      const empty = document.getElementById('events-empty');
+
+      if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+        loading.classList.add('hidden');
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${EVENT_REG_SCRIPT_URL}?action=events`, { method: 'GET', redirect: 'follow' });
+        const data = await response.json();
+
+        loading.classList.add('hidden');
+
+        if (data.success && data.events && data.events.length > 0) {
+          renderEvents(data.events);
+          container.classList.remove('hidden');
+          empty.classList.add('hidden');
+          checkEventHash(); // Auto-open event from URL hash
+        } else {
+          container.classList.add('hidden');
+          empty.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+        loading.classList.add('hidden');
+        empty.classList.remove('hidden');
+      }
+    }
+
+    // All events cache for modal
+    let _allEvents = [];
+
+    // Format description text with basic markdown support
+    function formatDescription(text) {
+      if (!text) return '<span class="text-neutral-400 italic">No description available.</span>';
+      let html = text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')  // escape HTML
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')                     // **bold**
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')                                 // *italic*
+        .replace(/^### (.+)$/gm, '<h5 class="font-bold text-neutral-800 text-sm mt-3 mb-1">$1</h5>')  // ### heading
+        .replace(/^## (.+)$/gm, '<h4 class="font-bold text-neutral-800 text-base mt-4 mb-1">$1</h4>') // ## heading
+        .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-neutral-600 text-sm">$1</li>')          // - bullet
+        .replace(/^• (.+)$/gm, '<li class="ml-4 list-disc text-neutral-600 text-sm">$1</li>')          // • bullet
+        .replace(/---/g, '<hr class="my-3 border-neutral-200">')               // --- rule
+        .replace(/\n/g, '<br>');                                               // newlines
+      // Wrap consecutive <li> in <ul>
+      html = html.replace(/(<li[^>]*>.*?<\/li>(<br>)?)+/g, m => '<ul class="my-2 space-y-1">' + m.replace(/<br>/g, '') + '</ul>');
+      return html;
+    }
+
+    function renderEvents(events) {
+      _allEvents = events;
+      const container = document.getElementById('events-container');
+      container.innerHTML = '';
+
+      events.forEach((event, idx) => {
+        const dateStr = event.date || 'TBD';
+        const status = (event.status || '').toLowerCase();
+        const hasPhotos = (event.photos || '').trim().length > 0;
+        const hasReport = (event.report || '').trim().length > 0;
+        const isRegistrable = event.requiresReg === 'yes' && (status.includes('upcoming') || status.includes('live'));
+
+        let statusCls = 'bg-neutral-100 text-neutral-500';
+        let statusLabel = 'Completed';
+        if (status.includes('live')) { statusCls = 'bg-emerald-100 text-emerald-600 animate-pulse'; statusLabel = 'Live'; }
+        if (status.includes('upcoming')) { statusCls = 'bg-blue-100 text-blue-600'; statusLabel = 'Upcoming'; }
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl border border-neutral-200/70 p-5 shadow-soft hover:shadow-card transition-all duration-300 group cursor-pointer hover:-translate-y-0.5';
+        card.onclick = () => openEventModal(idx);
+        card.innerHTML = `
+           <div class="flex justify-between items-start mb-3">
+             <span class="font-mono text-[11px] text-neutral-400">${dateStr}</span>
+             <div class="flex items-center gap-2">
+               ${isRegistrable ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent-100 text-accent-600">Register →</span>` : ''}
+               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusCls}">${statusLabel}</span>
+             </div>
+           </div>
+           <h3 class="text-lg font-bold text-neutral-800 mb-1 group-hover:text-accent-600 transition-colors">${event.name}</h3>
+           <div class="flex items-center gap-2 mb-3">
+             ${event.type ? `<span class="text-[10px] font-mono font-bold text-neutral-400 bg-neutral-50 px-2 py-0.5 rounded-md border border-neutral-100">${event.type}</span>` : ''}
+             ${event.mode ? `<span class="text-[10px] font-mono font-bold text-neutral-400 bg-neutral-50 px-2 py-0.5 rounded-md border border-neutral-100">${event.mode}</span>` : ''}
+           </div>
+           <p class="text-sm text-neutral-500 leading-relaxed line-clamp-2 mb-3">${event.description}</p>
+           <div class="flex items-center gap-3 pt-3 border-t border-neutral-100">
+             ${hasPhotos ? '<span class="inline-flex items-center gap-1 text-[11px] font-medium text-violet-600"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 15l-5-5L5 21"/></svg> Photos</span>' : ''}
+             ${hasReport ? '<span class="inline-flex items-center gap-1 text-[11px] font-medium text-accent-600"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> Report</span>' : ''}
+             <span class="ml-auto text-[11px] text-neutral-300 group-hover:text-accent-400 transition-colors font-medium">View details →</span>
+           </div>
+         `;
+        container.appendChild(card);
+      });
+    }
+
+    function openEventModal(idx) {
+      const event = _allEvents[idx];
+      if (!event) return;
+      const status = (event.status || '').toLowerCase();
+      let statusCls = 'bg-neutral-100 text-neutral-500';
+      let statusLabel = 'Completed';
+      if (status.includes('live')) { statusCls = 'bg-emerald-100 text-emerald-600'; statusLabel = '🟢 Live'; }
+      if (status.includes('upcoming')) { statusCls = 'bg-blue-100 text-blue-600'; statusLabel = '🔵 Upcoming'; }
+
+      document.getElementById('eModal-badges').innerHTML = `
+        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusCls}">${statusLabel}</span>
+        ${event.type ? `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-500 uppercase tracking-wider">${event.type}</span>` : ''}
+        ${event.mode ? `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-500 uppercase tracking-wider">${event.mode}</span>` : ''}
+      `;
+      document.getElementById('eModal-title').textContent = event.name || 'Event';
+      document.getElementById('eModal-date').textContent = event.date || '';
+      document.getElementById('eModal-desc').innerHTML = formatDescription(event.description);
+
+      const reportWrap = document.getElementById('eModal-report-wrap');
+      const reportBody = document.getElementById('eModal-report-body');
+      const reportLinkWrap = document.getElementById('eModal-report-link-wrap');
+      const reportLink = document.getElementById('eModal-report-link');
+      const reportLoading = document.getElementById('eModal-report-loading');
+
+      // Reset state
+      reportBody.classList.add('hidden');
+      reportLinkWrap.classList.add('hidden');
+      reportLoading.classList.add('hidden');
+
+      if (event.report && event.report.trim()) {
+        const txt = event.report.trim();
+        const isUrl = /^https?:\/\//i.test(txt);
+
+        reportWrap.classList.remove('hidden');
+        if (isUrl) {
+          // All URLs (Google Docs, PDFs, Drive) → just open in new tab
+          reportLinkWrap.classList.remove('hidden');
+          reportLink.href = txt;
+        } else {
+          // Plain text report — display directly
+          reportBody.textContent = txt;
+          reportBody.classList.remove('hidden');
+        }
+      } else {
+        reportWrap.classList.add('hidden');
+      }
+
+      // Auto-convert Google Drive share links to embeddable image URLs
+      function toDriveImg(url) {
+        url = url.trim();
+        let m = url.match(/\/file\/d\/([^/?#]+)/);
+        if (m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+        m = url.match(/[?&]id=([^&]+)/);
+        if (m) return 'https://lh3.googleusercontent.com/d/' + m[1];
+        return url;
+      }
+
+      const photosWrap = document.getElementById('eModal-photos-wrap');
+      const photosGrid = document.getElementById('eModal-photos-grid');
+      photosGrid.innerHTML = '';
+      if (event.photos && event.photos.trim()) {
+        const rawUrls = event.photos.split(',').map(u => u.trim()).filter(Boolean);
+        rawUrls.forEach(rawUrl => {
+          const imgUrl = toDriveImg(rawUrl);
+          const fig = document.createElement('div');
+          fig.className = 'rounded-xl overflow-hidden bg-neutral-100 aspect-square relative group/photo';
+          const img = document.createElement('img');
+          img.src = imgUrl;
+          img.alt = 'Event photo';
+          img.loading = 'lazy';
+          img.className = 'w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in';
+          img.onclick = () => window.open(imgUrl, '_blank');
+          img.onerror = function () {
+            this.parentElement.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-neutral-400 text-xs p-2 text-center"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="mt-1">Unable to load</span></div>';
+          };
+          fig.appendChild(img);
+          photosGrid.appendChild(fig);
+        });
+        photosWrap.classList.remove('hidden');
+      } else {
+        photosWrap.classList.add('hidden');
+      }
+
+      // Show/hide register CTA
+      const regCta = document.getElementById('eModal-reg-cta');
+      const isRegistrable = event.requiresReg === 'yes' && (status.includes('upcoming') || status.includes('live'));
+      if (isRegistrable) {
+        const fee = parseFloat(event.regFee || '0');
+        document.getElementById('eModal-fee-label').textContent = fee > 0 ? `₹${fee} registration fee` : 'Free';
+        document.getElementById('eModal-reg-btn').onclick = () => openEventRegModal(event);
+        regCta.classList.remove('hidden');
+      } else {
+        regCta.classList.add('hidden');
+      }
+
+      const modal = document.getElementById('eventModal');
+      modal.classList.remove('hidden');
+      document.getElementById('eventModalBox').scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+
+      // Update URL hash for shareable link
+      const slug = encodeURIComponent((event.name || '').trim());
+      history.replaceState(null, '', '#event=' + slug);
+
+      // Share button
+      document.getElementById('eModal-share-btn').onclick = () => {
+        const shareUrl = window.location.origin + window.location.pathname + '#event=' + slug;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          showToast('🔗 Event link copied!', 'success');
+        }).catch(() => {
+          prompt('Copy this link:', shareUrl);
+        });
+      };
+    }
+
+    function closeEventModal() {
+      document.getElementById('eventModal').classList.add('hidden');
+      document.body.style.overflow = '';
+      history.replaceState(null, '', window.location.pathname);
+    }
+
+    // Auto-open event from URL hash on page load
+    function checkEventHash() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#event=') && _allEvents.length > 0) {
+        const target = decodeURIComponent(hash.replace('#event=', '')).toLowerCase();
+        const idx = _allEvents.findIndex(e => (e.name || '').trim().toLowerCase() === target);
+        if (idx >= 0) {
+          openEventModal(idx);
+        }
+      }
+    }
+
+    // On page load, if URL has #event=, switch to events tab (which triggers fetchEvents → checkEventHash)
+    if (window.location.hash.startsWith('#event=')) {
+      switchTab('events');
+    }
+
+    // ─── Event Registration Modal ────────────────────────────────
+    let _currentRegEvent = null;
+
+    function openEventRegModal(event) {
+      _currentRegEvent = event;
+      const fee = parseFloat(event.regFee || '0');
+
+      document.getElementById('evReg-title').textContent = event.name;
+      const feeBadge = document.getElementById('evReg-fee-badge');
+      if (fee > 0) {
+        feeBadge.textContent = `₹${fee} Registration Fee`;
+        feeBadge.classList.remove('hidden');
+      } else {
+        feeBadge.textContent = 'Free';
+        feeBadge.classList.remove('hidden');
+      }
+
+      // Reset fields
+      ['evReg-name','evReg-email','evReg-phone','evReg-dept','evReg-utr'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('evReg-roleYear').value = '';
+      document.getElementById('evReg-error').classList.add('hidden');
+
+      // Show/hide payment section
+      const paySection = document.getElementById('evReg-payment-section');
+      if (fee > 0) {
+        document.getElementById('evReg-amount-label').textContent = `₹${fee}`;
+        document.getElementById('evReg-upi-id').textContent = UPI_ID;
+        // Generate QR for event payment
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${fee}&cu=INR&tn=${encodeURIComponent(event.name + ' Registration')}`;
+        document.getElementById('evReg-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+        paySection.classList.remove('hidden');
+      } else {
+        paySection.classList.add('hidden');
+      }
+
+      document.getElementById('eventRegModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+
+      // Copy UPI btn
+      document.getElementById('evReg-copy-btn').onclick = () => {
+        navigator.clipboard.writeText(UPI_ID).then(() => {
+          showToast('UPI ID copied!', 'success');
+          document.getElementById('evReg-copy-btn').textContent = 'Copied!';
+          setTimeout(() => { document.getElementById('evReg-copy-btn').textContent = 'Copy'; }, 2000);
+        });
+      };
+
+      // Submit handler
+      document.getElementById('evReg-submit-btn').onclick = async () => {
+        const btn = document.getElementById('evReg-submit-btn');
+        const errEl = document.getElementById('evReg-error');
+        errEl.classList.add('hidden');
+
+        const name = document.getElementById('evReg-name').value.trim();
+        const email = document.getElementById('evReg-email').value.trim();
+        const phone = document.getElementById('evReg-phone').value.trim();
+        const roleYear = document.getElementById('evReg-roleYear').value;
+        const dept = document.getElementById('evReg-dept').value.trim();
+        const utr = document.getElementById('evReg-utr') ? document.getElementById('evReg-utr').value.trim() : '';
+        const evFee = parseFloat(_currentRegEvent.regFee || '0');
+
+        if (!name || !email || !phone || !roleYear || !dept) {
+          errEl.textContent = 'Please fill all required fields.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          errEl.textContent = 'Please enter a valid email address.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (!/^\d{10}$/.test(phone)) {
+          errEl.textContent = 'Phone must be a 10-digit number.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        if (evFee > 0 && !utr) {
+          errEl.textContent = 'Please enter your UTR / Transaction ID after payment.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+
+        btn.disabled = true;
+        document.getElementById('evReg-submit-text').classList.add('hidden');
+        document.getElementById('evReg-spinner').classList.remove('hidden');
+
+        try {
+          const payload = {
+            action: 'eventRegister',
+            eventName: _currentRegEvent.name,
+            name, email, phone, roleYear, dept,
+            fee: evFee > 0 ? String(evFee) : '0',
+            utr: utr || ''
+          };
+          const res = await fetch(EVENT_REG_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            redirect: 'follow'
+          });
+          const json = await res.json();
+          if (json.success) {
+            closeEventRegModal();
+            showToast('✅ Registered successfully! We\'ll confirm soon.', 'success');
+          } else {
+            errEl.textContent = json.message || 'Registration failed. Please try again.';
+            errEl.classList.remove('hidden');
+          }
+        } catch (err) {
+          errEl.textContent = 'Network error. Please check your connection.';
+          errEl.classList.remove('hidden');
+        }
+
+        btn.disabled = false;
+        document.getElementById('evReg-submit-text').classList.remove('hidden');
+        document.getElementById('evReg-spinner').classList.add('hidden');
+      };
+    }
+
+    function closeEventRegModal() {
+      document.getElementById('eventRegModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEventModal(); closeEventRegModal(); } });
 
     // ═══════════════════════════════════════════════════════════
     //  TECH STACK INTEREST CHIPS
@@ -986,6 +1689,9 @@
       if (!skillLevel) { showToast('Please select your tech skill level.', 'error'); focusField('skill-level'); return null; }
       if (!dob) { showToast('Please enter your date of birth.', 'error'); focusField('dob'); return null; }
       if (selectedInterests.size === 0) { showToast('Please select at least one tech interest.', 'error'); return null; }
+
+      const photoFile = document.getElementById('photo-input').files[0];
+      if (!photoFile) { showToast('Please upload your professional photo.', 'error'); return null; }
 
       return { fullName, email, phone, year, branch, skillLevel, dob, interests };
     }
@@ -1086,6 +1792,30 @@
       return { valid: true, cleaned };
     }
 
+    // Helper to read file as Base64
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // File Label Helper
+    function updateFileLabel(inputId, labelId) {
+      const file = document.getElementById(inputId).files[0];
+      const label = document.getElementById(labelId);
+      if (file) {
+        label.innerHTML = `
+          <div class="flex items-center gap-2 text-accent-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="text-xs font-bold">${file.name}</span>
+          </div>
+        `;
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════
     //  SUBMIT REGISTRATION → POST TO GOOGLE APPS SCRIPT
     // ═══════════════════════════════════════════════════════════
@@ -1104,29 +1834,46 @@
         setTimeout(() => utrInput.classList.remove('!border-red-400'), 2500);
         return;
       }
-      utrError.classList.add('hidden');
+      // Check Payment Proof
+      const paymentFile = document.getElementById('payment-input').files[0];
+      if (!paymentFile) {
+        showToast('Please upload your payment proof screenshot.', 'error');
+        return;
+      }
 
       // Show loading state
       const btn = document.getElementById('btn-submit-registration');
       const btnText = document.getElementById('submit-btn-text');
       const spinner = document.getElementById('submit-spinner');
       btn.disabled = true;
-      btnText.textContent = 'Submitting...';
+      btnText.textContent = 'Uploading Assets...';
       spinner.classList.remove('hidden');
 
-      // Build payload
-      const payload = {
-        fullName: currentFormData.fullName,
-        email: currentFormData.email,
-        phone: currentFormData.phone,
-        year: currentFormData.year,
-        branch: currentFormData.branch,
-        skillLevel: currentFormData.skillLevel,
-        dob: currentFormData.dob,
-        interests: currentFormData.interests,
-        utr: result.cleaned,
-        amount: FEE_LABEL,
-      };
+      try {
+        // Convert files to Base64
+        const photoFile = document.getElementById('photo-input').files[0];
+        const photoBase64 = await readFileAsBase64(photoFile);
+        const paymentBase64 = await readFileAsBase64(paymentFile);
+
+        btnText.textContent = 'Submitting Data...';
+
+        // Build payload
+        const payload = {
+          fullName: currentFormData.fullName,
+          email: currentFormData.email,
+          phone: currentFormData.phone,
+          year: currentFormData.year,
+          branch: currentFormData.branch,
+          skillLevel: currentFormData.skillLevel,
+          dob: currentFormData.dob,
+          interests: currentFormData.interests,
+          utr: result.cleaned,
+          amount: FEE_LABEL,
+          photoBase64: photoBase64,
+          photoType: photoFile.type,
+          paymentBase64: paymentBase64,
+          paymentType: paymentFile.type
+        };
 
       try {
         // POST to Google Apps Script
@@ -1307,17 +2054,58 @@
           const isConfirmed = status.includes('confirm') || status.includes('approved') || status.includes('active');
 
           if (isConfirmed) {
-            // ✅ Confirmed
+            // ✅ Confirmed — show ID card preview
+            const memberName = data.name || 'Operative';
+            const memberEmail = data.email || '';
+            const memberId = data.id || 'INVX-XX';
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${memberId}`;
+
             resultDiv.innerHTML = `
-              <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center animate-scale-in">
-                <div class="mx-auto w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-                  <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+              <div class="animate-scale-in space-y-4">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                  <p class="text-sm font-semibold text-emerald-700">✅ Registration Confirmed!</p>
+                  <p class="text-xs text-emerald-600 mt-1">Welcome to the Hub, Operative. Your access is active. 🚀</p>
                 </div>
-                <p class="text-sm font-semibold text-emerald-700 mb-1">Status: Registration Confirmed!</p>
-                <p class="text-xs text-emerald-600">Welcome to the Hub, Operative. Your access is active. 🚀</p>
-                ${data.name ? `<p class="text-xs text-emerald-500 mt-2 font-mono">operative: ${data.name}</p>` : ''}
+
+                <!-- ID CARD PREVIEW -->
+                <div class="flex flex-col items-center">
+                  <p class="text-xs font-mono text-neutral-400 mb-4">— your operative ID card —</p>
+                  <div id="id-card-preview" style="width:240px; background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3); font-family:'Inter',sans-serif; color:white;">
+                    <!-- Top accent bar -->
+                    <div style="height:5px; background:linear-gradient(90deg,#3b82f6,#6366f1);"></div>
+                    <!-- Header -->
+                    <div style="padding:16px 16px 8px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.08);">
+                      <div style="font-size:11px; font-weight:800; letter-spacing:3px; color:#94a3b8; text-transform:uppercase;">Innovexa Hub</div>
+                      <div style="font-size:8px; color:#475569; letter-spacing:1px; margin-top:2px;">OPERATIVE MEMBERSHIP CARD</div>
+                    </div>
+                    <!-- Body -->
+                    <div style="padding:14px 16px; text-align:center;">
+                      <div style="font-size:18px; font-weight:800; letter-spacing:1px; color:#f1f5f9; line-height:1.2;">${memberName.toUpperCase()}</div>
+                      <div style="font-size:9px; font-weight:600; color:#6366f1; letter-spacing:3px; margin-top:4px; text-transform:uppercase;">VERIFIED OPERATIVE</div>
+                      <!-- ID badge -->
+                      <div style="margin:12px auto; display:inline-block; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.4); border-radius:8px; padding:4px 14px;">
+                        <span style="font-family:monospace; font-size:13px; font-weight:700; color:#818cf8; letter-spacing:2px;">${memberId}</span>
+                      </div>
+                      <!-- Email -->
+                      <div style="font-size:8px; color:#64748b; margin-top:6px; word-break:break-all;">${memberEmail}</div>
+                    </div>
+                    <!-- QR Code -->
+                    <div style="padding:4px 0 14px; display:flex; justify-content:center;">
+                      <div style="background:white; padding:6px; border-radius:8px;">
+                        <img src="${qrUrl}" alt="QR" style="width:80px;height:80px;display:block;">
+                      </div>
+                    </div>
+                    <!-- Bottom bar -->
+                    <div style="height:4px; background:linear-gradient(90deg,#6366f1,#3b82f6);"></div>
+                  </div>
+                  <!-- Download button -->
+                  <button onclick="downloadIdCard()" style="margin-top:16px;" class="inline-flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-glow transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Download ID Card
+                  </button>
+                </div>
               </div>
             `;
           } else {
@@ -1379,6 +2167,119 @@
     });
 
     // ═══════════════════════════════════════════════════════════
+    //  ID CARD DOWNLOAD (Print-to-PDF)
+    // ═══════════════════════════════════════════════════════════
+    function downloadIdCard() {
+      const card = document.getElementById('id-card-preview');
+      if (!card) return;
+      const printWin = window.open('', '_blank', 'width=400,height=700');
+      printWin.document.write(`
+        <!DOCTYPE html><html><head>
+        <style>
+          body{margin:0;padding:20px;background:#f1f5f9;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+          @media print{body{background:white;padding:0;}@page{margin:10mm;}}
+        </style>
+        </head><body>
+        ${card.outerHTML}
+        <script>window.onload=function(){window.print();window.close();};<\/script>
+        </body></html>`);
+      printWin.document.close();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  RESOURCE HUB
+    // ═══════════════════════════════════════════════════════════
+    let resourcesLoaded = false;
+    let allResources = [];
+    let activeFilter = 'All';
+
+    async function fetchResources() {
+      if (resourcesLoaded) { renderResources(allResources); return; }
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=resources`, { method: 'GET', redirect: 'follow' });
+        const data = await response.json();
+        document.getElementById('resources-loading').classList.add('hidden');
+        if (data.success && data.resources && data.resources.length > 0) {
+          allResources = data.resources;
+          resourcesLoaded = true;
+          buildFilters(allResources);
+          renderResources(allResources);
+          document.getElementById('resources-container').classList.remove('hidden');
+        } else {
+          document.getElementById('resources-empty').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('resources-loading').classList.add('hidden');
+        document.getElementById('resources-empty').classList.remove('hidden');
+      }
+    }
+
+    function buildFilters(resources) {
+      const stacks = ['All', ...new Set(resources.map(r => r.stack).filter(Boolean))];
+      const filterContainer = document.getElementById('resource-filters');
+      filterContainer.innerHTML = '';
+      stacks.forEach(stack => {
+        const btn = document.createElement('button');
+        btn.textContent = stack;
+        btn.className = `px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${stack === activeFilter
+          ? 'bg-accent-500 text-white border-accent-500'
+          : 'bg-white text-neutral-500 border-neutral-200 hover:border-accent-400'
+          }`;
+        btn.onclick = () => {
+          activeFilter = stack;
+          buildFilters(allResources);
+          const filtered = stack === 'All' ? allResources : allResources.filter(r => r.stack === stack);
+          renderResources(filtered);
+        };
+        filterContainer.appendChild(btn);
+      });
+    }
+
+    function renderResources(resources) {
+      const container = document.getElementById('resources-container');
+      container.innerHTML = '';
+      const CATEGORY_ICONS = {
+        'Roadmap': '🗺️', 'Cheat Sheet': '📋', 'Tool': '🔧', 'Course': '🎓',
+        'YouTube': '▶️', 'Book': '📖', 'Article': '📰', 'GitHub': '🐙'
+      };
+      resources.forEach(res => {
+        const icon = CATEGORY_ICONS[res.category] || '🔗';
+        // Ensure the link always has a protocol prefix
+        let linkUrl = (res.link || '').trim();
+        if (linkUrl && !linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
+          linkUrl = 'https://' + linkUrl;
+        }
+        const card = document.createElement('a');
+        card.href = linkUrl || '#';
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        // Explicit click handler as fallback
+        if (linkUrl) {
+          card.onclick = (e) => {
+            e.preventDefault();
+            window.open(linkUrl, '_blank', 'noopener,noreferrer');
+          };
+        }
+        card.className = 'block bg-white rounded-2xl border border-neutral-200/70 p-5 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer';
+        card.innerHTML = `
+          <div class="flex items-start justify-between mb-3">
+            <span class="text-2xl">${icon}</span>
+            <span class="text-[10px] font-mono font-bold text-neutral-400 bg-neutral-50 border border-neutral-100 px-2 py-0.5 rounded-md">${res.stack}</span>
+          </div>
+          <h3 class="text-sm font-bold text-neutral-800 group-hover:text-accent-600 transition-colors mb-1">${res.title}</h3>
+          <p class="text-xs text-neutral-500 leading-relaxed line-clamp-2">${res.description}</p>
+          <div class="mt-3 flex items-center gap-1 text-xs text-accent-500 font-medium">
+            <span>${res.category}</span>
+            <svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
     //  SCROLL ANIMATIONS
     // ═══════════════════════════════════════════════════════════
 
@@ -1395,7 +2296,779 @@
     );
 
     document.querySelectorAll('fieldset, .bg-white.rounded-2xl').forEach((el) => observer.observe(el));
+
+    // ═══════════════════════════════════════════════════════════
+    //  ANIMATED COUNTER (count-up on scroll)
+    // ═══════════════════════════════════════════════════════════
+    function animateCount(el, target, suffix = '', duration = 1500) {
+      if (!el || el.dataset.animated === 'true') return;
+      el.dataset.animated = 'true';
+      const start = 0;
+      const startTime = performance.now();
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(eased * target) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    const statObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Events stat
+          const eventEl = document.getElementById('stat-events');
+          animateCount(eventEl, 1, '+');
+          statObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    const statsGrid = document.getElementById('stats-counter-grid');
+    if (statsGrid) statObserver.observe(statsGrid);
+
+    // Also animate member-count once it's loaded from the API
+    const origFetchCount = window.fetchMemberCount;
+
+    // ═══════════════════════════════════════════════════════════
+    //  CORE NETWORK TEAM (Sheet4)
+    //  Headers: Name | Role | LinkedIn | GitHub | Bio | Avatar
+    // ═══════════════════════════════════════════════════════════
+    async function fetchTeam() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=team`, { method: 'GET', redirect: 'follow' });
+        const data = await res.json();
+        document.getElementById('team-loading').classList.add('hidden');
+        if (data.success && data.team && data.team.length > 0) {
+          renderTeam(data.team);
+        } else {
+          document.getElementById('team-empty').classList.remove('hidden');
+        }
+      } catch (e) {
+        document.getElementById('team-loading').classList.add('hidden');
+        document.getElementById('team-empty').classList.remove('hidden');
+      }
+    }
+
+    function renderTeam(members) {
+      const grid = document.getElementById('team-grid');
+      grid.classList.remove('hidden');
+      grid.innerHTML = '';
+      members.forEach(m => {
+        const initials = (m.name || 'XX').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        const avatarHTML = m.avatar
+          ? `<img src="${m.avatar}" alt="${m.name}" class="w-full h-full object-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+             <span style="display:none" class="absolute inset-0 flex items-center justify-center text-lg font-bold text-accent-600">${initials}</span>`
+          : `<span class="text-lg font-bold text-accent-600">${initials}</span>`;
+
+        const card = document.createElement('div');
+        card.className = 'flex flex-col items-center text-center p-5 bg-white rounded-2xl border border-neutral-200/70 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-200';
+        card.innerHTML = `
+          <div class="relative w-16 h-16 rounded-full bg-accent-50 border-2 border-accent-200 flex items-center justify-center overflow-hidden mb-3">
+            ${avatarHTML}
+          </div>
+          <p class="text-sm font-bold text-neutral-800 leading-tight">${m.name || ''}</p>
+          <p class="text-[10px] text-accent-500 font-mono font-semibold uppercase tracking-wider mt-1">${m.role || ''}</p>
+          ${m.bio ? `<p class="text-[11px] text-neutral-400 mt-2 leading-snug line-clamp-2">${m.bio}</p>` : ''}
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    fetchTeam();
+
+    // ═══════════════════════════════════════════════════════════
+    //  FAQ ACCORDION
+    // ═══════════════════════════════════════════════════════════
+    const FAQS = [
+      { q: 'How long does membership verification take?', a: 'Our team manually reviews UPI payments. Verification typically takes up to 24 hours on weekdays.' },
+      { q: 'What is the membership fee?', a: 'The yearly membership fee is ₹499. Zero gateway fees, direct UPI payment.' },
+      { q: 'Can I change my tech interest after registering?', a: 'Yes! Your interests are just for community matching. Reach out to any Core Network member and we\'ll update it.' },
+      { q: 'What do I get after joining?', a: 'Access to workshops, hackathons, the resource hub, an official Innovexa Operative ID card, and the core network community.' },
+      { q: 'I lost my UTR number. How do I check my status?', a: 'You can also check your status using your registered email address in the Status tab — no UTR needed.' },
+      { q: 'Is this only for CS / IT students?', a: 'Not at all! Innovexa Hub welcomes students from all branches. We have interest groups for everyone from AI to UI/UX.' },
+    ];
+
+    const faqList = document.getElementById('faq-list');
+    FAQS.forEach((faq, i) => {
+      const item = document.createElement('div');
+      item.className = 'border border-neutral-200 rounded-xl overflow-hidden';
+      item.innerHTML = `
+        <button id="faq-btn-${i}" class="w-full flex items-center justify-between px-5 py-4 text-left bg-white hover:bg-neutral-50 transition-colors cursor-pointer" onclick="toggleFaq(${i})">
+          <span class="text-sm font-semibold text-neutral-800 pr-4">${faq.q}</span>
+          <svg id="faq-icon-${i}" class="w-4 h-4 text-neutral-400 flex-shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div id="faq-body-${i}" class="hidden px-5 pb-4 bg-white">
+          <p class="text-sm text-neutral-500 leading-relaxed border-t border-neutral-100 pt-3">${faq.a}</p>
+        </div>
+      `;
+      faqList.appendChild(item);
+    });
+
+    function toggleFaq(index) {
+      FAQS.forEach((_, i) => {
+        const body = document.getElementById(`faq-body-${i}`);
+        const icon = document.getElementById(`faq-icon-${i}`);
+        if (i === index) {
+          const isOpen = !body.classList.contains('hidden');
+          body.classList.toggle('hidden', isOpen);
+          icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        } else {
+          body.classList.add('hidden');
+          icon.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+    // ═══════════════════════════════════════════════════════════
+    //  PUBLIC MEMBER PORTFOLIO (?profile=INVX-XX)
+    // ═══════════════════════════════════════════════════════════
+    (async function checkProfileMode() {
+      const params = new URLSearchParams(window.location.search);
+      const profileId = params.get('profile');
+      if (!profileId) return;
+
+      document.body.style.background = '#050a18';
+      document.body.style.margin = '0';
+      document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#050a18;color:#64748b;font-family:'JetBrains Mono',monospace;font-size:13px;">
+        <div style="text-align:center"><div style="width:40px;height:40px;border:3px solid #1e293b;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>Initializing profile...</div></div>
+        <style>@keyframes spin{100%{transform:rotate(360deg)}}</style>`;
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=profile&id=${encodeURIComponent(profileId)}`, { method: 'GET', redirect: 'follow' });
+        const d = await res.json();
+        if (!d.success) throw new Error(d.message || 'Not found');
+
+        const name = d.name || 'Innovexa Operative';
+        const firstName = name.split(' ')[0];
+        const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+        const interests = (d.interests || '').split(',').map(s => s.trim()).filter(Boolean);
+        const skills = (d.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+        const allTags = [...new Set([...interests, ...skills])];
+        const isConfirmed = (d.status || '').toLowerCase().includes('confirmed');
+        const opId = (d.operativeId || profileId).toUpperCase();
+        const linkedinUser = d.linkedin ? d.linkedin.split('/').filter(Boolean).pop() : '';
+        const githubUser = d.github ? d.github.split('/').filter(Boolean).pop() : '';
+
+        document.body.innerHTML = `
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+          @keyframes spin{100%{transform:rotate(360deg)}}
+          @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+          @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+          @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+          *{margin:0;padding:0;box-sizing:border-box}
+          html{scroll-behavior:smooth}
+          body{font-family:'Inter',system-ui,sans-serif;background:#050a18;min-height:100vh;color:#e2e8f0;overflow-x:hidden}
+          .bg-mesh{position:fixed;inset:0;z-index:0;overflow:hidden}
+          .bg-mesh .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;animation:float 12s ease-in-out infinite}
+          .bg-mesh .orb-1{width:500px;height:500px;background:#6366f1;top:-10%;left:-5%;animation-delay:0s}
+          .bg-mesh .orb-2{width:400px;height:400px;background:#3b82f6;bottom:-10%;right:-5%;animation-delay:4s}
+          .bg-mesh .orb-3{width:300px;height:300px;background:#8b5cf6;top:40%;left:50%;animation-delay:8s}
+          .p-wrap{position:relative;z-index:1}
+          .p-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,10,24,0.85);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(99,102,241,0.1)}
+          .p-nav a{color:#94a3b8;font-size:12px;font-family:'JetBrains Mono',monospace;text-decoration:none;transition:color .2s}
+          .p-nav a:hover{color:#e2e8f0}
+          .p-nav-brand{display:flex;align-items:center;gap:8px}
+          .p-nav-dot{width:8px;height:8px;border-radius:50%;background:#6366f1;animation:pulse 2s infinite}
+          .p-main{max-width:800px;margin:0 auto;padding:80px 20px 48px}
+          .p-header{display:flex;gap:32px;align-items:flex-start;padding:32px;margin-bottom:4px;
+            background:rgba(15,23,42,0.8);backdrop-filter:blur(16px);
+            border:1px solid rgba(99,102,241,0.15);border-radius:20px;
+            animation:fadeIn .5s ease both;}
+          .p-avatar-wrap{position:relative;flex-shrink:0}
+          .p-avatar{width:110px;height:110px;border-radius:24px;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#3b82f6 100%);background-size:200% 200%;animation:gradientMove 6s ease infinite;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:white;font-family:'JetBrains Mono',monospace;overflow:hidden;box-shadow:0 20px 60px rgba(99,102,241,0.3)}
+          .p-avatar img{width:100%;height:100%;object-fit:cover}
+          .p-status-dot{position:absolute;bottom:6px;right:6px;width:18px;height:18px;border-radius:50%;border:3px solid #0f172a}
+          .p-status-active{background:#22c55e;box-shadow:0 0 8px #22c55e}
+          .p-status-pending{background:#eab308}
+          .p-meta{flex:1;padding-top:4px}
+          .p-name{font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-.02em;line-height:1.2}
+          .p-role-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+          .p-handle{font-size:13px;color:#818cf8;font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:6px}
+          .p-bio-text{font-size:14px;color:#cbd5e1;line-height:1.75;margin-top:10px;max-width:440px}
+          .p-tags-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+          .p-mini-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:6px;background:rgba(99,102,241,0.15);color:#c4b5fd;border:1px solid rgba(99,102,241,0.2);font-family:'JetBrains Mono',monospace;letter-spacing:.3px}
+          .p-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,0.15),transparent);margin:16px 0}
+          .p-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;animation:fadeIn .5s ease both;animation-delay:.15s}
+          .p-card{background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.15);border-radius:16px;padding:24px;transition:all .25s}
+          .p-card:hover{border-color:rgba(99,102,241,0.35);transform:translateY(-2px);box-shadow:0 12px 40px rgba(99,102,241,0.12)}
+          .p-card-full{grid-column:1/-1}
+          .p-card-label{font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:2px;font-family:'JetBrains Mono',monospace;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+          .p-card-label::before{content:'';width:16px;height:2px;background:linear-gradient(90deg,#6366f1,transparent);border-radius:1px}
+          .p-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(99,102,241,0.12);border-radius:12px;overflow:hidden}
+          .p-stat-item{background:rgba(9,18,36,0.95);padding:20px;text-align:center}
+          .p-stat-val{font-size:18px;font-weight:800;color:#f1f5f9;font-family:'JetBrains Mono',monospace}
+          .p-stat-lbl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;margin-top:4px}
+          .p-social-item{display:flex;align-items:center;gap:14px;padding:14px;border-radius:12px;background:rgba(5,10,24,0.6);border:1px solid rgba(99,102,241,0.08);text-decoration:none;color:#cbd5e1;transition:all .2s;cursor:pointer}
+          .p-social-item:hover{border-color:rgba(99,102,241,0.3);background:rgba(99,102,241,0.06);transform:translateX(4px)}
+          .p-social-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+          .p-social-name{font-size:13px;font-weight:600;color:#e2e8f0}
+          .p-social-handle{font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace;margin-top:2px}
+          .p-social-arrow{margin-left:auto;color:#334155;transition:color .2s}
+          .p-social-item:hover .p-social-arrow{color:#6366f1}
+          .p-skill-tags{display:flex;flex-wrap:wrap;gap:8px}
+          .p-skill{font-size:12px;font-weight:600;padding:8px 14px;border-radius:10px;background:rgba(99,102,241,0.08);color:#a5b4fc;border:1px solid rgba(99,102,241,0.12);transition:all .2s}
+          .p-skill:hover{background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.28)}
+          .p-share-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+          .p-share-url{font-size:11px;color:#94a3b8;font-family:'JetBrains Mono',monospace;word-break:break-all;background:rgba(5,10,24,0.6);padding:10px 14px;border-radius:8px;border:1px solid rgba(99,102,241,0.08);flex:1}
+          .p-qr-box{background:white;border-radius:12px;padding:8px;flex-shrink:0}
+          .p-qr-box img{width:96px;height:96px;display:block}
+          .p-edit-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;background:rgba(99,102,241,0.15);color:#c4b5fd;border:1px solid rgba(99,102,241,0.3);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
+          .p-edit-btn:hover{background:rgba(99,102,241,0.25);border-color:rgba(99,102,241,0.5);transform:translateY(-1px)}
+          .p-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;animation:fadeIn .2s ease}
+          .p-modal-box{background:#0f172a;border:1px solid rgba(99,102,241,0.2);border-radius:20px;padding:32px;width:460px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,0.7)}
+          .p-modal-title{font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:4px}
+          .p-modal-sub{font-size:12px;color:#94a3b8;margin-bottom:24px}
+          .p-field{margin-bottom:16px}
+          .p-field label{display:block;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+          .p-field input,.p-field textarea{width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(99,102,241,0.15);background:rgba(5,10,24,0.8);color:#e2e8f0;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:all .2s}
+          .p-field input:focus,.p-field textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,0.12)}
+          .p-field textarea{resize:vertical;min-height:80px}
+          .p-modal-btns{display:flex;gap:10px;margin-top:24px}
+          .p-save{flex:1;padding:12px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:none;font-weight:700;cursor:pointer;font-size:14px;transition:all .2s}
+          .p-save:hover{box-shadow:0 8px 24px rgba(99,102,241,0.4);transform:translateY(-1px)}
+          .p-cancel{padding:12px 20px;border-radius:12px;background:transparent;color:#64748b;border:1px solid rgba(100,116,139,0.2);cursor:pointer;font-size:13px;transition:all .2s}
+          .p-cancel:hover{border-color:rgba(100,116,139,0.4);color:#94a3b8}
+          .p-empty{text-align:center;padding:24px;color:#475569;font-size:12px;font-family:'JetBrains Mono',monospace}
+          .p-footer{text-align:center;padding:32px 0;font-size:10px;color:#334155;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+          .p-verify-err{color:#f87171;font-size:12px;margin-top:8px;display:none;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:8px;border:1px solid rgba(239,68,68,0.2)}
+          @media(max-width:640px){.p-header{flex-direction:column;align-items:center;text-align:center}.p-bio-text{max-width:100%}.p-tags-row{justify-content:center}.p-grid{grid-template-columns:1fr}.p-stat-grid{grid-template-columns:1fr}.p-share-row{flex-direction:column}}
+        </style>
+
+        <div class="bg-mesh"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+        <div class="p-wrap">
+          <nav class="p-nav">
+            <a href="index.html" class="p-nav-brand"><span class="p-nav-dot"></span><span>&larr; innovexa.hub</span></a>
+            <a href="index.html">innovexareg.vercel.app</a>
+          </nav>
+
+          <div class="p-main">
+            <div class="p-header">
+              <div class="p-avatar-wrap">
+                <div class="p-avatar">
+                  ${d.avatar ? `<img src="${d.avatar}" alt="${name}" onerror="this.parentElement.textContent='${initials}'">` : initials}
+                </div>
+                <div class="p-status-dot ${isConfirmed ? 'p-status-active' : 'p-status-pending'}"></div>
+              </div>
+              <div class="p-meta">
+                <h1 class="p-name">${name}</h1>
+                <p class="p-handle">@${opId.toLowerCase()}${{
+            'INVX-01': '<span class="p-role-badge" style="background:#ede9fe;color:#7c3aed">President</span>',
+            'INVX-02': '<span class="p-role-badge" style="background:#e0f2fe;color:#0369a1">CTO</span>',
+            'INVX-03': '<span class="p-role-badge" style="background:#d1fae5;color:#065f46">General Secretary</span>'
+          }[opId] || ''
+          }</p>
+                <p class="p-bio-text">${d.bio || `${firstName} is an Innovexa Hub operative and tech enthusiast based in Bangalore.`}</p>
+                <div class="p-tags-row">
+                  <span class="p-mini-tag">${opId}</span>
+                  <span class="p-mini-tag" style="${isConfirmed ? 'color:#34d399;border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.06)' : 'color:#facc15;border-color:rgba(234,179,8,0.2);background:rgba(234,179,8,0.06)'}">${isConfirmed ? '&#10003; Verified' : '&#9203; Pending'}</span>
+                  ${allTags.slice(0, 3).map(t => `<span class="p-mini-tag">${t}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+            <div class="p-divider"></div>
+            <div class="p-grid">
+              <div class="p-card p-card-full">
+                <div class="p-stat-grid">
+                  <div class="p-stat-item"><div class="p-stat-val">${opId}</div><div class="p-stat-lbl">Operative ID</div></div>
+                  <div class="p-stat-item"><div class="p-stat-val">2026</div><div class="p-stat-lbl">Member Since</div></div>
+                  <div class="p-stat-item"><div class="p-stat-val" style="color:${isConfirmed ? '#34d399' : '#facc15'}">${isConfirmed ? 'Active' : 'Pending'}</div><div class="p-stat-lbl">Status</div></div>
+                </div>
+              </div>
+              <div class="p-card">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div class="p-card-label">Connect</div>
+                  <button class="p-edit-btn" onclick="document.getElementById('verifyModal').style.display='flex'">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a2.1 2.1 0 113.001 2.948L7.5 18.795l-4 1 1-4L16.862 3.487z"/></svg>
+                    Edit
+                  </button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  ${d.linkedin ? `<a href="${d.linkedin}" target="_blank" rel="noopener" class="p-social-item">
+                    <div class="p-social-icon" style="background:rgba(10,102,194,0.08)"><svg width="18" height="18" fill="#0a66c2" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+                    <div><div class="p-social-name">LinkedIn</div><div class="p-social-handle">${linkedinUser || 'View Profile'}</div></div>
+                    <svg class="p-social-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  </a>` : ''}
+                  ${d.github ? `<a href="${d.github}" target="_blank" rel="noopener" class="p-social-item">
+                    <div class="p-social-icon" style="background:rgba(255,255,255,0.03)"><svg width="18" height="18" fill="#e2e8f0" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></div>
+                    <div><div class="p-social-name">GitHub</div><div class="p-social-handle">${githubUser || 'View Code'}</div></div>
+                    <svg class="p-social-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  </a>` : ''}
+                  ${!d.linkedin && !d.github ? '<div class="p-empty">No links yet &mdash; click Edit to add yours</div>' : ''}
+                </div>
+              </div>
+              <div class="p-card">
+                <div class="p-card-label">Skills &amp; Interests</div>
+                ${allTags.length > 0 ? `<div class="p-skill-tags">${allTags.map(t => `<span class="p-skill">${t}</span>`).join('')}</div>` : '<div class="p-empty">No skills added yet</div>'}
+              </div>
+              <div class="p-card p-card-full">
+                <div class="p-card-label">Share this profile</div>
+                <div class="p-share-row">
+                  <div class="p-share-url">${window.location.href}</div>
+                  <div class="p-qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(window.location.href)}" alt="QR" /></div>
+                </div>
+              </div>
+            </div>
+            <div class="p-footer">INNOVEXA HUB &middot; YENEPOYA UNIVERSITY &middot; BANGALORE</div>
+          </div>
+        </div>
+
+        <!-- Verify Identity Modal -->
+        <div class="p-modal" id="verifyModal" onclick="if(event.target===this)this.style.display='none'">
+          <div class="p-modal-box">
+            <h2 class="p-modal-title">Verify Your Identity</h2>
+            <p class="p-modal-sub">Enter your registered email and date of birth to edit this profile.</p>
+            <div class="p-field"><label>Registered Email</label><input type="email" id="verifyEmail" placeholder="your@email.com" /></div>
+            <div class="p-field"><label>Date of Birth</label><input type="date" id="verifyDob" /></div>
+            <p class="p-verify-err" id="verifyErr">Email or DOB does not match our records.</p>
+            <div class="p-modal-btns">
+              <button class="p-cancel" onclick="document.getElementById('verifyModal').style.display='none'">Cancel</button>
+              <button class="p-save" id="verifyBtn" onclick="verifyIdentity()">Verify &amp; Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Profile Modal (hidden until verified) -->
+        <div class="p-modal" id="editModal" onclick="if(event.target===this)this.style.display='none'">
+          <div class="p-modal-box">
+            <h2 class="p-modal-title">Edit Profile</h2>
+            <p class="p-modal-sub">Update your public operative profile.</p>
+            <div class="p-field"><label>LinkedIn URL</label><input type="url" id="editLinkedin" value="${d.linkedin || ''}" placeholder="https://linkedin.com/in/yourname" /></div>
+            <div class="p-field"><label>GitHub URL</label><input type="url" id="editGithub" value="${d.github || ''}" placeholder="https://github.com/yourname" /></div>
+            <div class="p-field"><label>Bio</label><textarea id="editBio" placeholder="A short description about yourself...">${d.bio || ''}</textarea></div>
+            <div class="p-field"><label>Avatar URL</label><input type="url" id="editAvatar" value="${d.avatar || ''}" placeholder="https://github.com/yourname.png" /></div>
+            <div class="p-field"><label>Skills (comma separated)</label><input type="text" id="editSkills" value="${d.skills || ''}" placeholder="React, Python, Machine Learning" /></div>
+            <div class="p-modal-btns">
+              <button class="p-cancel" onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+              <button class="p-save" onclick="saveProfile()">Save Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          async function verifyIdentity() {
+            const btn = document.getElementById('verifyBtn');
+            const errEl = document.getElementById('verifyErr');
+            const email = document.getElementById('verifyEmail').value.trim();
+            const dob = document.getElementById('verifyDob').value.trim();
+            errEl.style.display = 'none';
+            if (!email || !dob) { errEl.textContent = 'Please fill in both fields.'; errEl.style.display = 'block'; return; }
+            btn.textContent = 'Verifying...'; btn.disabled = true;
+            try {
+              const r = await fetch('${SCRIPT_URL}?email=' + encodeURIComponent(email), { method: 'GET', redirect: 'follow' });
+              const data = await r.json();
+              if (!data.success || !data.id) { errEl.textContent = 'Email not found in our records.'; errEl.style.display = 'block'; btn.textContent = 'Verify & Continue'; btn.disabled = false; return; }
+              if (data.id !== '${opId}') { errEl.textContent = 'This email does not belong to this profile.'; errEl.style.display = 'block'; btn.textContent = 'Verify & Continue'; btn.disabled = false; return; }
+              if (data.dob && data.dob !== dob) { errEl.textContent = 'Date of birth does not match.'; errEl.style.display = 'block'; btn.textContent = 'Verify & Continue'; btn.disabled = false; return; }
+              document.getElementById('verifyModal').style.display = 'none';
+              document.getElementById('editModal').style.display = 'flex';
+            } catch(e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; btn.textContent = 'Verify & Continue'; btn.disabled = false; }
+          }
+          async function saveProfile() {
+            const btn = document.querySelector('#editModal .p-save');
+            btn.textContent = 'Saving...'; btn.disabled = true;
+            try {
+              await fetch('${SCRIPT_URL}', {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'updateProfile', operativeId: '${opId}',
+                  linkedin: document.getElementById('editLinkedin').value.trim(),
+                  github: document.getElementById('editGithub').value.trim(),
+                  bio: document.getElementById('editBio').value.trim(),
+                  avatar: document.getElementById('editAvatar').value.trim(),
+                  skills: document.getElementById('editSkills').value.trim()
+                })
+              });
+              btn.textContent = '\u2713 Saved!';
+              setTimeout(() => window.location.reload(), 1200);
+            } catch(e) { btn.textContent = 'Error \u2014 Retry'; btn.disabled = false; }
+          }
+        <\/script>`;
+      } catch (err) {
+        document.body.innerHTML = `
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{font-family:'JetBrains Mono',monospace;background:#050a18;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh}
+        </style>
+        <p style="font-size:72px;font-weight:900;background:linear-gradient(135deg,#1e293b,#0f172a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;">404</p>
+        <p style="color:#94a3b8;font-size:13px;margin-bottom:28px;">Operative profile not found.</p>
+        <a href="index.html" style="color:#6366f1;font-size:12px;text-decoration:none;padding:10px 20px;border:1px solid rgba(99,102,241,0.2);border-radius:10px;">&larr; Return to Base</a>`;
+      }
+    })();
+
+    // ═══════════════════════════════════════════════════════════
+    //  COMMAND LINE TERMINAL (Ctrl + ` or click the icon)
+    // ═══════════════════════════════════════════════════════════
+
+    // Inject terminal HTML
+    const terminalHTML = `
+    <div id="inno-terminal-btn" onclick="toggleTerminal()" style="position:fixed;bottom:24px;right:24px;z-index:9998;width:52px;height:52px;background:linear-gradient(135deg,#6366f1,#3b82f6);border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 32px rgba(99,102,241,0.4);transition:all 0.3s;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">
+      <svg width="22" height="22" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    </div>
+    <div id="inno-terminal" style="display:none;position:fixed;bottom:90px;right:24px;z-index:9999;width:520px;max-width:92vw;height:380px;background:#0f172a;border:1px solid rgba(99,102,241,0.3);border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,0.6);font-family:'JetBrains Mono','Courier New',monospace;overflow:hidden;flex-direction:column;">
+      <div style="padding:12px 16px;background:#1e293b;display:flex;align-items:center;justify-content:between;border-bottom:1px solid rgba(99,102,241,0.15);">
+        <div style="display:flex;gap:7px;margin-right:12px;">
+          <div onclick="toggleTerminal()" style="width:12px;height:12px;border-radius:50%;background:#ef4444;cursor:pointer;"></div>
+          <div style="width:12px;height:12px;border-radius:50%;background:#eab308;"></div>
+          <div style="width:12px;height:12px;border-radius:50%;background:#22c55e;"></div>
+        </div>
+        <span style="color:#64748b;font-size:11px;flex:1;text-align:center;">innovexa-terminal — bash</span>
+      </div>
+      <div id="term-output" style="flex:1;overflow-y:auto;padding:16px;font-size:12.5px;line-height:1.8;color:#cbd5e1;"></div>
+      <div style="display:flex;align-items:center;padding:8px 16px;border-top:1px solid rgba(99,102,241,0.15);background:#0f172a;">
+        <span style="color:#6366f1;font-size:13px;margin-right:8px;font-weight:700;">❯</span>
+        <input id="term-input" type="text" autocomplete="off" spellcheck="false" placeholder="Type 'help' to start..."
+          style="flex:1;background:transparent;border:none;outline:none;color:#e2e8f0;font-family:inherit;font-size:12.5px;"
+          onkeydown="if(event.key==='Enter')execCmd()" />
+      </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', terminalHTML);
+
+    let termOpen = false;
+    function toggleTerminal() {
+      const t = document.getElementById('inno-terminal');
+      termOpen = !termOpen;
+      t.style.display = termOpen ? 'flex' : 'none';
+      if (termOpen) {
+        document.getElementById('term-input').focus();
+        if (!document.getElementById('term-output').innerHTML) {
+          termPrint('<span style="color:#6366f1">╔══════════════════════════════════════════╗</span>');
+          termPrint('<span style="color:#6366f1">║</span>  <span style="color:#f1f5f9;font-weight:700">INNOVEXA HUB</span> <span style="color:#64748b">// Command Interface</span>  <span style="color:#6366f1">║</span>');
+          termPrint('<span style="color:#6366f1">╚══════════════════════════════════════════╝</span>');
+          termPrint('');
+          termPrint('<span style="color:#64748b">Type</span> <span style="color:#22c55e">help</span> <span style="color:#64748b">to see available commands.</span>');
+          termPrint('');
+        }
+      }
+    }
+
+    // Ctrl + ` shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === '`') { e.preventDefault(); toggleTerminal(); }
+      if (e.key === 'Escape' && termOpen) toggleTerminal();
+    });
+
+    function termPrint(html) {
+      const out = document.getElementById('term-output');
+      out.innerHTML += html + '<br>';
+      out.scrollTop = out.scrollHeight;
+    }
+
+    async function execCmd() {
+      const input = document.getElementById('term-input');
+      const raw = input.value.trim();
+      input.value = '';
+      if (!raw) return;
+
+      termPrint(`<span style="color:#6366f1;font-weight:700">❯</span> <span style="color:#e2e8f0">${raw}</span>`);
+
+      const parts = raw.split(/\s+/);
+      const cmd = parts[0].toLowerCase();
+      const args = parts.slice(1).join(' ');
+
+      switch (cmd) {
+        case 'help':
+          termPrint('<span style="color:#eab308">Available commands:</span>');
+          termPrint('  <span style="color:#22c55e">status</span> <span style="color:#64748b">&lt;email&gt;</span>    — Check registration status');
+          termPrint('  <span style="color:#22c55e">resources</span>           — List all tech resources');
+          termPrint('  <span style="color:#22c55e">resources</span> <span style="color:#64748b">&lt;stack&gt;</span>  — Filter resources by stack');
+          termPrint('  <span style="color:#22c55e">team</span>                — Show core network team');
+          termPrint('  <span style="color:#22c55e">events</span>              — Show event log');
+          termPrint('  <span style="color:#22c55e">count</span>               — Show total member count');
+          termPrint('  <span style="color:#22c55e">profile</span> <span style="color:#64748b">&lt;INVX-XX&gt;</span>  — Open member profile');
+          termPrint('  <span style="color:#22c55e">whoami</span>              — About Innovexa Hub');
+          termPrint('  <span style="color:#22c55e">ascii</span>               — Show logo art');
+          termPrint('  <span style="color:#22c55e">clear</span>               — Clear terminal');
+          termPrint('  <span style="color:#22c55e">exit</span>                — Close terminal');
+          break;
+
+        case 'clear':
+          document.getElementById('term-output').innerHTML = '';
+          break;
+
+        case 'exit':
+          toggleTerminal();
+          break;
+
+        case 'whoami':
+          termPrint('<span style="color:#f1f5f9;font-weight:700">Innovexa Hub</span> <span style="color:#64748b">// Est. 2026</span>');
+          termPrint('<span style="color:#94a3b8">The premier student-led tech & developer community.</span>');
+          termPrint('<span style="color:#94a3b8">Partnered with Yenepoya University, Bangalore.</span>');
+          termPrint('<span style="color:#64748b">Build projects · Attend workshops · Ship code</span>');
+          break;
+
+        case 'ascii':
+          termPrint('<span style="color:#6366f1">  ___                                      </span>');
+          termPrint('<span style="color:#6366f1"> |_ _|_ __  _ __   _____   _____  __  __ _ </span>');
+          termPrint('<span style="color:#6366f1">  | || \'_ \\| \'_ \\ / _ \\ \\ / / _ \\ \\/ / / _` |</span>');
+          termPrint('<span style="color:#6366f1">  | || | | | | | | (_) \\ V /  __/>  < | (_| |</span>');
+          termPrint('<span style="color:#6366f1"> |___|_| |_|_| |_|\\___/ \\_/ \\___/_/\\_\\ \\__,_|</span>');
+          termPrint('<span style="color:#64748b">              Hub · Bangalore · 2026</span>');
+          break;
+
+        case 'count':
+          termPrint('<span style="color:#64748b">Fetching member count...</span>');
+          try {
+            const r = await fetch(`${SCRIPT_URL}?action=count`, { method: 'GET', redirect: 'follow' });
+            const d = await r.json();
+            termPrint(`<span style="color:#22c55e">✓</span> Total operatives: <span style="color:#f1f5f9;font-weight:700">${d.count || 0}</span>`);
+          } catch (e) { termPrint('<span style="color:#ef4444">✗ Error fetching count.</span>'); }
+          break;
+
+        case 'status':
+          if (!args) { termPrint('<span style="color:#ef4444">Usage: status &lt;email&gt;</span>'); break; }
+          termPrint('<span style="color:#64748b">Querying database...</span>');
+          try {
+            const r = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(args)}`, { method: 'GET', redirect: 'follow' });
+            const d = await r.json();
+            if (d.success && d.status) {
+              const clr = d.status.toLowerCase().includes('confirmed') ? '#22c55e' : '#eab308';
+              termPrint(`<span style="color:${clr}">●</span> <span style="color:#f1f5f9">${d.name || 'Member'}</span>`);
+              termPrint(`  Status:  <span style="color:${clr};font-weight:700">${d.status}</span>`);
+              termPrint(`  ID:      <span style="color:#818cf8">${d.id || 'N/A'}</span>`);
+              termPrint(`  Email:   <span style="color:#94a3b8">${d.email || args}</span>`);
+            } else {
+              termPrint(`<span style="color:#ef4444">✗</span> ${d.message || 'Not found.'}`);
+            }
+          } catch (e) { termPrint('<span style="color:#ef4444">✗ Network error.</span>'); }
+          break;
+
+        case 'resources':
+          termPrint('<span style="color:#64748b">Loading resources...</span>');
+          try {
+            const r = await fetch(`${SCRIPT_URL}?action=resources`, { method: 'GET', redirect: 'follow' });
+            const d = await r.json();
+            if (d.success && d.resources) {
+              let filtered = d.resources;
+              if (args) filtered = d.resources.filter(r => r.stack.toLowerCase().includes(args.toLowerCase()));
+              if (filtered.length === 0) { termPrint('<span style="color:#eab308">No resources found for that stack.</span>'); break; }
+              termPrint(`<span style="color:#22c55e">Found ${filtered.length} resource(s):</span>`);
+              filtered.forEach((r, i) => {
+                termPrint(`  <span style="color:#818cf8">${i + 1}.</span> <span style="color:#f1f5f9">${r.title}</span> <span style="color:#64748b">[${r.category}]</span> <span style="color:#475569">— ${r.stack}</span>`);
+              });
+            } else { termPrint('<span style="color:#eab308">No resources available.</span>'); }
+          } catch (e) { termPrint('<span style="color:#ef4444">✗ Error loading resources.</span>'); }
+          break;
+
+        case 'team':
+          termPrint('<span style="color:#64748b">Loading core network...</span>');
+          try {
+            const r = await fetch(`${SCRIPT_URL}?action=team`, { method: 'GET', redirect: 'follow' });
+            const d = await r.json();
+            if (d.success && d.team && d.team.length > 0) {
+              termPrint(`<span style="color:#22c55e">Core Network (${d.team.length} members):</span>`);
+              d.team.forEach(m => {
+                termPrint(`  <span style="color:#818cf8">◆</span> <span style="color:#f1f5f9;font-weight:700">${m.name}</span> <span style="color:#64748b">— ${m.role}</span>`);
+                if (m.bio) termPrint(`    <span style="color:#475569">${m.bio}</span>`);
+              });
+            } else { termPrint('<span style="color:#eab308">No team data found. Add members to Sheet4.</span>'); }
+          } catch (e) { termPrint('<span style="color:#ef4444">✗ Error loading team.</span>'); }
+          break;
+
+        case 'events':
+          termPrint('<span style="color:#64748b">Loading event log...</span>');
+          try {
+            const r = await fetch(`${EVENT_REG_SCRIPT_URL}?action=events`, { method: 'GET', redirect: 'follow' });
+            const d = await r.json();
+            if (d.success && d.events && d.events.length > 0) {
+              termPrint(`<span style="color:#22c55e">Event Log (${d.events.length} entries):</span>`);
+              d.events.forEach(ev => {
+                const st = (ev.status || '').toLowerCase().includes('live') ? '<span style="color:#22c55e">● LIVE</span>' : '<span style="color:#64748b">○ ' + (ev.status || 'TBD') + '</span>';
+                termPrint(`  ${st} <span style="color:#f1f5f9">${ev.name}</span> <span style="color:#475569">— ${ev.date}</span>`);
+              });
+            } else { termPrint('<span style="color:#eab308">No events found.</span>'); }
+          } catch (e) { termPrint('<span style="color:#ef4444">✗ Error loading events.</span>'); }
+          break;
+
+        case 'profile':
+          if (!args) { termPrint('<span style="color:#ef4444">Usage: profile &lt;INVX-XX&gt;</span>'); break; }
+          termPrint(`<span style="color:#64748b">Opening profile for ${args}...</span>`);
+          window.open(`?profile=${encodeURIComponent(args)}`, '_blank');
+          break;
+
+        default:
+          termPrint(`<span style="color:#ef4444">Command not found:</span> <span style="color:#94a3b8">${cmd}</span>`);
+          termPrint('<span style="color:#64748b">Type</span> <span style="color:#22c55e">help</span> <span style="color:#64748b">for available commands.</span>');
+      }
+      termPrint('');
+    }
+
   </script>
+
+
+  <!-- ════ EVENT DETAIL MODAL ════ -->
+  <div id="eventModal" class="fixed inset-0 z-50 hidden" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEventModal()"></div>
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" id="eventModalBox">
+        <div class="sticky top-0 bg-white border-b border-neutral-100 px-6 pt-6 pb-4 rounded-t-3xl z-10">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex flex-wrap gap-2 mb-2" id="eModal-badges"></div>
+              <h2 class="text-2xl font-bold text-neutral-900" id="eModal-title"></h2>
+              <p class="text-sm text-neutral-400 font-mono mt-1" id="eModal-date"></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="eModal-share-btn" title="Copy share link"
+                class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-accent-50 hover:bg-accent-100 transition-colors text-accent-500">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+              </button>
+              <button onclick="closeEventModal()"
+                class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-neutral-100 hover:bg-neutral-200 transition-colors text-neutral-500">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-5 space-y-6">
+          <p class="text-neutral-600 leading-relaxed text-sm" id="eModal-desc"></p>
+          <div id="eModal-report-wrap" class="hidden">
+            <h3 class="text-xs font-mono font-bold text-neutral-400 uppercase tracking-widest mb-3">📄 Event Report</h3>
+            <!-- Loading spinner -->
+            <div id="eModal-report-loading"
+              class="hidden flex items-center gap-2 text-sm text-neutral-400 font-mono py-3"><svg
+                class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>Loading report...</div>
+            <!-- Plain text report -->
+            <div id="eModal-report-body"
+              class="hidden bg-neutral-50 border border-neutral-200 rounded-xl p-4 text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap font-sans max-h-64 overflow-y-auto">
+            </div>
+            <!-- Link report -->
+            <div id="eModal-report-link-wrap" class="hidden">
+              <a id="eModal-report-link" href="#" target="_blank" rel="noopener"
+                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent-50 border border-accent-200 text-accent-700 font-semibold text-sm hover:bg-accent-100 transition-colors">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                View Full Report
+              </a>
+            </div>
+          </div>
+
+          <!-- Register CTA (shown for Upcoming/Live events with requiresReg=yes) -->
+          <div id="eModal-reg-cta" class="hidden pt-4 border-t border-neutral-100">
+            <div class="bg-gradient-to-r from-accent-50 to-blue-50 rounded-2xl p-4 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-sm font-bold text-neutral-800">Register for this Event</p>
+                <p class="text-xs text-neutral-500 mt-0.5"><span id="eModal-fee-label"></span> &middot; Secure your spot now</p>
+              </div>
+              <button type="button" id="eModal-reg-btn"
+                class="flex-shrink-0 flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-glow transition-all duration-200 cursor-pointer">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Register
+              </button>
+            </div>
+          </div>
+          <div id="eModal-photos-wrap" class="hidden">
+            <h3 class="text-xs font-mono font-bold text-neutral-400 uppercase tracking-widest mb-3">📸 Event Photos</h3>
+            <div id="eModal-photos-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- EVENT REGISTRATION MODAL -->
+  <div id="eventRegModal" class="fixed inset-0 z-[60] hidden" aria-modal="true" role="dialog">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeEventRegModal()"></div>
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b border-neutral-100 px-6 pt-6 pb-4 rounded-t-3xl z-10 flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-mono text-neutral-400 uppercase tracking-wider">Event Registration</p>
+            <h2 class="text-xl font-bold text-neutral-900 mt-0.5" id="evReg-title"></h2>
+            <span id="evReg-fee-badge" class="hidden mt-1 inline-block text-xs font-bold text-accent-600 bg-accent-50 px-2.5 py-0.5 rounded-full"></span>
+          </div>
+          <button onclick="closeEventRegModal()" class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-neutral-100 hover:bg-neutral-200 transition-colors text-neutral-500">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-neutral-600 mb-1.5">Full Name <span class="text-red-400">*</span></label>
+            <input type="text" id="evReg-name" placeholder="Your full name" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all duration-200"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-600 mb-1.5">Email <span class="text-red-400">*</span></label>
+            <input type="email" id="evReg-email" placeholder="you@example.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all duration-200"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-600 mb-1.5">Phone <span class="text-red-400">*</span></label>
+            <input type="tel" id="evReg-phone" placeholder="10-digit mobile number" maxlength="10" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all duration-200"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-600 mb-1.5">Role / Year <span class="text-red-400">*</span></label>
+            <select id="evReg-roleYear" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all duration-200">
+              <option value="">Select your role</option>
+              <option value="1st Year Student">1st Year Student</option>
+              <option value="2nd Year Student">2nd Year Student</option>
+              <option value="3rd Year Student">3rd Year Student</option>
+              <option value="4th Year Student">4th Year Student</option>
+              <option value="Faculty">Faculty</option>
+              <option value="Alumni">Alumni</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-600 mb-1.5">Department <span class="text-red-400">*</span></label>
+            <input type="text" id="evReg-dept" placeholder="e.g. CSE, ECE, MBA..." class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all duration-200"/>
+          </div>
+          <div id="evReg-payment-section" class="hidden space-y-4 pt-2 border-t border-neutral-100">
+            <p class="text-xs font-mono text-neutral-400 uppercase tracking-wider pt-1">Payment Required</p>
+            <div class="flex flex-col items-center">
+              <p class="text-sm text-neutral-500 mb-3">Scan QR to pay <strong id="evReg-amount-label" class="text-neutral-800"></strong>:</p>
+              <div class="bg-surface-50 p-4 rounded-2xl border border-neutral-100 inline-block">
+                <img id="evReg-qr-img" alt="UPI QR Code" class="w-44 h-44"/>
+              </div>
+              <p class="text-[10px] text-neutral-400 font-medium tracking-wide mt-2 uppercase">GPay &middot; PhonePe &middot; Paytm &middot; Any UPI App</p>
+            </div>
+            <div class="bg-surface-50 rounded-xl border border-neutral-200/60 p-3 flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">UPI ID</p>
+                <p class="text-sm font-mono font-semibold text-neutral-700 mt-0.5" id="evReg-upi-id"></p>
+              </div>
+              <button type="button" id="evReg-copy-btn" class="text-xs font-medium text-accent-600 hover:text-accent-700 bg-accent-50 hover:bg-accent-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">Copy</button>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-600 mb-1.5">UTR / Transaction ID <span class="text-red-400">*</span></label>
+              <input type="text" id="evReg-utr" maxlength="22" placeholder="12-digit UTR after payment" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm font-mono outline-none transition-all duration-200 tracking-wider"/>
+            </div>
+          </div>
+          <p id="evReg-error" class="hidden text-xs text-red-500 font-medium"></p>
+          <button type="button" id="evReg-submit-btn" class="w-full flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm py-3.5 rounded-xl shadow-glow hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span id="evReg-submit-text">Submit Registration</span>
+            <svg id="evReg-spinner" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 
