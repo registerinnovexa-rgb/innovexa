@@ -538,6 +538,20 @@
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Start Date</label><input type="date" id="pub-date-start" class="search-box" style="width:100%;"/></div>
           <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">End Date (optional)</label><input type="date" id="pub-date-end" class="search-box" style="width:100%;"/></div>
         </div>
+        <!-- Note / Additional Request -->
+        <div style="margin-top:12px;">
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">📝 Note / Additional Request</label>
+          <select id="pub-note-preset" class="search-box" style="width:100%;margin-bottom:8px;" onchange="if(this.value)document.getElementById('pub-note').value=this.value;">
+            <option value="">— Select a template or type custom below —</option>
+            <option value="Kindly permit the student to leave the class early for event preparation.">Request early leave for event preparation</option>
+            <option value="The student may need to be absent from regular classes during the event hours. Kindly grant permission.">Request class absence during event</option>
+            <option value="Please allow the student to carry a laptop/equipment to the event venue.">Allow laptop/equipment at venue</option>
+            <option value="The student is part of the organizing committee and requires additional time for setup and coordination.">Organizing committee — extra time needed</option>
+            <option value="This event is a national-level competition and requires travel. Kindly grant leave for the travel dates.">Travel leave for national-level event</option>
+            <option value="The student will represent Yenepoya University at an external institution. Kindly grant necessary permissions.">Representing university externally</option>
+          </select>
+          <textarea id="pub-note" placeholder="Type any additional note or request for the professor here... (optional)" class="search-box" style="width:100%;min-height:70px;resize:vertical;font-size:13px;line-height:1.6;"></textarea>
+        </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn-add" onclick="previewPublicNOC()" style="background:var(--accent);">👁 Preview</button>
           <button class="btn-add" onclick="downloadPublicNOC()" style="background:var(--green);">📄 Download PDF</button>
@@ -1712,17 +1726,20 @@ function _buildPublicNOCHTML() {
   const _pds=document.getElementById('pub-date-start')?.value||'';
   const _pde=document.getElementById('pub-date-end')?.value||'';
   const dt=_pds?(_pde&&_pde!==_pds?_fmtRange(_pds,_pde):_fmtDate(_pds)):getDocDate();
+  const note = document.getElementById('pub-note')?.value?.trim() || '';
   if (!nm || !ev) { showToast('Please fill Name and Event fields.', 'error'); return null; }
   const today = getDocDate();
   const p = 'font-size:13px;line-height:2;color:#333;text-align:justify;margin-top:14px;';
+  const noteHtml = note ? `<p style="${p}"><strong>Note:</strong> ${note.replace(/\n/g,'<br/>')}</p>` : '';
   return { html: _docHeader() + _titleBlock('PERMISSION LETTER') +
     `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
     <p style="${p}">To Whom It May Concern,</p>
     <p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${nm}</strong>, ${yr} Year, <strong>${br}</strong> student at Yenepoya University, Bangalore Campus, is a <strong>${rl}</strong> of <strong>Innovexa Hub</strong> — the official innovation and technology community of the university.</p>
     <p style="${p}">The above-mentioned student is required to attend <strong>"${ev}"</strong> on <strong>${dt}</strong> as part of Innovexa Hub activities.</p>
     <p style="${p}">We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student's participation during the event hours.</p>
+    ${noteHtml}
     <p style="${p}">We appreciate your kind cooperation.</p>` +
-    _docSignature('MBR', 'NOC'), name: nm, branch: br, year: yr, event: ev, date: dt, role: rl };
+    _docSignature('MBR', 'NOC'), name: nm, branch: br, year: yr, event: ev, date: dt, role: rl, note: note };
 }
 
 function previewPublicNOC() {
@@ -1761,6 +1778,7 @@ function downloadPublicNOC() {
   addP('This is to certify that ' + res.name + ', ' + res.year + ' Year, ' + res.branch + ' student at Yenepoya University, Bangalore Campus, is a ' + res.role + ' of Innovexa Hub \u2014 the official innovation and technology community of the university.');
   addP('The above-mentioned student is required to attend "' + res.event + '" on ' + res.date + ' as part of Innovexa Hub activities.');
   addP('We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.');
+  if (res.note) { addP('Note: ' + res.note); }
   addP('We appreciate your kind cooperation.');
 
   y = Math.max(y + 18, 215);
