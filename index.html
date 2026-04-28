@@ -944,20 +944,16 @@
             <div class="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center text-xl">🏅</div>
             <div>
               <h3 class="font-bold text-neutral-800">Membership Certificate</h3>
-              <p class="text-xs text-neutral-400 mt-0.5">Enter your details to verify — all data is pulled from your registration</p>
+              <p class="text-xs text-neutral-400 mt-0.5">Verify your identity — all data is pulled from your registration</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Operative ID *</label>
-              <input type="text" id="portal-cert-opid" placeholder="INVX-01" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm font-mono outline-none transition-all" style="text-transform:uppercase"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Email *</label>
+              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Registered Email *</label>
               <input type="email" id="portal-cert-email" placeholder="your@email.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Phone *</label>
+              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Phone Number *</label>
               <input type="tel" id="portal-cert-phone" placeholder="9876543210" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
             </div>
           </div>
@@ -3350,33 +3346,31 @@ function portalDownloadApprovedNOC(nm,br,yr,rl,ev,dt){
 }
 
 async function portalDownloadCert(){
-  const opId=(document.getElementById('portal-cert-opid')?.value?.trim()||'').toUpperCase();
   const email=(document.getElementById('portal-cert-email')?.value?.trim()||'').toLowerCase();
   const phone=(document.getElementById('portal-cert-phone')?.value?.trim()||'').replace(/\s+/g,'');
   const statusEl=document.getElementById('portal-cert-status');
-  if(!opId||!email||!phone){_pToast('Please fill all three fields',false);return;}
+  if(!email||!phone){_pToast('Please fill Email and Phone',false);return;}
   statusEl.className='mb-4 p-3 rounded-xl text-sm bg-blue-50 text-blue-700';
   statusEl.textContent='🔍 Verifying your identity...';
   statusEl.classList.remove('hidden');
   try{
-    const res=await fetch(SCRIPT_URL+'?action=profile&id='+encodeURIComponent(opId),{method:'GET',redirect:'follow'});
+    const res=await fetch(SCRIPT_URL+'?action=profilebyemail&email='+encodeURIComponent(email),{method:'GET',redirect:'follow'});
     const data=await res.json();
     if(!data.success){
       statusEl.className='mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700';
-      statusEl.textContent='❌ Operative ID not found. Please check and try again.';
+      statusEl.textContent='❌ Email not found in our records. Please use the email you registered with.';
       return;
     }
-    const p=data;
-    const sheetEmail=(p.email||'').toLowerCase();
-    const sheetPhone=(p.phone||'').replace(/\s+/g,'');
-    if(sheetEmail!==email||!sheetPhone.includes(phone.slice(-10))){
+    const sheetPhone=(data.phone||'').replace(/\s+/g,'');
+    if(!sheetPhone.includes(phone.slice(-10))&&!phone.includes(sheetPhone.slice(-10))){
       statusEl.className='mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700';
-      statusEl.textContent='❌ Email or Phone does not match our records for '+opId+'.';
+      statusEl.textContent='❌ Phone number does not match our records for this email.';
       return;
     }
-    const nm=p.name||'Member';
-    const br=p.branch||'Engineering';
-    const yr=p.year||'1st';
+    const nm=data.name||'Member';
+    const br=data.branch||'Engineering';
+    const yr=data.year||'1st';
+    const opId=data.operativeId||('MBR-'+email.split('@')[0].toUpperCase().slice(0,6));
     statusEl.className='mb-4 p-3 rounded-xl text-sm bg-emerald-50 text-emerald-700';
     statusEl.textContent='✅ Verified! Generating certificate for '+nm+'...';
     const today=_pdfDate();
@@ -3385,11 +3379,11 @@ async function portalDownloadCert(){
     doc.setTextColor(140,140,140);doc.setFontSize(8);doc.text('Date: '+today+' | Ref: '+opId+'/CERT/'+new Date().getFullYear(),105,54,{align:'center'});
     doc.setTextColor(50,50,50);doc.setFontSize(10);doc.setFont('helvetica','normal');let y=68;
     function ap(t){const ls=doc.splitTextToSize(t,170);ls.forEach(l=>{doc.text(l,20,y);y+=6;});y+=4;}
-    ap('This is to certify that '+nm+', Operative ID '+opId+', studying in '+yr+' Year, '+br+' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Hub — the official innovation and technology community.');
+    ap('This is to certify that '+nm+', studying in '+yr+' Year, '+br+' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Hub — the official innovation and technology community.');
     ap('As a member, the individual has demonstrated commitment to collaborative learning, technical development, and community engagement through active participation in hub activities, workshops, and events.');
     ap('This certificate is issued upon request for academic and professional reference purposes.');
     y=Math.max(y+15,210);_pdfSig(doc,y);_pdfFooter(doc);
-    doc.save(opId+'_membership_certificate.pdf');
+    doc.save(nm.replace(/\s+/g,'_')+'_membership_certificate.pdf');
     _pToast('Certificate PDF downloaded!');
   }catch(e){
     statusEl.className='mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700';

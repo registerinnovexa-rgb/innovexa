@@ -393,6 +393,11 @@ function doGet(e) {
       return handleGetProfile(sheet, e.parameter);
     }
 
+    // ── Handle Profile by Email ──────────────────────────────
+    if (action === 'profilebyemail') {
+      return handleGetProfileByEmail(sheet, e.parameter);
+    }
+
     // ── Handle Resources Request ─────────────────────────────
     if (action === 'resources') {
       return handleGetResources(ss);
@@ -674,6 +679,34 @@ function handleAdminMembers(sheet) {
   return createJsonResponse(true, 'Members fetched.', { members: members });
 }
 
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  handleGetProfileByEmail() — Lookup member by email
+ * ═══════════════════════════════════════════════════════════════
+ */
+function handleGetProfileByEmail(sheet, params) {
+  var email = (params.email || '').trim().toLowerCase();
+  if (!email) {
+    return createJsonResponse(false, 'Missing email parameter.');
+  }
+  var allData = sheet.getDataRange().getValues();
+  for (var i = 1; i < allData.length; i++) {
+    var rowEmail = (allData[i][2] || '').toString().trim().toLowerCase();
+    if (rowEmail === email) {
+      return createJsonResponse(true, 'Profile found.', {
+        name:        (allData[i][1]  || '').toString().trim(),
+        email:       (allData[i][2]  || '').toString().trim(),
+        phone:       (allData[i][3]  || '').toString().trim(),
+        year:        (allData[i][4]  || '').toString().trim(),
+        branch:      (allData[i][5]  || '').toString().trim(),
+        operativeId: (allData[i][12] || '').toString().trim(),
+        status:      (allData[i][10] || '').toString().trim()
+      });
+    }
+  }
+  return createJsonResponse(false, 'No member found with email: ' + email);
+}
 
 /**
  * ═══════════════════════════════════════════════════════════════
