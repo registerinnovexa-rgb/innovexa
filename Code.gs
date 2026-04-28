@@ -510,6 +510,8 @@ function handleGetProfile(sheet, params) {
         name:        (allData[i][1]  || '').toString().trim(),  // B: Name
         email:       (allData[i][2]  || '').toString().trim(),  // C: Email
         phone:       (allData[i][3]  || '').toString().trim(),  // D: Phone
+        year:        (allData[i][4]  || '').toString().trim(),  // E: Year
+        branch:      (allData[i][5]  || '').toString().trim(),  // F: Branch
         interests:   (allData[i][8]  || '').toString().trim(),  // I: Interests
         status:      (allData[i][10] || '').toString().trim(),  // K: Status
         operativeId: rowOpId,                                    // M: Operative ID
