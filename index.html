@@ -2235,7 +2235,7 @@
             // ✅ Confirmed — show ID card preview
             const memberName = data.name || 'Operative';
             const memberEmail = data.email || '';
-            const memberId = data.id || 'INVX-XX';
+            const memberId = data.operativeId || data.id || 'INVX-XX';
             const qrText = 'INNOVEXA:' + memberId;
             const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrText)}&size=200&centerImageUrl=${encodeURIComponent('https://innovexareg.vercel.app/assets/logo-Dz7_MOiZ.png')}&centerImageSizeRatio=0.3&margin=1`;
 

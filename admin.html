@@ -939,7 +939,8 @@ function renderEventCards() {
 
 function editEvent(i) {
   editingIndex = cachedEvents[i].rowIndex;
-  openModal('event', cachedEvents[i]);
+  const prefill = {...cachedEvents[i], eventStatus: cachedEvents[i].status};
+  openModal('event', prefill);
 }
 
 async function viewEventRegs(eventName) {
