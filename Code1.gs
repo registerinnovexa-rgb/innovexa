@@ -86,27 +86,57 @@ function doGet(e) {
       return createJsonResponse(true, 'Status updated to ' + data.status);
     }
 
-    // Mark Attendance via QR Scan
+    // Mark Attendance via QR Scan — no event registration required
     if (data.op === 'markAttendance') {
-      var regSS = SpreadsheetApp.openById(EVENT_REG_SHEET_ID);
-      var tab = regSS.getSheetByName((data.eventName || '').substring(0, 50));
-      if (!tab) return createJsonResponse(false, 'Event registration sheet not found.');
-      
-      var rows = tab.getDataRange().getValues();
       var operativeId = (data.operativeId || '').trim().toUpperCase();
+      var eventName = (data.eventName || '').trim();
+      if (!operativeId || !eventName) return createJsonResponse(false, 'Missing operative ID or event name.');
+
+      // 1. Validate member exists in MAIN members sheet
+      var mainSS = SpreadsheetApp.openById(MAIN_SHEET_ID);
+      var mainSheet = mainSS.getSheets()[0];
+      var allMembers = mainSheet.getDataRange().getValues();
       
-      // Look for Operative ID in the sheet (Assuming we added it as a column)
-      // We'll search all columns for the ID
-      for (var i = 1; i < rows.length; i++) {
-        for (var j = 0; j < rows[i].length; j++) {
-          if (String(rows[i][j]).trim().toUpperCase() === operativeId) {
-            // Found the user! Update status to 'Present' in the Status column (index 8)
-            tab.getRange(i + 1, 9).setValue('Present');
-            return createJsonResponse(true, 'Attendance marked for ' + rows[i][1]);
-          }
+      var memberName = '';
+      var memberEmail = '';
+      var foundRow = -1;
+      
+      for (var i = 1; i < allMembers.length; i++) {
+        var rowOpId = (allMembers[i][12] || '').toString().trim().toUpperCase();
+        // Also auto-generate ID from row number (same logic as Code.gs)
+        var autoId = 'INVX-' + String(i).padStart(2, '0');
+        
+        if ((rowOpId && rowOpId === operativeId) || autoId === operativeId) {
+          memberName = (allMembers[i][1] || '').toString().trim();
+          memberEmail = (allMembers[i][2] || '').toString().trim();
+          foundRow = i;
+          break;
         }
       }
-      return createJsonResponse(false, 'Operative ID not found in this event.');
+      
+      if (foundRow === -1) return createJsonResponse(false, 'Member not found: ' + operativeId);
+
+      // 2. Log attendance in event-specific tab (auto-create if needed)
+      var regSS = SpreadsheetApp.openById(EVENT_REG_SHEET_ID);
+      var tabName = ('ATT_' + eventName).substring(0, 50);
+      var attTab = regSS.getSheetByName(tabName);
+      
+      if (!attTab) {
+        attTab = regSS.insertSheet(tabName);
+        attTab.appendRow(['Timestamp', 'Operative ID', 'Name', 'Email', 'Status']);
+      }
+      
+      // 3. Check if already marked present
+      var attData = attTab.getDataRange().getValues();
+      for (var k = 1; k < attData.length; k++) {
+        if (String(attData[k][1]).trim().toUpperCase() === operativeId) {
+          return createJsonResponse(false, memberName + ' is already marked present.');
+        }
+      }
+      
+      // 4. Mark present
+      attTab.appendRow([new Date(), operativeId, memberName, memberEmail, 'Present']);
+      return createJsonResponse(true, '✅ ' + memberName + ' marked present!');
     }
 
     return createJsonResponse(false, 'Unknown op: ' + data.op);

@@ -289,7 +289,64 @@ function handleAdminWrite(ss, data) {
     }
   }
 
+  // ── Asset Operations ─────────────────────────────────────────
+  if (target === 'assets') {
+    var aSheet = getOrCreateAssetSheet(ss);
+
+    if (operation === 'add') {
+      aSheet.appendRow([data.name || '', data.type || '', data.serial || '', 'Available', '', '']);
+      return createJsonResponse(true, 'Asset "' + data.name + '" added.');
+    }
+
+    if (operation === 'borrow') {
+      var aRows = aSheet.getDataRange().getValues();
+      for (var i = 1; i < aRows.length; i++) {
+        if (aRows[i][0] === data.assetName) {
+          if (aRows[i][3] === 'Borrowed') return createJsonResponse(false, '"' + data.assetName + '" is already borrowed by ' + aRows[i][4]);
+          aSheet.getRange(i+1, 4).setValue('Borrowed');
+          aSheet.getRange(i+1, 5).setValue(data.operativeId || '');
+          aSheet.getRange(i+1, 6).setValue(new Date().toLocaleString('en-IN'));
+          return createJsonResponse(true, '"' + data.assetName + '" issued to ' + data.operativeId);
+        }
+      }
+      return createJsonResponse(false, 'Asset not found: ' + data.assetName);
+    }
+
+    if (operation === 'return') {
+      var aRows2 = aSheet.getDataRange().getValues();
+      for (var j = 1; j < aRows2.length; j++) {
+        if (aRows2[j][0] === data.assetName) {
+          aSheet.getRange(j+1, 4).setValue('Available');
+          aSheet.getRange(j+1, 5).setValue('');
+          aSheet.getRange(j+1, 6).setValue('');
+          return createJsonResponse(true, '"' + data.assetName + '" returned successfully.');
+        }
+      }
+      return createJsonResponse(false, 'Asset not found: ' + data.assetName);
+    }
+  }
+
   return createJsonResponse(false, 'Unknown admin operation.');
+}
+
+// ── Asset Helpers ────────────────────────────────────────────
+function getOrCreateAssetSheet(ss) {
+  var sheet = ss.getSheetByName('Assets');
+  if (!sheet) {
+    sheet = ss.insertSheet('Assets');
+    sheet.appendRow(['Name', 'Type', 'Serial', 'Status', 'BorrowedBy', 'BorrowDate']);
+    sheet.getRange(1,1,1,6).setFontWeight('bold');
+  }
+  return sheet;
+}
+
+function handleGetAssets(ss) {
+  var sheet = getOrCreateAssetSheet(ss);
+  var rows = sheet.getDataRange().getValues().slice(1);
+  var assets = rows.map(function(r) {
+    return { name: r[0], type: r[1], serial: r[2], status: r[3] || 'Available', borrowedBy: r[4] || '', borrowDate: r[5] || '' };
+  });
+  return createJsonResponse(true, 'Assets fetched', { assets: assets });
 }
 
 
@@ -348,6 +405,11 @@ function doGet(e) {
       return handleAdminMembers(sheet);
     }
 
+    // ── Handle Assets List ───────────────────────────────────
+    if (action === 'assets') {
+      return handleGetAssets(ss);
+    }
+
     // ── Handle Email / UTR Status Query ──────────────────────
     const emailQuery = (e.parameter.email || '').trim().toLowerCase();
     const utrQuery   = (e.parameter.utr   || '').trim();
@@ -369,6 +431,9 @@ function doGet(e) {
       const rowDob    = (allData[i][7]  || '').toString().trim();                // Column H = DOB
       const rowOpId   = (allData[i][12] || '').toString().trim();               // Column M = Operative ID
 
+      // Auto-generate Operative ID if empty (INVX-01 for row 2, INVX-02 for row 3, etc.)
+      const operativeId = rowOpId || ('INVX-' + String(i).padStart(2, '0'));
+
       // Check if the email matches
       if (emailQuery && rowEmail === emailQuery) {
         return createJsonResponse(true, 'Status found.', {
@@ -377,7 +442,7 @@ function doGet(e) {
           email: rowEmail,
           phone: rowPhone,
           dob: rowDob,
-          id: rowOpId
+          id: operativeId
         });
       }
 
@@ -387,7 +452,7 @@ function doGet(e) {
           status: rowStatus,
           name: rowName,
           utr: rowUTR,
-          id: rowOpId
+          id: operativeId
         });
       }
     }
@@ -538,10 +603,15 @@ function handleVerifyChat(sheet, params) {
     const rowName  = (allData[i][1]  || '').toString().trim();
     const rowStatus = (allData[i][10] || '').toString().trim();
 
-    if (rowOpId === id && rowEmail === email && rowPhone === phone) {
+    // Match by Operative ID if it exists, OR by row position for INVX-01 (president = row 2 = index 1)
+    const idMatch = (rowOpId && rowOpId === id) || (!rowOpId && id === 'INVX-01' && i === 1);
+    const emailMatch = rowEmail === email;
+    const phoneMatch = rowPhone === phone || rowPhone.endsWith(phone);
+
+    if (idMatch && emailMatch && phoneMatch) {
       return createJsonResponse(true, 'Verification successful.', {
         name: rowName,
-        operativeId: rowOpId,
+        operativeId: rowOpId || id,
         status: rowStatus
       });
     }
