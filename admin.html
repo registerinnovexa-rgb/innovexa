@@ -385,6 +385,22 @@
       </div>
       <div id="eventsLoading" class="loading"><div class="spinner"></div> Loading events...</div>
       <div class="card-grid" id="eventsGrid"></div>
+
+      <!-- Certificate Requests Section -->
+      <div class="section-header" style="margin-top:32px;">
+        <h2 class="section-title">📜 Certificate Requests</h2>
+        <button class="btn-add" style="background:var(--blue)" onclick="loadCertRequests()">↻ Refresh</button>
+      </div>
+      <div id="certReqsLoading" class="loading" style="display:none"><div class="spinner"></div> Loading requests...</div>
+      <div class="table-wrap" id="certReqsTable" style="display:none">
+        <table class="data-table">
+          <thead>
+            <tr><th>Member</th><th>Event</th><th>Date</th><th>Requested</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="certReqsBody"></tbody>
+        </table>
+      </div>
+      <div id="certReqsEmpty" style="display:none;text-align:center;padding:24px;color:var(--text3);font-size:13px;">No certificate requests yet.</div>
     </div>
 
     <!-- ── RESOURCES TAB ── -->
@@ -703,7 +719,7 @@ function switchAdminTab(tab) {
 
   if (tab === 'overview') loadOverview();
   if (tab === 'members') loadMembers();
-  if (tab === 'events') loadEvents();
+  if (tab === 'events') { loadEvents(); loadCertRequests(); }
   if (tab === 'resources') loadResources();
   if (tab === 'team') loadTeam();
   if (tab === 'assets') loadAssets();
@@ -1767,6 +1783,52 @@ function downloadPublicNOC() {
   showToast('Permission Letter PDF downloaded!', 'success');
 }
 
+// ══════ CERTIFICATE REQUEST MANAGEMENT ══════
+async function loadCertRequests() {
+  const loading = document.getElementById('certReqsLoading');
+  const table = document.getElementById('certReqsTable');
+  const empty = document.getElementById('certReqsEmpty');
+  const body = document.getElementById('certReqsBody');
+  loading.style.display = 'flex'; table.style.display = 'none'; empty.style.display = 'none';
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=certreqs', { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    loading.style.display = 'none';
+    const reqs = data.requests || [];
+    if (reqs.length === 0) { empty.style.display = 'block'; return; }
+    table.style.display = 'block';
+    body.innerHTML = reqs.map(r => {
+      const isPending = r.status === 'Pending';
+      const badge = r.status === 'Approved' ? '<span style="color:var(--green);font-weight:600">✅ Approved</span>'
+        : r.status === 'Rejected' ? '<span style="color:#e53e3e;font-weight:600">❌ Rejected</span>'
+        : '<span style="color:#d69e2e;font-weight:600">⏳ Pending</span>';
+      const actions = isPending
+        ? `<button class="btn-sm" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green)" onclick="certReqAction(${r.rowIndex},'Approved')">✓ Approve</button>
+           <button class="btn-sm btn-delete" onclick="certReqAction(${r.rowIndex},'Rejected')">✕ Reject</button>`
+        : '<span style="color:var(--text3);font-size:11px">—</span>';
+      return `<tr>
+        <td style="color:var(--text)"><strong>${escHtml(r.memberName)}</strong><br><span style="font-size:11px;color:var(--text3)">${escHtml(r.memberEmail)}</span></td>
+        <td>${escHtml(r.eventName)}</td>
+        <td>${escHtml(r.eventDate)}</td>
+        <td style="font-size:11px;color:var(--text3)">${escHtml(r.timestamp)}</td>
+        <td>${badge}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { loading.style.display = 'none'; showToast('Failed to load cert requests', 'error'); }
+}
+
+async function certReqAction(rowIndex, status) {
+  if (!confirm(status === 'Approved' ? 'Approve this certificate request?' : 'Reject this certificate request?')) return;
+  try {
+    const res = await fetch(SCRIPT_URL, { method: 'POST', redirect: 'follow', headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({ action: 'certApprove', rowIndex: rowIndex, status: status })
+    });
+    const data = await res.json();
+    showToast(data.message, data.success ? 'success' : 'error');
+    loadCertRequests();
+  } catch(e) { showToast('Error updating request', 'error'); }
+}
 </script>
 </body>
 </html>

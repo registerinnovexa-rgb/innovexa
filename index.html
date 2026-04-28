@@ -971,6 +971,43 @@
             Verify &amp; Download Certificate
           </button>
         </div>
+
+        <!-- Event Certificate Card -->
+        <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 mt-6">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-xl">🎓</div>
+            <div>
+              <h3 class="font-bold text-neutral-800">Event Certificate</h3>
+              <p class="text-xs text-neutral-400 mt-0.5">Request a participation certificate for events you attended</p>
+            </div>
+          </div>
+          <!-- Request Form -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Select Event *</label>
+              <select id="portal-evt-select" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all">
+                <option value="">Loading events...</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Your Registered Email *</label>
+              <input type="email" id="portal-evt-email" placeholder="your@email.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
+            </div>
+          </div>
+          <div id="portal-evt-status" class="hidden mb-4 p-3 rounded-xl text-sm"></div>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="portalSubmitCertReq()" class="btn-deploy flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-glow transition-all cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              Submit Request
+            </button>
+            <button onclick="portalCheckCertStatus()" class="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-sm px-6 py-3 rounded-xl transition-all cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              Check Status
+            </button>
+          </div>
+          <!-- Status results -->
+          <div id="portal-evt-results" class="hidden mt-5"></div>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════════
@@ -3408,6 +3445,117 @@ async function portalDownloadCert(){
     statusEl.textContent='❌ Error verifying. Please try again.';
   }
 }
+// ══════ EVENT CERTIFICATE SYSTEM ══════
+// Load completed events into dropdown
+async function _loadEventDropdown(){
+  const sel=document.getElementById('portal-evt-select');
+  if(!sel)return;
+  try{
+    const res=await fetch(SCRIPT_URL+'?action=events',{method:'GET',redirect:'follow'});
+    const data=await res.json();
+    sel.innerHTML='<option value="">— Select an event —</option>';
+    if(data.success&&data.events){
+      const completed=data.events.filter(e=>e.status==='Completed');
+      if(completed.length===0){sel.innerHTML='<option value="">No completed events available</option>';return;}
+      completed.forEach(e=>{
+        const opt=document.createElement('option');
+        opt.value=JSON.stringify({name:e.eventName,date:e.eventDate});
+        opt.textContent=e.eventName+(e.eventDate?' ('+e.eventDate+')':'');
+        sel.appendChild(opt);
+      });
+    }
+  }catch(err){sel.innerHTML='<option value="">Failed to load events</option>';}
+}
+// Auto-load on page ready
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_loadEventDropdown,1500));
+
+// Submit certificate request
+async function portalSubmitCertReq(){
+  const sel=document.getElementById('portal-evt-select');
+  const email=(document.getElementById('portal-evt-email')?.value?.trim()||'').toLowerCase();
+  const statusEl=document.getElementById('portal-evt-status');
+  if(!sel?.value||!email){_pToast('Please select an event and enter your email',false);return;}
+  const evt=JSON.parse(sel.value);
+  statusEl.className='mb-4 p-3 rounded-xl text-sm bg-blue-50 text-blue-700';
+  statusEl.textContent='📤 Verifying and submitting...';
+  statusEl.classList.remove('hidden');
+  try{
+    // Verify member exists
+    const pRes=await fetch(SCRIPT_URL+'?action=profilebyemail&email='+encodeURIComponent(email),{method:'GET',redirect:'follow'});
+    const pData=await pRes.json();
+    if(!pData.success){
+      statusEl.className='mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700';
+      statusEl.textContent='❌ Email not found. You must be a registered member.';
+      return;
+    }
+    // Submit request
+    const res=await fetch(SCRIPT_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'certRequest',memberName:pData.name||'',memberEmail:email,operativeId:pData.operativeId||'',eventName:evt.name,eventDate:evt.date})
+    });
+    const data=await res.json();
+    if(data.success){
+      statusEl.className='mb-4 p-3 rounded-xl text-sm bg-emerald-50 text-emerald-700';
+      statusEl.textContent='✅ '+data.message;
+    }else{
+      statusEl.className='mb-4 p-3 rounded-xl text-sm bg-amber-50 text-amber-700';
+      statusEl.textContent='⚠️ '+data.message;
+    }
+  }catch(e){
+    statusEl.className='mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700';
+    statusEl.textContent='❌ Error submitting request.';
+  }
+}
+
+// Check cert request status + download if approved
+async function portalCheckCertStatus(){
+  const email=(document.getElementById('portal-evt-email')?.value?.trim()||'').toLowerCase();
+  const resultsEl=document.getElementById('portal-evt-results');
+  if(!email){_pToast('Enter your email first',false);return;}
+  resultsEl.classList.remove('hidden');
+  resultsEl.innerHTML='<p class="text-sm text-neutral-400">Loading...</p>';
+  try{
+    const res=await fetch(SCRIPT_URL+'?action=mycertstatus&email='+encodeURIComponent(email),{method:'GET',redirect:'follow'});
+    const data=await res.json();
+    if(!data.success||!data.requests||data.requests.length===0){
+      resultsEl.innerHTML='<p class="text-sm text-neutral-400">No certificate requests found for this email.</p>';
+      return;
+    }
+    // Also fetch profile for PDF generation
+    const pRes=await fetch(SCRIPT_URL+'?action=profilebyemail&email='+encodeURIComponent(email),{method:'GET',redirect:'follow'});
+    const pData=await pRes.json();
+    let html='<div class="space-y-3">';
+    data.requests.forEach(r=>{
+      const badge=r.status==='Approved'?'bg-emerald-100 text-emerald-700':r.status==='Rejected'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700';
+      const dlBtn=r.status==='Approved'?` <button onclick="portalDownloadEventCert('${r.eventName.replace(/'/g,"\\'")}','${r.eventDate.replace(/'/g,"\\'")}','${(pData.name||'').replace(/'/g,"\\'")}','${(pData.branch||'').replace(/'/g,"\\'")}','${(pData.year||'').replace(/'/g,"\\'")}','${(pData.operativeId||'').replace(/'/g,"\\'")}')" class="ml-2 text-xs px-3 py-1 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-all cursor-pointer">⬇ Download PDF</button>`:'';
+      html+=`<div class="flex items-center justify-between p-3 rounded-xl border border-neutral-100 bg-surface-50">
+        <div><p class="text-sm font-semibold text-neutral-800">${r.eventName}</p><p class="text-xs text-neutral-400">${r.eventDate}</p></div>
+        <div class="flex items-center gap-2"><span class="text-xs px-2 py-1 rounded-full ${badge} font-medium">${r.status}</span>${dlBtn}</div>
+      </div>`;
+    });
+    html+='</div>';
+    resultsEl.innerHTML=html;
+  }catch(e){
+    resultsEl.innerHTML='<p class="text-sm text-red-500">Error loading status.</p>';
+  }
+}
+
+// Generate event participation certificate PDF
+function portalDownloadEventCert(evName,evDate,nm,br,yr,opId){
+  const today=_pdfDate();
+  const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');
+  _pdfHeader(doc);_pdfTitle(doc,'CERTIFICATE OF PARTICIPATION');
+  doc.setTextColor(140,140,140);doc.setFontSize(8);
+  doc.text('Date: '+today+' | Ref: '+(opId||'CERT')+'/EVT/'+new Date().getFullYear(),105,54,{align:'center'});
+  doc.setTextColor(50,50,50);doc.setFontSize(10);doc.setFont('helvetica','normal');let y=68;
+  function ap(t){const ls=doc.splitTextToSize(t,170);ls.forEach(l=>{doc.text(l,20,y);y+=6;});y+=4;}
+  ap('This is to certify that '+nm+(br?', '+br:'')+', has actively participated in "'+evName+'" organized by Innovexa Hub'+(evDate?' on '+evDate:'')+' at Yenepoya University, Bangalore Campus.');
+  ap('The event was conducted as part of the hub\'s mission to foster innovation, technical skill development, and collaborative learning among university students.');
+  ap('This certificate is issued in recognition of the participant\'s engagement and contribution to the event.');
+  y=Math.max(y+15,210);_pdfSig(doc,y);_pdfFooter(doc);
+  doc.save(nm.replace(/\s+/g,'_')+'_'+evName.replace(/\s+/g,'_')+'_certificate.pdf');
+  _pToast('Event certificate downloaded!');
+}
+
 </script>
 
 </body>

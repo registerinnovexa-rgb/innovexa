@@ -42,6 +42,9 @@
  *  - Sheet2: (Reserved)
  *  - Sheet3: Resources — Headers: Title | Description | Link | Category | Stack
  *  - Sheet4: Team      — Headers: Name | Role | LinkedIn | GitHub | Bio | Avatar
+ *  - Sheet5: DocRequests — Headers: Timestamp | Name | Email | OpID | Event | Dates | Reason | Status | AdminNote
+ *  - Sheet6: Events      — Headers: EventName | EventDate | Description | Status | CreatedAt
+ *  - Sheet7: CertRequests — Headers: Timestamp | MemberName | MemberEmail | OperativeID | EventName | EventDate | Status | AdminNote
  *
  *  Step 3: Add This Script
  *  ───────────────────────
@@ -83,7 +86,27 @@ function doPost(e) {
 
     if (!sheet) return createJsonResponse(false, 'Sheet not found: ' + SHEET_NAME);
 
-    // ── Handle Profile Update ────────────────────────────────
+    // ── Handle Create Event ─────────────────────────────────
+    if (data.action === 'createEvent') {
+      return handleCreateEvent(ss, data);
+    }
+
+    // ── Handle Delete Event ──────────────────────────────────
+    if (data.action === 'deleteEvent') {
+      return handleDeleteEvent(ss, data);
+    }
+
+    // ── Handle Certificate Request ───────────────────────────
+    if (data.action === 'certRequest') {
+      return handleCertRequest(ss, data);
+    }
+
+    // ── Handle Certificate Approve/Reject ────────────────────
+    if (data.action === 'certApprove') {
+      return handleCertApprove(ss, data);
+    }
+
+    // ── Handle Document Request ──────────────────────────────
     if (data.action === 'docRequest') {
       return handleDocRequest(ss, data);
     }
@@ -398,6 +421,21 @@ function doGet(e) {
       return handleGetProfileByEmail(sheet, e.parameter);
     }
 
+    // ── Handle Events List ─────────────────────────────────
+    if (action === 'events') {
+      return handleGetEvents(ss);
+    }
+
+    // ── Handle Cert Requests (Admin) ────────────────────────
+    if (action === 'certreqs') {
+      return handleGetCertRequests(ss);
+    }
+
+    // ── Handle My Cert Status (Member) ──────────────────────
+    if (action === 'mycertstatus') {
+      return handleMyCertStatus(ss, e.parameter);
+    }
+
     // ── Handle Resources Request ─────────────────────────────
     if (action === 'resources') {
       return handleGetResources(ss);
@@ -679,6 +717,144 @@ function handleAdminMembers(sheet) {
   return createJsonResponse(true, 'Members fetched.', { members: members });
 }
 
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  EVENT CERTIFICATE SYSTEM (Approval-Based)
+ * ═══════════════════════════════════════════════════════════════
+ *
+ *  Sheet6 (Events):       EventName | EventDate | Description | Status | CreatedAt
+ *  Sheet7 (CertRequests): Timestamp | MemberName | MemberEmail | OperativeID | EventName | EventDate | Status | AdminNote
+ */
+
+/** handleCreateEvent() — Admin creates a new event */
+function handleCreateEvent(ss, data) {
+  var sheet = ss.getSheetByName('Sheet6');
+  if (!sheet) {
+    sheet = ss.insertSheet('Sheet6');
+    sheet.getRange(1, 1, 1, 5).setValues([['EventName', 'EventDate', 'Description', 'Status', 'CreatedAt']]);
+  }
+  var name = (data.eventName || '').trim();
+  var date = (data.eventDate || '').trim();
+  var desc = (data.description || '').trim();
+  var status = (data.status || 'Upcoming').trim();
+  if (!name) return createJsonResponse(false, 'Event name is required.');
+  sheet.appendRow([name, date, desc, status, new Date().toLocaleString()]);
+  return createJsonResponse(true, 'Event "' + name + '" created.');
+}
+
+/** handleDeleteEvent() — Admin deletes an event by row index */
+function handleDeleteEvent(ss, data) {
+  var sheet = ss.getSheetByName('Sheet6');
+  if (!sheet) return createJsonResponse(false, 'Sheet6 (Events) not found.');
+  var rowIndex = parseInt(data.rowIndex);
+  if (!rowIndex || rowIndex < 2) return createJsonResponse(false, 'Invalid row index.');
+  sheet.deleteRow(rowIndex);
+  return createJsonResponse(true, 'Event deleted.');
+}
+
+/** handleGetEvents() — List all events (public) */
+function handleGetEvents(ss) {
+  var sheet = ss.getSheetByName('Sheet6');
+  if (!sheet) return createJsonResponse(true, 'No events yet.', { events: [] });
+  var allData = sheet.getDataRange().getValues();
+  var events = [];
+  for (var i = 1; i < allData.length; i++) {
+    events.push({
+      rowIndex:    i + 1,
+      eventName:   (allData[i][0] || '').toString().trim(),
+      eventDate:   (allData[i][1] || '').toString().trim(),
+      description: (allData[i][2] || '').toString().trim(),
+      status:      (allData[i][3] || '').toString().trim(),
+      createdAt:   (allData[i][4] || '').toString().trim()
+    });
+  }
+  return createJsonResponse(true, 'Events fetched.', { events: events });
+}
+
+/** handleCertRequest() — Member submits a certificate request */
+function handleCertRequest(ss, data) {
+  var sheet = ss.getSheetByName('Sheet7');
+  if (!sheet) {
+    sheet = ss.insertSheet('Sheet7');
+    sheet.getRange(1, 1, 1, 8).setValues([['Timestamp', 'MemberName', 'MemberEmail', 'OperativeID', 'EventName', 'EventDate', 'Status', 'AdminNote']]);
+  }
+  var name = (data.memberName || '').trim();
+  var email = (data.memberEmail || '').trim();
+  var opId = (data.operativeId || '').trim();
+  var eventName = (data.eventName || '').trim();
+  var eventDate = (data.eventDate || '').trim();
+  if (!email || !eventName) return createJsonResponse(false, 'Email and Event are required.');
+  // Check for duplicate requests
+  var allData = sheet.getDataRange().getValues();
+  for (var i = 1; i < allData.length; i++) {
+    var rEmail = (allData[i][2] || '').toString().trim().toLowerCase();
+    var rEvent = (allData[i][4] || '').toString().trim().toLowerCase();
+    if (rEmail === email.toLowerCase() && rEvent === eventName.toLowerCase()) {
+      return createJsonResponse(false, 'You have already submitted a request for this event.');
+    }
+  }
+  sheet.appendRow([new Date().toLocaleString(), name, email, opId, eventName, eventDate, 'Pending', '']);
+  return createJsonResponse(true, 'Certificate request submitted. Awaiting admin approval.');
+}
+
+/** handleCertApprove() — Admin approves or rejects a cert request */
+function handleCertApprove(ss, data) {
+  var sheet = ss.getSheetByName('Sheet7');
+  if (!sheet) return createJsonResponse(false, 'Sheet7 (CertRequests) not found.');
+  var rowIndex = parseInt(data.rowIndex);
+  var newStatus = (data.status || '').trim();
+  var note = (data.note || '').trim();
+  if (!rowIndex || rowIndex < 2) return createJsonResponse(false, 'Invalid row.');
+  if (newStatus !== 'Approved' && newStatus !== 'Rejected') return createJsonResponse(false, 'Status must be Approved or Rejected.');
+  sheet.getRange(rowIndex, 7).setValue(newStatus);
+  if (note) sheet.getRange(rowIndex, 8).setValue(note);
+  return createJsonResponse(true, 'Certificate request ' + newStatus.toLowerCase() + '.');
+}
+
+/** handleGetCertRequests() — List all cert requests (admin) */
+function handleGetCertRequests(ss) {
+  var sheet = ss.getSheetByName('Sheet7');
+  if (!sheet) return createJsonResponse(true, 'No requests yet.', { requests: [] });
+  var allData = sheet.getDataRange().getValues();
+  var requests = [];
+  for (var i = 1; i < allData.length; i++) {
+    requests.push({
+      rowIndex:    i + 1,
+      timestamp:   (allData[i][0] || '').toString().trim(),
+      memberName:  (allData[i][1] || '').toString().trim(),
+      memberEmail: (allData[i][2] || '').toString().trim(),
+      operativeId: (allData[i][3] || '').toString().trim(),
+      eventName:   (allData[i][4] || '').toString().trim(),
+      eventDate:   (allData[i][5] || '').toString().trim(),
+      status:      (allData[i][6] || '').toString().trim(),
+      adminNote:   (allData[i][7] || '').toString().trim()
+    });
+  }
+  return createJsonResponse(true, 'Cert requests fetched.', { requests: requests });
+}
+
+/** handleMyCertStatus() — Member checks their cert request status */
+function handleMyCertStatus(ss, params) {
+  var email = (params.email || '').trim().toLowerCase();
+  if (!email) return createJsonResponse(false, 'Email is required.');
+  var sheet = ss.getSheetByName('Sheet7');
+  if (!sheet) return createJsonResponse(true, 'No requests found.', { requests: [] });
+  var allData = sheet.getDataRange().getValues();
+  var results = [];
+  for (var i = 1; i < allData.length; i++) {
+    var rEmail = (allData[i][2] || '').toString().trim().toLowerCase();
+    if (rEmail === email) {
+      results.push({
+        eventName:  (allData[i][4] || '').toString().trim(),
+        eventDate:  (allData[i][5] || '').toString().trim(),
+        status:     (allData[i][6] || '').toString().trim(),
+        adminNote:  (allData[i][7] || '').toString().trim()
+      });
+    }
+  }
+  return createJsonResponse(true, 'Status fetched.', { requests: results });
+}
 
 /**
  * ═══════════════════════════════════════════════════════════════
