@@ -1620,11 +1620,9 @@ async function downloadDocument() {
   if (storedSignatureB64) {
     try {
       const img = new Image(); img.src = storedSignatureB64;
-      const maxW = 55, maxH = 28;
-      let w = img.naturalWidth || 200, h = img.naturalHeight || 80;
-      const scale = Math.min(maxW / w, maxH / h);
-      w = w * scale; h = h * scale;
-      doc.addImage(storedSignatureB64, 'PNG', 20, y - h - 4, w, h);
+      const w = (img.naturalWidth || 150) * 0.264583;
+      const h = (img.naturalHeight || 60) * 0.264583;
+      doc.addImage(storedSignatureB64, 'PNG', 20, y - h - 2, w, h);
     } catch(e) { console.log('Sig skip:', e); }
   }
   doc.setDrawColor(40, 40, 40); doc.setLineWidth(0.5);
@@ -1766,7 +1764,7 @@ function downloadPublicNOC() {
   addP('We appreciate your kind cooperation.');
 
   y = Math.max(y + 18, 215);
-  if (storedSignatureB64) { try { const img=new Image();img.src=storedSignatureB64;const mW=55,mH=28;let w=img.naturalWidth||200,h=img.naturalHeight||80;const s=Math.min(mW/w,mH/h);w*=s;h*=s;doc.addImage(storedSignatureB64,'PNG',20,y-h-4,w,h); } catch(e) {} }
+  if (storedSignatureB64) { try { const img=new Image();img.src=storedSignatureB64;const w=(img.naturalWidth||150)*0.264583;const h=(img.naturalHeight||60)*0.264583;doc.addImage(storedSignatureB64,'PNG',20,y-h-2,w,h); } catch(e) {} }
   doc.setDrawColor(40, 40, 40); doc.setLineWidth(0.5); doc.line(20, y, 75, y);
   doc.setTextColor(30, 58, 95); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text(PRESIDENT_NAME, 20, y + 6);

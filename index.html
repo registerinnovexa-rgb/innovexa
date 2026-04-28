@@ -3273,7 +3273,7 @@ function _pdfHeader(doc){
 }
 function _pdfSig(doc,y){
   const sigB64=localStorage.getItem('innovexa_sig_b64')||_DEFAULT_SIG||'';
-  if(sigB64){try{const img=new Image();img.src=sigB64;const mW=55,mH=28;let w=img.naturalWidth||200,h=img.naturalHeight||80;const s=Math.min(mW/w,mH/h);w*=s;h*=s;doc.addImage(sigB64,'PNG',20,y-h-4,w,h);}catch(e){}}
+  if(sigB64){try{const img=new Image();img.src=sigB64;const w=(img.naturalWidth||150)*0.264583;const h=(img.naturalHeight||60)*0.264583;doc.addImage(sigB64,'PNG',20,y-h-2,w,h);}catch(e){}}
   doc.setDrawColor(40,40,40);doc.setLineWidth(0.4);doc.line(20,y,70,y);
   doc.setTextColor(30,58,95);doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text(_PORTAL_PRES,20,y+5);
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(60,60,60);doc.text('President, Innovexa Hub',20,y+10);
