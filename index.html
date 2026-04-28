@@ -913,6 +913,20 @@
                 <input type="date" id="portal-pub-date-end" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
               </div>
             </div>
+            <!-- Note / Additional Request -->
+            <div class="mb-4">
+              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">📝 Note / Additional Request</label>
+              <select id="portal-pub-note-preset" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all mb-2" onchange="if(this.value)document.getElementById('portal-pub-note').value=this.value;">
+                <option value="">— Select a template or type custom below —</option>
+                <option value="Kindly permit the student to leave the class early for event preparation.">Request early leave for event preparation</option>
+                <option value="The student may need to be absent from regular classes during the event hours. Kindly grant permission.">Request class absence during event</option>
+                <option value="Please allow the student to carry a laptop/equipment to the event venue.">Allow laptop/equipment at venue</option>
+                <option value="The student is part of the organizing committee and requires additional time for setup and coordination.">Organizing committee — extra time needed</option>
+                <option value="This event is a national-level competition and requires travel. Kindly grant leave for the travel dates.">Travel leave for national-level event</option>
+                <option value="The student will represent Yenepoya University at an external institution. Kindly grant necessary permissions.">Representing university externally</option>
+              </select>
+              <textarea id="portal-pub-note" placeholder="Type any additional note or request for the professor here... (optional)" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all" style="min-height:70px;resize:vertical;line-height:1.6;"></textarea>
+            </div>
             <button onclick="portalSubmitNOCRequest()" class="btn-deploy flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-glow transition-all cursor-pointer">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
               Submit Request for Approval
@@ -3315,11 +3329,12 @@ async function portalSubmitNOCRequest(){
   const _ds=document.getElementById('portal-pub-date-start')?.value||'';
   const _de=document.getElementById('portal-pub-date-end')?.value||'';
   const dt=_ds?(_de&&_de!==_ds?_formatDateRange(_ds,_de):_formatSingleDate(_ds)):_pdfDate();
+  const nt=document.getElementById('portal-pub-note')?.value?.trim()||'';
   if(!nm||!em||!ev){_pToast('Please fill Name, Email, and Event fields',false);return;}
   _pToast('Submitting request...');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'docRequest',name:nm,email:em,branch:br,year:yr,role:rl,event:ev,dates:dt})});
+      body:JSON.stringify({action:'docRequest',name:nm,email:em,branch:br,year:yr,role:rl,event:ev,dates:dt,note:nt})});
     document.getElementById('portal-noc-form').classList.add('hidden');
     document.getElementById('portal-noc-submitted').classList.remove('hidden');
     document.getElementById('portal-req-id-display').textContent='Check status with your email below';
@@ -3347,8 +3362,8 @@ async function portalCheckDocStatus(){
       const isApproved=r.status==='Approved';
       const statusColor=isApproved?'bg-emerald-100 text-emerald-700':isPending?'bg-amber-100 text-amber-700':'bg-red-100 text-red-700';
       const dlBtn=isApproved?`<div class="flex gap-2 mt-3">
-        <button onclick="portalDownloadApprovedNOC('${r.name}','${r.branch}','${r.year}','${r.role}','${r.event}','${r.dates}')" class="text-xs font-semibold bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg transition-all cursor-pointer">⬇ Download PDF</button>
-        <button onclick="portalPreviewApprovedNOC('${r.name}','${r.branch}','${r.year}','${r.role}','${r.event}','${r.dates}')" class="text-xs font-semibold bg-neutral-800 hover:bg-neutral-900 text-white px-4 py-2 rounded-lg transition-all cursor-pointer">👁 Preview</button>
+        <button onclick="portalDownloadApprovedNOC('${r.name}','${r.branch}','${r.year}','${r.role}','${r.event}','${r.dates}','${(r.note||'').replace(/'/g,"\\'")}')" class="text-xs font-semibold bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg transition-all cursor-pointer">⬇ Download PDF</button>
+        <button onclick="portalPreviewApprovedNOC('${r.name}','${r.branch}','${r.year}','${r.role}','${r.event}','${r.dates}','${(r.note||'').replace(/'/g,"\\'")}')" class="text-xs font-semibold bg-neutral-800 hover:bg-neutral-900 text-white px-4 py-2 rounded-lg transition-all cursor-pointer">👁 Preview</button>
       </div>`:isPending?'<p class="text-xs text-amber-600 mt-2">⏳ Awaiting admin approval</p>':'<p class="text-xs text-red-500 mt-2">Request was rejected</p>';
       return `<div class="bg-surface-50 border border-neutral-100 rounded-xl p-4">
         <div class="flex items-center justify-between mb-2"><span class="font-mono text-xs text-neutral-400">${r.requestId}</span><span class="text-xs font-bold px-2 py-0.5 rounded-full ${statusColor}">${r.status}</span></div>
@@ -3359,15 +3374,17 @@ async function portalCheckDocStatus(){
   }catch(e){wrap.innerHTML='<p class="text-sm text-red-500">Error checking status.</p>';}
 }
 
-function portalPreviewApprovedNOC(nm,br,yr,rl,ev,dt){
+function portalPreviewApprovedNOC(nm,br,yr,rl,ev,dt,nt){
   const today=_pdfDate();
   const p='font-size:12px;line-height:2;color:#333;text-align:justify;margin-top:10px;';
+  const noteHtml=nt?'<p style="'+p+'"><strong>Note:</strong> '+nt+'</p>':'';
   const html=_htmlHeader()+_htmlTitle('PERMISSION LETTER')+
     '<p style="font-size:10px;color:#aaa;margin-bottom:12px;">Date: '+today+'</p>'+
     '<p style="'+p+'">To Whom It May Concern,</p>'+
     '<p style="'+p+'">This is to certify that <strong style="color:#1e3a5f;">'+nm+'</strong>, '+yr+' Year, <strong>'+br+'</strong> student at Yenepoya University, Bangalore Campus, is a <strong>'+rl+'</strong> of <strong>Innovexa Hub</strong> — the official innovation and technology community.</p>'+
     '<p style="'+p+'">The above-mentioned student is required to attend <strong>"'+ev+'"</strong> on <strong>'+dt+'</strong> as part of Innovexa Hub activities.</p>'+
     '<p style="'+p+'">We kindly request the concerned faculty/authorities to grant necessary permission. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.</p>'+
+    noteHtml+
     '<p style="'+p+'">We appreciate your kind cooperation.</p>'+_htmlSig('MBR/NOC/'+new Date().getFullYear());
   // Show in a modal-like overlay
   let wrap=document.getElementById('portal-noc-preview-wrap');
@@ -3378,7 +3395,7 @@ function portalPreviewApprovedNOC(nm,br,yr,rl,ev,dt){
   document.getElementById('portal-noc-preview').innerHTML=html;
 }
 
-function portalDownloadApprovedNOC(nm,br,yr,rl,ev,dt){
+function portalDownloadApprovedNOC(nm,br,yr,rl,ev,dt,nt){
   const today=_pdfDate();
   const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');
   _pdfHeader(doc);_pdfTitle(doc,'PERMISSION LETTER');
@@ -3389,6 +3406,7 @@ function portalDownloadApprovedNOC(nm,br,yr,rl,ev,dt){
   ap('This is to certify that '+nm+', '+yr+' Year, '+br+' student at Yenepoya University, Bangalore Campus, is a '+rl+' of Innovexa Hub — the official innovation and technology community.');
   ap('The above-mentioned student is required to attend "'+ev+'" on '+dt+' as part of Innovexa Hub activities.');
   ap("We kindly request the concerned faculty/authorities to grant necessary permission. Innovexa Hub takes full responsibility for the student's participation during the event hours.");
+  if(nt){ap('Note: '+nt);}
   ap('We appreciate your kind cooperation.');
   y=Math.max(y+15,210);_pdfSig(doc,y);_pdfFooter(doc);
   doc.save('permission_letter_'+nm.replace(/\s+/g,'_')+'.pdf');

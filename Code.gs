@@ -911,10 +911,11 @@ function handleDocRequest(ss, data) {
   var role = (data.role || 'Member').trim();
   var event_ = (data.event || '').trim();
   var dates = (data.dates || '').trim();
+  var note = (data.note || '').trim();
   if (!name || !email || !event_) {
     return createJsonResponse(false, 'Name, Email, and Event are required.');
   }
-  sheet.appendRow([new Date().toISOString(), reqId, name, email, branch, year, role, event_, dates, 'Pending']);
+  sheet.appendRow([new Date().toISOString(), reqId, name, email, branch, year, role, event_, dates, 'Pending', note]);
   return createJsonResponse(true, 'Request submitted! Your Request ID: ' + reqId, { requestId: reqId });
 }
 
@@ -930,7 +931,7 @@ function handleDocStatus(ss, params) {
     var rowEmail = (row[3] || '').toString().trim().toLowerCase();
     var rowReqId = (row[1] || '').toString().trim().toUpperCase();
     if ((email && rowEmail === email) || (reqId && rowReqId === reqId)) {
-      results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', timestamp: row[0] });
+      results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', note: row[10] || '', timestamp: row[0] });
     }
   }
   return createJsonResponse(true, 'Found ' + results.length + ' request(s).', { requests: results });
@@ -942,7 +943,7 @@ function handleDocRequests(ss) {
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
-    results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', timestamp: row[0] });
+    results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', note: row[10] || '', timestamp: row[0] });
   }
   return createJsonResponse(true, 'Fetched ' + results.length + ' doc request(s).', { requests: results });
 }
