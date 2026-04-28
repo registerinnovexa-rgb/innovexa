@@ -84,6 +84,14 @@ function doPost(e) {
     if (!sheet) return createJsonResponse(false, 'Sheet not found: ' + SHEET_NAME);
 
     // ── Handle Profile Update ────────────────────────────────
+    if (data.action === 'docRequest') {
+      return handleDocRequest(ss, data);
+    }
+
+    if (data.action === 'docApprove') {
+      return handleDocApprove(ss, data);
+    }
+
     if (data.action === 'updateProfile') {
       return handleUpdateProfile(sheet, data);
     }
@@ -410,6 +418,16 @@ function doGet(e) {
       return handleGetAssets(ss);
     }
 
+    // ── Handle Doc Request Status (member check) ────────────
+    if (action === 'docstatus') {
+      return handleDocStatus(ss, e.parameter);
+    }
+
+    // ── Handle Doc Requests List (admin) ────────────────────
+    if (action === 'docrequests') {
+      return handleDocRequests(ss);
+    }
+
     // ── Handle Email / UTR Status Query ──────────────────────
     const emailQuery = (e.parameter.email || '').trim().toLowerCase();
     const utrQuery   = (e.parameter.utr   || '').trim();
@@ -654,6 +672,83 @@ function handleAdminMembers(sheet) {
   return createJsonResponse(true, 'Members fetched.', { members: members });
 }
 
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  DOCUMENT REQUEST SYSTEM (Sheet5: DocRequests)
+ *  Headers: Timestamp | RequestID | Name | Email | Branch | Year | Role | Event | Dates | Status
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+function getOrCreateDocSheet(ss) {
+  var sheet = ss.getSheetByName('Sheet5');
+  if (!sheet) {
+    sheet = ss.insertSheet('Sheet5');
+    sheet.getRange(1, 1, 1, 10).setValues([['Timestamp', 'RequestID', 'Name', 'Email', 'Branch', 'Year', 'Role', 'Event', 'Dates', 'Status']]);
+  }
+  return sheet;
+}
+
+function handleDocRequest(ss, data) {
+  var sheet = getOrCreateDocSheet(ss);
+  var reqId = 'DOC-' + Date.now().toString(36).toUpperCase();
+  var name = (data.name || '').trim();
+  var email = (data.email || '').trim();
+  var branch = (data.branch || '').trim();
+  var year = (data.year || '').trim();
+  var role = (data.role || 'Member').trim();
+  var event_ = (data.event || '').trim();
+  var dates = (data.dates || '').trim();
+  if (!name || !email || !event_) {
+    return createJsonResponse(false, 'Name, Email, and Event are required.');
+  }
+  sheet.appendRow([new Date().toISOString(), reqId, name, email, branch, year, role, event_, dates, 'Pending']);
+  return createJsonResponse(true, 'Request submitted! Your Request ID: ' + reqId, { requestId: reqId });
+}
+
+function handleDocStatus(ss, params) {
+  var sheet = getOrCreateDocSheet(ss);
+  var email = (params.email || '').trim().toLowerCase();
+  var reqId = (params.reqid || '').trim().toUpperCase();
+  if (!email && !reqId) return createJsonResponse(false, 'Provide email or reqid parameter.');
+  var data = sheet.getDataRange().getValues();
+  var results = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var rowEmail = (row[3] || '').toString().trim().toLowerCase();
+    var rowReqId = (row[1] || '').toString().trim().toUpperCase();
+    if ((email && rowEmail === email) || (reqId && rowReqId === reqId)) {
+      results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', timestamp: row[0] });
+    }
+  }
+  return createJsonResponse(true, 'Found ' + results.length + ' request(s).', { requests: results });
+}
+
+function handleDocRequests(ss) {
+  var sheet = getOrCreateDocSheet(ss);
+  var data = sheet.getDataRange().getValues();
+  var results = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    results.push({ requestId: row[1], name: row[2], email: row[3], branch: row[4], year: row[5], role: row[6], event: row[7], dates: row[8], status: row[9] || 'Pending', timestamp: row[0] });
+  }
+  return createJsonResponse(true, 'Fetched ' + results.length + ' doc request(s).', { requests: results });
+}
+
+function handleDocApprove(ss, data) {
+  var sheet = getOrCreateDocSheet(ss);
+  var reqId = (data.requestId || '').trim().toUpperCase();
+  var newStatus = (data.status || 'Approved').trim();
+  if (!reqId) return createJsonResponse(false, 'requestId is required.');
+  var allData = sheet.getDataRange().getValues();
+  for (var i = 1; i < allData.length; i++) {
+    if ((allData[i][1] || '').toString().trim().toUpperCase() === reqId) {
+      sheet.getRange(i + 1, 10).setValue(newStatus);
+      return createJsonResponse(true, 'Request ' + reqId + ' updated to: ' + newStatus);
+    }
+  }
+  return createJsonResponse(false, 'Request ID not found: ' + reqId);
+}
 
 /**
  * ═══════════════════════════════════════════════════════════════

@@ -527,6 +527,15 @@
         <div id="doc-preview" style="background:#fff;color:#000;padding:40px;border-radius:8px;font-family:'Times New Roman',serif;max-width:700px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.25);"></div>
       </div>
 
+      <!-- Doc Request Approval Panel -->
+      <div class="admin-card" style="border:1px solid rgba(251,191,36,0.4);background:rgba(251,191,36,0.04);margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h3 style="font-size:14px;font-weight:700;">📋 Permission Letter Requests</h3>
+          <button class="btn-add" onclick="fetchDocRequests()" style="background:var(--accent);padding:7px 16px;font-size:12px;">🔄 Refresh</button>
+        </div>
+        <div id="doc-requests-list" style="font-size:13px;color:var(--text3);">Click Refresh to load pending requests.</div>
+      </div>
+
       <!-- Member Self-Service NOC -->
       <div class="admin-card" style="border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.03);">
         <h3 style="font-size:14px;font-weight:700;margin-bottom:4px;">🎓 Member Self-Service — Permission Letter for Professor</h3>
@@ -1430,7 +1439,7 @@ function _docHeader() {
     <div>
       <div style="font-size:22px;font-weight:900;color:#1e3a5f;letter-spacing:2px;">INNOVEXA HUB</div>
       <div style="font-size:9px;color:#888;letter-spacing:1.5px;margin-top:2px;">YENEPOYA UNIVERSITY · BANGALORE CAMPUS</div>
-      <div style="font-size:8px;color:#aaa;margin-top:1px;">In Association with Kalvium</div>
+      
     </div>
   </div>`;
 }
@@ -1566,7 +1575,7 @@ async function downloadDocument() {
   doc.text('INNOVEXA HUB', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.setTextColor(120, 120, 120);
-  doc.text('YENEPOYA UNIVERSITY · BANGALORE CAMPUS · In Association with Kalvium', 42, 24);
+  doc.text('YENEPOYA UNIVERSITY · BANGALORE CAMPUS · ', 42, 24);
 
   // Header line
   doc.setDrawColor(30, 58, 95); doc.setLineWidth(1);
@@ -1636,6 +1645,62 @@ async function downloadDocument() {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  DOC REQUEST APPROVAL (Admin)
+// ══════════════════════════════════════════════════════════════
+async function fetchDocRequests() {
+  const wrap = document.getElementById('doc-requests-list');
+  wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Loading...</div>';
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=docrequests', { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
+    if (!data.success || !data.requests || data.requests.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">No requests found.</div>';
+      return;
+    }
+    // Show newest first
+    const reqs = data.requests.reverse();
+    wrap.innerHTML = reqs.map(r => {
+      const isPending = r.status === 'Pending';
+      const isApproved = r.status === 'Approved';
+      const badge = isApproved ? '<span style="background:var(--green);color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">Approved</span>'
+        : isPending ? '<span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">Pending</span>'
+        : '<span style="background:var(--red);color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">' + r.status + '</span>';
+      const actions = isPending ? `<div style="display:flex;gap:6px;margin-top:8px;">
+        <button onclick="approveDocReq('${r.requestId}','Approved')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">✅ Approve</button>
+        <button onclick="approveDocReq('${r.requestId}','Rejected')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">❌ Reject</button>
+      </div>` : '';
+      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-family:monospace;font-size:11px;color:var(--accent);">${r.requestId}</span>
+          ${badge}
+        </div>
+        <div style="font-weight:700;color:var(--text1);">${r.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${r.email} · ${r.branch} · ${r.year} Year</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px;">📌 <strong>${r.event}</strong> — ${r.dates || '—'}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">Role: ${r.role}</div>
+        ${actions}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    wrap.innerHTML = '<div style="color:var(--red);font-size:12px;">Error loading requests.</div>';
+  }
+}
+
+async function approveDocReq(reqId, status) {
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'docApprove', requestId: reqId, status: status })
+    });
+    showToast(reqId + ' → ' + status, status === 'Approved' ? 'success' : 'error');
+    setTimeout(() => fetchDocRequests(), 1500);
+  } catch (e) {
+    showToast('Error updating request', 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 //  PUBLIC NOC (Member Self-Service)
 // ══════════════════════════════════════════════════════════════
 function _buildPublicNOCHTML() {
@@ -1676,7 +1741,7 @@ function downloadPublicNOC() {
   doc.setTextColor(30, 58, 95); doc.setFontSize(20); doc.setFont('helvetica', 'bold');
   doc.text('INNOVEXA HUB', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
-  doc.text('YENEPOYA UNIVERSITY \xb7 BANGALORE CAMPUS \xb7 In Association with Kalvium', 42, 24);
+  doc.text('YENEPOYA UNIVERSITY \xb7 BANGALORE CAMPUS \xb7 ', 42, 24);
   doc.setDrawColor(30, 58, 95); doc.setLineWidth(1); doc.line(15, 33, 195, 33);
   doc.setFillColor(99, 102, 241); doc.rect(15, 33, 180, 0.8, 'F');
 
