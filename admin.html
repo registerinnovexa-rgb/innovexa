@@ -475,7 +475,7 @@
           <label for="sig-upload" style="cursor:pointer;padding:8px 18px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:600;">📁 Upload Signature PNG</label>
           <input type="file" id="sig-upload" accept="image/png,image/jpeg" style="display:none;" onchange="handleSigUpload(event)"/>
           <div id="sig-preview-wrap" style="display:none;align-items:center;gap:10px;">
-            <img id="sig-preview-img" style="height:48px;object-fit:contain;background:#fff;padding:6px;border-radius:6px;border:1px solid var(--border);" alt="Signature"/>
+            <img id="sig-preview-img" style="max-height:64px;max-width:200px;object-fit:contain;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid var(--border);" alt="Signature"/>
             <button onclick="clearSignature()" style="padding:5px 12px;border:1px solid var(--red);border-radius:6px;background:transparent;color:var(--red);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">✕ Remove</button>
           </div>
           <span id="sig-status" style="font-size:12px;color:var(--text3);">No signature uploaded</span>
@@ -1438,8 +1438,8 @@ function _docHeader() {
 function _docSignature(opId, type) {
   const today = getDocDate();
   const sigImg = storedSignatureB64
-    ? `<img src="${storedSignatureB64}" style="height:48px;object-fit:contain;display:block;margin-bottom:2px;" alt="Signature"/>`
-    : `<div style="height:36px;"></div>`;
+    ? `<img src="${storedSignatureB64}" style="max-height:64px;max-width:200px;object-fit:contain;display:block;margin-bottom:4px;" alt="Signature"/>`
+    : `<div style="height:40px;"></div>`;
   return `<div style="margin-top:56px;display:flex;justify-content:space-between;align-items:flex-end;">
     <div>
       ${sigImg}
@@ -1618,7 +1618,7 @@ async function downloadDocument() {
   // ── Signature block ──
   y = Math.max(y + 18, 215);
   if (storedSignatureB64) {
-    try { doc.addImage(storedSignatureB64, 'PNG', 20, y - 16, 40, 18); } catch(e) { console.log('Sig skip:', e); }
+    try { doc.addImage(storedSignatureB64, 'PNG', 20, y - 22, 50, 22); } catch(e) { console.log('Sig skip:', e); }
   }
   doc.setDrawColor(40, 40, 40); doc.setLineWidth(0.5);
   doc.line(20, y, 75, y);
@@ -1759,7 +1759,7 @@ function downloadPublicNOC() {
   addP('We appreciate your kind cooperation.');
 
   y = Math.max(y + 18, 215);
-  if (storedSignatureB64) { try { doc.addImage(storedSignatureB64, 'PNG', 20, y - 16, 40, 18); } catch(e) {} }
+  if (storedSignatureB64) { try { doc.addImage(storedSignatureB64, 'PNG', 20, y - 22, 50, 22); } catch(e) {} }
   doc.setDrawColor(40, 40, 40); doc.setLineWidth(0.5); doc.line(20, y, 75, y);
   doc.setTextColor(30, 58, 95); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text(PRESIDENT_NAME, 20, y + 6);
