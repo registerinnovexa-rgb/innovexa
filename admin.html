@@ -1672,12 +1672,12 @@ async function fetchDocRequests() {
         <button onclick="approveDocReq('${r.requestId}','Approved')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">✅ Approve</button>
         <button onclick="approveDocReq('${r.requestId}','Rejected')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">❌ Reject</button>
       </div>` : '';
-      return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+      return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <span style="font-family:monospace;font-size:11px;color:var(--accent);">${r.requestId}</span>
           ${badge}
         </div>
-        <div style="font-weight:700;color:var(--text1);">${r.name}</div>
+        <div style="font-weight:700;color:var(--text);">${r.name}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px;">${r.email} · ${r.branch} · ${r.year} Year</div>
         <div style="font-size:12px;color:var(--text2);margin-top:4px;">📌 <strong>${r.event}</strong> — ${r.dates || '—'}</div>
         <div style="font-size:10px;color:var(--text3);margin-top:2px;">Role: ${r.role}</div>
@@ -1692,8 +1692,8 @@ async function fetchDocRequests() {
 async function approveDocReq(reqId, status) {
   try {
     await fetch(SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'docApprove', requestId: reqId, status: status })
     });
     showToast(reqId + ' → ' + status, status === 'Approved' ? 'success' : 'error');

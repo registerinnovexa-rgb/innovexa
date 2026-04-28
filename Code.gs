@@ -589,15 +589,16 @@ function handleGetResources(ss) {
   const resources = [];
 
   for (let i = 1; i < allData.length; i++) {
-    const title = (allData[i][0] || '').toString().trim();
-    if (!title) continue; // Skip empty rows
+    const title = (allData[i][1] || '').toString().trim();
+    const stack = (allData[i][0] || '').toString().trim();
+    if (!title && !stack) continue; // Skip empty rows
 
     resources.push({
-      title:       title,
-      description: (allData[i][1] || '').toString().trim(),
-      link:        (allData[i][2] || '').toString().trim(),
-      category:    (allData[i][3] || '').toString().trim(),
-      stack:       (allData[i][4] || '').toString().trim()
+      stack:       (allData[i][0] || '').toString().trim(),
+      title:       (allData[i][1] || '').toString().trim(),
+      category:    (allData[i][2] || '').toString().trim(),
+      link:        (allData[i][3] || '').toString().trim(),
+      description: (allData[i][4] || '').toString().trim()
     });
   }
 
