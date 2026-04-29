@@ -71,7 +71,7 @@
 
 // ─── Configuration ──────────────────────────────────────────────
 const SHEET_NAME = 'Sheet1';
-const UPLOADS_FOLDER_NAME = 'Innovexa Hub - Operative Assets';
+const UPLOADS_FOLDER_ID = '1jvYCpmETyXRsXarvI_Qg_0A6xXnmrT-N';
 
 /**
  * ═══════════════════════════════════════════════════════════════
@@ -192,7 +192,7 @@ function handleFileUpload(base64Data, fileName, mimeType) {
       Logger.log('Upload skipped: invalid or empty base64 data for ' + fileName);
       return 'Upload Failed - No Data';
     }
-    var folder = getOrCreateFolder(UPLOADS_FOLDER_NAME);
+    var folder = DriveApp.getFolderById(UPLOADS_FOLDER_ID);
     // Handle both "data:image/jpeg;base64,..." and raw base64 strings
     var rawBase64 = base64Data.indexOf(',') > -1 ? base64Data.split(',')[1] : base64Data;
     if (!rawBase64 || rawBase64.length < 50) {
@@ -214,10 +214,8 @@ function handleFileUpload(base64Data, fileName, mimeType) {
 /**
  * getOrCreateFolder() — Helper to manage Drive folders
  */
-function getOrCreateFolder(folderName) {
-  const folders = DriveApp.getFoldersByName(folderName);
-  if (folders.hasNext()) return folders.next();
-  return DriveApp.createFolder(folderName);
+function getOrCreateFolder(folderId) {
+  return DriveApp.getFolderById(folderId);
 }
 
 /**
