@@ -188,15 +188,26 @@ function doPost(e) {
  */
 function handleFileUpload(base64Data, fileName, mimeType) {
   try {
-    const folder = getOrCreateFolder(UPLOADS_FOLDER_NAME);
-    const decoded = Utilities.base64Decode(base64Data.split(',')[1]);
-    const blob = Utilities.newBlob(decoded, mimeType, fileName);
-    const file = folder.createFile(blob);
+    if (!base64Data || typeof base64Data !== 'string' || base64Data.length < 100) {
+      Logger.log('Upload skipped: invalid or empty base64 data for ' + fileName);
+      return 'Upload Failed - No Data';
+    }
+    var folder = getOrCreateFolder(UPLOADS_FOLDER_NAME);
+    // Handle both "data:image/jpeg;base64,..." and raw base64 strings
+    var rawBase64 = base64Data.indexOf(',') > -1 ? base64Data.split(',')[1] : base64Data;
+    if (!rawBase64 || rawBase64.length < 50) {
+      Logger.log('Upload skipped: base64 content too short for ' + fileName);
+      return 'Upload Failed - Data Too Short';
+    }
+    var decoded = Utilities.base64Decode(rawBase64);
+    var blob = Utilities.newBlob(decoded, mimeType || 'image/jpeg', fileName + '.jpg');
+    var file = folder.createFile(blob);
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    Logger.log('Upload success: ' + fileName + ' → ' + file.getUrl());
     return file.getUrl();
   } catch (e) {
-    Logger.log('Upload Error: ' + e.message);
-    return 'Upload Failed';
+    Logger.log('Upload Error for ' + fileName + ': ' + e.message);
+    return 'Upload Failed - ' + e.message;
   }
 }
 

@@ -1985,6 +1985,31 @@
       });
     }
 
+    // Compress & resize image to stay under GAS payload limits
+    function compressImageToBase64(file, maxDim = 800, quality = 0.6) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = reject;
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else       { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     // File Label Helper
     function updateFileLabel(inputId, labelId) {
       const file = document.getElementById(inputId).files[0];
@@ -2045,14 +2070,14 @@
       spinner.classList.remove('hidden');
 
       try {
-        // Convert files to Base64 (skip if not selected)
+        // Compress images client-side (max 800px, JPEG 60%) to stay under GAS limits
+        btnText.textContent = 'Compressing Photo...';
         let photoBase64 = '';
-        let photoType = '';
         if (photoFile) {
-          photoBase64 = await readFileAsBase64(photoFile);
-          photoType = photoFile.type;
+          photoBase64 = await compressImageToBase64(photoFile, 800, 0.6);
         }
-        const paymentBase64 = await readFileAsBase64(paymentFile);
+        btnText.textContent = 'Compressing Payment Proof...';
+        const paymentBase64 = await compressImageToBase64(paymentFile, 800, 0.6);
 
         btnText.textContent = 'Submitting Data...';
 
@@ -2069,17 +2094,17 @@
           utr: result.cleaned,
           amount: FEE_LABEL,
           photoBase64: photoBase64,
-          photoType: photoType,
+          photoType: 'image/jpeg',
           paymentBase64: paymentBase64,
-          paymentType: paymentFile.type
+          paymentType: 'image/jpeg'
         };
 
-        // POST to Google Apps Script
+        // POST to Google Apps Script (text/plain avoids CORS preflight)
         if (SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
           await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(payload),
           });
           console.log('✅ Registration data sent to Google Sheets.');
