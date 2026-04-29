@@ -137,10 +137,9 @@ function doPost(e) {
     const nextId = lastRow;
     const operativeId = 'INVX-' + String(nextId).padStart(2, '0');
 
-    // ── Handle File Uploads (Drive) ──────────────────────────
-    // ── Use Base64 directly (Drive bypass) ──────────────────
-    let photoUrl = data.photoBase64 || '';
-    let paymentUrl = data.paymentBase64 || '';
+    // ── Image URLs (Cloudinary) ────────────────────────────────
+    let photoUrl = data.photoUrl || data.photoBase64 || '';
+    let paymentUrl = data.paymentUrl || data.paymentBase64 || '';
 
     // ── Append New Row ───────────────────────────────────────
     // Columns: [Timestamp, Name, Email, Phone, Year, Branch, SkillLevel, DOB, Interests, UTR, Status, Amount, OperativeID, LinkedIn, GitHub, Bio, Avatar (Photo URL), Skills, Payment Proof URL]

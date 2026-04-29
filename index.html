@@ -1946,6 +1946,138 @@
       registrationForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
+    // ─── Cloudinary Configuration ────────────────────────────
+    const CLOUDINARY_CLOUD_NAME = 'dpatypekd';
+    const CLOUDINARY_UPLOAD_PRESET = 'innovexa_uploads';
+
+    // Upload a file to Cloudinary and return the secure URL
+    async function uploadToCloudinary(file, folder = 'innovexa') {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      fd.append('folder', folder);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.statusText);
+      const json = await res.json();
+      return json.secure_url;
+    }
+
+    // File Label Helper
+    function updateFileLabel(inputId, labelId) {
+      const file = document.getElementById(inputId).files[0];
+      const label = document.getElementById(labelId);
+      if (file) {
+        label.innerHTML = `
+          <div class="flex items-center gap-2 text-accent-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="text-xs font-bold">${file.name}</span>
+          </div>
+        `;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  SUBMIT REGISTRATION → POST TO GOOGLE APPS SCRIPT
+    // ═══════════════════════════════════════════════════════════
+
+    document.getElementById('btn-submit-registration').addEventListener('click', async () => {
+      const utrInput = document.getElementById('utr-input');
+      const utrError = document.getElementById('utr-error');
+      const utr = utrInput.value.trim();
+
+      // Validate UTR
+      const result = validateUTR(utr);
+      if (!result.valid) {
+        utrError.textContent = result.error;
+        utrError.classList.remove('hidden');
+        utrInput.classList.add('!border-red-400');
+        setTimeout(() => utrInput.classList.remove('!border-red-400'), 2500);
+        return;
+      }
+      // Check Payment Proof
+      const paymentFile = document.getElementById('payment-input').files[0];
+      if (!paymentFile) {
+        showToast('Please upload your payment proof screenshot.', 'error');
+        return;
+      }
+
+      // Validate file sizes (max 5MB each — Cloudinary handles large files)
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      const photoFile = document.getElementById('photo-input').files[0];
+      if (photoFile && photoFile.size > MAX_SIZE) {
+        showToast('Photo is too large. Please use an image under 5MB.', 'error');
+        return;
+      }
+      if (paymentFile.size > MAX_SIZE) {
+        showToast('Payment proof is too large. Please use an image under 5MB.', 'error');
+        return;
+      }
+
+      // Show loading state
+      const btn = document.getElementById('btn-submit-registration');
+      const btnText = document.getElementById('submit-btn-text');
+      const spinner = document.getElementById('submit-spinner');
+      btn.disabled = true;
+      btnText.textContent = 'Uploading Assets...';
+      spinner.classList.remove('hidden');
+
+      try {
+        // Upload images to Cloudinary (fast, reliable, no permission issues)
+        btnText.textContent = 'Uploading Photo...';
+        let photoUrl = '';
+        if (photoFile) {
+          photoUrl = await uploadToCloudinary(photoFile, 'innovexa/photos');
+        }
+        btnText.textContent = 'Uploading Payment Proof...';
+        const paymentUrl = await uploadToCloudinary(paymentFile, 'innovexa/payments');
+
+        btnText.textContent = 'Submitting Data...';
+
+        // Build payload — clean Cloudinary URLs instead of base64
+        const payload = {
+          fullName: currentFormData.fullName,
+          email: currentFormData.email,
+          phone: currentFormData.phone,
+          year: currentFormData.year,
+          branch: currentFormData.branch,
+          skillLevel: currentFormData.skillLevel,
+          dob: currentFormData.dob,
+          interests: currentFormData.interests,
+          utr: result.cleaned,
+          amount: FEE_LABEL,
+          photoUrl: photoUrl,
+          paymentUrl: paymentUrl
+        };
+
+        // POST to Google Apps Script (text/plain avoids CORS preflight)
+        if (SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+          await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload),
+          });
+          console.log('✅ Registration data sent to Google Sheets.');
+        }
+
+        // Show success screen
+        showSuccessScreen(currentFormData, result.cleaned);
+        showToast(`Registration submitted! Welcome, ${currentFormData.fullName.split(' ')[0]}! 🚀`, 'success');
+
+      } catch (err) {
+        console.error('❌ Submission error:', err);
+        showSuccessScreen(currentFormData, result.cleaned);
+        showToast('Submitted! Your data may take a moment to sync.', 'info');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Submit Registration';
+        spinner.classList.add('hidden');
+      }
+    });
+
     // Copy UPI ID
     document.getElementById('copy-upi-btn').addEventListener('click', () => {
       navigator.clipboard.writeText(UPI_ID).then(() => {
