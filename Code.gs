@@ -138,15 +138,9 @@ function doPost(e) {
     const operativeId = 'INVX-' + String(nextId).padStart(2, '0');
 
     // ── Handle File Uploads (Drive) ──────────────────────────
-    let photoUrl = '';
-    let paymentUrl = '';
-
-    if (data.photoBase64) {
-      photoUrl = handleFileUpload(data.photoBase64, operativeId + '_photo', data.photoType);
-    }
-    if (data.paymentBase64) {
-      paymentUrl = handleFileUpload(data.paymentBase64, operativeId + '_payment', data.paymentType);
-    }
+    // ── Use Base64 directly (Drive bypass) ──────────────────
+    let photoUrl = data.photoBase64 || '';
+    let paymentUrl = data.paymentBase64 || '';
 
     // ── Append New Row ───────────────────────────────────────
     // Columns: [Timestamp, Name, Email, Phone, Year, Branch, SkillLevel, DOB, Interests, UTR, Status, Amount, OperativeID, LinkedIn, GitHub, Bio, Avatar (Photo URL), Skills, Payment Proof URL]
@@ -187,28 +181,8 @@ function doPost(e) {
  * handleFileUpload() — Saves Base64 data to Google Drive
  */
 function handleFileUpload(base64Data, fileName, mimeType) {
-  try {
-    if (!base64Data || typeof base64Data !== 'string' || base64Data.length < 100) {
-      Logger.log('Upload skipped: invalid or empty base64 data for ' + fileName);
-      return 'Upload Failed - No Data';
-    }
-    var folder = DriveApp.getFolderById(UPLOADS_FOLDER_ID);
-    // Handle both "data:image/jpeg;base64,..." and raw base64 strings
-    var rawBase64 = base64Data.indexOf(',') > -1 ? base64Data.split(',')[1] : base64Data;
-    if (!rawBase64 || rawBase64.length < 50) {
-      Logger.log('Upload skipped: base64 content too short for ' + fileName);
-      return 'Upload Failed - Data Too Short';
-    }
-    var decoded = Utilities.base64Decode(rawBase64);
-    var blob = Utilities.newBlob(decoded, mimeType || 'image/jpeg', fileName + '.jpg');
-    var file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    Logger.log('Upload success: ' + fileName + ' → ' + file.getUrl());
-    return file.getUrl();
-  } catch (e) {
-    Logger.log('Upload Error for ' + fileName + ': ' + e.message);
-    return 'Upload Failed - ' + e.message;
-  }
+  // Drive upload bypassed. Storing base64 directly in sheet.
+  return base64Data;
 }
 
 /**
@@ -720,7 +694,9 @@ function handleAdminMembers(sheet) {
       utr:         (allData[i][9]  || '').toString().trim(),
       status:      (allData[i][10] || '').toString().trim(),
       amount:      (allData[i][11] || '').toString().trim(),
-      operativeId: (allData[i][12] || '').toString().trim()
+      operativeId: (allData[i][12] || '').toString().trim(),
+      avatar:      (allData[i][16] || '').toString().trim(),
+      paymentProof: (allData[i][18] || '').toString().trim()
     });
   }
 

@@ -2070,14 +2070,14 @@
       spinner.classList.remove('hidden');
 
       try {
-        // Compress images client-side (max 800px, JPEG 60%) to stay under GAS limits
+        // Compress images client-side (max 400px, JPEG 40%) to fit in Google Sheets cells (50k char limit)
         btnText.textContent = 'Compressing Photo...';
         let photoBase64 = '';
         if (photoFile) {
-          photoBase64 = await compressImageToBase64(photoFile, 800, 0.6);
+          photoBase64 = await compressImageToBase64(photoFile, 400, 0.4);
         }
         btnText.textContent = 'Compressing Payment Proof...';
-        const paymentBase64 = await compressImageToBase64(paymentFile, 800, 0.6);
+        const paymentBase64 = await compressImageToBase64(paymentFile, 400, 0.4);
 
         btnText.textContent = 'Submitting Data...';
 
