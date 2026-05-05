@@ -193,7 +193,7 @@ function savePayConfig(d) {
 function getPayConfig() {
   const p = PropertiesService.getScriptProperties();
   return {
-    upiId: p.getProperty('pay_upi') || '',
+    upiId: p.getProperty('pay_upi') || '9445253099@okbizaxis',
     name:  p.getProperty('pay_name') || CLUB_NAME,
     fee:   p.getProperty('pay_fee')  || REG_FEE
   };
@@ -596,7 +596,7 @@ function setupSheets() {
 
   // Default pay config
   PropertiesService.getScriptProperties().setProperties({
-    pay_upi: 'innovexa@upi', pay_name: CLUB_NAME, pay_fee: REG_FEE
+    pay_upi: '9445253099@okbizaxis', pay_name: CLUB_NAME, pay_fee: REG_FEE
   });
 
   SpreadsheetApp.getUi().alert(

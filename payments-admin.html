@@ -390,7 +390,9 @@ tr:hover td{background:var(--surface)}
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
 const SCRIPT_URL = localStorage.getItem('innovexa_script_url') || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
-const PAY        = JSON.parse(localStorage.getItem('innovexa_pay') || '{}');
+const PAY = JSON.parse(localStorage.getItem('innovexa_pay') || JSON.stringify({
+  upi: '9445253099@okbizaxis', name: 'Innovexa Hub', fee: '599'
+}));
 const ADMIN      = JSON.parse(localStorage.getItem('innovexa_user') || '{}');
 const FEE        = Number(PAY.fee || 599);
 
