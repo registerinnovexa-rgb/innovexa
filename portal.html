@@ -394,7 +394,7 @@ tr:hover td{background:var(--surface)}
                     <div class="id-fields">
                       <div class="id-field"><span class="id-fl">ID</span><span class="id-fv" id="idMemberID">—</span></div>
                       <div class="id-field"><span class="id-fl">Email</span><span class="id-fv" id="idEmail">—</span></div>
-                      <div class="id-field"><span class="id-fl">Valid</span><span class="id-fv">2024–2027</span></div>
+                      <div class="id-field"><span class="id-fl">Valid</span><span class="id-fv">2025–2026</span></div>
                     </div>
                     <div class="id-qr-box" id="idQRCode"></div>
                   </div>
@@ -862,7 +862,7 @@ async function generateDocument() {
   let title, body;
   if (selectedDocType === 'membership') {
     title = 'Membership Certificate';
-    body = `This is to certify that <strong>${u.FullName}</strong> (${u.Branch}, ${u.Year}) is an active member of Innovexa Hub — University Technology & Innovation Club. Member ID: ${u.ID || 'IH-'+Date.now().toString().slice(-6)}. Valid 2024–2027.`;
+    body = `This is to certify that <strong>${u.FullName}</strong> (${u.Branch}, ${u.Year}) is an active member of Innovexa Hub — University Technology & Innovation Club. Member ID: ${u.ID || 'IH-'+Date.now().toString().slice(-6)}. Valid 2025–2026.`;
   } else if (selectedDocType === 'event') {
     const evId = document.getElementById('docEventId').value;
     const ev = allEvents.find(e=>e.ID===evId);
@@ -962,7 +962,7 @@ function downloadIDCard() {
   </style></head><body><div class="card">
     <div class="top"><div><div class="club">Innovexa Hub</div><div class="sub">UNIVERSITY TECH CLUB</div></div><div class="type-badge">MEMBER ID</div></div>
     <div><div class="name">${u.FullName}</div><div class="detail">${u.Branch} · ${u.Year} · ${u.ID||'IH-'+Date.now().toString().slice(-6)}</div></div>
-    <div class="bottom"><div><div class="id-text">ID: ${u.ID||'IH-'+Date.now().toString().slice(-6)}</div><div class="id-text">Valid: 2024–2027</div></div><div class="qr-placeholder">QR CODE</div></div>
+    <div class="bottom"><div><div class="id-text">ID: ${u.ID||'IH-'+Date.now().toString().slice(-6)}</div><div class="id-text">Valid: 2025–2026</div></div><div class="qr-placeholder">QR CODE</div></div>
   </div><script>window.onload=()=>window.print()<\/script></body></html>`);
 }
 

@@ -232,7 +232,7 @@ function registerWithPayment(d) {
   // ── Email to ADMIN ────────────────────────────────────────
   const adminBody = emailWrap(`
     <h2 style="font-size:20px;color:#1a1a2e;margin:0 0 8px">💰 New Payment Application</h2>
-    <p style="font-size:13px;color:#6b6682;margin:0 0 20px">A student has submitted a registration payment for verification.</p>
+    <p style="font-size:13px;color:#6b6682;margin:0 0 20px">A student has submitted a annual membership payment for verification.</p>
     <table style="width:100%;border-collapse:collapse;font-size:13px">
       <tr style="background:#f4f2ff"><td style="padding:10px 14px;color:#6b6682;width:40%;font-weight:600">Name</td><td style="padding:10px 14px;font-weight:500">${d.name}</td></tr>
       <tr><td style="padding:10px 14px;color:#6b6682;font-weight:600">Email</td><td style="padding:10px 14px">${d.email}</td></tr>
@@ -256,7 +256,7 @@ function registerWithPayment(d) {
     <h2 style="font-size:20px;color:#1a1a2e;margin:0 0 8px">Application Received! 🎉</h2>
     <p style="font-size:14px;color:#1a1a2e;margin:0 0 6px">Hi <strong>${d.name}</strong>,</p>
     <p style="font-size:13px;color:#6b6682;line-height:1.7;margin:0 0 20px">
-      We've received your membership application for <strong>${CLUB_NAME}</strong>. Our admin will verify your payment and get back to you within <strong>24–48 hours</strong>.
+      We've received your <strong>annual membership</strong> application for <strong>${CLUB_NAME}</strong>. Our admin will verify your payment and get back to you within <strong>24–48 hours</strong>.
     </p>
     <div style="background:#f4f2ff;border-radius:10px;padding:18px;margin-bottom:20px">
       <div style="font-size:11px;font-weight:700;color:#6b6682;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Your Application Summary</div>
@@ -355,7 +355,7 @@ function approvePayment(d) {
     <p style="font-size:13px;color:#6b6682;line-height:1.7;margin:0 0 20px">
       Great news! Your payment of <strong style="color:#059669">₹${pAmount || REG_FEE}</strong>
       (UTR: <code style="background:#f4f2ff;padding:2px 7px;border-radius:4px;color:#5b21b6;font-size:12px">${pUTR}</code>)
-      has been successfully verified. Your membership is now <strong>active</strong>!
+      has been successfully verified. Your annual membership is now <strong>active</strong> until <strong>May 2026</strong>!
     </p>
     <div style="background:#f4f2ff;border-radius:12px;padding:20px;margin-bottom:20px">
       <div style="font-size:11px;font-weight:700;color:#6b6682;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">Your Member Details</div>
@@ -479,7 +479,7 @@ function updateStatus(id, status) {
   if (status === 'active') {
     const row = s.getRange(r, 1, 1, 13).getValues()[0];
     sendMail(row[2], `Welcome to ${CLUB_NAME}! 🎉`,
-      emailWrap(`<p style="font-size:14px;color:#1a1a2e">Hi <strong>${row[1]}</strong>,</p><p style="font-size:13px;color:#6b6682;line-height:1.7;">Your membership is now <strong>active</strong>! Sign in to the portal with your email to access your digital ID card, events, and more.</p>`));
+      emailWrap(`<p style="font-size:14px;color:#1a1a2e">Hi <strong>${row[1]}</strong>,</p><p style="font-size:13px;color:#6b6682;line-height:1.7;">Your annual membership is now <strong>active</strong> until <strong>May 2026</strong>! Sign in to the portal with your email to access your digital ID card, events, and more.</p>`));
   }
   return { success: true };
 }
