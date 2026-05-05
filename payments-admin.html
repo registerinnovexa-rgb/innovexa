@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Payment Verification — Innovexa Hub Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0d0b14;--muted:#6b6682;--light:#f4f2ff;--surface:#faf9ff;--white:#fff;--v:#5b21b6;--v2:#7c3aed;--v3:#a78bfa;--v4:#ede9fe;--c:#06b6d4;--cl:#e0f2fe;--g:#059669;--gl:#d1fae5;--a:#d97706;--al:#fef3c7;--r:#e11d48;--rl:#ffe4e6;--border:rgba(91,33,182,0.12);--border2:rgba(91,33,182,0.22)}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink)}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-width:210px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;overflow-y:auto;z-index:100}
+.main{margin-left:210px;flex:1;display:flex;flex-direction:column}
+.sb-head{padding:16px 14px 12px;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.sb-lm{width:28px;height:28px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-lm svg{width:13px;height:13px}
+.sb-ln{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--ink)}
+.sb-ls{font-size:9px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.admin-pill{margin:8px 12px 0;background:linear-gradient(90deg,var(--v4),#fff);border:1px solid #c4b5fd;border-radius:5px;padding:4px 9px;font-size:9px;font-weight:700;color:var(--v);display:flex;align-items:center;gap:4px}
+.sb-nav{padding:10px 6px;flex:1}
+.sb-sec{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#c4b5fd;padding:6px 10px 3px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;margin-bottom:1px;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none;transition:.15s}
+.sb-item:hover{background:var(--light);color:var(--ink)}
+.sb-item.on{background:var(--v4);color:var(--v);font-weight:500}
+.sb-item svg{width:12px;height:12px;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;background:var(--r);color:#fff;padding:1px 5px;border-radius:99px}
+.sb-foot{padding:10px 10px 14px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:8px;background:var(--surface)}
+.av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--c));display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;flex-shrink:0}
+
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1px solid var(--border);height:54px;padding:0 22px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--ink);flex:1;letter-spacing:-.3px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s;text-decoration:none}
+.btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:var(--v)}
+.btn-green{background:var(--g);color:#fff}.btn-green:hover{opacity:.9}
+.btn-red{background:var(--r);color:#fff}.btn-red:hover{opacity:.9}
+.btn-amber{background:var(--a);color:#fff}.btn-amber:hover{opacity:.9}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--light)}
+.btn-sm{padding:4px 9px;font-size:10px;border-radius:5px}
+.btn svg{width:11px;height:11px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CONTENT */
+.content{padding:20px 22px;flex:1}
+.panel{background:#fff;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.panel-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel-title{font-size:13px;font-weight:600;color:var(--ink)}
+.panel-acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.sc{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:13px 16px}
+.sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.sv{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px}
+.st{font-size:10px;font-weight:500}
+.st.up{color:var(--g)}.st.dn{color:var(--r)}.st.nu{color:var(--muted)}
+.si{float:right;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.si svg{width:14px;height:14px}
+.si-v{background:var(--v4);color:var(--v)}.si-g{background:var(--gl);color:#065f46}.si-a{background:var(--al);color:#92400e}.si-r{background:var(--rl);color:#9f1239}
+
+/* REVENUE CARD */
+.rev-card{background:linear-gradient(135deg,#1e1065,#5b21b6 55%,#7c3aed);border-radius:14px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;position:relative;overflow:hidden}
+.rev-card::after{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;background:rgba(6,182,212,.1)}
+.rev-label{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+.rev-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1}
+.rev-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:4px}
+.rev-right{text-align:right;position:relative;z-index:1}
+.rev-left{position:relative;z-index:1}
+.rev-pending-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:rgba(255,255,255,.7);line-height:1;margin-bottom:4px}
+
+/* TABS */
+.tab-row{display:flex;gap:3px;background:var(--surface);border-radius:8px;padding:4px;width:fit-content;margin-bottom:14px}
+.tab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);background:transparent;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* SEARCH */
+.srch{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;width:220px}
+.srch svg{width:12px;height:12px;color:#c4b5fd;flex-shrink:0}
+.srch input{border:none;background:transparent;font-size:12px;color:var(--ink);outline:none;width:100%;font-family:'DM Sans',sans-serif}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:9px;font-weight:600;color:#c4b5fd;letter-spacing:.5px;text-transform:uppercase;padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;font-size:12px;color:var(--ink);border-bottom:1px solid #f0effe;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+.mc{display:flex;align-items:center;gap:8px}
+.av-sm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.a1{background:#ede9fe;color:#3b0764}.a2{background:#e0f2fe;color:#0c4a6e}.a3{background:#d1fae5;color:#064e3b}.a4{background:#fef3c7;color:#78350f}.a5{background:#ffe4e6;color:#9f1239}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px}
+.b-pend{background:var(--al);color:#92400e}
+.b-verif{background:var(--gl);color:#065f46}
+.b-rej{background:var(--rl);color:#9f1239}
+.bdot{width:4px;height:4px;border-radius:50%;background:currentColor}
+.utr-chip{font-family:monospace;font-size:11px;font-weight:700;color:var(--v);background:var(--v4);padding:3px 8px;border-radius:4px;display:inline-block;letter-spacing:.3px}
+.act-btns{display:flex;gap:4px;flex-wrap:wrap}
+.thumb-wrap{cursor:pointer;border-radius:5px;overflow:hidden;border:1px solid var(--border2);width:32px;height:32px;flex-shrink:0;background:var(--surface);display:flex;align-items:center;justify-content:center}
+.thumb-wrap img{width:100%;height:100%;object-fit:cover}
+.thumb-none{font-size:14px}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,11,20,.58);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:18px;padding:28px;width:100%;max-width:520px;position:relative;transform:translateY(20px) scale(.97);transition:.25s;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:none}
+.modal-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:var(--light);border:none;cursor:pointer;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:4px;letter-spacing:-.4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f0effe;gap:12px}
+.detail-row:last-child{border-bottom:none}
+.dr-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;margin-top:2px}
+.dr-val{font-size:13px;font-weight:500;color:var(--ink);text-align:right;word-break:break-all}
+.screenshot-preview-box{width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--border2);margin-bottom:16px;cursor:pointer;position:relative}
+.screenshot-preview-box img{width:100%;display:block;max-height:220px;object-fit:cover;transition:.2s}
+.screenshot-preview-box:hover img{opacity:.92}
+.screenshot-zoom-hint{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500}
+.no-screenshot{background:var(--surface);border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;color:var(--muted);font-size:12px;margin-bottom:16px}
+.verify-warning{background:var(--al);border:1px solid #fbbf24;border-radius:10px;padding:14px 16px;margin:14px 0}
+.vw-title{font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.vw-text{font-size:12px;color:#78350f;line-height:1.7}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s;backdrop-filter:blur(6px)}
+.lightbox.open{opacity:1;pointer-events:all}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5);object-fit:contain}
+.lightbox-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);border:none;cursor:pointer;font-size:20px;color:#fff;display:flex;align-items:center;justify-content:center}
+
+/* REJECT MODAL */
+.rj-option{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--border2);border-radius:9px;margin-bottom:8px;cursor:pointer;transition:.15s}
+.rj-option:hover,.rj-option.selected{border-color:var(--r);background:var(--rl)}
+.rj-radio{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;margin-top:2px;transition:.15s}
+.rj-option.selected .rj-radio{border-color:var(--r);background:var(--r)}
+.rj-text{font-size:12px;font-weight:500;color:var(--ink)}
+.rj-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* FORM */
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);outline:none;transition:.15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--v);background:#fff}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-submit{width:100%;padding:11px;border-radius:9px;background:var(--r);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:.15s;margin-top:8px}
+.form-submit:hover{opacity:.9}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g)}.toast.error{background:var(--r)}
+
+/* LOADER */
+.loader{display:flex;align-items:center;justify-content:center;padding:50px;color:var(--muted);font-size:13px}
+
+/* RESULT COUNT */
+.result-count{font-size:11px;color:var(--muted);padding:10px 18px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <a href="index.html" class="sb-logo">
+        <div class="sb-lm"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L12.5 4.5V9.5L7 13L1.5 9.5V4.5L7 1Z" fill="white" fill-opacity=".9"/><circle cx="7" cy="7" r="2.5" fill="#06b6d4"/></svg></div>
+        <div><div class="sb-ln">Innovexa</div><div class="sb-ls">Hub</div></div>
+      </a>
+      <div class="admin-pill">★ Admin Panel</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-sec">Overview</div>
+      <a class="sb-item" href="admin.html">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/></svg>
+        Dashboard
+      </a>
+      <div class="sb-sec">Manage</div>
+      <a class="sb-item" href="admin.html">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="5" cy="4" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.21 1.79-4 4-4s4 1.79 4 4" stroke="currentColor" stroke-width="1.2"/></svg>
+        Members
+      </a>
+      <a class="sb-item on">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="7" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 4v3l2 1.2" stroke="currentColor" stroke-width="1.2"/></svg>
+        Payments <span class="sb-badge" id="sbBadge">0</span>
+      </a>
+      <a class="sb-item" href="admin.html">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="9.5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 1v2M8.5 1v2M1 5.5h11" stroke="currentColor" stroke-width="1.2"/></svg>
+        Events
+      </a>
+      <a class="sb-item" href="admin.html">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="2.5" y="2.5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x=".5" y=".5" width="2.5" height="2.5" rx=".5" fill="currentColor"/><rect x="10" y=".5" width="2.5" height="2.5" rx=".5" fill="currentColor"/><rect x=".5" y="10" width="2.5" height="2.5" rx=".5" fill="currentColor"/></svg>
+        Attendance
+      </a>
+      <a class="sb-item" href="admin.html">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5A5 5 0 0111.5 6.5v3.5H1.5V6.5A5 5 0 016.5 1.5z" stroke="currentColor" stroke-width="1.2"/><path d="M5 11a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
+        Announcements
+      </a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="av" id="adminAv">A</div>
+        <div>
+          <div style="font-size:11px;font-weight:500;color:var(--ink)" id="adminName">Admin</div>
+          <div style="font-size:10px;color:var(--muted)">Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Payment Verification</div>
+      <div class="srch">
+        <svg viewBox="0 0 12 12" fill="none"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M8.5 8.5L11 11" stroke="currentColor" stroke-width="1.3"/></svg>
+        <input type="text" placeholder="Search name, email, UTR…" oninput="filterTable(this.value)">
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3.5 6L6 8.5L8.5 6M1 10h10" stroke="currentColor" stroke-width="1.3"/></svg>
+        Export CSV
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="loadData()">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M11 6A5 5 0 111 6" stroke="currentColor" stroke-width="1.3"/><path d="M11 2v4H7" stroke="currentColor" stroke-width="1.3"/></svg>
+        Refresh
+      </button>
+    </div>
+
+    <div class="content">
+
+      <!-- REVENUE CARD -->
+      <div class="rev-card">
+        <div class="rev-left">
+          <div class="rev-label">Total revenue collected</div>
+          <div class="rev-val" id="totalRev">₹0</div>
+          <div class="rev-sub" id="totalRevSub">0 verified payments</div>
+        </div>
+        <div class="rev-right">
+          <div class="rev-label">Pending verification</div>
+          <div class="rev-pending-val" id="pendRev">₹0</div>
+          <div class="rev-sub" id="pendRevSub">0 applications waiting</div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="sgrid">
+        <div class="sc">
+          <div class="si si-a" style="float:right"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5V7l1.5 1" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <div class="sl">Pending</div><div class="sv" id="sPend">0</div>
+          <div class="st dn">Needs review</div>
+        </div>
+        <div class="sc">
+          <div class="si si-g" style="float:right"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <div class="sl">Verified</div><div class="sv" id="sVerif">0</div>
+          <div class="st up">Members activated</div>
+        </div>
+        <div class="sc">
+          <div class="si si-r" style="float:right"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 9l2-2 2 2M5 5l2 2 2-2" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <div class="sl">Rejected</div><div class="sv" id="sRej">0</div>
+          <div class="st nu">Invalid / wrong UTR</div>
+        </div>
+        <div class="sc">
+          <div class="si si-v" style="float:right"><svg viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="9" rx="1.3" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 6h11" stroke="currentColor" stroke-width="1.3"/></svg></div>
+          <div class="sl">Today</div><div class="sv" id="sToday">0</div>
+          <div class="st nu">New applications</div>
+        </div>
+      </div>
+
+      <!-- BULK ACTIONS -->
+      <div id="bulkBar" style="display:none;background:var(--v4);border:1px solid #c4b5fd;border-radius:10px;padding:10px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px">
+        <span style="font-size:12px;font-weight:600;color:var(--v)" id="bulkCount">0 selected</span>
+        <button class="btn btn-green btn-sm" onclick="bulkApprove()">✓ Approve all selected</button>
+        <button class="btn btn-red btn-sm" onclick="bulkReject()">✗ Reject all selected</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearSelection()">Clear</button>
+      </div>
+
+      <!-- TABS + TABLE -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:2px">
+        <div class="tab-row">
+          <button class="tab on" onclick="setTab('all',this)">All</button>
+          <button class="tab" onclick="setTab('pending_verification',this)">⏳ Pending</button>
+          <button class="tab" onclick="setTab('verified',this)">✅ Verified</button>
+          <button class="tab" onclick="setTab('rejected',this)">❌ Rejected</button>
+        </div>
+        <span id="resultCount" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+
+      <div class="panel">
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr>
+              <th style="width:28px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)" style="accent-color:var(--v)"></th>
+              <th>#</th>
+              <th>Applicant</th>
+              <th>Branch · Year</th>
+              <th>UTR</th>
+              <th>Screenshot</th>
+              <th>Amount</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr></thead>
+            <tbody id="tBody">
+              <tr><td colspan="10"><div class="loader">Loading payments...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="result-count" id="resultCountBottom"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('reviewModal')">×</button>
+    <div class="modal-title" id="rmTitle">Review Application</div>
+    <div class="modal-sub" id="rmSub">Verify UTR before approving</div>
+    <div id="rmScreenshot"></div>
+    <div id="rmDetails"></div>
+    <div class="verify-warning">
+      <div class="vw-title">⚠️ Before approving — verify the UTR</div>
+      <div class="vw-text">
+        1. Open your UPI app (GPay / PhonePe / bank app)<br>
+        2. Go to Transaction History or Passbook<br>
+        3. Confirm the UTR matches and the amount is <strong>₹<span id="rmFee">599</span></strong><br>
+        4. Only then click <strong>Approve</strong> to activate the membership
+      </div>
+    </div>
+    <div class="modal-actions" id="rmActions"></div>
+  </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('rejectModal')">×</button>
+    <div class="modal-title">Reject payment?</div>
+    <div class="modal-sub">Select a reason. The applicant will receive an email explaining the rejection.</div>
+
+    <div id="rejectOptions">
+      <div class="rj-option selected" onclick="selectReason(this,'Invalid or incorrect UTR number')">
+        <div class="rj-radio"></div>
+        <div><div class="rj-text">Invalid UTR</div><div class="rj-sub">The transaction ID doesn't match any record</div></div>
+      </div>
+      <div class="rj-option" onclick="selectReason(this,'Payment amount does not match ₹599')">
+        <div class="rj-radio"></div>
+        <div><div class="rj-text">Amount mismatch</div><div class="rj-sub">Amount paid is not ₹<span class="fee-span">599</span></div></div>
+      </div>
+      <div class="rj-option" onclick="selectReason(this,'Duplicate submission — UTR already used')">
+        <div class="rj-radio"></div>
+        <div><div class="rj-text">Duplicate submission</div><div class="rj-sub">Same UTR submitted more than once</div></div>
+      </div>
+      <div class="rj-option" onclick="selectReason(this,'Screenshot unclear or not matching')">
+        <div class="rj-radio"></div>
+        <div><div class="rj-text">Screenshot mismatch</div><div class="rj-sub">Screenshot doesn't match the UTR provided</div></div>
+      </div>
+      <div class="rj-option" onclick="selectReason(this,'')">
+        <div class="rj-radio"></div>
+        <div><div class="rj-text">Other</div><div class="rj-sub">Write a custom reason below</div></div>
+      </div>
+    </div>
+
+    <div id="customReasonGroup" style="display:none;margin-top:10px">
+      <div class="form-group">
+        <label>Custom reason</label>
+        <textarea id="customReason" placeholder="Describe the issue…"></textarea>
+      </div>
+    </div>
+
+    <button class="form-submit" onclick="confirmReject()">Confirm Rejection</button>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightboxImg" src="" alt="Payment screenshot">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const SCRIPT_URL = localStorage.getItem('innovexa_script_url') || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
+const PAY        = JSON.parse(localStorage.getItem('innovexa_pay') || '{}');
+const ADMIN      = JSON.parse(localStorage.getItem('innovexa_user') || '{}');
+const FEE        = Number(PAY.fee || 599);
+
+let all = [], filtered = [], currentTab = 'all', searchQ = '', selectedId = null;
+let selectedReason = 'Invalid or incorrect UTR number';
+const AV = ['a1','a2','a3','a4','a5'];
+
+// Init admin UI
+if (ADMIN.FullName) {
+  document.getElementById('adminAv').textContent   = ini(ADMIN.FullName);
+  document.getElementById('adminName').textContent = ADMIN.FullName;
+}
+document.querySelectorAll('.fee-span').forEach(s => s.textContent = PAY.fee || '599');
+document.getElementById('rmFee').textContent = PAY.fee || '599';
+
+function ini(n) { return (n||'').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+
+// ── LOAD ────────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('tBody').innerHTML = '<tr><td colspan="10"><div class="loader">Loading…</div></td></tr>';
+  try {
+    if (!SCRIPT_URL) throw new Error('no url');
+    const r = await fetch(`${SCRIPT_URL}?action=getPayments`);
+    const d = await r.json();
+    all = d.payments || [];
+  } catch(e) { all = demoData(); }
+  renderStats(); renderTable();
+}
+
+function demoData() {
+  return [
+    { id:'PAY-001', name:'Neha Mishra',  email:'n.mishra@uni.edu',  phone:'+91 98765 11111', branch:'IT',   year:'1st Year', skills:'Python, Data Viz',        utr:'407612345678',    amount:599, screenshot: '', paymentStatus:'pending_verification', submittedAt:'2026-05-03T08:15:00Z' },
+    { id:'PAY-002', name:'Rahul Sen',    email:'r.sen@uni.edu',     phone:'+91 98765 22222', branch:'CSE',  year:'2nd Year', skills:'Flutter, Firebase, UI/UX', utr:'T25050312345679', amount:599, screenshot: '', paymentStatus:'pending_verification', submittedAt:'2026-05-03T09:22:00Z' },
+    { id:'PAY-003', name:'Preet Anand',  email:'p.anand@uni.edu',   phone:'+91 98765 33333', branch:'ECE',  year:'3rd Year', skills:'React, Node.js, Tailwind', utr:'407699887766',    amount:599, screenshot: '', paymentStatus:'verified',              submittedAt:'2026-05-02T14:10:00Z', verifiedAt:'2026-05-02T16:30:00Z' },
+    { id:'PAY-004', name:'Sneha Patel',  email:'s.patel@uni.edu',   phone:'+91 98765 44444', branch:'MECH', year:'2nd Year', skills:'CAD, SolidWorks',          utr:'INVALID123',      amount:599, screenshot: '', paymentStatus:'rejected',              submittedAt:'2026-05-01T11:05:00Z', rejectedAt:'2026-05-01T12:00:00Z', rejectReason:'Invalid or incorrect UTR number' },
+    { id:'PAY-005', name:'Aryan Mehta',  email:'a.mehta@uni.edu',   phone:'+91 98765 55555', branch:'CSE',  year:'4th Year', skills:'ML, Python, TensorFlow',   utr:'512345678901',    amount:599, screenshot: '', paymentStatus:'pending_verification', submittedAt:'2026-05-03T10:45:00Z' },
+    { id:'PAY-006', name:'Divya Nair',   email:'d.nair@uni.edu',    phone:'+91 98765 66666', branch:'EEE',  year:'3rd Year', skills:'MATLAB, VHDL',             utr:'321098765432',    amount:599, screenshot: '', paymentStatus:'pending_verification', submittedAt:'2026-05-03T11:30:00Z' },
+  ];
+}
+
+// ── STATS ───────────────────────────────────────────────────
+function renderStats() {
+  const pend  = all.filter(p=>p.paymentStatus==='pending_verification').length;
+  const verif = all.filter(p=>p.paymentStatus==='verified').length;
+  const rej   = all.filter(p=>p.paymentStatus==='rejected').length;
+  const today = all.filter(p=>new Date(p.submittedAt).toDateString()===new Date().toDateString()).length;
+
+  document.getElementById('sPend').textContent  = pend;
+  document.getElementById('sVerif').textContent = verif;
+  document.getElementById('sRej').textContent   = rej;
+  document.getElementById('sToday').textContent = today;
+  document.getElementById('sbBadge').textContent = pend;
+
+  document.getElementById('totalRev').textContent   = '₹' + (verif * FEE).toLocaleString('en-IN');
+  document.getElementById('totalRevSub').textContent = verif + ' verified payment' + (verif!==1?'s':'');
+  document.getElementById('pendRev').textContent    = '₹' + (pend * FEE).toLocaleString('en-IN');
+  document.getElementById('pendRevSub').textContent  = pend + ' application' + (pend!==1?'s':'') + ' waiting';
+}
+
+// ── TABLE ───────────────────────────────────────────────────
+function renderTable() {
+  filtered = all.filter(p => {
+    if (currentTab !== 'all' && p.paymentStatus !== currentTab) return false;
+    if (searchQ) { const q = searchQ.toLowerCase(); return (p.name+p.email+p.utr+p.branch).toLowerCase().includes(q); }
+    return true;
+  }).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  document.getElementById('resultCount').textContent       = filtered.length + ' result' + (filtered.length!==1?'s':'');
+  document.getElementById('resultCountBottom').textContent = `Showing ${filtered.length} of ${all.length} total`;
+
+  if (!filtered.length) {
+    document.getElementById('tBody').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No applications found</td></tr>';
+    return;
+  }
+
+  const sc = { pending_verification:'b-pend', verified:'b-verif', rejected:'b-rej' };
+  const sl = { pending_verification:'Pending', verified:'Verified', rejected:'Rejected' };
+
+  document.getElementById('tBody').innerHTML = filtered.map((p,i) => {
+    const utrOk = /^[A-Z0-9]{8,22}$/i.test(p.utr||'');
+    const thumb = p.screenshot
+      ? `<div class="thumb-wrap" onclick="openLightbox('${p.id}')"><img src="${p.screenshot}" alt="ss"></div>`
+      : `<div class="thumb-none" title="No screenshot">📎</div>`;
+
+    return `<tr>
+      <td><input type="checkbox" class="row-check" data-id="${p.id}" onchange="onCheck()" style="accent-color:var(--v)"></td>
+      <td style="color:var(--muted);font-size:11px;font-weight:500">${i+1}</td>
+      <td>
+        <div class="mc">
+          <div class="av-sm ${AV[i%5]}">${ini(p.name)}</div>
+          <div>
+            <div style="font-weight:500;font-size:12px">${p.name}</div>
+            <div style="font-size:10px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis">${p.email}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:11px">${p.branch||'—'} · ${p.year||'—'}</td>
+      <td><span class="utr-chip" title="${p.utr}">${(p.utr||'—').substring(0,14)}${(p.utr||'').length>14?'…':''}</span></td>
+      <td>${thumb}</td>
+      <td style="font-weight:700;color:var(--g);font-size:13px">₹${Number(p.amount||FEE).toLocaleString('en-IN')}</td>
+      <td style="font-size:11px;color:var(--muted);white-space:nowrap">${fmtDT(p.submittedAt)}</td>
+      <td><span class="badge ${sc[p.paymentStatus]||'b-pend'}"><span class="bdot"></span>${sl[p.paymentStatus]||'Pending'}</span></td>
+      <td>
+        <div class="act-btns">
+          <button class="btn btn-ghost btn-sm" onclick="openReview('${p.id}')">Review</button>
+          ${p.paymentStatus==='pending_verification' ? `
+            <button class="btn btn-green btn-sm" onclick="approve('${p.id}')">✓</button>
+            <button class="btn btn-red btn-sm" onclick="openReject('${p.id}')">✗</button>
+          ` : p.paymentStatus==='rejected' ? `
+            <button class="btn btn-amber btn-sm" onclick="approve('${p.id}')">Override ✓</button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── REVIEW MODAL ────────────────────────────────────────────
+function openReview(id) {
+  const p = all.find(x=>x.id===id); if(!p) return;
+  selectedId = id;
+  document.getElementById('rmTitle').textContent = p.name + ' — Application Review';
+  document.getElementById('rmSub').textContent   = `${p.branch} · ${p.year} · Submitted ${fmtDT(p.submittedAt)}`;
+
+  // Screenshot
+  document.getElementById('rmScreenshot').innerHTML = p.screenshot
+    ? `<div class="screenshot-preview-box" onclick="openLightbox('${p.id}')">
+        <img src="${p.screenshot}" alt="Payment screenshot">
+        <div class="screenshot-zoom-hint">🔍 Click to enlarge</div>
+       </div>`
+    : `<div class="no-screenshot">📎 No screenshot uploaded — verify UTR manually in your bank / UPI app</div>`;
+
+  // Details
+  const utrOk = /^[A-Z0-9]{8,22}$/i.test(p.utr||'');
+  const sc = {pending_verification:'b-pend',verified:'b-verif',rejected:'b-rej'};
+  const sl = {pending_verification:'Pending',verified:'Verified',rejected:'Rejected'};
+  document.getElementById('rmDetails').innerHTML = [
+    ['Full name',     p.name],
+    ['Email',         p.email],
+    ['Phone',         p.phone||'—'],
+    ['Branch & year', (p.branch||'—') + ' · ' + (p.year||'—')],
+    ['Skills',        p.skills||'—'],
+    ['UTR number',    `<span class="utr-chip">${p.utr||'—'}</span> <span class="badge ${utrOk?'b-verif':'b-pend'}" style="margin-left:4px"><span class="bdot"></span>${utrOk?'Valid format':'Check manually'}</span>`],
+    ['Amount',        `<strong style="color:var(--g)">₹${Number(p.amount||FEE).toLocaleString('en-IN')}</strong>`],
+    ['Screenshot',    p.screenshot ? '<span style="color:var(--g)">✅ Uploaded</span>' : '<span style="color:var(--a)">⚠️ Not uploaded</span>'],
+    ['Status',        `<span class="badge ${sc[p.paymentStatus]||'b-pend'}"><span class="bdot"></span>${sl[p.paymentStatus]||'Pending'}</span>`],
+    ['Submitted',     fmtDT(p.submittedAt)],
+    p.verifiedAt  ? ['Verified at',  fmtDT(p.verifiedAt)]  : null,
+    p.rejectedAt  ? ['Rejected at',  fmtDT(p.rejectedAt)]  : null,
+    p.rejectReason? ['Reject reason',`<span style="color:var(--r)">${p.rejectReason}</span>`] : null,
+  ].filter(Boolean).map(([l,v])=>`<div class="detail-row"><span class="dr-label">${l}</span><span class="dr-val">${v}</span></div>`).join('');
+
+  // Actions
+  let acts = '';
+  if (p.paymentStatus === 'pending_verification') {
+    acts = `
+      <button class="btn btn-green" style="flex:1;justify-content:center" onclick="approve('${p.id}');closeModal('reviewModal')">
+        ✓ Approve & Activate Member
+      </button>
+      <button class="btn btn-red" onclick="openReject('${p.id}');closeModal('reviewModal')">✗ Reject</button>`;
+  } else if (p.paymentStatus === 'verified') {
+    acts = `<div style="color:var(--g);font-size:12px;font-weight:600;padding:8px 0;flex:1">✅ Payment verified — member is active</div>`;
+  } else {
+    acts = `
+      <div style="color:var(--r);font-size:12px;flex:1;line-height:1.5">❌ Rejected: ${p.rejectReason||'—'}</div>
+      <button class="btn btn-amber btn-sm" onclick="approve('${p.id}');closeModal('reviewModal')">Override & Approve</button>`;
+  }
+  document.getElementById('rmActions').innerHTML = acts;
+  openModal('reviewModal');
+}
+
+// ── LIGHTBOX ────────────────────────────────────────────────
+function openLightbox(id) {
+  const p = all.find(x=>x.id===id);
+  if (!p?.screenshot) return;
+  document.getElementById('lightboxImg').src = p.screenshot;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+document.getElementById('lightbox').addEventListener('click', closeLightbox);
+document.getElementById('lightboxImg').addEventListener('click', e => e.stopPropagation());
+
+// ── APPROVE ─────────────────────────────────────────────────
+async function approve(id) {
+  const p = all.find(x=>x.id===id); if(!p) return;
+  showToast('Approving and activating member…');
+  try {
+    if (SCRIPT_URL) {
+      await fetch(SCRIPT_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'approvePayment', paymentId:id, email:p.email, name:p.name, branch:p.branch, year:p.year, phone:p.phone, skills:p.skills, utr:p.utr, verifiedBy: ADMIN.FullName||'Admin' }),
+        mode:'no-cors'
+      });
+    }
+  } catch(e) {}
+  p.paymentStatus = 'verified'; p.verifiedAt = new Date().toISOString();
+  renderStats(); renderTable();
+  showToast(`✅ ${p.name} approved! Membership activated.`, 'success');
+}
+
+// ── REJECT ──────────────────────────────────────────────────
+function openReject(id) {
+  selectedId = id;
+  selectedReason = 'Invalid or incorrect UTR number';
+  document.querySelectorAll('.rj-option').forEach((o,i) => { o.classList.toggle('selected', i===0); o.querySelector('.rj-radio').style.background = i===0 ? 'var(--r)' : ''; o.querySelector('.rj-radio').style.borderColor = i===0 ? 'var(--r)' : ''; });
+  document.getElementById('customReasonGroup').style.display = 'none';
+  document.getElementById('customReason').value = '';
+  openModal('rejectModal');
+}
+
+function selectReason(el, reason) {
+  selectedReason = reason;
+  document.querySelectorAll('.rj-option').forEach(o => {
+    o.classList.remove('selected');
+    o.querySelector('.rj-radio').style.background   = '';
+    o.querySelector('.rj-radio').style.borderColor  = '';
+  });
+  el.classList.add('selected');
+  el.querySelector('.rj-radio').style.background  = 'var(--r)';
+  el.querySelector('.rj-radio').style.borderColor = 'var(--r)';
+  document.getElementById('customReasonGroup').style.display = reason === '' ? 'block' : 'none';
+}
+
+async function confirmReject() {
+  const p = all.find(x=>x.id===selectedId); if(!p) return;
+  let reason = selectedReason || document.getElementById('customReason').value.trim();
+  if (!reason) { showToast('Please select or enter a rejection reason', 'error'); return; }
+
+  try {
+    if (SCRIPT_URL) {
+      await fetch(SCRIPT_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'rejectPayment', paymentId: selectedId, email: p.email, name: p.name, reason }),
+        mode:'no-cors'
+      });
+    }
+  } catch(e) {}
+
+  p.paymentStatus = 'rejected'; p.rejectedAt = new Date().toISOString(); p.rejectReason = reason;
+  renderStats(); renderTable();
+  closeModal('rejectModal');
+  showToast(`Payment rejected: ${reason.substring(0,40)}`, 'error');
+}
+
+// ── BULK ─────────────────────────────────────────────────────
+function onCheck() {
+  const checked = [...document.querySelectorAll('.row-check:checked')];
+  const bar = document.getElementById('bulkBar');
+  if (checked.length) {
+    bar.style.display = 'flex';
+    document.getElementById('bulkCount').textContent = checked.length + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+function toggleAll(master) {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = master.checked);
+  onCheck();
+}
+function clearSelection() {
+  document.querySelectorAll('.row-check').forEach(c => c.checked = false);
+  document.getElementById('checkAll').checked = false;
+  document.getElementById('bulkBar').style.display = 'none';
+}
+function bulkApprove() {
+  const ids = [...document.querySelectorAll('.row-check:checked')].map(c=>c.dataset.id);
+  if (!ids.length) return;
+  ids.forEach(id => approve(id));
+  clearSelection();
+}
+function bulkReject() {
+  const ids = [...document.querySelectorAll('.row-check:checked')].map(c=>c.dataset.id);
+  if (!ids.length) return;
+  // Open reject modal, on confirm apply to all
+  selectedId = ids[0];
+  openReject(ids[0]);
+  // Override confirmReject to handle all
+  const origConfirm = window.confirmReject;
+  window.confirmReject = async function() {
+    let reason = selectedReason || document.getElementById('customReason').value.trim();
+    if (!reason) { showToast('Select a reason', 'error'); return; }
+    for (const id of ids) {
+      const p = all.find(x=>x.id===id);
+      if (p && p.paymentStatus === 'pending_verification') {
+        if (SCRIPT_URL) {
+          await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'rejectPayment', paymentId:id, email:p.email, name:p.name, reason }), mode:'no-cors' }).catch(()=>{});
+        }
+        p.paymentStatus = 'rejected'; p.rejectedAt = new Date().toISOString(); p.rejectReason = reason;
+      }
+    }
+    renderStats(); renderTable(); closeModal('rejectModal'); clearSelection();
+    showToast(`Rejected ${ids.length} payments`, 'error');
+    window.confirmReject = origConfirm;
+  };
+}
+
+// ── EXPORT ───────────────────────────────────────────────────
+function exportCSV() {
+  const hdr = 'ID,Name,Email,Phone,Branch,Year,Skills,UTR,Amount,Status,Screenshot,Submitted,VerifiedAt,RejectedAt,RejectReason\n';
+  const rows = filtered.map(p =>
+    [p.id, `"${p.name}"`, `"${p.email}"`, `"${p.phone||''}"`, p.branch||'', p.year||'', `"${p.skills||''}"`, p.utr||'', `₹${p.amount||FEE}`, p.paymentStatus, p.screenshot?'Yes':'No', p.submittedAt||'', p.verifiedAt||'', p.rejectedAt||'', `"${p.rejectReason||''}"`].join(',')
+  ).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(hdr+rows);
+  a.download = 'innovexa_payments_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ── TABS & FILTER ────────────────────────────────────────────
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  renderTable();
+}
+function filterTable(q) { searchQ = q; renderTable(); }
+
+// ── UTILS ─────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3800);
+}
+function fmtDT(d) {
+  if (!d) return '—';
+  try { return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e) { return d; }
+}
+
+loadData();
+</script>
+</body>
+</html>

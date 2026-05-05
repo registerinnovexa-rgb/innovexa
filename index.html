@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Innovexa Hub — University Tech Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0b14;--muted:#6b6682;--light:#f4f2ff;--surface:#faf9ff;--white:#fff;
+  --v:#5b21b6;--v2:#7c3aed;--v3:#a78bfa;--v4:#ede9fe;
+  --c:#06b6d4;--cl:#e0f2fe;
+  --g:#059669;--gl:#d1fae5;
+  --a:#d97706;--al:#fef3c7;
+  --r:#e11d48;--rl:#ffe4e6;
+  --border:rgba(91,33,182,0.13);--border2:rgba(91,33,182,0.24);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);overflow-x:hidden}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:999;height:62px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;background:rgba(250,249,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.4px}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:16px;height:16px}
+.nav-links{display:flex;gap:2px}
+.nav-links a{padding:5px 13px;border-radius:6px;font-size:13px;color:var(--muted);text-decoration:none;transition:.15s}
+.nav-links a:hover{color:var(--ink);background:var(--light)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--light)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:var(--v)}
+.btn-violet{background:var(--v);color:#fff}
+.btn-violet:hover{background:var(--v2)}
+.btn-lg{padding:12px 26px;font-size:15px;border-radius:10px}
+.btn svg{width:13px;height:13px}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 5% 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 65% 45% at 50% 15%,rgba(124,58,237,.12) 0%,transparent 70%),radial-gradient(ellipse 40% 30% at 80% 65%,rgba(6,182,212,.07) 0%,transparent 60%)}
+.hero-grid{position:absolute;inset:0;opacity:.38;background-image:linear-gradient(rgba(91,33,182,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(91,33,182,.09) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(ellipse 80% 55% at 50% 40%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 80% 55% at 50% 40%,#000 30%,transparent 80%)}
+.hero-badge{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--border2);border-radius:99px;padding:5px 14px 5px 6px;font-size:12px;color:var(--muted);margin-bottom:26px;animation:fadeUp .6s ease both}
+.badge-dot{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--v2),var(--c));display:flex;align-items:center;justify-content:center}
+.badge-dot svg{width:11px;height:11px}
+h1{position:relative;z-index:1;font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(44px,7.5vw,90px);letter-spacing:-2.5px;line-height:1;max-width:900px;margin-bottom:12px;animation:fadeUp .6s .1s ease both}
+h1 .it{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:var(--v2)}
+.hero-sub{position:relative;z-index:1;font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:36px;font-weight:300;animation:fadeUp .6s .2s ease both}
+.hero-btns{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;animation:fadeUp .6s .3s ease both}
+.hero-stats{position:relative;z-index:1;display:flex;gap:36px;align-items:center;margin-top:60px;animation:fadeUp .6s .4s ease both}
+.hstat{text-align:center}
+.hstat-n{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--ink);line-height:1}
+.hstat-l{font-size:11px;color:var(--muted);margin-top:3px}
+.hstat-div{width:1px;height:34px;background:var(--border2)}
+
+/* ── SECTIONS ── */
+.section{padding:96px 5%}
+.inner{max-width:1160px;margin:0 auto}
+.sec-label{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--v);margin-bottom:14px}
+.sec-label::before{content:'';width:18px;height:2px;background:var(--v3);border-radius:99px}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(28px,4vw,46px);letter-spacing:-1px;line-height:1.1;margin-bottom:14px}
+.sec-title .it{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+.sec-desc{font-size:16px;color:var(--muted);line-height:1.7;max-width:520px}
+
+/* FEATURES */
+#features{background:var(--white)}
+.feat-hdr{text-align:center;margin-bottom:60px}
+.feat-hdr .sec-desc{margin:0 auto}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.feat-card{background:#fff;padding:32px 28px;transition:background .2s}
+.feat-card:hover{background:var(--light)}
+.feat-icon{width:44px;height:44px;border-radius:11px;background:var(--light);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.feat-icon svg{width:20px;height:20px;color:var(--v)}
+.feat-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:8px;letter-spacing:-.2px}
+.feat-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* HOW */
+#how{background:var(--surface)}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-n{width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step.hi .step-n{background:linear-gradient(135deg,var(--v2),var(--c))}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.how-visual{background:#fff;border:1px solid var(--border2);border-radius:18px;padding:26px}
+.id-card{background:linear-gradient(135deg,#2d1b69,#5b21b6 55%,#7c3aed);border-radius:13px;padding:20px 20px 16px;position:relative;overflow:hidden;margin-bottom:14px}
+.id-card::after{content:'';position:absolute;bottom:-20px;right:-15px;width:90px;height:90px;border-radius:50%;background:rgba(6,182,212,.13)}
+.id-logo-row{display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.id-lm{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center}
+.id-lm svg{width:11px;height:11px}
+.id-club{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:rgba(255,255,255,.9)}
+.id-sub{font-size:8px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.id-name{font-family:'Instrument Serif',serif;font-size:22px;color:#fff;font-style:italic;margin-bottom:3px}
+.id-detail{font-size:9px;color:rgba(255,255,255,.6);margin-bottom:13px}
+.id-footer{display:flex;justify-content:space-between;align-items:flex-end}
+.id-id{font-family:monospace;font-size:9px;color:rgba(255,255,255,.5)}
+.id-qr{width:36px;height:36px;background:#fff;border-radius:4px;padding:3px}
+.id-qr svg{width:30px;height:30px}
+.mini-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.mini-box{background:var(--light);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center}
+.mini-v{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--ink)}
+.mini-l{font-size:9px;color:var(--muted);margin-top:2px}
+.lb-box{background:var(--light);border:1px solid var(--border2);border-radius:12px;padding:18px 20px}
+.lb-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:12px}
+.lb-row{display:flex;align-items:center;gap:9px;padding:8px 10px;background:#fff;border-radius:8px;border:1px solid var(--border);margin-bottom:5px}
+.lb-row:last-child{margin-bottom:0}
+.lb-pos{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;width:16px;text-align:center}
+.gold{color:#c9a84c}.silver{color:#9ca3af}.bronze{color:#c2825a}
+.lb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:9px;font-weight:800;flex-shrink:0}
+.a1{background:#ede9fe;color:#3b0764}.a2{background:#e0f2fe;color:#0c4a6e}.a3{background:#d1fae5;color:#064e3b}.a4{background:#fef3c7;color:#78350f}
+.lb-inf{flex:1}
+.lb-nm{font-size:11px;font-weight:500;color:var(--ink)}
+.lb-br{font-size:10px;color:var(--muted)}
+.lb-pts{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--v)}
+
+/* ADMIN SHOWCASE */
+#admin{background:var(--ink)}
+#admin .sec-title{color:#fff}
+#admin .sec-desc{color:rgba(255,255,255,.42)}
+#admin .sec-label{color:var(--v3)}
+#admin .sec-label::before{background:var(--v3)}
+.adm-tabs{display:flex;gap:3px;margin:36px 0 28px;padding:4px;background:rgba(255,255,255,.05);border-radius:9px;width:fit-content}
+.atab{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:rgba(255,255,255,.38);background:transparent;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.atab.on{background:rgba(255,255,255,.1);color:#fff}
+.adm-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.adm-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:26px;transition:border-color .2s}
+.adm-card:hover{border-color:rgba(167,139,250,.35)}
+.adm-icon{width:38px;height:38px;border-radius:9px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.adm-icon svg{width:17px;height:17px;color:var(--v3)}
+.adm-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:8px;letter-spacing:-.2px}
+.adm-desc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.65}
+.adm-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-top:12px;background:rgba(167,139,250,.15);color:var(--v3)}
+
+/* EVENTS */
+#events{background:#fff}
+.ev-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:44px}
+.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ev-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:transform .2s,border-color .2s}
+.ev-card:hover{transform:translateY(-4px);border-color:var(--v3)}
+.ev-top{padding:20px;background:linear-gradient(135deg,var(--ink),var(--v));position:relative;overflow:hidden}
+.ev-top::after{content:'';position:absolute;bottom:-18px;right:-18px;width:65px;height:65px;border-radius:50%;background:rgba(6,182,212,.1)}
+.ev-date{font-size:10px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.4px;margin-bottom:5px}
+.ev-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.2}
+.ev-body{padding:18px 20px}
+.ev-type{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-bottom:10px}
+.t-ws{background:#e0f2fe;color:#0c4a6e}.t-hk{background:#ede9fe;color:#3b0764}.t-sm{background:#fef3c7;color:#78350f}.t-mt{background:#d1fae5;color:#064e3b}
+.ev-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.ev-foot{display:flex;align-items:center;justify-content:space-between}
+.ev-spots{font-size:11px;color:var(--muted)}
+.ev-reg{font-size:11px;font-weight:600;color:var(--v);padding:5px 11px;border-radius:5px;background:var(--light);border:1px solid var(--border2);text-decoration:none;transition:.15s}
+.ev-reg:hover{background:var(--v);color:#fff;border-color:var(--v)}
+
+/* MEMBERS */
+#members{background:var(--surface)}
+.mem-hdr{text-align:center;margin-bottom:52px}
+.mem-hdr .sec-desc{margin:0 auto}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:44px}
+.mem-card{background:#fff;border:1px solid var(--border2);border-radius:13px;padding:22px;text-align:center;transition:transform .2s}
+.mem-card:hover{transform:translateY(-3px)}
+.mem-av{width:50px;height:50px;border-radius:50%;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+.mem-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
+.mem-branch{font-size:11px;color:var(--muted);margin-bottom:10px}
+.mem-skills{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.sk{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;background:var(--light);color:var(--v);border:1px solid var(--border2)}
+.mem-cta{text-align:center}
+
+/* CTA */
+#cta{background:var(--ink);padding:108px 5%;text-align:center;position:relative;overflow:hidden}
+#cta::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:700px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(124,58,237,.26) 0%,transparent 70%)}
+.cta-inner{position:relative;z-index:1}
+.cta-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.25);border-radius:99px;padding:5px 16px;font-size:11px;color:var(--v3);margin-bottom:26px;font-weight:500}
+.cta-chip::before{content:'✦';font-size:9px}
+#cta h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(36px,5.5vw,66px);color:#fff;letter-spacing:-2px;line-height:1.05;margin-bottom:16px}
+#cta h2 .it{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:var(--v3)}
+#cta p{font-size:16px;color:rgba(255,255,255,.42);margin-bottom:40px}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--ink);padding:13px 28px;font-size:15px;border-radius:10px;display:inline-flex;align-items:center;gap:7px}
+.btn-white:hover{background:var(--light)}
+.btn-white svg{width:14px;height:14px}
+.btn-ow{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.2);padding:13px 28px;font-size:15px;border-radius:10px}
+.btn-ow:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05)}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.06);padding:50px 5% 30px}
+.foot-inner{max-width:1160px;margin:0 auto}
+.foot-top{display:flex;justify-content:space-between;align-items:flex-start;gap:48px;margin-bottom:40px}
+.foot-brand{max-width:260px}
+.foot-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-bottom:12px}
+.foot-logo-mk{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center}
+.foot-logo-mk svg{width:14px;height:14px}
+.foot-logo-n{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:-.3px}
+.foot-tag{font-size:12px;color:rgba(255,255,255,.28);line-height:1.65}
+.foot-cols{display:flex;gap:56px}
+.foot-col h4{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.foot-col a{display:block;font-size:12px;color:rgba(255,255,255,.28);text-decoration:none;margin-bottom:8px;transition:.15s}
+.foot-col a:hover{color:#fff}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:22px;display:flex;justify-content:space-between;align-items:center}
+.foot-copy,.foot-made{font-size:11px;color:rgba(255,255,255,.18)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,11,20,.6);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:18px;padding:36px;width:100%;max-width:480px;position:relative;transform:translateY(20px) scale(.97);transition:transform .25s}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:var(--light);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted)}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;margin-bottom:6px;letter-spacing:-.4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:10px 13px;border-radius:8px;border:1px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+.form-group input:focus,.form-group select:focus{border-color:var(--v);background:#fff}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-submit{width:100%;padding:12px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:.15s;margin-top:8px}
+.form-submit:hover{background:var(--v)}
+.form-submit:disabled{opacity:.5;cursor:not-allowed}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g)}
+.toast.error{background:var(--r)}
+
+/* SIGN IN MODAL */
+.signin-tabs{display:flex;gap:2px;background:var(--light);border-radius:8px;padding:3px;margin-bottom:24px}
+.stab-m{flex:1;padding:7px;border-radius:6px;font-size:13px;font-weight:500;background:transparent;border:none;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;transition:.15s}
+.stab-m.on{background:#fff;color:var(--ink)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+/* CONFIG BANNER */
+.config-bar{background:linear-gradient(90deg,var(--v),var(--v2));color:#fff;padding:10px 5%;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.config-bar a{color:rgba(255,255,255,.85);text-decoration:underline;cursor:pointer}
+.config-bar button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:4px 12px;border-radius:5px;font-size:11px;cursor:pointer}
+.config-bar.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER -->
+<div class="config-bar" id="configBar">
+  <span>⚙️ Setup required: <a onclick="openConfig()">Add your Google Apps Script URL</a> to enable member registration & data.</span>
+  <button onclick="document.getElementById('configBar').classList.add('hidden')">Dismiss</button>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.8V11.2L8 15L2 11.2V4.8L8 1Z" fill="white" fill-opacity=".9"/><circle cx="8" cy="8" r="2.8" fill="#06b6d4"/></svg>
+    </div>
+    Innovexa Hub
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#events">Events</a>
+    <a href="#members">Members</a>
+    <a href="#how">How it works</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-ghost" onclick="openSignin()">Sign in</button>
+    <button class="btn btn-dark" onclick="window.location.href='register.html'">
+      Join now
+      <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-badge">
+    <div class="badge-dot"><svg viewBox="0 0 10 10" fill="none"><path d="M5 1L6.2 4H9.5L6.9 5.8L7.8 9L5 7.4L2.2 9L3.1 5.8L.5 4H3.8L5 1Z" fill="white"/></svg></div>
+    University Technology & Innovation Club
+  </div>
+  <h1>Where <span class="it">ideas</span> meet<br>execution</h1>
+  <p class="hero-sub">A vibrant community of builders, hackers, and creators. Join Innovexa Hub and turn your university years into a launchpad.</p>
+  <div class="hero-btns">
+    <button class="btn btn-dark btn-lg" onclick="window.location.href='register.html'">
+      Apply for membership
+      <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+    <a href="#features" class="btn btn-ghost btn-lg">Explore features</a>
+  </div>
+  <div class="hero-stats" id="heroStats">
+    <div class="hstat"><div class="hstat-n" id="statMembers">—</div><div class="hstat-l">Active members</div></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><div class="hstat-n" id="statEvents">—</div><div class="hstat-l">Events this year</div></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><div class="hstat-n">23</div><div class="hstat-l">Projects shipped</div></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><div class="hstat-n">6</div><div class="hstat-l">Branches</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="section">
+  <div class="inner">
+    <div class="feat-hdr reveal">
+      <div class="sec-label">Everything you need</div>
+      <div class="sec-title">A full portal for every <span class="it">member</span></div>
+      <p class="sec-desc">Digital ID cards, event registration, leaderboards, certificates — all in one place.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="7" cy="9" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M11 8h5M11 10h3" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <div class="feat-title">Digital ID Card</div>
+        <div class="feat-desc">Official membership ID with SHA-256 QR verification. Download as PDF anytime.</div>
+      </div>
+      <div class="feat-card reveal d1">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 8h8M6 11h5" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <div class="feat-title">Document Generator</div>
+        <div class="feat-desc">Create membership certificates, event certificates, and permission letters with QR authenticity.</div>
+      </div>
+      <div class="feat-card reveal d2">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 3V1M15 3V1M2 8h16M6 12l2 2 4-4" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <div class="feat-title">Event Registration</div>
+        <div class="feat-desc">Browse workshops, hackathons, and seminars. Register in one click.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="feat-title">Points Leaderboard</div>
+        <div class="feat-desc">Earn points for attending events. Compete on a real-time ranked leaderboard.</div>
+      </div>
+      <div class="feat-card reveal d1">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="14" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 17c0-3.31 2.24-6 5-6s5 2.69 5 6" stroke="currentColor" stroke-width="1.5"/><path d="M13 11.3A5 5 0 0118 17" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <div class="feat-title">Member Directory</div>
+        <div class="feat-desc">Searchable grid of members by branch, year, and skills with hover-reveal contact.</div>
+      </div>
+      <div class="feat-card reveal d2">
+        <div class="feat-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="4" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="15" y="1" width="4" height="4" rx="1" fill="currentColor"/><rect x="1" y="15" width="4" height="4" rx="1" fill="currentColor"/></svg></div>
+        <div class="feat-title">QR Attendance</div>
+        <div class="feat-desc">Admins scan member QR codes at events for live attendance tracking.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="section">
+  <div class="inner how-grid">
+    <div>
+      <div class="sec-label reveal">Simple process</div>
+      <div class="sec-title reveal">Sign up to <span class="it">active member</span></div>
+      <p class="sec-desc reveal" style="margin-bottom:36px">No passwords, no friction. Just your university email.</p>
+      <div class="steps">
+        <div class="step hi reveal"><div class="step-n">1</div><div><div class="step-title">Register with your email</div><div class="step-desc">Submit your name, branch, and year. Passwordless authentication.</div></div></div>
+        <div class="step reveal"><div class="step-n">2</div><div><div class="step-title">Admin approval</div><div class="step-desc">You get an email the moment you're approved.</div></div></div>
+        <div class="step reveal"><div class="step-n">3</div><div><div class="step-title">Get your digital ID</div><div class="step-desc">Download your official ID card with QR code.</div></div></div>
+        <div class="step reveal"><div class="step-n">4</div><div><div class="step-title">Attend events & earn points</div><div class="step-desc">Register, get scanned, climb the leaderboard.</div></div></div>
+      </div>
+    </div>
+    <div class="how-visual reveal">
+      <div class="id-card">
+        <div class="id-logo-row">
+          <div class="id-lm"><svg viewBox="0 0 11 11" fill="none"><path d="M5.5 1L9.5 3.6V7.4L5.5 10L1.5 7.4V3.6L5.5 1Z" fill="white" fill-opacity=".9"/><circle cx="5.5" cy="5.5" r="1.6" fill="#06b6d4"/></svg></div>
+          <div><div class="id-club">Innovexa Hub</div><div class="id-sub">MEMBER ID</div></div>
+        </div>
+        <div class="id-name">Arjun Rao</div>
+        <div class="id-detail">Computer Science · Year 3 · IH-2024-0047</div>
+        <div class="id-footer">
+          <div class="id-id">Valid 2024–2027</div>
+          <div class="id-qr"><svg viewBox="0 0 30 30" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" fill="#1e1b4b"/><rect x="2.5" y="2.5" width="9" height="9" rx="1" fill="white"/><rect x="4" y="4" width="6" height="6" fill="#1e1b4b"/><rect x="17" y="1" width="12" height="12" rx="1.5" fill="#1e1b4b"/><rect x="18.5" y="2.5" width="9" height="9" rx="1" fill="white"/><rect x="20" y="4" width="6" height="6" fill="#1e1b4b"/><rect x="1" y="17" width="12" height="12" rx="1.5" fill="#1e1b4b"/><rect x="2.5" y="18.5" width="9" height="9" rx="1" fill="white"/><rect x="4" y="20" width="6" height="6" fill="#1e1b4b"/><rect x="17" y="17" width="4" height="4" fill="#1e1b4b"/><rect x="23" y="17" width="4" height="4" fill="#1e1b4b"/><rect x="17" y="23" width="4" height="4" fill="#1e1b4b"/><rect x="23" y="23" width="4" height="4" fill="#1e1b4b"/></svg></div>
+        </div>
+      </div>
+      <div class="mini-row">
+        <div class="mini-box"><div class="mini-v" id="howMembers">—</div><div class="mini-l">Members</div></div>
+        <div class="mini-box"><div class="mini-v" style="color:var(--v)">150</div><div class="mini-l">Your points</div></div>
+        <div class="mini-box"><div class="mini-v" style="color:var(--g)" id="howEvents">—</div><div class="mini-l">Upcoming</div></div>
+      </div>
+      <div class="lb-box">
+        <div class="lb-title">Top members this month</div>
+        <div id="leaderboardPreview">
+          <div class="lb-row"><div class="lb-pos gold">1</div><div class="lb-av a1">PR</div><div class="lb-inf"><div class="lb-nm">Priya Reddy</div><div class="lb-br">ECE · Y2</div></div><div class="lb-pts">240 pts</div></div>
+          <div class="lb-row"><div class="lb-pos silver">2</div><div class="lb-av a2">KS</div><div class="lb-inf"><div class="lb-nm">Kiran Sharma</div><div class="lb-br">CSE · Y3</div></div><div class="lb-pts">185 pts</div></div>
+          <div class="lb-row"><div class="lb-pos bronze">3</div><div class="lb-av a3">VK</div><div class="lb-inf"><div class="lb-nm">Vishal Kumar</div><div class="lb-br">MECH · Y4</div></div><div class="lb-pts">165 pts</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section id="admin" class="section">
+  <div class="inner">
+    <div class="sec-label">Admin superpowers</div>
+    <div class="sec-title">Built for club <span class="it">admins</span> too</div>
+    <p class="sec-desc">Full dashboard powered by Google Sheets — no traditional database needed.</p>
+    <div class="adm-tabs">
+      <button class="atab on">Members</button>
+      <button class="atab">Events</button>
+      <button class="atab">Attendance</button>
+      <button class="atab">Docs</button>
+    </div>
+    <div class="adm-cards">
+      <div class="adm-card reveal">
+        <div class="adm-icon"><svg viewBox="0 0 17 17" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.3"/><path d="M12 6l1.5 1.5L16 5" stroke="currentColor" stroke-width="1.3"/></svg></div>
+        <div class="adm-title">Approve & manage members</div>
+        <div class="adm-desc">Review pending applications, approve or reject in one click. Bulk actions, role promotion, status management. Email notifications via Resend.</div>
+        <div class="adm-tag">Email alerts on approval/rejection</div>
+      </div>
+      <div class="adm-card reveal d1">
+        <div class="adm-icon"><svg viewBox="0 0 17 17" fill="none"><rect x="1.5" y="2" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2V1M12 2V1M1.5 6h14" stroke="currentColor" stroke-width="1.3"/></svg></div>
+        <div class="adm-title">Create & manage events</div>
+        <div class="adm-desc">Add workshops, hackathons, seminars, meetups. Members browse and register. Track registration counts in real time.</div>
+        <div class="adm-tag">4 event types supported</div>
+      </div>
+      <div class="adm-card reveal">
+        <div class="adm-icon"><svg viewBox="0 0 17 17" fill="none"><rect x="3" y="3" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="1" width="3" height="3" rx=".5" fill="currentColor"/><rect x="13" y="1" width="3" height="3" rx=".5" fill="currentColor"/><rect x="1" y="13" width="3" height="3" rx=".5" fill="currentColor"/></svg></div>
+        <div class="adm-title">Live QR scanner</div>
+        <div class="adm-desc">Open the scanner on any device, point at a member QR, attendance logged instantly. Live present vs. pending counts on screen.</div>
+        <div class="adm-tag">SHA-256 offline verification</div>
+      </div>
+      <div class="adm-card reveal d1">
+        <div class="adm-icon"><svg viewBox="0 0 17 17" fill="none"><path d="M2 2h13a1 1 0 011 1v10a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3"/><path d="M4 6.5h9M4 9.5h6" stroke="currentColor" stroke-width="1.3"/></svg></div>
+        <div class="adm-title">Announcements & resources</div>
+        <div class="adm-desc">Post priority-sorted announcements (High/Med/Low). Curate a resource library with Tutorial, Tool, Course, and Article categories.</div>
+        <div class="adm-tag">Priority-sorted member feed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events" class="section">
+  <div class="inner">
+    <div class="ev-hdr">
+      <div>
+        <div class="sec-label reveal">What's on</div>
+        <div class="sec-title reveal">Upcoming <span class="it">events</span></div>
+      </div>
+      <a href="portal.html" class="btn btn-ghost reveal">View all →</a>
+    </div>
+    <div class="ev-grid" id="eventsGrid">
+      <div style="grid-column:span 3;text-align:center;padding:40px;color:var(--muted);font-size:14px">Loading events...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMBERS PREVIEW -->
+<section id="members" class="section">
+  <div class="inner">
+    <div class="mem-hdr">
+      <div class="sec-label reveal">Our community</div>
+      <div class="sec-title reveal">Meet <span class="it">the builders</span></div>
+      <p class="sec-desc reveal">Engineers, designers, and tinkerers from every branch.</p>
+    </div>
+    <div class="mem-grid" id="membersGrid">
+      <div style="grid-column:span 4;text-align:center;padding:40px;color:var(--muted);font-size:14px">Loading members...</div>
+    </div>
+    <div class="mem-cta reveal">
+      <a href="portal.html" class="btn btn-dark btn-lg">
+        Browse all members
+        <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-inner">
+    <div class="cta-chip">Open for applications</div>
+    <h2>Ready to <span class="it">build</span><br>something?</h2>
+    <p>Join students already shaping the future at Innovexa Hub.</p>
+    <div class="cta-btns">
+      <button class="btn btn-white btn-lg" onclick="window.location.href='register.html'">
+        Apply now — it's free
+        <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <button class="btn btn-ow btn-lg" onclick="openSignin()">Sign in to portal</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="index.html" class="foot-logo">
+          <div class="foot-logo-mk"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.8V11.2L8 15L2 11.2V4.8L8 1Z" fill="white" fill-opacity=".8"/><circle cx="8" cy="8" r="2.5" fill="#06b6d4"/></svg></div>
+          <span class="foot-logo-n">Innovexa Hub</span>
+        </a>
+        <p class="foot-tag">University Technology & Innovation Club. Building the builders of tomorrow.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Portal</h4>
+          <a href="portal.html">Dashboard</a>
+          <a href="portal.html#idcard">ID Card</a>
+          <a href="portal.html#docs">Documents</a>
+          <a href="portal.html#events">Events</a>
+          <a href="portal.html#leaderboard">Leaderboard</a>
+        </div>
+        <div class="foot-col">
+          <h4>Community</h4>
+          <a href="portal.html#directory">Member Directory</a>
+          <a href="portal.html#projects">Projects</a>
+          <a href="portal.html#resources">Resources</a>
+          <a href="portal.html#announcements">Announcements</a>
+        </div>
+        <div class="foot-col">
+          <h4>About</h4>
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="admin.html">Admin portal</a>
+          <a href="#cta">Apply to join</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span class="foot-copy">© 2026 Innovexa Hub. All rights reserved.</span>
+      <span class="foot-made">Built with Next.js · Google Sheets backend</span>
+    </div>
+  </div>
+</footer>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+    <div class="modal-title">Join Innovexa Hub</div>
+    <div class="modal-sub">Submit your details. We'll email you once approved.</div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="reg-name" placeholder="e.g. Arjun Rao">
+    </div>
+    <div class="form-group">
+      <label>University Email</label>
+      <input type="email" id="reg-email" placeholder="you@university.edu">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="reg-phone" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>Branch</label>
+        <select id="reg-branch">
+          <option value="">Select branch</option>
+          <option>CSE</option><option>ECE</option><option>IT</option>
+          <option>MECH</option><option>EEE</option><option>CIVIL</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Year of Study</label>
+      <select id="reg-year">
+        <option value="">Select year</option>
+        <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+      </select>
+    </div>
+    <button class="form-submit" id="regSubmitBtn" onclick="submitRegistration()">Submit Application</button>
+  </div>
+</div>
+
+<!-- SIGN IN MODAL -->
+<div class="modal-overlay" id="signinModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('signinModal')">×</button>
+    <div class="modal-title">Welcome back</div>
+    <div class="modal-sub">Sign in with your registered email.</div>
+    <div class="signin-tabs">
+      <button class="stab-m on" onclick="setSigninTab('member',this)">Member</button>
+      <button class="stab-m" onclick="setSigninTab('admin',this)">Admin</button>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="signin-email" placeholder="you@university.edu">
+    </div>
+    <div class="form-group" id="adminPassGroup" style="display:none">
+      <label>Admin Password</label>
+      <input type="password" id="signin-pass" placeholder="Enter admin password">
+    </div>
+    <button class="form-submit" id="signinBtn" onclick="submitSignin()">Sign In</button>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted)">
+      Not a member yet? <a href="#" onclick="closeModal('signinModal');window.location.href='register.html';return false;" style="color:var(--v);font-weight:500">Apply to join →</a>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG MODAL -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('configModal')">×</button>
+    <div class="modal-title">Setup Google Sheets</div>
+    <div class="modal-sub">Paste your Google Apps Script Web App URL to connect the database.</div>
+    <div class="form-group">
+      <label>Google Apps Script URL</label>
+      <input type="url" id="config-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div style="background:var(--light);border-radius:9px;padding:14px;margin-bottom:16px;font-size:12px;color:var(--muted);line-height:1.65">
+      <strong style="color:var(--ink);display:block;margin-bottom:6px">How to set up:</strong>
+      1. Open Google Sheets → Extensions → Apps Script<br>
+      2. Paste the <code style="background:#e2d9f3;padding:1px 4px;border-radius:3px">Code.gs</code> content from the downloaded package<br>
+      3. Deploy → New deployment → Web app → Execute as: Me → Who has access: Anyone<br>
+      4. Copy the deployment URL and paste above
+    </div>
+    <button class="form-submit" onclick="saveConfig()">Save & Connect</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───
+const CONFIG_KEY = 'innovexa_script_url';
+let SCRIPT_URL = localStorage.getItem(CONFIG_KEY) || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
+let signinMode = 'member';
+
+document.getElementById('configBar').classList.add('hidden'); // URL pre-configured
+
+function openConfig() { openModal('configModal'); document.getElementById('config-url').value = SCRIPT_URL; }
+function saveConfig() {
+  const url = document.getElementById('config-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) { showToast('Invalid URL — must be a Google Apps Script URL', 'error'); return; }
+  SCRIPT_URL = url;
+  localStorage.setItem(CONFIG_KEY, url);
+  document.getElementById('configBar').classList.add('hidden');
+  closeModal('configModal');
+  showToast('Connected! Loading data...', 'success');
+  loadAll();
+}
+
+// ─── API HELPERS ───
+async function api(action, data = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL configured');
+  const params = new URLSearchParams({ action, ...data });
+  const res = await fetch(`${SCRIPT_URL}?${params}`);
+  if (!res.ok) throw new Error('Network error');
+  return res.json();
+}
+
+async function apiPost(action, data = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL configured');
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, ...data }),
+    mode: 'no-cors'
+  });
+  return { success: true };
+}
+
+// ─── LOAD DATA ───
+async function loadAll() {
+  loadStats();
+  loadEvents();
+  loadMembersPreview();
+  loadLeaderboard();
+}
+
+async function loadStats() {
+  try {
+    const data = await api('getStats');
+    if (data.members !== undefined) {
+      document.getElementById('statMembers').textContent = data.members + '+';
+      document.getElementById('howMembers').textContent = data.members;
+    }
+    if (data.events !== undefined) {
+      document.getElementById('statEvents').textContent = data.events;
+      document.getElementById('howEvents').textContent = data.upcomingEvents || data.events;
+    }
+  } catch(e) {
+    document.getElementById('statMembers').textContent = '142+';
+    document.getElementById('statEvents').textContent = '9';
+    document.getElementById('howMembers').textContent = '142';
+    document.getElementById('howEvents').textContent = '3';
+  }
+}
+
+const EVENT_COLORS = {
+  Workshop: 'linear-gradient(135deg,#0c4a6e,#0e7490)',
+  Hackathon: 'linear-gradient(135deg,#1e1b4b,#4c1d95)',
+  Seminar:   'linear-gradient(135deg,#1c1917,#44403c)',
+  Meetup:    'linear-gradient(135deg,#064e3b,#065f46)',
+  Competition:'linear-gradient(135deg,#3b0764,#6d28d9)',
+};
+const EVENT_TYPE_CLASS = { Workshop:'t-ws', Hackathon:'t-hk', Seminar:'t-sm', Meetup:'t-mt', Competition:'t-hk' };
+
+async function loadEvents() {
+  const grid = document.getElementById('eventsGrid');
+  try {
+    const data = await api('getEvents');
+    const events = (data.events || []).slice(0, 3);
+    if (events.length === 0) { grid.innerHTML = '<div style="grid-column:span 3;text-align:center;padding:40px;color:var(--muted)">No upcoming events. Check back soon!</div>'; return; }
+    grid.innerHTML = events.map((ev, i) => `
+      <div class="ev-card reveal${i>0?' d'+i:''}">
+        <div class="ev-top" style="background:${EVENT_COLORS[ev.Type]||EVENT_COLORS.Workshop}">
+          <div class="ev-date">${formatDate(ev.Date)} · ${ev.Location||''}</div>
+          <div class="ev-name">${ev.Title}</div>
+        </div>
+        <div class="ev-body">
+          <span class="ev-type ${EVENT_TYPE_CLASS[ev.Type]||'t-ws'}">${ev.Type||'Event'}</span>
+          <p class="ev-desc">${(ev.Description||'').substring(0,100)}${(ev.Description||'').length>100?'...':''}</p>
+          <div class="ev-foot">
+            <span class="ev-spots">${ev.Registered||0} registered</span>
+            <a href="portal.html" class="ev-reg">Register →</a>
+          </div>
+        </div>
+      </div>`).join('');
+    reObserve();
+  } catch(e) {
+    grid.innerHTML = fallbackEvents();
+  }
+}
+
+function fallbackEvents() {
+  return [
+    {title:'Web3 & Blockchain Workshop', date:'May 8, 2026 · 10:00 AM', type:'Workshop', desc:'Hands-on session covering smart contracts and building your first dApp.', spots:'18 / 30', color:EVENT_COLORS.Workshop, typeClass:'t-ws'},
+    {title:'InnoHack 2026', date:'May 15–16, 2026 · 9:00 AM', type:'Hackathon', desc:'24-hour hackathon with prizes, mentors, and free food. Solo or teams up to 4.', spots:'38 / 60', color:EVENT_COLORS.Hackathon, typeClass:'t-hk'},
+    {title:'AI/ML Trends Seminar', date:'May 22, 2026 · 2:00 PM', type:'Seminar', desc:'Industry speakers on where AI is heading in 2026. Certificate for attendees.', spots:'21 / 40', color:EVENT_COLORS.Seminar, typeClass:'t-sm'},
+  ].map((ev,i)=>`
+    <div class="ev-card reveal${i>0?' d'+i:''}">
+      <div class="ev-top" style="background:${ev.color}">
+        <div class="ev-date">${ev.date}</div>
+        <div class="ev-name">${ev.title}</div>
+      </div>
+      <div class="ev-body">
+        <span class="ev-type ${ev.typeClass}">${ev.type}</span>
+        <p class="ev-desc">${ev.desc}</p>
+        <div class="ev-foot"><span class="ev-spots">${ev.spots} spots filled</span><a href="portal.html" class="ev-reg">Register →</a></div>
+      </div>
+    </div>`).join('');
+}
+
+const AV_COLORS = ['a1','a2','a3','a4'];
+function initials(name) { return (name||'').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+
+async function loadMembersPreview() {
+  const grid = document.getElementById('membersGrid');
+  try {
+    const data = await api('getMembers');
+    const members = (data.members||[]).filter(m=>m.Status==='active').slice(0,4);
+    if (members.length === 0) { grid.innerHTML = '<div style="grid-column:span 4;text-align:center;padding:40px;color:var(--muted)">No active members yet.</div>'; return; }
+    grid.innerHTML = members.map((m,i)=>`
+      <div class="mem-card reveal${i>0?' d'+i:''}">
+        <div class="mem-av ${AV_COLORS[i%4]}">${initials(m.FullName)}</div>
+        <div class="mem-name">${m.FullName}</div>
+        <div class="mem-branch">${m.Branch||''} · ${m.Year||''}</div>
+        <div class="mem-skills">${(m.Skills||'').split(',').filter(Boolean).map(s=>`<span class="sk">${s.trim()}</span>`).join('')}</div>
+      </div>`).join('');
+    reObserve();
+  } catch(e) {
+    grid.innerHTML = [
+      {n:'Priya Reddy',b:'ECE · Year 2',s:['React','Python','ML'],c:'a1'},
+      {n:'Kiran Sharma',b:'CSE · Year 3',s:['Node.js','Docker','Go'],c:'a2'},
+      {n:'Vishal Kumar',b:'MECH · Year 4',s:['CAD','Arduino','IoT'],c:'a3'},
+      {n:'Deepa Singh',b:'EEE · Year 2',s:['MATLAB','Circuits'],c:'a4'},
+    ].map((m,i)=>`
+      <div class="mem-card reveal${i>0?' d'+i:''}">
+        <div class="mem-av ${m.c}">${initials(m.n)}</div>
+        <div class="mem-name">${m.n}</div>
+        <div class="mem-branch">${m.b}</div>
+        <div class="mem-skills">${m.s.map(s=>`<span class="sk">${s}</span>`).join('')}</div>
+      </div>`).join('');
+  }
+}
+
+async function loadLeaderboard() {
+  try {
+    const data = await api('getLeaderboard');
+    const top3 = (data.leaderboard||[]).slice(0,3);
+    if (top3.length < 1) return;
+    const medals = ['gold','silver','bronze'];
+    document.getElementById('leaderboardPreview').innerHTML = top3.map((m,i)=>`
+      <div class="lb-row">
+        <div class="lb-pos ${medals[i]}">${i+1}</div>
+        <div class="lb-av ${AV_COLORS[i]}">${initials(m.MemberName)}</div>
+        <div class="lb-inf"><div class="lb-nm">${m.MemberName}</div><div class="lb-br">${m.Branch||''}</div></div>
+        <div class="lb-pts">${m.Points} pts</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ─── REGISTRATION ───
+async function submitRegistration() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const branch = document.getElementById('reg-branch').value;
+  const year = document.getElementById('reg-year').value;
+
+  if (!name || !email || !branch || !year) { showToast('Please fill all required fields', 'error'); return; }
+  if (!email.includes('@')) { showToast('Please enter a valid email', 'error'); return; }
+
+  const btn = document.getElementById('regSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  try {
+    if (!SCRIPT_URL) { showToast('Please configure Google Apps Script URL first', 'error'); openConfig(); btn.disabled=false; btn.textContent='Submit Application'; return; }
+    await apiPost('register', { name, email, phone, branch, year });
+    closeModal('registerModal');
+    showToast('Application submitted! We\'ll email you within 24–48 hours.', 'success');
+    document.getElementById('reg-name').value='';
+    document.getElementById('reg-email').value='';
+    document.getElementById('reg-phone').value='';
+    document.getElementById('reg-branch').value='';
+    document.getElementById('reg-year').value='';
+  } catch(e) {
+    showToast('Submission failed. Please try again.', 'error');
+  }
+  btn.disabled=false; btn.textContent='Submit Application';
+}
+
+// ─── SIGN IN ───
+function setSigninTab(mode, el) {
+  signinMode = mode;
+  document.querySelectorAll('.stab-m').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('adminPassGroup').style.display = mode==='admin' ? 'block' : 'none';
+}
+
+async function submitSignin() {
+  const emailVal = document.getElementById('signin-email').value.trim().toLowerCase();
+  const passEl   = document.getElementById('signin-pass');
+  const passVal  = passEl ? passEl.value : '';
+
+  // Hardcoded admin shortcut
+  if (signinMode === 'admin' &&
+      emailVal === 'register.innovexa@gmail.com' &&
+      passVal  === 'admin@innovexa') {
+    const adminUser = {
+      FullName: 'Innovexa Admin',
+      Email: 'register.innovexa@gmail.com',
+      Role: 'admin', Status: 'active',
+      Branch: 'CSE', Year: '4th Year', ID: 'IH-0001'
+    };
+    localStorage.setItem('innovexa_user', JSON.stringify(adminUser));
+    showToast('Welcome Admin! Redirecting...', 'success');
+    setTimeout(() => window.location.href = 'admin.html', 1200);
+    return;
+  }
+  const email = document.getElementById('signin-email').value.trim();
+  if (!email) { showToast('Please enter your email', 'error'); return; }
+
+  const btn = document.getElementById('signinBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+
+  try {
+    if (!SCRIPT_URL) { showToast('Please configure Google Apps Script URL first', 'error'); openConfig(); btn.disabled=false; btn.textContent='Sign In'; return; }
+
+    const data = await api('signin', { email, mode: signinMode, pass: document.getElementById('signin-pass')?.value||'' });
+
+    if (data.success) {
+      localStorage.setItem('innovexa_user', JSON.stringify(data.member));
+      showToast(`Welcome back, ${data.member.FullName}! Redirecting...`, 'success');
+      setTimeout(() => {
+        window.location.href = data.member.Role === 'admin' ? 'admin.html' : 'portal.html';
+      }, 1200);
+    } else {
+      showToast(data.message || 'Email not found or account not active.', 'error');
+    }
+  } catch(e) {
+    showToast('Sign in failed. Please try again.', 'error');
+  }
+  btn.disabled=false; btn.textContent='Sign In';
+}
+
+// ─── UTILS ───
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openRegister() { window.location.href='register.html'; }
+function openSignin() { openModal('signinModal'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try { return new Date(dateStr).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'}); }
+  catch(e) { return dateStr; }
+}
+
+// ─── SCROLL REVEAL ───
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('vis');revealObserver.unobserve(e.target);} });
+}, { threshold: 0.1 });
+function reObserve() { document.querySelectorAll('.reveal:not(.vis)').forEach(el=>revealObserver.observe(el)); }
+reObserve();
+
+// ─── ADMIN TABS ───
+document.querySelectorAll('.atab').forEach(btn => {
+  btn.addEventListener('click', function() { document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on')); this.classList.add('on'); });
+});
+
+// ─── INIT ───
+if (SCRIPT_URL) loadAll();
+</script>
+</body>
+</html>

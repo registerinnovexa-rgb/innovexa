@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Member Portal — Innovexa Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0d0b14;--muted:#6b6682;--light:#f4f2ff;--surface:#faf9ff;--white:#fff;--v:#5b21b6;--v2:#7c3aed;--v3:#a78bfa;--v4:#ede9fe;--c:#06b6d4;--cl:#e0f2fe;--g:#059669;--gl:#d1fae5;--a:#d97706;--al:#fef3c7;--r:#e11d48;--rl:#ffe4e6;--border:rgba(91,33,182,0.13);--border2:rgba(91,33,182,0.24)}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink)}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100;overflow-y:auto}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* SIDEBAR */
+.sb-head{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.sb-lm{width:30px;height:30px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-lm svg{width:15px;height:15px}
+.sb-ln{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px}
+.sb-ls{font-size:9px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.sb-nav{padding:10px 8px;flex:1}
+.sb-section{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#c4b5fd;padding:8px 10px 4px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:1px;font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;transition:.15s}
+.sb-item:hover{background:var(--light);color:var(--ink)}
+.sb-item.active{background:var(--v4);color:var(--v);font-weight:500}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;background:var(--r);color:#fff;padding:1px 5px;border-radius:99px}
+.sb-foot{padding:12px 12px 16px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface);cursor:pointer}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--c));display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;flex-shrink:0}
+.sb-un{font-size:12px;font-weight:500;color:var(--ink)}
+.sb-ur{font-size:10px;color:var(--muted)}
+
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:300;font-size:18px;color:var(--ink);flex:1}
+.topbar-title em{font-style:italic;color:var(--v)}
+.search{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;width:200px}
+.search svg{width:13px;height:13px;color:#c4b5fd;flex-shrink:0}
+.search input{border:none;background:transparent;font-size:12px;color:var(--ink);outline:none;width:100%;font-family:'DM Sans',sans-serif}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.notif-btn svg{width:15px;height:15px;color:var(--muted)}
+.ndot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--r);border:1.5px solid #fff}
+
+/* CONTENT */
+.content{padding:22px 24px;flex:1}
+.page{display:none}
+.page.active{display:block}
+
+/* CARDS & COMMON */
+.panel{background:#fff;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.panel-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:13px;font-weight:600;color:var(--ink)}
+.panel-action{font-size:11px;color:var(--v);font-weight:500;padding:4px 10px;border-radius:6px;background:var(--v4);cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:99px}
+.badge-active{background:var(--gl);color:#065f46}
+.badge-pending{background:var(--al);color:#92400e}
+.badge-rejected{background:var(--rl);color:#9f1239}
+.badge-admin{background:var(--v4);color:var(--v)}
+.bdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;transition:.15s}
+.btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:var(--v)}
+.btn-violet{background:var(--v);color:#fff}.btn-violet:hover{background:var(--v2)}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--light)}
+.btn svg{width:13px;height:13px}
+
+/* DASHBOARD */
+.welcome-strip{background:linear-gradient(130deg,#2d1b69,var(--v) 55%,#7c3aed);border-radius:16px;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;overflow:hidden}
+.welcome-strip::after{content:'';position:absolute;top:-20px;right:70px;width:100px;height:100px;border-radius:50%;background:rgba(6,182,212,.12)}
+.welcome-left{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.welcome-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.welcome-icon svg{width:20px;height:20px}
+.welcome-text h2{font-family:'Syne',sans-serif;font-weight:300;font-size:20px;color:#fff;margin-bottom:3px}
+.welcome-text h2 em{font-style:italic;font-weight:700}
+.welcome-text p{font-size:12px;color:rgba(255,255,255,.65)}
+.active-chip{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:6px 14px;font-size:11px;color:#fff;font-weight:500;display:flex;align-items:center;gap:5px;position:relative;z-index:1;flex-shrink:0}
+.active-dot{width:6px;height:6px;border-radius:50%;background:#34d399}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:14px 16px}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-value{font-size:24px;font-weight:600;color:var(--ink);line-height:1;margin-bottom:5px;font-family:'Syne',sans-serif}
+.stat-trend{font-size:10px;font-weight:500;color:var(--g)}
+.stat-icon{float:right;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:15px;height:15px}
+.si-v{background:var(--v4);color:var(--v)}.si-g{background:var(--gl);color:#065f46}.si-a{background:var(--al);color:#92400e}.si-c{background:var(--cl);color:#0c4a6e}
+
+.two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{text-align:left;font-size:9px;font-weight:600;color:#c4b5fd;letter-spacing:.5px;text-transform:uppercase;padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+td{padding:9px 14px;font-size:12px;color:var(--ink);border-bottom:1px solid #f0effe;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+.mc{display:flex;align-items:center;gap:7px}
+.av-sm{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.a1{background:#ede9fe;color:#3b0764}.a2{background:#e0f2fe;color:#0c4a6e}.a3{background:#d1fae5;color:#064e3b}.a4{background:#fef3c7;color:#78350f}.a5{background:#ffe4e6;color:#9f1239}
+
+/* QA GRID */
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px}
+.qa-tile{padding:14px 10px;border-radius:10px;text-align:center;cursor:pointer;border:1px solid var(--border2);background:var(--surface);transition:.15s}
+.qa-tile:hover{background:var(--v4);border-color:#c4b5fd}
+.qa-emoji{font-size:20px;margin-bottom:5px}
+.qa-label{font-size:10px;font-weight:500;color:var(--muted)}
+.qa-tile:hover .qa-label{color:var(--v)}
+
+/* LEADERBOARD */
+.podium-row{display:flex;gap:10px;padding:14px;border-bottom:1px solid var(--border)}
+.pod-card{flex:1;text-align:center;padding:12px 8px;border-radius:10px;border:1px solid var(--border2)}
+.pod-1{background:linear-gradient(160deg,#fef9c3,#fef3c7);border-color:#fde68a}
+.pod-2{background:var(--surface)}
+.pod-3{background:linear-gradient(160deg,#ffedd5,#fed7aa);border-color:#fdba74}
+.pod-rank{font-size:16px;margin-bottom:4px}
+.pod-av{width:30px;height:30px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.pod-name{font-size:11px;font-weight:600;color:var(--ink)}
+.pod-pts{font-size:13px;font-weight:800;color:var(--v);font-family:'Syne',sans-serif}
+.lb-list-row{display:flex;align-items:center;gap:9px;padding:8px 14px;border-bottom:1px solid #f0effe;font-size:12px}
+.lb-list-row:last-child{border-bottom:none}
+.lb-num{font-size:11px;color:var(--muted);min-width:18px}
+.you-chip{font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;background:var(--v4);color:var(--v);margin-left:5px}
+
+/* ID CARD */
+.id-section{display:flex;gap:24px;align-items:flex-start}
+.id-card-wrap{flex-shrink:0}
+.id-card{width:340px;aspect-ratio:85.6/54;background:linear-gradient(135deg,#2d1b69,#5b21b6 55%,#7c3aed);border-radius:14px;padding:20px 22px 16px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 32px rgba(91,33,182,.3)}
+.id-card::before{content:'';position:absolute;top:-25px;right:-25px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.04)}
+.id-card::after{content:'';position:absolute;bottom:-30px;left:20px;width:90px;height:90px;border-radius:50%;background:rgba(6,182,212,.1)}
+.id-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.id-logo{display:flex;align-items:center;gap:7px}
+.id-lm{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.id-lm svg{width:11px;height:11px}
+.id-club-name{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.9)}
+.id-club-sub{font-size:8px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.id-type-badge{font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.65);background:rgba(255,255,255,.1);padding:3px 8px;border-radius:99px;border:1px solid rgba(255,255,255,.15)}
+.id-mid{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.id-avatar{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;font-family:'Syne',sans-serif}
+.id-member-name{font-family:'Instrument Serif',serif;font-size:19px;color:#fff;font-style:italic;margin-bottom:2px}
+.id-member-detail{font-size:9px;color:rgba(255,255,255,.65)}
+.id-bot{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
+.id-fields{display:flex;flex-direction:column;gap:3px}
+.id-field{display:flex;gap:6px;align-items:center}
+.id-fl{font-size:7px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.45);width:32px}
+.id-fv{font-size:9px;color:rgba(255,255,255,.85);font-weight:500}
+.id-qr-box{width:44px;height:44px;background:#fff;border-radius:6px;padding:4px;display:flex;align-items:center;justify-content:center}
+.id-qr-box div{width:36px!important;height:36px!important}
+.id-details-panel{flex:1}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0effe}
+.detail-row:last-child{border-bottom:none}
+.dr-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.dr-val{font-size:13px;font-weight:500;color:var(--ink)}
+.hash-strip{background:var(--surface);border-top:1px solid var(--border);padding:11px 18px;display:flex;align-items:center;gap:8px}
+.hash-icon{width:22px;height:22px;border-radius:6px;background:var(--v4);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hash-icon svg{width:12px;height:12px;color:var(--v)}
+.hash-label{font-size:10px;color:var(--muted);font-weight:500}
+.hash-val{font-size:10px;color:var(--v);font-family:monospace;margin-left:auto}
+
+/* EVENTS */
+.ev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ev-card{background:#fff;border:1px solid var(--border2);border-radius:13px;overflow:hidden;transition:transform .2s,border-color .2s}
+.ev-card:hover{transform:translateY(-2px);border-color:var(--v3)}
+.ev-card-top{padding:16px;background:linear-gradient(135deg,var(--ink),var(--v));position:relative;overflow:hidden}
+.ev-card-top::after{content:'';position:absolute;bottom:-15px;right:-15px;width:60px;height:60px;border-radius:50%;background:rgba(6,182,212,.1)}
+.ev-card-date{font-size:9px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.4px;margin-bottom:4px}
+.ev-card-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.ev-card-body{padding:14px 16px}
+.ev-badge{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-bottom:8px}
+.t-ws{background:#e0f2fe;color:#0c4a6e}.t-hk{background:#ede9fe;color:#3b0764}.t-sm{background:#fef3c7;color:#78350f}.t-mt{background:#d1fae5;color:#064e3b}
+.ev-card-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px}
+.ev-card-foot{display:flex;justify-content:space-between;align-items:center}
+.ev-spots-text{font-size:11px;color:var(--muted)}
+.reg-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;background:var(--v4);color:var(--v);border:1px solid var(--border2);cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s}
+.reg-btn:hover{background:var(--v);color:#fff}
+.reg-btn.registered{background:var(--gl);color:#065f46;cursor:default}
+
+/* DIRECTORY */
+.dir-filters{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.filter-chip{font-size:11px;font-weight:500;padding:4px 11px;border-radius:99px;border:1px solid var(--border2);cursor:pointer;color:var(--muted);background:#fff;transition:.15s}
+.filter-chip.on{background:var(--v4);color:var(--v);border-color:#c4b5fd}
+.dir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px}
+.dir-card{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:18px;text-align:center;transition:transform .2s;position:relative}
+.dir-card:hover{transform:translateY(-2px)}
+.dir-card:hover .dir-email{max-height:24px;opacity:1}
+.dir-av{width:46px;height:46px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800}
+.dir-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
+.dir-branch{font-size:11px;color:var(--muted);margin-bottom:8px}
+.dir-skills{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.sk{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;background:var(--light);color:var(--v);border:1px solid var(--border2)}
+.dir-email{max-height:0;overflow:hidden;opacity:0;transition:.2s;margin-top:6px;font-size:10px;color:var(--c)}
+
+/* ANNOUNCEMENTS */
+.ann-item{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid #f0effe;align-items:flex-start}
+.ann-item:last-child{border-bottom:none}
+.ann-bar{width:3px;border-radius:99px;flex-shrink:0;align-self:stretch}
+.ann-hi{background:var(--r)}.ann-md{background:var(--a)}.ann-lo{background:var(--g)}
+.ann-title{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.ann-meta{font-size:11px;color:var(--muted)}
+.prio-badge{display:inline-block;font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:6px}
+.p-hi{background:var(--rl);color:#9f1239}.p-md{background:var(--al);color:#92400e}.p-lo{background:var(--gl);color:#065f46}
+
+/* RESOURCES */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}
+.res-card{background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:16px;transition:.2s}
+.res-card:hover{border-color:var(--v3);background:var(--v4)}
+.res-cat{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-bottom:8px}
+.rc-tutorial{background:var(--cl);color:#0c4a6e}.rc-documentation{background:var(--v4);color:var(--v)}.rc-tool{background:var(--gl);color:#064e3b}.rc-course{background:var(--al);color:#92400e}.rc-article{background:var(--rl);color:#9f1239}.rc-general{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.res-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.res-link{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--c);text-decoration:none}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:16px}
+.proj-card{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:18px}
+.proj-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px}
+.proj-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.proj-meta{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;font-size:11px;color:var(--muted)}
+.proj-meta span strong{color:var(--ink)}
+.proj-status{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;margin-bottom:8px}
+.ps-active{background:var(--gl);color:#064e3b}.ps-completed{background:var(--cl);color:#0c4a6e}.ps-planning{background:var(--al);color:#92400e}
+.tech-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tech-tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+
+/* DOCS */
+.doc-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px}
+.doc-type-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px;cursor:pointer;transition:.2s;text-align:center}
+.doc-type-card:hover,.doc-type-card.selected{background:var(--v4);border-color:#c4b5fd}
+.doc-type-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.doc-type-icon svg{width:20px;height:20px}
+.doc-type-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px}
+.doc-type-desc{font-size:11px;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g)}.toast.error{background:var(--r)}
+
+/* LOADING */
+.loader{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <a href="index.html" class="sb-logo">
+        <div class="sb-lm"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.8V11.2L8 15L2 11.2V4.8L8 1Z" fill="white" fill-opacity=".9"/><circle cx="8" cy="8" r="2.8" fill="#06b6d4"/></svg></div>
+        <div><div class="sb-ln">Innovexa</div><div class="sb-ls">Hub</div></div>
+      </a>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Portal</div>
+      <a class="sb-item active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor"/></svg>
+        Dashboard
+      </a>
+      <a class="sb-item" onclick="showPage('profile')">
+        <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 12.5c0-3.04 2.46-5.5 5.5-5.5s5.5 2.46 5.5 5.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Profile
+      </a>
+      <a class="sb-item" onclick="showPage('idcard')">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="2.5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 6h3.5M8 7.5h2" stroke="currentColor" stroke-width="1.2"/></svg>
+        ID Card
+      </a>
+      <a class="sb-item" onclick="showPage('documents')">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M2.5 1.5h9v11h-9z" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 5h5M4.5 7h3" stroke="currentColor" stroke-width="1.2"/></svg>
+        Documents
+      </a>
+      <a class="sb-item" onclick="showPage('events')">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="2.5" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 1.5v2M9.5 1.5v2M1 6h12" stroke="currentColor" stroke-width="1.2"/></svg>
+        Events <span class="sb-badge" id="sb-ev-count">0</span>
+      </a>
+      <div class="sb-section" style="margin-top:8px">Community</div>
+      <a class="sb-item" onclick="showPage('directory')">
+        <svg viewBox="0 0 14 14" fill="none"><circle cx="4.5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="10" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M0.5 11.5c0-2.21 1.79-4 4-4s4 1.79 4 4" stroke="currentColor" stroke-width="1.2"/><path d="M9 7.8A4 4 0 0113.5 11.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Directory
+      </a>
+      <a class="sb-item" onclick="showPage('leaderboard')">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.3 3.2H12l-2.7 2L10.2 10 7 8.2 3.8 10l.9-3.3L2 4.7h3.7L7 1.5z" stroke="currentColor" stroke-width="1.2"/></svg>
+        Leaderboard
+      </a>
+      <a class="sb-item" onclick="showPage('announcements')">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5A5.5 5.5 0 0112.5 7v4H1.5V7A5.5 5.5 0 017 1.5z" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 11.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/></svg>
+        Announcements <span class="sb-badge" id="sb-ann-count">0</span>
+      </a>
+      <a class="sb-item" onclick="showPage('resources')">
+        <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5A5.5 5.5 0 0112.5 7a5.5 5.5 0 01-11 0A5.5 5.5 0 017 1.5z" stroke="currentColor" stroke-width="1.3"/><path d="M7 4.5v3l2 1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Resources
+      </a>
+      <a class="sb-item" onclick="showPage('projects')">
+        <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3.5" width="5" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1.5" width="5" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Projects
+      </a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-av" id="sbAvatar">?</div>
+        <div><div class="sb-un" id="sbName">Loading...</div><div class="sb-ur" id="sbRole">Member</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Good morning, <em>loading...</em></div>
+      <div class="search">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9 9l2.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        <input type="text" placeholder="Search..." id="globalSearch" oninput="handleSearch(this.value)">
+      </div>
+      <div class="notif-btn" onclick="showPage('announcements')">
+        <svg viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5A4.5 4.5 0 0112 6v3l1.5 1.5v.5h-12V10.5L3 9V6a4.5 4.5 0 014.5-4.5z" stroke="currentColor" stroke-width="1.2"/><path d="M6 11.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
+        <div class="ndot"></div>
+      </div>
+      <div class="sb-av" id="topAvatar" style="width:32px;height:32px;font-size:12px;cursor:pointer" onclick="showPage('profile')">?</div>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="welcome-strip">
+          <div class="welcome-left">
+            <div class="welcome-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L14.5 5.5V10.5L10 14L5.5 10.5V5.5L10 2Z" fill="white" fill-opacity=".9"/><circle cx="10" cy="8" r="2.5" fill="#06b6d4"/></svg></div>
+            <div class="welcome-text">
+              <h2>Welcome back, <em id="welcomeName">...</em></h2>
+              <p id="welcomeSub">Loading your portal...</p>
+            </div>
+          </div>
+          <div class="active-chip"><div class="active-dot"></div><span id="welcomeStatus">Active Member</span></div>
+        </div>
+        <div class="stats-row" id="dashStats">
+          <div class="stat-card"><div class="stat-icon si-v" style="float:right"><svg viewBox="0 0 15 15" fill="none"><path d="M7.5 1L9.5 5.5H14L10.5 8L11.5 13L7.5 10.5L3.5 13L4.5 8L1 5.5H5.5L7.5 1Z" stroke="currentColor" stroke-width="1.2"/></svg></div><div class="stat-label">Your Points</div><div class="stat-value" id="userPoints">—</div><div class="stat-trend">Rank <span id="userRank">#—</span></div></div>
+          <div class="stat-card"><div class="stat-icon si-g" style="float:right"><svg viewBox="0 0 15 15" fill="none"><rect x="1" y="2" width="13" height="11" rx="1.3" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 1.5v2M10.5 1.5v2M1 6.5h13" stroke="currentColor" stroke-width="1.2"/></svg></div><div class="stat-label">Events Attended</div><div class="stat-value" id="userEventsAtt">—</div><div class="stat-trend">of <span id="totalEventsCount">—</span> total</div></div>
+          <div class="stat-card"><div class="stat-icon si-a" style="float:right"><svg viewBox="0 0 15 15" fill="none"><path d="M2 2h11a1 1 0 011 1v9a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h7M4 8.5h4.5" stroke="currentColor" stroke-width="1.2"/></svg></div><div class="stat-label">Documents</div><div class="stat-value">3</div><div class="stat-trend">Available to generate</div></div>
+          <div class="stat-card"><div class="stat-icon si-c" style="float:right"><svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 7.5l1.5 1.5 3.5-3.5" stroke="currentColor" stroke-width="1.2"/></svg></div><div class="stat-label">Member Status</div><div class="stat-value" style="font-size:16px" id="dashStatus">—</div><div class="stat-trend" id="dashStatusTrend">—</div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">Upcoming events</div><button class="panel-action" onclick="showPage('events')">View all</button></div>
+            <div id="dashEvents"><div class="loader">Loading...</div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">Quick actions</div></div>
+            <div class="qa-grid">
+              <div class="qa-tile" onclick="showPage('idcard')"><div class="qa-emoji">🪪</div><div class="qa-label">My ID Card</div></div>
+              <div class="qa-tile" onclick="showPage('documents')"><div class="qa-emoji">📄</div><div class="qa-label">Certificates</div></div>
+              <div class="qa-tile" onclick="showPage('events')"><div class="qa-emoji">📅</div><div class="qa-label">Events</div></div>
+              <div class="qa-tile" onclick="showPage('leaderboard')"><div class="qa-emoji">🏆</div><div class="qa-label">Leaderboard</div></div>
+              <div class="qa-tile" onclick="showPage('announcements')"><div class="qa-emoji">📢</div><div class="qa-label">News</div></div>
+              <div class="qa-tile" onclick="showPage('resources')"><div class="qa-emoji">💡</div><div class="qa-label">Resources</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Latest announcements</div><button class="panel-action" onclick="showPage('announcements')">See all</button></div>
+          <div id="dashAnn"><div class="loader">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="panel" style="max-width:600px">
+          <div class="panel-head"><div class="panel-title">My Profile</div></div>
+          <div id="profileContent" style="padding:20px"><div class="loader">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- ID CARD -->
+      <div class="page" id="page-idcard">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Digital ID Card</div><button class="panel-action btn btn-violet" onclick="downloadIDCard()">⬇ Download PDF</button></div>
+          <div style="padding:24px">
+            <div class="id-section">
+              <div class="id-card-wrap">
+                <div class="id-card" id="myIDCard">
+                  <div class="id-top">
+                    <div class="id-logo">
+                      <div class="id-lm"><svg viewBox="0 0 11 11" fill="none"><path d="M5.5 1L9.5 3.6V7.4L5.5 10L1.5 7.4V3.6L5.5 1Z" fill="white" fill-opacity=".9"/><circle cx="5.5" cy="5.5" r="1.6" fill="#06b6d4"/></svg></div>
+                      <div><div class="id-club-name">Innovexa Hub</div><div class="id-club-sub">University Tech Club</div></div>
+                    </div>
+                    <div class="id-type-badge">Member ID</div>
+                  </div>
+                  <div class="id-mid">
+                    <div class="id-avatar" id="idAvatar">?</div>
+                    <div>
+                      <div class="id-member-name" id="idName">Loading...</div>
+                      <div class="id-member-detail" id="idDetail">—</div>
+                    </div>
+                  </div>
+                  <div class="id-bot">
+                    <div class="id-fields">
+                      <div class="id-field"><span class="id-fl">ID</span><span class="id-fv" id="idMemberID">—</span></div>
+                      <div class="id-field"><span class="id-fl">Email</span><span class="id-fv" id="idEmail">—</span></div>
+                      <div class="id-field"><span class="id-fl">Valid</span><span class="id-fv">2024–2027</span></div>
+                    </div>
+                    <div class="id-qr-box" id="idQRCode"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="id-details-panel panel" style="margin:0">
+                <div class="panel-head"><div class="panel-title">Member Details</div></div>
+                <div style="padding:0 18px" id="idDetailsContent"></div>
+                <div class="hash-strip">
+                  <div class="hash-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M2 4h8M2 8h8M4.5 1.5L3.5 10.5M8.5 1.5L7.5 10.5" stroke="currentColor" stroke-width="1.2"/></svg></div>
+                  <span class="hash-label">SHA-256 verification hash</span>
+                  <span class="hash-val" id="idHashVal">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="page" id="page-documents">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Document Generator</div></div>
+          <div class="doc-types">
+            <div class="doc-type-card selected" onclick="selectDocType('membership',this)">
+              <div class="doc-type-icon si-v"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 8h8M6 11h5" stroke="currentColor" stroke-width="1.4"/></svg></div>
+              <div class="doc-type-name">Membership Certificate</div>
+              <div class="doc-type-desc">Official proof of club membership with QR verification</div>
+            </div>
+            <div class="doc-type-card" onclick="selectDocType('event',this)">
+              <div class="doc-type-icon si-c"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 3V1M15 3V1M2 8h16M6 12l2 2 4-4" stroke="currentColor" stroke-width="1.4"/></svg></div>
+              <div class="doc-type-name">Event Participation</div>
+              <div class="doc-type-desc">Certificate for events you've attended</div>
+            </div>
+            <div class="doc-type-card" onclick="selectDocType('letter',this)">
+              <div class="doc-type-icon si-a"><svg viewBox="0 0 20 20" fill="none"><path d="M2 4h16v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.5"/><path d="M2 4l8 7 8-7" stroke="currentColor" stroke-width="1.4"/></svg></div>
+              <div class="doc-type-name">Permission Letter</div>
+              <div class="doc-type-desc">Formal letter for professors / leave applications</div>
+            </div>
+          </div>
+          <div style="padding:0 16px 16px">
+            <div id="docEventSelect" style="display:none;margin-bottom:12px">
+              <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Select Event</label>
+              <select id="docEventId" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);outline:none">
+                <option value="">Choose an event you attended...</option>
+              </select>
+            </div>
+            <div id="docLetterFields" style="display:none;margin-bottom:12px">
+              <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Event Name</label>
+              <input id="docLetterEvent" type="text" placeholder="e.g. InnoHack 2026" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);outline:none">
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="generateDocument()">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8M4 7l2.5 2.5L9 7" stroke="currentColor" stroke-width="1.4"/><path d="M1 11h11" stroke="currentColor" stroke-width="1.4"/></svg>
+              Generate & Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="page" id="page-events">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">All Events</div><span id="eventsCount" style="font-size:11px;color:var(--muted)"></span></div>
+          <div class="ev-grid" style="padding:16px" id="eventsFullGrid"><div class="loader">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- DIRECTORY -->
+      <div class="page" id="page-directory">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Member Directory</div>
+            <span id="dirCount" style="font-size:11px;color:var(--muted)"></span>
+          </div>
+          <div class="dir-filters" id="dirFilters">
+            <div class="filter-chip on" onclick="filterDir('all',this)">All</div>
+            <div class="filter-chip" onclick="filterDir('CSE',this)">CSE</div>
+            <div class="filter-chip" onclick="filterDir('ECE',this)">ECE</div>
+            <div class="filter-chip" onclick="filterDir('IT',this)">IT</div>
+            <div class="filter-chip" onclick="filterDir('MECH',this)">MECH</div>
+            <div class="filter-chip" onclick="filterDir('EEE',this)">EEE</div>
+          </div>
+          <div class="dir-grid" id="dirGrid"><div class="loader" style="grid-column:span 4">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="page" id="page-leaderboard">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Points Leaderboard</div></div>
+          <div class="podium-row" id="podiumRow"><div class="loader" style="flex:1">Loading...</div></div>
+          <div id="lbFullList"></div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="page" id="page-announcements">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Announcements</div></div>
+          <div id="annList"><div class="loader">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div class="page" id="page-resources">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Resource Library</div></div>
+          <div class="res-grid" id="resGrid"><div class="loader" style="grid-column:span 3">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="page" id="page-projects">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Club Projects</div></div>
+          <div class="proj-grid" id="projGrid"><div class="loader" style="grid-column:span 2">Loading...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG & AUTH ───
+const SCRIPT_URL = localStorage.getItem('innovexa_script_url') || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
+let currentUser = JSON.parse(localStorage.getItem('innovexa_user') || 'null');
+let currentDocType = 'membership';
+let allMembers = [], allEvents = [], myAttendance = [];
+
+if (!currentUser) {
+  showToast('Please sign in to access the portal', 'error');
+  setTimeout(() => window.location.href = 'index.html', 2000);
+}
+
+async function api(action, params = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL');
+  const p = new URLSearchParams({ action, ...params });
+  const res = await fetch(`${SCRIPT_URL}?${p}`);
+  return res.json();
+}
+async function apiPost(action, data = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL');
+  await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action,...data}), mode:'no-cors' });
+  return { success: true };
+}
+
+function initials(name) { return (name||'').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+const AV_COLORS = ['a1','a2','a3','a4','a5'];
+function avColor(i) { return AV_COLORS[i % AV_COLORS.length]; }
+
+// ─── INIT ───
+async function init() {
+  if (!currentUser) return;
+  const u = currentUser;
+  const ini = initials(u.FullName);
+  document.getElementById('sbAvatar').textContent = ini;
+  document.getElementById('topAvatar').textContent = ini;
+  document.getElementById('sbName').textContent = u.FullName;
+  document.getElementById('sbRole').textContent = `${u.Role||'Member'} · ${u.Branch||''} ${u.Year||''}`;
+  document.getElementById('welcomeName').textContent = u.FullName.split(' ')[0];
+  document.getElementById('topbarTitle').innerHTML = `Good morning, <em>${u.FullName.split(' ')[0]}</em>`;
+  document.getElementById('welcomeStatus').textContent = u.Role === 'admin' ? 'Admin' : 'Active Member';
+  document.getElementById('dashStatus').textContent = (u.Status||'').charAt(0).toUpperCase() + (u.Status||'').slice(1);
+  document.getElementById('dashStatusTrend').textContent = u.Status === 'active' ? '✓ Full access' : 'Pending approval';
+
+  // ID Card
+  document.getElementById('idAvatar').textContent = ini;
+  document.getElementById('idName').textContent = u.FullName;
+  document.getElementById('idDetail').textContent = `${u.Branch||''} · ${u.Year||''} · ${u.ID||''}`;
+  document.getElementById('idMemberID').textContent = u.ID || 'IH-' + Date.now().toString().slice(-6);
+  document.getElementById('idEmail').textContent = (u.Email||'').substring(0,22) + ((u.Email||'').length > 22 ? '…' : '');
+
+  // QR for ID card
+  const hash = await sha256(`${u.ID}:${u.Email}:${u.FullName}`);
+  document.getElementById('idHashVal').textContent = hash.substring(0,12) + '…';
+  const qrData = JSON.stringify({ id: u.ID, email: u.Email, name: u.FullName, hash: hash.substring(0,16) });
+  new QRCode(document.getElementById('idQRCode'), { text: qrData, width: 36, height: 36, colorDark:'#1e1b4b', colorLight:'#fff' });
+
+  // ID Details
+  document.getElementById('idDetailsContent').innerHTML = [
+    ['Full Name', u.FullName], ['Member ID', u.ID||'—'], ['Branch', u.Branch||'—'],
+    ['Year', u.Year||'—'], ['Phone', u.Phone||'—'], ['Status', u.Status||'—'], ['Role', u.Role||'Member']
+  ].map(([l,v]) => `<div class="detail-row"><span class="dr-label">${l}</span><span class="dr-val">${v}</span></div>`).join('');
+
+  // Profile
+  document.getElementById('profileContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+      <div class="sb-av" style="width:56px;height:56px;font-size:20px">${ini}</div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px">${u.FullName}</div>
+        <div style="font-size:13px;color:var(--muted)">${u.Email}</div>
+        <span class="badge ${u.Status==='active'?'badge-active':u.Status==='pending'?'badge-pending':'badge-rejected'}" style="margin-top:6px"><span class="bdot"></span>${(u.Status||'').charAt(0).toUpperCase()+(u.Status||'').slice(1)}</span>
+      </div>
+    </div>
+    ${[['Branch',u.Branch],['Year',u.Year],['Phone',u.Phone],['Role',u.Role||'Member']].map(([l,v])=>`
+    <div class="detail-row"><span class="dr-label">${l}</span><span class="dr-val">${v||'—'}</span></div>`).join('')}
+    <div style="margin-top:20px">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Skills</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${(u.Skills||'Python,React,NodeJS').split(',').map(s=>`<span class="sk">${s.trim()}</span>`).join('')}</div>
+    </div>`;
+
+  document.getElementById('welcomeSub').textContent = `${u.Branch || ''} · ${u.Year || ''} · Member Portal`;
+
+  loadData();
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ─── LOAD DATA ───
+async function loadData() {
+  if (!SCRIPT_URL) { loadFallback(); return; }
+  try {
+    const [evData, memData, lbData, annData, resData, projData] = await Promise.all([
+      api('getEvents'), api('getMembers'), api('getLeaderboard'),
+      api('getAnnouncements'), api('getResources'), api('getProjects')
+    ]);
+    allEvents = evData.events || [];
+    allMembers = (memData.members||[]).filter(m=>m.Status==='active');
+    renderEvents(allEvents);
+    renderLeaderboard(lbData.leaderboard||[], lbData.myPoints||0, lbData.myRank||'—');
+    renderDirectory(allMembers);
+    renderAnnouncements(annData.announcements||[]);
+    renderResources(resData.resources||[]);
+    renderProjects(projData.projects||[]);
+    renderDashEvents(allEvents.slice(0,3));
+    renderDashAnn((annData.announcements||[]).slice(0,3));
+    document.getElementById('sb-ev-count').textContent = allEvents.filter(e=>new Date(e.Date)>=new Date()).length;
+    document.getElementById('sb-ann-count').textContent = annData.announcements?.length||0;
+
+    // attendance for this user
+    try {
+      const attData = await api('getMyAttendance', { email: currentUser.Email });
+      myAttendance = attData.attendance || [];
+      document.getElementById('userEventsAtt').textContent = myAttendance.filter(a=>a.Attended).length;
+      populateDocEvents();
+    } catch(e) {}
+
+    try {
+      const lb = lbData.leaderboard||[];
+      const me = lb.find(m=>m.Email===currentUser.Email);
+      document.getElementById('userPoints').textContent = me?.Points || 10;
+      document.getElementById('userRank').textContent = '#'+(lb.findIndex(m=>m.Email===currentUser.Email)+1||'—');
+    } catch(e) {}
+
+    document.getElementById('totalEventsCount').textContent = allEvents.length;
+    document.getElementById('eventsCount').textContent = `${allEvents.length} events`;
+    document.getElementById('dirCount').textContent = `${allMembers.length} active members`;
+
+  } catch(e) { loadFallback(); }
+}
+
+function loadFallback() {
+  const fEvents = [
+    {ID:'ev1',Title:'Web3 & Blockchain Workshop',Date:'2026-05-08',Type:'Workshop',Description:'Hands-on session on smart contracts and dApps.',Location:'Hall A',Registered:18},
+    {ID:'ev2',Title:'InnoHack 2026',Date:'2026-05-15',Type:'Hackathon',Description:'24-hour hackathon with prizes and mentors.',Location:'Lab Complex',Registered:38},
+    {ID:'ev3',Title:'AI/ML Trends Seminar',Date:'2026-05-22',Type:'Seminar',Description:'Industry speakers on AI in 2026.',Location:'Auditorium',Registered:21},
+  ];
+  allEvents = fEvents;
+  renderEvents(fEvents); renderDashEvents(fEvents);
+  document.getElementById('sb-ev-count').textContent = fEvents.length;
+  document.getElementById('userPoints').textContent = '150'; document.getElementById('userRank').textContent = '#4';
+  document.getElementById('userEventsAtt').textContent = '3'; document.getElementById('totalEventsCount').textContent = fEvents.length;
+  document.getElementById('eventsCount').textContent = `${fEvents.length} events`;
+
+  const fMembers = [
+    {FullName:'Priya Reddy',Branch:'ECE',Year:'Year 2',Skills:'React,Python,ML',Email:'p.reddy@uni.edu'},
+    {FullName:'Kiran Sharma',Branch:'CSE',Year:'Year 3',Skills:'Node.js,Docker,Go',Email:'k.sharma@uni.edu'},
+    {FullName:'Vishal Kumar',Branch:'MECH',Year:'Year 4',Skills:'CAD,Arduino,IoT',Email:'v.kumar@uni.edu'},
+    {FullName:'Deepa Singh',Branch:'EEE',Year:'Year 2',Skills:'MATLAB,Circuits',Email:'d.singh@uni.edu'},
+    {FullName:'Neha Mishra',Branch:'IT',Year:'Year 1',Skills:'Python,Data Viz',Email:'n.mishra@uni.edu'},
+    {FullName:'Rahul Sen',Branch:'CSE',Year:'Year 2',Skills:'Flutter,Firebase',Email:'r.sen@uni.edu'},
+    {FullName:'Shreya Kaur',Branch:'MECH',Year:'Year 1',Skills:'SolidWorks,3D Print',Email:'s.kaur@uni.edu'},
+    {FullName:'Arjun Rao',Branch:'CSE',Year:'Year 3',Skills:'Next.js,TypeScript',Email:'a.rao@uni.edu'},
+  ];
+  allMembers = fMembers;
+  renderDirectory(fMembers);
+  document.getElementById('dirCount').textContent = `${fMembers.length} active members`;
+
+  const fLb = fMembers.map((m,i)=>({MemberName:m.FullName,Branch:m.Branch,Points:240-i*25,Email:m.Email}));
+  renderLeaderboard(fLb, 150, '#4');
+
+  renderAnnouncements([
+    {ID:'a1',Title:'InnoHack 2026 registration now open!',Content:'Register your teams before May 10. Limited spots.',Date:'2026-05-01',Priority:'High',CreatedBy:'Vishal Kumar'},
+    {ID:'a2',Title:'New learning resources added',Content:'Check out 5 new ML and Web3 tutorials.',Date:'2026-04-28',Priority:'Medium',CreatedBy:'Priya Reddy'},
+    {ID:'a3',Title:'Club photo session reminder',Content:'This Saturday at 10 AM near the main gate.',Date:'2026-04-25',Priority:'Low',CreatedBy:'Arjun Rao'},
+  ]);
+  renderResources([
+    {ID:'r1',Title:'React Documentation',Link:'https://react.dev',Category:'Documentation'},
+    {ID:'r2',Title:'Full Stack Open Course',Link:'https://fullstackopen.com',Category:'Course'},
+    {ID:'r3',Title:'Docker Getting Started',Link:'https://docs.docker.com',Category:'Documentation'},
+    {ID:'r4',Title:'ML Crash Course',Link:'https://developers.google.com/machine-learning/crash-course',Category:'Course'},
+    {ID:'r5',Title:'Figma Design Tool',Link:'https://figma.com',Category:'Tool'},
+    {ID:'r6',Title:'Web3 Intro Article',Link:'https://ethereum.org',Category:'Article'},
+  ]);
+  renderProjects([
+    {ID:'p1',Title:'Campus Lost & Found App',Description:'A mobile app to report and find lost items on campus using QR tagging.',Lead:'Kiran Sharma',Members:'Kiran Sharma, Priya Reddy, Arjun Rao',Status:'Active',TechStack:'Flutter,Firebase,QR Code'},
+    {ID:'p2',Title:'Smart Attendance System',Description:'IoT-based attendance using RFID cards integrated with Google Sheets.',Lead:'Vishal Kumar',Members:'Vishal Kumar, Deepa Singh',Status:'Completed',TechStack:'Arduino,RFID,Google Sheets'},
+    {ID:'p3',Title:'AI Study Planner',Description:'ML-powered personalized study schedule generator for students.',Lead:'Neha Mishra',Members:'Neha Mishra, Rahul Sen',Status:'Planning',TechStack:'Python,FastAPI,React'},
+    {ID:'p4',Title:'Club Portal (This App)',Description:'Full-stack member management portal with Google Sheets backend.',Lead:'Arjun Rao',Members:'Full Dev Team',Status:'Active',TechStack:'Next.js,Google Apps Script,Tailwind'},
+  ]);
+  const fAnn = [{ID:'a1',Title:'InnoHack 2026 registration open!',Content:'Register your teams before May 10.',Date:'2026-05-01',Priority:'High',CreatedBy:'Vishal Kumar'},{ID:'a2',Title:'New learning resources added',Content:'5 new ML and Web3 tutorials added.',Date:'2026-04-28',Priority:'Medium',CreatedBy:'Priya Reddy'}];
+  renderDashAnn(fAnn);
+  populateDocEvents();
+}
+
+// ─── RENDER FUNCTIONS ───
+const EV_COLORS = {Workshop:'linear-gradient(135deg,#0c4a6e,#0e7490)',Hackathon:'linear-gradient(135deg,#1e1b4b,#4c1d95)',Seminar:'linear-gradient(135deg,#1c1917,#44403c)',Meetup:'linear-gradient(135deg,#064e3b,#065f46)',Competition:'linear-gradient(135deg,#3b0764,#6d28d9)'};
+const EV_TC = {Workshop:'t-ws',Hackathon:'t-hk',Seminar:'t-sm',Meetup:'t-mt',Competition:'t-hk'};
+
+function renderEvents(evs) {
+  const g = document.getElementById('eventsFullGrid');
+  if (!evs.length) { g.innerHTML='<div class="loader" style="grid-column:span 2">No events yet. Check back soon!</div>'; return; }
+  g.innerHTML = evs.map((ev,i)=>{
+    const attended = myAttendance.some(a=>a.EventID===ev.ID && a.Attended);
+    return `<div class="ev-card">
+      <div class="ev-card-top" style="background:${EV_COLORS[ev.Type]||EV_COLORS.Workshop}">
+        <div class="ev-card-date">${formatDate(ev.Date)} · ${ev.Location||''}</div>
+        <div class="ev-card-name">${ev.Title}</div>
+      </div>
+      <div class="ev-card-body">
+        <span class="ev-badge ${EV_TC[ev.Type]||'t-ws'}">${ev.Type||'Event'}</span>
+        <p class="ev-card-desc">${(ev.Description||'').substring(0,120)}${(ev.Description||'').length>120?'...':''}</p>
+        <div class="ev-card-foot">
+          <span class="ev-spots-text">${ev.Registered||0} registered</span>
+          <button class="reg-btn ${attended?'registered':''}" ${attended?'disabled':''} onclick="registerEvent('${ev.ID}','${ev.Title}',this)">${attended?'✓ Attended':'Register'}</button>
+        </div>
+      </div>
+    </div>`}).join('');
+}
+
+function renderDashEvents(evs) {
+  document.getElementById('dashEvents').innerHTML = evs.slice(0,3).map(ev=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f0effe">
+      <div style="width:38px;text-align:center;background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:5px 3px;flex-shrink:0">
+        <div style="font-size:8px;text-transform:uppercase;letter-spacing:.4px;color:var(--v);font-weight:600">${formatMonth(ev.Date)}</div>
+        <div style="font-size:16px;font-weight:700;color:var(--ink);line-height:1.1">${formatDay(ev.Date)}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">${ev.Title}</div>
+        <div style="font-size:10px;color:var(--muted)">${ev.Location||''} · <span class="${EV_TC[ev.Type]||'t-ws'}" style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:3px">${ev.Type}</span></div>
+      </div>
+    </div>`).join('') || '<div class="loader">No upcoming events</div>';
+}
+
+function renderLeaderboard(lb, myPts, myRank) {
+  document.getElementById('userPoints').textContent = myPts || '—';
+  if (myRank) document.getElementById('userRank').textContent = typeof myRank === 'number' ? '#'+myRank : myRank;
+  const top3 = lb.slice(0,3);
+  const medals = ['pod-1','pod-2','pod-3']; const ranks = ['👑','🥈','🥉'];
+  // order: 2nd, 1st, 3rd
+  const ordered = [top3[1],top3[0],top3[2]].filter(Boolean);
+  document.getElementById('podiumRow').innerHTML = ordered.map((m,oi)=>{
+    const realI = oi===0?1:oi===1?0:2;
+    return `<div class="pod-card ${medals[realI]}" style="${realI===0?'order:2':''}">
+      <div class="pod-rank">${ranks[realI]}</div>
+      <div class="pod-av ${AV_COLORS[realI]}">${initials(m.MemberName)}</div>
+      <div class="pod-name">${(m.MemberName||'').split(' ')[0]}</div>
+      <div class="pod-pts">${m.Points} pts</div>
+    </div>`}).join('');
+
+  document.getElementById('lbFullList').innerHTML = lb.slice(3).map((m,i)=>`
+    <div class="lb-list-row">
+      <div class="lb-num">#${i+4}</div>
+      <div class="av-sm ${AV_COLORS[(i+3)%5]}">${initials(m.MemberName)}</div>
+      <div style="flex:1;font-size:12px;font-weight:500;color:var(--ink)">${m.MemberName} ${m.Email===currentUser?.Email?'<span class="you-chip">you</span>':''}</div>
+      <div style="font-size:12px;color:var(--muted)">${m.Branch||''}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--v);min-width:60px;text-align:right">${m.Points} pts</div>
+    </div>`).join('');
+}
+
+function renderDirectory(members) {
+  const g = document.getElementById('dirGrid');
+  g.innerHTML = members.map((m,i)=>`
+    <div class="dir-card">
+      <div class="dir-av ${AV_COLORS[i%5]}">${initials(m.FullName)}</div>
+      <div class="dir-name">${m.FullName}</div>
+      <div class="dir-branch">${m.Branch||''} · ${m.Year||''}</div>
+      <div class="dir-skills">${(m.Skills||'').split(',').filter(Boolean).map(s=>`<span class="sk">${s.trim()}</span>`).join('')}</div>
+      <div class="dir-email">${m.Email||''}</div>
+    </div>`).join('');
+}
+
+function renderAnnouncements(anns) {
+  const prio = {High:'ann-hi',Medium:'ann-md',Low:'ann-lo'};
+  const pchip = {High:'p-hi',Medium:'p-md',Low:'p-lo'};
+  const html = anns.map(a=>`
+    <div class="ann-item">
+      <div class="ann-bar ${prio[a.Priority]||'ann-lo'}"></div>
+      <div>
+        <div class="ann-title">${a.Title}<span class="prio-badge ${pchip[a.Priority]||'p-lo'}">${a.Priority||'Low'}</span></div>
+        <div class="ann-meta">By ${a.CreatedBy||'Admin'} · ${formatDate(a.Date)}</div>
+        ${a.Content?`<div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.55">${a.Content}</div>`:''}
+      </div>
+    </div>`).join('') || '<div class="loader">No announcements yet.</div>';
+  document.getElementById('annList').innerHTML = html;
+  document.getElementById('dashAnn').innerHTML = anns.slice(0,3).map(a=>`
+    <div class="ann-item">
+      <div class="ann-bar ${prio[a.Priority]||'ann-lo'}"></div>
+      <div>
+        <div class="ann-title" style="font-size:12px">${a.Title}<span class="prio-badge ${pchip[a.Priority]||'p-lo'}">${a.Priority||'Low'}</span></div>
+        <div class="ann-meta">By ${a.CreatedBy||'Admin'} · ${formatDate(a.Date)}</div>
+      </div>
+    </div>`).join('') || '<div class="loader">No announcements.</div>';
+}
+
+function renderResources(res) {
+  const catClass = {Documentation:'rc-documentation',Course:'rc-course',Tool:'rc-tool',Tutorial:'rc-tutorial',Article:'rc-article',General:'rc-general'};
+  document.getElementById('resGrid').innerHTML = res.map(r=>`
+    <div class="res-card">
+      <span class="res-cat ${catClass[r.Category]||'rc-general'}">${r.Category||'General'}</span>
+      <div class="res-title">${r.Title}</div>
+      <a href="${r.Link||'#'}" target="_blank" class="res-link">
+        <svg viewBox="0 0 12 12" fill="none" width="10" height="10"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8M7.5 1h3.5v3.5M10.5 1L5 6.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Open resource →
+      </a>
+    </div>`).join('') || '<div class="loader" style="grid-column:span 3">No resources yet.</div>';
+}
+
+function renderProjects(projs) {
+  const sc = {Active:'ps-active',Completed:'ps-completed',Planning:'ps-planning'};
+  document.getElementById('projGrid').innerHTML = projs.map(p=>`
+    <div class="proj-card">
+      <span class="proj-status ${sc[p.Status]||'ps-planning'}">${p.Status||'Planning'}</span>
+      <div class="proj-title">${p.Title}</div>
+      <div class="proj-desc">${p.Description||''}</div>
+      <div class="proj-meta"><span><strong>Lead:</strong> ${p.Lead||'—'}</span><span><strong>Team:</strong> ${p.Members||'—'}</span></div>
+      <div class="tech-tags">${(p.TechStack||'').split(',').filter(Boolean).map(t=>`<span class="tech-tag">${t.trim()}</span>`).join('')}</div>
+    </div>`).join('') || '<div class="loader" style="grid-column:span 2">No projects yet.</div>';
+}
+
+// ─── REGISTER FOR EVENT ───
+async function registerEvent(eventId, eventTitle, btn) {
+  btn.disabled = true; btn.textContent = 'Registering...';
+  try {
+    await apiPost('registerEvent', { eventId, eventTitle, memberId: currentUser.ID, memberEmail: currentUser.Email, memberName: currentUser.FullName });
+    btn.textContent = '✓ Registered'; btn.classList.add('registered');
+    showToast(`Registered for ${eventTitle}!`, 'success');
+  } catch(e) { btn.disabled=false; btn.textContent='Register'; showToast('Registration failed. Try again.','error'); }
+}
+
+// ─── DOCUMENT GENERATION ───
+let selectedDocType = 'membership';
+function selectDocType(type, el) {
+  selectedDocType = type;
+  document.querySelectorAll('.doc-type-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('docEventSelect').style.display = type==='event' ? 'block' : 'none';
+  document.getElementById('docLetterFields').style.display = type==='letter' ? 'block' : 'none';
+}
+function populateDocEvents() {
+  const sel = document.getElementById('docEventId');
+  const attended = myAttendance.filter(a=>a.Attended);
+  sel.innerHTML = '<option value="">Choose an event you attended...</option>' +
+    allEvents.map(ev=>`<option value="${ev.ID}">${ev.Title}</option>`).join('');
+}
+
+async function generateDocument() {
+  showToast('Generating PDF... (opens in browser as print)', 'success');
+  const u = currentUser;
+  let title, body;
+  if (selectedDocType === 'membership') {
+    title = 'Membership Certificate';
+    body = `This is to certify that <strong>${u.FullName}</strong> (${u.Branch}, ${u.Year}) is an active member of Innovexa Hub — University Technology & Innovation Club. Member ID: ${u.ID || 'IH-'+Date.now().toString().slice(-6)}. Valid 2024–2027.`;
+  } else if (selectedDocType === 'event') {
+    const evId = document.getElementById('docEventId').value;
+    const ev = allEvents.find(e=>e.ID===evId);
+    title = 'Event Participation Certificate';
+    body = `This certifies that <strong>${u.FullName}</strong> participated in <strong>${ev?.Title||'the event'}</strong> organized by Innovexa Hub on ${formatDate(ev?.Date||new Date())}.`;
+  } else {
+    const evName = document.getElementById('docLetterEvent').value || 'the club event';
+    title = 'Permission Letter';
+    body = `This is to inform that <strong>${u.FullName}</strong> (${u.Branch}, ${u.Year}) is a member of Innovexa Hub and will be attending <strong>${evName}</strong>. We kindly request you to grant them permission to attend this event.`;
+  }
+
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>
+    body{font-family:'Times New Roman',serif;margin:60px;color:#1a1a2e}
+    .header{text-align:center;border-bottom:3px double #5b21b6;padding-bottom:20px;margin-bottom:30px}
+    h1{font-size:28px;color:#5b21b6;margin-bottom:4px}
+    .sub{font-size:14px;color:#666}
+    .body-text{font-size:16px;line-height:1.8;margin:30px 0}
+    .member-name{font-size:24px;color:#1a1a2e;text-align:center;margin:20px 0;font-style:italic}
+    .footer{margin-top:60px;display:flex;justify-content:space-between;align-items:flex-end}
+    .sig-line{border-top:1px solid #333;width:160px;text-align:center;padding-top:6px;font-size:13px}
+    .qr-note{font-size:11px;color:#999;text-align:center;margin-top:30px;border-top:1px solid #eee;padding-top:14px}
+    @media print{body{margin:40px}}
+  </style></head><body>
+    <div class="header"><h1>Innovexa Hub</h1><div class="sub">University Technology & Innovation Club</div></div>
+    <h2 style="text-align:center;font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#333;margin-bottom:24px">${title}</h2>
+    <div class="body-text">${body}</div>
+    <div class="footer">
+      <div class="sig-line">Issued by Admin<br>Innovexa Hub</div>
+      <div style="text-align:right;font-size:13px;color:#666">Date: ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}<br>Cert #IH-${Date.now().toString().slice(-8)}</div>
+    </div>
+    <div class="qr-note">This document is digitally verified. Scan the QR code on your Member ID card to verify authenticity.</div>
+    <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+}
+
+// ─── DIRECTORY FILTER ───
+function filterDir(branch, el) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const filtered = branch==='all' ? allMembers : allMembers.filter(m=>m.Branch===branch);
+  renderDirectory(filtered);
+}
+
+// ─── PAGE NAVIGATION ───
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>{ if(i.getAttribute('onclick')?.includes(name)) i.classList.add('active'); });
+  const titles = {dashboard:'Dashboard',profile:'My Profile',idcard:'Digital ID Card',documents:'Documents',events:'Events',directory:'Member Directory',leaderboard:'Leaderboard',announcements:'Announcements',resources:'Resources',projects:'Projects'};
+  document.getElementById('topbarTitle').innerHTML = titles[name] || name;
+}
+
+// ─── SEARCH ───
+function handleSearch(q) {
+  if (!q) return;
+  showPage('directory');
+  const filtered = allMembers.filter(m => (m.FullName+m.Branch+m.Skills).toLowerCase().includes(q.toLowerCase()));
+  renderDirectory(filtered);
+}
+
+// ─── UTILS ───
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show '+type;
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'),3500);
+}
+function formatDate(d) {
+  if (!d) return ''; try { return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); } catch(e){return d;}
+}
+function formatMonth(d) {
+  if (!d) return ''; try { return new Date(d).toLocaleDateString('en-IN',{month:'short'}); } catch(e){return '';}
+}
+function formatDay(d) {
+  if (!d) return ''; try { return new Date(d).getDate(); } catch(e){return '';}
+}
+
+function downloadIDCard() {
+  showToast('Opening ID card for printing as PDF...', 'success');
+  const u = currentUser;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Member ID — ${u.FullName}</title><style>
+    body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f5f0ff;font-family:'DM Sans',sans-serif}
+    .card{width:85.6mm;height:54mm;background:linear-gradient(135deg,#2d1b69,#5b21b6 55%,#7c3aed);border-radius:8mm;padding:5mm 6mm 4mm;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4mm 12mm rgba(91,33,182,.4);position:relative;overflow:hidden}
+    .card::after{content:'';position:absolute;bottom:-8mm;right:-5mm;width:25mm;height:25mm;border-radius:50%;background:rgba(6,182,212,.12)}
+    .top{display:flex;justify-content:space-between;align-items:flex-start}
+    .club{font-weight:800;font-size:3.5mm;color:rgba(255,255,255,.9);font-family:'Arial Black',sans-serif}
+    .sub{font-size:2mm;color:rgba(255,255,255,.5);letter-spacing:.5px}
+    .type-badge{font-size:2mm;font-weight:700;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);padding:1mm 2.5mm;border-radius:99mm;border:0.3mm solid rgba(255,255,255,.15)}
+    .name{font-family:'Times New Roman',serif;font-style:italic;font-size:6mm;color:#fff;margin-bottom:1mm}
+    .detail{font-size:2.5mm;color:rgba(255,255,255,.65)}
+    .bottom{display:flex;justify-content:space-between;align-items:flex-end}
+    .id-text{font-family:monospace;font-size:2mm;color:rgba(255,255,255,.5)}
+    .qr-placeholder{width:11mm;height:11mm;background:#fff;border-radius:1.5mm;display:flex;align-items:center;justify-content:center;font-size:1.5mm;color:#5b21b6;text-align:center;font-weight:700}
+    @media print{body{background:none}.card{box-shadow:none}}
+  </style></head><body><div class="card">
+    <div class="top"><div><div class="club">Innovexa Hub</div><div class="sub">UNIVERSITY TECH CLUB</div></div><div class="type-badge">MEMBER ID</div></div>
+    <div><div class="name">${u.FullName}</div><div class="detail">${u.Branch} · ${u.Year} · ${u.ID||'IH-'+Date.now().toString().slice(-6)}</div></div>
+    <div class="bottom"><div><div class="id-text">ID: ${u.ID||'IH-'+Date.now().toString().slice(-6)}</div><div class="id-text">Valid: 2024–2027</div></div><div class="qr-placeholder">QR CODE</div></div>
+  </div><script>window.onload=()=>window.print()<\/script></body></html>`);
+}
+
+init();
+</script>
+</body>
+</html>

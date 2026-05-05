@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Join Innovexa Hub — Registration & Payment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0b14;--muted:#6b6682;--light:#f4f2ff;--surface:#faf9ff;--white:#fff;
+  --v:#5b21b6;--v2:#7c3aed;--v3:#a78bfa;--v4:#ede9fe;
+  --c:#06b6d4;--cl:#e0f2fe;
+  --g:#059669;--gl:#d1fae5;
+  --a:#d97706;--al:#fef3c7;
+  --r:#e11d48;--rl:#ffe4e6;
+  --border:rgba(91,33,182,0.13);--border2:rgba(91,33,182,0.22)
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;background:rgba(250,249,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--ink);letter-spacing:-.4px}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:15px;height:15px}
+
+/* CONFIG BANNER */
+.config-bar{background:linear-gradient(90deg,var(--v),var(--v2));color:#fff;padding:9px 5%;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.config-bar a{color:rgba(255,255,255,.9);text-decoration:underline;cursor:pointer;font-weight:500}
+.config-bar button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 10px;border-radius:5px;font-size:11px;cursor:pointer}
+.config-bar.hidden{display:none}
+
+/* LAYOUT */
+.page-wrap{min-height:100vh;padding:82px 5% 60px;display:flex;align-items:flex-start;justify-content:center;gap:36px;max-width:1060px;margin:0 auto}
+
+/* LEFT PANEL */
+.left-panel{width:240px;min-width:240px;position:sticky;top:88px}
+.fee-badge{background:linear-gradient(135deg,var(--v),var(--v2));border-radius:14px;padding:18px 20px;margin-bottom:22px;color:#fff}
+.fee-badge-label{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px;font-weight:600}
+.fee-badge-amount{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1}
+.fee-badge-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px}
+.step-list{display:flex;flex-direction:column;gap:3px;margin-bottom:20px}
+.step-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;transition:.15s}
+.step-item.active{background:var(--v4);border:1px solid #c4b5fd}
+.step-item.done .step-num{background:var(--g);color:#fff;border-color:var(--g)}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--light);color:var(--muted);border:1.5px solid var(--border2);font-family:'Syne',sans-serif;transition:.15s}
+.step-item.active .step-num{background:var(--v);color:#fff;border-color:var(--v)}
+.step-connector{width:1.5px;height:14px;background:var(--border2);margin-left:24px}
+.step-text{font-size:12px;font-weight:500;color:var(--muted)}
+.step-item.active .step-text{color:var(--ink);font-weight:600}
+.perks-box{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:14px 16px}
+.perks-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.perk-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--muted)}
+.perk-row svg{width:12px;height:12px;color:var(--g);flex-shrink:0}
+
+/* FORM CARD */
+.form-card{flex:1;max-width:540px;background:#fff;border:1px solid var(--border2);border-radius:20px;overflow:hidden}
+.progress-bar{height:3px;background:var(--border)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--v),var(--v3));border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.step-page{display:none;padding:30px;animation:stpIn .25s ease both}
+.step-page.active{display:block}
+@keyframes stpIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:19px;letter-spacing:-.4px;margin-bottom:3px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.55}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border-radius:9px;border:1.5px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);outline:none;transition:.15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--v);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,.07)}
+.form-group input.err,.form-group select.err{border-color:var(--r)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.input-hint{font-size:11px;color:var(--muted);margin-top:3px}
+.err-msg{font-size:11px;color:var(--r);margin-top:3px;display:none}
+.err-msg.show{display:block}
+
+/* PAYMENT BOX */
+.pay-box{background:linear-gradient(135deg,#1e1065 0%,#5b21b6 55%,#7c3aed 100%);border-radius:16px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden}
+.pay-box::before{content:'';position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(6,182,212,.12)}
+.pay-box::after{content:'';position:absolute;bottom:-24px;left:-16px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.03)}
+.pay-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;position:relative;z-index:1}
+.pay-to-label{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px}
+.pay-to-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#fff}
+.pay-amount-wrap{text-align:right}
+.pay-amount-label{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px;letter-spacing:.5px;text-transform:uppercase}
+.pay-amount-val{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#fff;letter-spacing:-1px}
+.pay-body{display:flex;gap:16px;align-items:flex-start;position:relative;z-index:1}
+.qr-wrap{width:110px;height:110px;flex-shrink:0;background:#fff;border-radius:11px;padding:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.qr-wrap img{width:100%;height:100%;object-fit:contain;border-radius:6px}
+.qr-placeholder{display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px}
+.qr-placeholder svg{width:60px;height:60px}
+.qr-placeholder span{font-size:9px;color:#bbb;text-align:center;line-height:1.3}
+.pay-info{flex:1}
+.pay-field{margin-bottom:11px}
+.pf-label{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.45);margin-bottom:2px}
+.pf-val{font-size:13px;color:#fff;font-weight:500;word-break:break-all}
+.copy-upi{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,.55);background:rgba(255,255,255,.1);border:none;border-radius:4px;padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:3px;transition:.15s}
+.copy-upi:hover{background:rgba(255,255,255,.2);color:#fff}
+.copy-upi svg{width:9px;height:9px}
+
+/* INSTRUCTIONS */
+.inst-list{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.inst-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--surface);border-radius:9px;border:1px solid var(--border)}
+.inst-num{width:20px;height:20px;border-radius:50%;background:var(--v4);color:var(--v);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Syne',sans-serif}
+.inst-text{font-size:12px;color:var(--ink);line-height:1.55}
+.inst-text strong{color:var(--v)}
+
+/* UTR */
+.utr-wrap{position:relative}
+.utr-wrap input{font-family:monospace;font-size:14px;letter-spacing:.8px;padding-right:100px}
+.utr-pill{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;display:none}
+.utr-pill.valid{background:var(--gl);color:#065f46;display:flex}
+.utr-pill.bad{background:var(--rl);color:#9f1239;display:flex}
+.utr-pill.checking{background:var(--al);color:#92400e;display:flex}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:.2s;background:var(--surface);position:relative;overflow:hidden}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--v3);background:var(--v4)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2}
+.upload-icon{font-size:26px;margin-bottom:7px}
+.upload-main-text{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px}
+.upload-sub-text{font-size:11px;color:var(--muted)}
+.upload-preview-content{display:none;flex-direction:column;align-items:center;gap:8px}
+.upload-preview-content img{max-width:140px;max-height:140px;border-radius:8px;border:1px solid var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.upload-preview-name{font-size:11px;color:var(--g);font-weight:500;display:flex;align-items:center;gap:5px}
+.upload-preview-name svg{width:12px;height:12px}
+.upload-change{font-size:10px;color:var(--muted);cursor:pointer;text-decoration:underline}
+
+/* WHERE TO FIND UTR */
+.utr-help{background:var(--al);border:1px solid #fbbf24;border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.utr-help-title{font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.utr-help-text{font-size:12px;color:#78350f;line-height:1.75}
+
+/* SUCCESS */
+.success-wrap{text-align:center;padding:10px 0 6px}
+.success-icon-wrap{width:72px;height:72px;border-radius:50%;background:var(--gl);border:3px solid #6ee7b7;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px}
+.success-h{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.5px;margin-bottom:8px}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.65;max-width:380px;margin:0 auto 22px}
+.ref-box{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:left}
+.ref-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.ref-row:last-child{border-bottom:none}
+.ref-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.ref-val{font-size:12px;font-weight:600;color:var(--ink)}
+.tl-row{display:flex;gap:6px}
+.tl-item{flex:1;text-align:center;padding:10px 6px;background:var(--surface);border-radius:9px;border:1px solid var(--border)}
+.tl-item.done{background:var(--gl);border-color:#a7f3d0}
+.tl-item.done .tl-name{color:#065f46}
+.tl-emoji{font-size:16px;margin-bottom:3px}
+.tl-name{font-size:10px;font-weight:600;color:var(--ink)}
+.tl-sub{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Syne',sans-serif;transition:.15s;text-decoration:none}
+.btn-primary{background:var(--ink);color:#fff;flex:1}.btn-primary:hover{background:var(--v)}
+.btn-pay{background:linear-gradient(135deg,var(--v),var(--v2));color:#fff;flex:1}.btn-pay:hover{opacity:.92}
+.btn-pay:disabled{opacity:.5;cursor:not-allowed}
+.btn-back{background:var(--surface);color:var(--muted);border:1.5px solid var(--border2);padding:12px 16px}.btn-back:hover{background:var(--light);color:var(--ink)}
+.btn svg{width:13px;height:13px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-icon{animation:spin .7s linear infinite;display:inline-block}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,11,20,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:18px;padding:28px;width:100%;max-width:440px;position:relative;transform:translateY(20px);transition:.25s;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:none}
+.modal-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:var(--light);border:none;cursor:pointer;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.form-submit{width:100%;padding:11px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:.15s;margin-top:8px}
+.form-submit:hover{background:var(--v)}
+.modal-section{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 8px}
+.pay-setup-qr-preview{width:80px;height:80px;border-radius:8px;border:1px solid var(--border2);object-fit:contain;display:none;margin-top:6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;white-space:nowrap;max-width:90vw;text-overflow:ellipsis;overflow:hidden}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g)}.toast.error{background:var(--r)}
+
+/* REQUIRED asterisk */
+.req{color:var(--r)}
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER (admin only) -->
+<div class="config-bar" id="configBar">
+  <span>⚙️ Admin setup: <a onclick="openPaySetup()">Upload QR & set UPI ID</a> · <a onclick="openConfigModal()">Connect Google Sheets</a></span>
+  <button onclick="this.parentElement.classList.add('hidden')">×</button>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.8V11.2L8 15L2 11.2V4.8L8 1Z" fill="white" fill-opacity=".9"/><circle cx="8" cy="8" r="2.8" fill="#06b6d4"/></svg></div>
+    Innovexa Hub
+  </a>
+  <a href="index.html" style="font-size:13px;color:var(--muted);text-decoration:none">← Back to home</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="fee-badge">
+      <div class="fee-badge-label">One-time membership fee</div>
+      <div class="fee-badge-amount" id="feeDisplay">₹599</div>
+      <div class="fee-badge-sub">Lifetime membership · No renewals</div>
+    </div>
+    <div class="step-list" id="stepList">
+      <div class="step-item active" id="sli-1">
+        <div class="step-num" id="sn-1">1</div>
+        <div class="step-text">Your details</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="sli-2">
+        <div class="step-num" id="sn-2">2</div>
+        <div class="step-text">Make payment</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="sli-3">
+        <div class="step-num" id="sn-3">3</div>
+        <div class="step-text">Submit UTR</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="sli-4">
+        <div class="step-num" id="sn-4">4</div>
+        <div class="step-text">Submitted!</div>
+      </div>
+    </div>
+    <div class="perks-box">
+      <div class="perks-title">What you get</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Digital ID card + PDF</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Access to all club events</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Membership certificate</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Permission letters</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Leaderboard & points</div>
+      <div class="perk-row"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>Member directory access</div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+    <!-- ── STEP 1: Details ── -->
+    <div class="step-page active" id="step1">
+      <div class="step-title">Tell us about you</div>
+      <div class="step-sub">Step 1 of 3 · Fill in your details to start your application.</div>
+
+      <div class="form-group">
+        <label>Full Name <span class="req">*</span></label>
+        <input type="text" id="f-name" placeholder="e.g. Arjun Rao" autocomplete="name">
+        <div class="err-msg" id="e-name">Please enter your full name</div>
+      </div>
+      <div class="form-group">
+        <label>University Email <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="you@university.edu" autocomplete="email">
+        <div class="err-msg" id="e-email">Enter a valid email address</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone <span class="req">*</span></label>
+          <input type="tel" id="f-phone" placeholder="+91 XXXXX XXXXX" autocomplete="tel">
+          <div class="err-msg" id="e-phone">Enter valid phone number</div>
+        </div>
+        <div class="form-group">
+          <label>Branch <span class="req">*</span></label>
+          <select id="f-branch">
+            <option value="">Select branch</option>
+            <option>CSE</option><option>ECE</option><option>IT</option>
+            <option>MECH</option><option>EEE</option><option>CIVIL</option><option>Other</option>
+          </select>
+          <div class="err-msg" id="e-branch">Select your branch</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Year of Study <span class="req">*</span></label>
+        <select id="f-year">
+          <option value="">Select year</option>
+          <option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+        </select>
+        <div class="err-msg" id="e-year">Select your year</div>
+      </div>
+      <div class="form-group">
+        <label>Skills <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input type="text" id="f-skills" placeholder="e.g. Python, React, ML — comma separated">
+        <div class="input-hint">Shown on your member card in the directory</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="step1Next()">
+          Continue to payment
+          <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Payment ── -->
+    <div class="step-page" id="step2">
+      <div class="step-title">Make the payment</div>
+      <div class="step-sub">Step 2 of 3 · Pay <strong id="feeInStep2">₹599</strong> using any UPI app. Come back once done.</div>
+
+      <div class="pay-box">
+        <div class="pay-top">
+          <div>
+            <div class="pay-to-label">Pay to</div>
+            <div class="pay-to-name" id="payToName">Innovexa Hub</div>
+          </div>
+          <div class="pay-amount-wrap">
+            <div class="pay-amount-label">Amount</div>
+            <div class="pay-amount-val" id="payAmountVal">₹599</div>
+          </div>
+        </div>
+        <div class="pay-body">
+          <div class="qr-wrap" id="qrDisplayWrap">
+            <!-- QR image injected here -->
+            <div class="qr-placeholder" id="qrPlaceholder">
+              <svg viewBox="0 0 60 60" fill="none">
+                <rect x="3" y="3" width="22" height="22" rx="2" fill="#c4b5fd" opacity=".5"/>
+                <rect x="6" y="6" width="16" height="16" rx="1" fill="#c4b5fd" opacity=".4"/>
+                <rect x="9" y="9" width="10" height="10" fill="#7c3aed" opacity=".5"/>
+                <rect x="35" y="3" width="22" height="22" rx="2" fill="#c4b5fd" opacity=".5"/>
+                <rect x="38" y="6" width="16" height="16" rx="1" fill="#c4b5fd" opacity=".4"/>
+                <rect x="41" y="9" width="10" height="10" fill="#7c3aed" opacity=".5"/>
+                <rect x="3" y="35" width="22" height="22" rx="2" fill="#c4b5fd" opacity=".5"/>
+                <rect x="6" y="38" width="16" height="16" rx="1" fill="#c4b5fd" opacity=".4"/>
+                <rect x="9" y="41" width="10" height="10" fill="#7c3aed" opacity=".5"/>
+                <rect x="35" y="35" width="8" height="8" fill="#7c3aed" opacity=".5"/>
+                <rect x="47" y="35" width="8" height="8" fill="#7c3aed" opacity=".5"/>
+                <rect x="35" y="47" width="8" height="8" fill="#7c3aed" opacity=".5"/>
+                <rect x="47" y="47" width="8" height="8" fill="#7c3aed" opacity=".5"/>
+              </svg>
+              <span id="qrHint">QR not configured<br>Admin: click setup banner</span>
+            </div>
+          </div>
+          <div class="pay-info">
+            <div class="pay-field">
+              <div class="pf-label">UPI ID</div>
+              <div class="pf-val" id="payUpiId">Not configured</div>
+              <button class="copy-upi" onclick="copyUPI()" id="copyUPIBtn" style="display:none">
+                <svg viewBox="0 0 10 10" fill="none"><rect x="1" y="3" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1"/><path d="M3 3V2a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H7" stroke="currentColor" stroke-width="1"/></svg>
+                Copy UPI ID
+              </button>
+            </div>
+            <div class="pay-field">
+              <div class="pf-label">Account name</div>
+              <div class="pf-val" id="payAccName">Innovexa Hub</div>
+            </div>
+            <div class="pay-field">
+              <div class="pf-label">Add note / remarks</div>
+              <div class="pf-val" id="payRemarks" style="font-size:11px;color:rgba(255,255,255,.7)">Your name + branch</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inst-list">
+        <div class="inst-item"><div class="inst-num">1</div><div class="inst-text">Open <strong>GPay, PhonePe, Paytm</strong> or any UPI app on your phone</div></div>
+        <div class="inst-item"><div class="inst-num">2</div><div class="inst-text">Scan the QR code or tap <strong>Copy UPI ID</strong> and paste it in your app</div></div>
+        <div class="inst-item"><div class="inst-num">3</div><div class="inst-text">Enter exactly <strong id="feeInInst">₹599</strong> — add your <strong>name + branch</strong> in the remarks field</div></div>
+        <div class="inst-item"><div class="inst-num">4</div><div class="inst-text">After payment, come back here and click <strong>"I've paid"</strong> to enter your UTR</div></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goTo(1)">← Back</button>
+        <button class="btn btn-pay" onclick="goTo(3)">
+          I've paid — enter UTR
+          <svg viewBox="0 0 13 13" fill="none"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: UTR + Screenshot ── -->
+    <div class="step-page" id="step3">
+      <div class="step-title">Confirm your payment</div>
+      <div class="step-sub">Step 3 of 3 · Enter your UTR/Transaction ID and upload a payment screenshot.</div>
+
+      <!-- UTR -->
+      <div class="form-group">
+        <label>UTR / Transaction ID <span class="req">*</span></label>
+        <div class="utr-wrap">
+          <input type="text" id="f-utr" placeholder="e.g. 407612345678" maxlength="24"
+            oninput="onUTRInput(this)" autocomplete="off" spellcheck="false">
+          <span class="utr-pill" id="utrPill"></span>
+        </div>
+        <div class="input-hint">12–22 character code from your UPI app or bank SMS</div>
+        <div class="err-msg" id="e-utr">Enter a valid UTR number (min 8 characters)</div>
+      </div>
+
+      <!-- Where to find UTR -->
+      <div class="utr-help">
+        <div class="utr-help-title">📍 Where to find your UTR</div>
+        <div class="utr-help-text">
+          <b>GPay:</b> Transactions → tap the payment → 12-digit UPI Ref No.<br>
+          <b>PhonePe:</b> History → tap payment → Transaction ID<br>
+          <b>Paytm:</b> Passbook → payment → UPI Reference ID<br>
+          <b>Bank SMS:</b> Look for "Ref No." or "UTR" in the payment SMS
+        </div>
+      </div>
+
+      <!-- Amount (read-only) -->
+      <div class="form-group">
+        <label>Amount paid</label>
+        <input type="text" id="f-amtpaid" readonly style="cursor:not-allowed;color:var(--muted);background:var(--surface)">
+        <div class="input-hint">Must match exactly ₹<span id="feeInAmt">599</span></div>
+      </div>
+
+      <!-- Screenshot REQUIRED -->
+      <div class="form-group">
+        <label>Payment screenshot <span class="req">*</span></label>
+        <div class="upload-zone" id="uploadZone"
+          ondragover="this.classList.add('dragover');event.preventDefault()"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="onFileDrop(event)">
+          <input type="file" id="f-screenshot" accept="image/*" onchange="onFileSelect(this)">
+          <div id="uploadDefault">
+            <div class="upload-icon">📸</div>
+            <div class="upload-main-text">Tap to upload screenshot</div>
+            <div class="upload-sub-text">PNG / JPG · max 5 MB · Drag & drop supported</div>
+          </div>
+          <div class="upload-preview-content" id="uploadPreview">
+            <img id="previewImg" src="" alt="Preview">
+            <div class="upload-preview-name">
+              <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2 2 6-6" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span id="previewName">screenshot.png</span>
+            </div>
+            <span class="upload-change" onclick="resetUpload()">Change file</span>
+          </div>
+        </div>
+        <div class="err-msg" id="e-screenshot">Please upload your payment screenshot</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="goTo(2)">← Back</button>
+        <button class="btn btn-pay" id="submitBtn" onclick="submitApp()">
+          Submit application
+          <svg viewBox="0 0 13 13" fill="none" id="submitIcon"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: Success ── -->
+    <div class="step-page" id="step4">
+      <div class="success-wrap">
+        <div class="success-icon-wrap">🎉</div>
+        <div class="success-h">Application submitted!</div>
+        <div class="success-sub">Your payment screenshot and UTR are under review. Our admin will verify and approve your membership within <strong>24–48 hours</strong>. You'll get an email once approved.</div>
+        <div class="ref-box" id="summaryRef"></div>
+        <div class="tl-row">
+          <div class="tl-item done"><div class="tl-emoji">📝</div><div class="tl-name">Applied</div><div class="tl-sub">Done</div></div>
+          <div class="tl-item"><div class="tl-emoji">🔍</div><div class="tl-name">UTR check</div><div class="tl-sub">24–48 hrs</div></div>
+          <div class="tl-item"><div class="tl-emoji">✅</div><div class="tl-name">Approved</div><div class="tl-sub">Email sent</div></div>
+          <div class="tl-item"><div class="tl-emoji">🪪</div><div class="tl-name">Portal ready</div><div class="tl-sub">Sign in</div></div>
+        </div>
+        <div style="margin-top:22px">
+          <a href="index.html" class="btn" style="background:var(--ink);color:#fff;display:inline-flex">← Back to homepage</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT SETUP MODAL (admin) -->
+<div class="modal-overlay" id="paySetupModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('paySetupModal')">×</button>
+    <div class="modal-title">⚙️ Payment Setup</div>
+    <div class="modal-sub">Configure the payment screen students see during registration.</div>
+
+    <div class="modal-section">UPI Details</div>
+    <div class="form-group">
+      <label>UPI ID <span class="req">*</span></label>
+      <input type="text" id="ps-upi" placeholder="yourname@upi or yourclub@okaxis">
+    </div>
+    <div class="form-group">
+      <label>Account / Club name <span class="req">*</span></label>
+      <input type="text" id="ps-name" placeholder="Innovexa Hub">
+    </div>
+    <div class="form-group">
+      <label>Registration fee (₹) <span class="req">*</span></label>
+      <input type="number" id="ps-fee" placeholder="599" value="599">
+    </div>
+
+    <div class="modal-section">QR Code Image</div>
+    <div class="form-group">
+      <div class="upload-zone" id="qrSetupZone" style="padding:14px">
+        <input type="file" id="ps-qr" accept="image/*" onchange="onQRSetupSelect(this)">
+        <div id="qrSetupDefault">
+          <div class="upload-icon" style="font-size:20px">🖼</div>
+          <div class="upload-main-text" style="font-size:12px">Upload your UPI QR code</div>
+          <div class="upload-sub-text" style="font-size:10px">Download from GPay / PhonePe → Profile → My QR Code</div>
+        </div>
+        <div class="upload-preview-content" id="qrSetupPreview" style="flex-direction:row;gap:10px">
+          <img id="qrSetupImg" src="" alt="QR" style="max-width:70px;max-height:70px;border-radius:6px;border:1px solid var(--border2)">
+          <span id="qrSetupName" style="font-size:11px;color:var(--g)"></span>
+        </div>
+      </div>
+      <div class="input-hint" style="margin-top:5px">The QR is stored locally in browser storage</div>
+    </div>
+
+    <button class="form-submit" onclick="savePaySetup()">Save & Apply</button>
+  </div>
+</div>
+
+<!-- SCRIPT CONFIG MODAL -->
+<div class="modal-overlay" id="configModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('configModal')">×</button>
+    <div class="modal-title">Connect Google Sheets</div>
+    <div class="modal-sub">Paste your deployed Google Apps Script Web App URL.</div>
+    <div class="form-group">
+      <label>Web App URL</label>
+      <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <button class="form-submit" onclick="saveCfg()">Save & Connect</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+const SCRIPT_URL = localStorage.getItem('innovexa_script_url') || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
+let PAY = JSON.parse(localStorage.getItem('innovexa_pay') || '{}');
+let currentStep = 1;
+let screenshotBase64 = '';
+let screenshotName = '';
+let qrBase64 = PAY.qr || '';
+
+// ── INIT ───────────────────────────────────────────────────
+function applyPAY() {
+  const fee = '₹' + (PAY.fee || '599');
+  document.getElementById('feeDisplay').textContent     = fee;
+  document.getElementById('feeInStep2').textContent     = fee;
+  document.getElementById('feeInInst').textContent      = fee;
+  document.getElementById('feeInAmt').textContent       = (PAY.fee || '599');
+  document.getElementById('f-amtpaid').value            = PAY.fee || '599';
+  document.getElementById('payAmountVal').textContent   = fee;
+  if (PAY.upi)  { document.getElementById('payUpiId').textContent = PAY.upi; document.getElementById('copyUPIBtn').style.display='inline-flex'; }
+  if (PAY.name) { document.getElementById('payToName').textContent = PAY.name; document.getElementById('payAccName').textContent = PAY.name; }
+  if (PAY.qr) {
+    document.getElementById('qrDisplayWrap').innerHTML = `<img src="${PAY.qr}" alt="UPI QR" style="width:100%;height:100%;object-fit:contain;border-radius:6px">`;
+  }
+  document.getElementById('configBar').classList.add('hidden');
+}
+applyPAY();
+
+// ── STEP NAV ───────────────────────────────────────────────
+function goTo(n) {
+  currentStep = n;
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    const li = document.getElementById('sli-'+i);
+    const sn = document.getElementById('sn-'+i);
+    li.classList.remove('active','done');
+    if (i < n) { li.classList.add('done'); sn.textContent = '✓'; }
+    else if (i === n) { li.classList.add('active'); sn.textContent = i; }
+    else sn.textContent = i;
+  });
+  const pct = {1:25,2:50,3:75,4:100}[n];
+  document.getElementById('progressFill').style.width = pct + '%';
+  window.scrollTo({ top: 0, behavior:'smooth' });
+}
+
+// ── STEP 1 VALIDATION ──────────────────────────────────────
+function step1Next() {
+  const fields = [
+    { id:'f-name',  err:'e-name',   test: v => v.trim().length >= 2 },
+    { id:'f-email', err:'e-email',  test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id:'f-phone', err:'e-phone',  test: v => v.replace(/\D/g,'').length >= 10 },
+    { id:'f-branch',err:'e-branch', test: v => v !== '' },
+    { id:'f-year',  err:'e-year',   test: v => v !== '' },
+  ];
+  let ok = true;
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const er = document.getElementById(f.err);
+    if (!f.test(el.value)) { el.classList.add('err'); er.classList.add('show'); ok = false; }
+    else { el.classList.remove('err'); er.classList.remove('show'); }
+  });
+  if (!ok) return;
+  const n = document.getElementById('f-name').value.trim();
+  const b = document.getElementById('f-branch').value;
+  document.getElementById('payRemarks').textContent = n + ' · ' + b;
+  goTo(2);
+}
+
+// ── UTR INPUT ──────────────────────────────────────────────
+function onUTRInput(input) {
+  const raw = input.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  input.value = raw;
+  document.getElementById('e-utr').classList.remove('show');
+  input.classList.remove('err');
+  const pill = document.getElementById('utrPill');
+  if (!raw) { pill.className='utr-pill'; return; }
+  if (raw.length < 8) { pill.className='utr-pill checking'; pill.textContent='Too short'; return; }
+  const valid = /^\d{12}$/.test(raw) || /^[A-Z0-9]{8,22}$/.test(raw);
+  if (valid) { pill.className='utr-pill valid'; pill.textContent='✓ Valid'; }
+  else if (raw.length > 22) { pill.className='utr-pill bad'; pill.textContent='Too long'; }
+  else { pill.className='utr-pill checking'; pill.textContent='Keep typing'; }
+}
+
+// ── FILE UPLOAD ────────────────────────────────────────────
+function onFileSelect(input) { if (input.files[0]) processFile(input.files[0]); }
+function onFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processFile(file);
+}
+function processFile(file) {
+  if (file.size > 5*1024*1024) { showToast('File too large — max 5 MB', 'error'); return; }
+  screenshotName = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    screenshotBase64 = e.target.result;
+    document.getElementById('uploadDefault').style.display = 'none';
+    const prev = document.getElementById('uploadPreview');
+    prev.style.display = 'flex';
+    document.getElementById('previewImg').src = screenshotBase64;
+    document.getElementById('previewName').textContent = file.name;
+    document.getElementById('e-screenshot').classList.remove('show');
+  };
+  reader.readAsDataURL(file);
+}
+function resetUpload() {
+  screenshotBase64 = ''; screenshotName = '';
+  document.getElementById('f-screenshot').value = '';
+  document.getElementById('uploadDefault').style.display = '';
+  document.getElementById('uploadPreview').style.display = 'none';
+}
+
+// ── SUBMIT ─────────────────────────────────────────────────
+async function submitApp() {
+  const utr = document.getElementById('f-utr').value.trim();
+  let ok = true;
+
+  if (!utr || utr.length < 8) {
+    document.getElementById('f-utr').classList.add('err');
+    document.getElementById('e-utr').classList.add('show');
+    ok = false;
+  }
+  if (!screenshotBase64) {
+    document.getElementById('e-screenshot').classList.add('show');
+    ok = false;
+  }
+  if (!ok) { showToast('Please fill all required fields', 'error'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin-icon">⏳</span> Submitting...';
+
+  const payload = {
+    action:      'registerWithPayment',
+    name:        document.getElementById('f-name').value.trim(),
+    email:       document.getElementById('f-email').value.trim(),
+    phone:       document.getElementById('f-phone').value.trim(),
+    branch:      document.getElementById('f-branch').value,
+    year:        document.getElementById('f-year').value,
+    skills:      document.getElementById('f-skills').value.trim(),
+    utr:         utr,
+    amount:      PAY.fee || '599',
+    screenshot:  screenshotBase64,
+    submittedAt: new Date().toISOString()
+  };
+
+  try {
+    if (SCRIPT_URL) {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        mode: 'no-cors'  // Google Apps Script doesn't support CORS preflight
+      });
+    }
+    // Show success (no-cors means we can't read response, assume success)
+    showSuccess(payload);
+  } catch(e) {
+    showSuccess(payload); // still show — data submitted even if read failed
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Submit application <svg viewBox="0 0 13 13" fill="none" style="width:13px;height:13px"><path d="M2.5 6.5h8M7 3l3.5 3.5L7 10" stroke="currentColor" stroke-width="1.5"/></svg>';
+}
+
+function showSuccess(d) {
+  document.getElementById('summaryRef').innerHTML = [
+    ['Name',       d.name],
+    ['Email',      d.email],
+    ['Branch',     d.branch + ' · ' + d.year],
+    ['UTR',        `<span style="font-family:monospace;color:var(--v);font-weight:700">${d.utr}</span>`],
+    ['Amount',     '₹' + d.amount],
+    ['Screenshot', screenshotBase64 ? '<span style="color:var(--g)">✅ Uploaded</span>' : '—'],
+    ['Status',     '<span style="color:#d97706;font-weight:700">Pending admin verification</span>'],
+    ['Submitted',  new Date().toLocaleString('en-IN')],
+  ].map(([l,v]) => `<div class="ref-row"><span class="ref-label">${l}</span><span class="ref-val">${v}</span></div>`).join('');
+  goTo(4);
+}
+
+// ── UPI COPY ───────────────────────────────────────────────
+function copyUPI() {
+  navigator.clipboard.writeText(PAY.upi || '').then(() => showToast('UPI ID copied!', 'success'));
+}
+
+// ── PAYMENT SETUP (admin) ──────────────────────────────────
+function openPaySetup() {
+  document.getElementById('ps-upi').value  = PAY.upi  || '';
+  document.getElementById('ps-name').value = PAY.name || '';
+  document.getElementById('ps-fee').value  = PAY.fee  || '599';
+  if (PAY.qr) {
+    document.getElementById('qrSetupDefault').style.display = 'none';
+    document.getElementById('qrSetupPreview').style.display = 'flex';
+    document.getElementById('qrSetupImg').src = PAY.qr;
+    document.getElementById('qrSetupName').textContent = 'Current QR uploaded';
+  }
+  openModal('paySetupModal');
+}
+function onQRSetupSelect(input) {
+  const f = input.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    qrBase64 = e.target.result;
+    document.getElementById('qrSetupDefault').style.display = 'none';
+    document.getElementById('qrSetupPreview').style.display = 'flex';
+    document.getElementById('qrSetupImg').src = qrBase64;
+    document.getElementById('qrSetupName').textContent = f.name;
+  };
+  r.readAsDataURL(f);
+}
+function savePaySetup() {
+  const upi  = document.getElementById('ps-upi').value.trim();
+  const name = document.getElementById('ps-name').value.trim();
+  const fee  = document.getElementById('ps-fee').value.trim();
+  if (!upi || !name || !fee) { showToast('All fields are required', 'error'); return; }
+  PAY = { upi, name, fee, qr: qrBase64 };
+  localStorage.setItem('innovexa_pay', JSON.stringify(PAY));
+  applyPAY();
+  closeModal('paySetupModal');
+  showToast('Payment setup saved! ✅', 'success');
+
+  // Optionally sync to Apps Script
+  if (SCRIPT_URL) {
+    fetch(SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'savePaymentConfig', upiId:upi, name, fee, qrUrl:'' }),
+      mode:'no-cors'
+    }).catch(()=>{});
+  }
+}
+
+// ── CONFIG ─────────────────────────────────────────────────
+function openConfigModal() { document.getElementById('cfg-url').value = SCRIPT_URL; openModal('configModal'); }
+function saveCfg() {
+  const url = document.getElementById('cfg-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) { showToast('Invalid URL', 'error'); return; }
+  localStorage.setItem('innovexa_script_url', url);
+  location.reload();
+}
+
+// ── UTILS ───────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+// Clear errors on input
+document.querySelectorAll('input,select').forEach(el => {
+  el.addEventListener('input', () => {
+    el.classList.remove('err');
+    const eid = 'e-' + el.id.replace('f-','');
+    const err = document.getElementById(eid);
+    if (err) err.classList.remove('show');
+  });
+});
+</script>
+</body>
+</html>

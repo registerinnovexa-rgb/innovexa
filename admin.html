@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard — Innovexa Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0d0b14;--muted:#6b6682;--light:#f4f2ff;--surface:#faf9ff;--white:#fff;--v:#5b21b6;--v2:#7c3aed;--v3:#a78bfa;--v4:#ede9fe;--c:#06b6d4;--cl:#e0f2fe;--g:#059669;--gl:#d1fae5;--a:#d97706;--al:#fef3c7;--r:#e11d48;--rl:#ffe4e6;--border:rgba(91,33,182,0.13);--border2:rgba(91,33,182,0.24)}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);overflow-x:hidden}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:216px;min-width:216px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100;overflow-y:auto}
+.main{margin-left:216px;flex:1;display:flex;flex-direction:column}
+.sb-head{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.sb-lm{width:30px;height:30px;border-radius:8px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-lm svg{width:15px;height:15px}
+.sb-ln{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--ink);letter-spacing:-.3px}
+.sb-ls{font-size:9px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.admin-pill{margin:10px 14px 0;background:linear-gradient(90deg,var(--v4),#fff);border:1px solid #c4b5fd;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:700;color:var(--v);display:flex;align-items:center;gap:5px}
+.admin-pill svg{width:11px;height:11px}
+.sb-nav{padding:10px 8px;flex:1}
+.sb-section{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#c4b5fd;padding:8px 10px 4px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:1px;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none;transition:.15s}
+.sb-item:hover{background:var(--light);color:var(--ink)}
+.sb-item.active{background:var(--v4);color:var(--v);font-weight:500}
+.sb-item svg{width:13px;height:13px;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;background:var(--r);color:#fff;padding:1px 5px;border-radius:99px}
+.sb-foot{padding:12px 12px 16px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface);cursor:pointer}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--c));display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;flex-shrink:0}
+.sb-un{font-size:12px;font-weight:500;color:var(--ink)}
+.sb-ur{font-size:10px;color:var(--muted)}
+.topbar{background:#fff;border-bottom:1px solid var(--border);height:56px;padding:0 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--ink);flex:1;letter-spacing:-.3px}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;width:220px}
+.search-box svg{width:13px;height:13px;color:#c4b5fd;flex-shrink:0}
+.search-box input{border:none;background:transparent;font-size:12px;color:var(--ink);outline:none;width:100%;font-family:'DM Sans',sans-serif}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:.15s;text-decoration:none}
+.btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:var(--v)}
+.btn-violet{background:var(--v);color:#fff}.btn-violet:hover{background:var(--v2)}
+.btn-green{background:var(--g);color:#fff}.btn-green:hover{opacity:.9}
+.btn-red{background:var(--r);color:#fff}.btn-red:hover{opacity:.9}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--light)}
+.btn-sm{padding:4px 9px;font-size:10px;border-radius:5px}
+.btn svg{width:12px;height:12px}
+.content{padding:22px 24px;flex:1}
+.page{display:none}.page.active{display:block}
+.panel{background:#fff;border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.panel-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.panel-title{font-size:13px;font-weight:600;color:var(--ink)}
+.panel-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px}
+.b-active{background:var(--gl);color:#065f46}.b-pending{background:var(--al);color:#92400e}.b-rejected{background:var(--rl);color:#9f1239}.b-admin{background:var(--v4);color:var(--v)}
+.bdot{width:4px;height:4px;border-radius:50%;background:currentColor}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:9px;font-weight:600;color:#c4b5fd;letter-spacing:.5px;text-transform:uppercase;padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 14px;font-size:12px;color:var(--ink);border-bottom:1px solid #f0effe;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface)}
+.mc{display:flex;align-items:center;gap:8px}
+.av-sm{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.a1{background:#ede9fe;color:#3b0764}.a2{background:#e0f2fe;color:#0c4a6e}.a3{background:#d1fae5;color:#064e3b}.a4{background:#fef3c7;color:#78350f}.a5{background:#ffe4e6;color:#9f1239}
+.act-btns{display:flex;gap:4px;flex-wrap:wrap}
+.chk{width:13px;height:13px;border:1.5px solid var(--border2);border-radius:3px;background:var(--surface);cursor:pointer;flex-shrink:0;accent-color:var(--v)}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sc{background:#fff;border:1px solid var(--border2);border-radius:12px;padding:14px 16px}
+.sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.sv{font-size:24px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:5px;font-family:'Syne',sans-serif}
+.st{font-size:10px;font-weight:500}.st.up{color:var(--g)}.st.nu{color:var(--muted)}.st.dn{color:var(--r)}
+.si{float:right;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.si svg{width:15px;height:15px}
+.si-v{background:var(--v4);color:var(--v)}.si-g{background:var(--gl);color:#065f46}.si-a{background:var(--al);color:#92400e}.si-c{background:var(--cl);color:#0c4a6e}
+.two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+.prog-row{padding:10px 16px;border-bottom:1px solid #f0effe}
+.prog-row:last-child{border-bottom:none}
+.prog-label{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-name{font-size:12px;font-weight:500;color:var(--ink)}
+.prog-val{font-size:11px;color:var(--muted)}
+.prog-bar{height:5px;background:var(--surface);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px}
+.modal-overlay{position:fixed;inset:0;background:rgba(13,11,20,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:18px;padding:32px;width:100%;max-width:500px;position:relative;transform:translateY(20px) scale(.97);transition:.25s;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal{transform:none}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:var(--light);border:none;cursor:pointer;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;margin-bottom:5px;letter-spacing:-.4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border2);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);outline:none;transition:.15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--v);background:#fff}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-submit{width:100%;padding:11px;border-radius:9px;background:var(--ink);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Syne',sans-serif;transition:.15s;margin-top:6px}
+.form-submit:hover{background:var(--v)}
+.form-submit:disabled{opacity:.5;cursor:not-allowed}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--g)}.toast.error{background:var(--r)}
+.loader{display:flex;align-items:center;justify-content:center;padding:50px;color:var(--muted);font-size:13px}
+.ev-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f0effe}
+.ev-item:last-child{border-bottom:none}
+.ev-date-box{width:38px;text-align:center;background:var(--surface);border:1px solid var(--border2);border-radius:7px;padding:5px 3px;flex-shrink:0}
+.ev-mon{font-size:8px;text-transform:uppercase;letter-spacing:.4px;color:var(--v);font-weight:600}
+.ev-day{font-size:16px;font-weight:700;color:var(--ink);line-height:1.1}
+.ev-badge{display:inline-block;font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px}
+.t-ws{background:#e0f2fe;color:#0c4a6e}.t-hk{background:#ede9fe;color:#3b0764}.t-sm{background:#fef3c7;color:#78350f}.t-mt{background:#d1fae5;color:#064e3b}
+.ann-item{display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid #f0effe;align-items:flex-start}
+.ann-item:last-child{border-bottom:none}
+.ann-bar{width:3px;border-radius:99px;flex-shrink:0;align-self:stretch}
+.p-hi{background:var(--rl);color:#9f1239}.p-md{background:var(--al);color:#92400e}.p-lo{background:var(--gl);color:#065f46}
+.scanner-wrap{background:#0f0a1e;border-radius:16px;padding:32px;display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:16px}
+.scan-frame{width:200px;height:200px;position:relative}
+.scan-frame::before,.scan-frame::after{content:'';position:absolute;width:32px;height:32px;border-color:#06b6d4;border-style:solid}
+.scan-frame::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.scan-frame::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.sf-tr{position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid var(--c);border-right:3px solid var(--c);border-radius:0 4px 0 0}
+.sf-bl{position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid var(--c);border-left:3px solid var(--c);border-radius:0 0 0 4px}
+.scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:scanAnim 2s ease-in-out infinite}
+@keyframes scanAnim{0%{top:0}50%{top:calc(100% - 2px)}100%{top:0}}
+.scan-label{color:rgba(255,255,255,.5);font-size:12px;text-align:center}
+.scan-result{background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.3);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;width:100%;max-width:400px}
+.scan-result .av{background:var(--g)}
+.scan-result-name{font-size:13px;font-weight:600;color:#34d399}
+.scan-result-detail{font-size:11px;color:rgba(255,255,255,.5)}
+.scan-result-time{font-size:11px;color:rgba(255,255,255,.4);margin-left:auto}
+.att-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border)}
+.att-stat{background:#fff;padding:14px;text-align:center}
+.att-stat-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--ink)}
+.att-stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <a href="index.html" class="sb-logo">
+        <div class="sb-lm"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.8V11.2L8 15L2 11.2V4.8L8 1Z" fill="white" fill-opacity=".9"/><circle cx="8" cy="8" r="2.8" fill="#06b6d4"/></svg></div>
+        <div><div class="sb-ln">Innovexa</div><div class="sb-ls">Hub</div></div>
+      </a>
+      <div class="admin-pill">
+        <svg viewBox="0 0 11 11" fill="none"><path d="M5.5 1L6.7 4H10L7.3 5.8L8.2 9L5.5 7.2L2.8 9L3.7 5.8L1 4H4.3L5.5 1Z" fill="currentColor"/></svg>
+        Admin Panel
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Overview</div>
+      <a class="sb-item active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="1" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="1" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1" fill="currentColor"/></svg>
+        Dashboard
+      </a>
+      <div class="sb-section">Manage</div>
+      <a class="sb-item" onclick="showPage('members')">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="4.5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M0.5 11c0-2.21 1.79-4 4-4s4 1.79 4 4" stroke="currentColor" stroke-width="1.2"/><path d="M9 5l1.3 1.3L12.5 4" stroke="currentColor" stroke-width="1.2"/></svg>
+        Members <span class="sb-badge" id="pendingBadge">0</span>
+      </a>
+      <a class="sb-item" onclick="showPage('events')">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="9.5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 1v2M8.5 1v2M1 5.5h11" stroke="currentColor" stroke-width="1.2"/></svg>
+        Events
+      </a>
+      <a class="sb-item" onclick="showPage('attendance')">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="2.5" y="2.5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="0.5" y="0.5" width="2.5" height="2.5" rx=".5" fill="currentColor"/><rect x="10" y="0.5" width="2.5" height="2.5" rx=".5" fill="currentColor"/><rect x="0.5" y="10" width="2.5" height="2.5" rx=".5" fill="currentColor"/></svg>
+        Attendance
+      </a>
+      <a class="sb-item" onclick="showPage('announcements')">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5A5 5 0 0111.5 6.5v3.5H1.5V6.5A5 5 0 016.5 1.5z" stroke="currentColor" stroke-width="1.2"/><path d="M5 11a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
+        Announcements
+      </a>
+      <a class="sb-item" onclick="showPage('resources')">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1a5.5 5.5 0 100 11A5.5 5.5 0 006.5 1z" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 4v3l2 1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Resources
+      </a>
+      <a class="sb-item" onclick="showPage('projects')">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="3" width="5" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="1" width="5" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        Projects
+      </a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="av" id="adminAv">?</div>
+        <div><div class="sb-un" id="adminName">Admin</div><div class="sb-ur">Super Admin</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Admin Dashboard</div>
+      <div class="search-box">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M9 9l2.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        <input type="text" placeholder="Search members..." id="adminSearch" oninput="filterMembersTable(this.value)">
+      </div>
+      <a href="portal.html" class="btn btn-ghost" style="font-size:11px">← Member Portal</a>
+      <button class="btn btn-primary" onclick="openAddMemberModal()">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5"/></svg>
+        Add Member
+      </button>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="sgrid" id="adminStats">
+          <div class="sc"><div class="si si-v" style="float:right"><svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7.5l1.5 1.5 3.5-3.5" stroke="currentColor" stroke-width="1.3"/></svg></div><div class="sl">Total Members</div><div class="sv" id="stat-total">—</div><div class="st up" id="stat-total-t">Loading...</div></div>
+          <div class="sc"><div class="si si-g" style="float:right"><svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" fill="currentColor"/></svg></div><div class="sl">Active</div><div class="sv" id="stat-active">—</div><div class="st up" id="stat-active-t">—</div></div>
+          <div class="sc"><div class="si si-a" style="float:right"><svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 4.5V7.5l2 1.2" stroke="currentColor" stroke-width="1.3"/></svg></div><div class="sl">Pending</div><div class="sv" id="stat-pending">—</div><div class="st nu">Needs review</div></div>
+          <div class="sc"><div class="si si-c" style="float:right"><svg viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="10" rx="1.3" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 1.5v2M10.5 1.5v2M1.5 6.5h12" stroke="currentColor" stroke-width="1.3"/></svg></div><div class="sl">Total Events</div><div class="sv" id="stat-events">—</div><div class="st nu" id="stat-events-t">—</div></div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Pending approvals</div>
+              <div class="panel-actions">
+                <button class="btn btn-green btn-sm" onclick="bulkApprove()">✓ Bulk approve selected</button>
+                <button class="btn btn-red btn-sm" onclick="bulkReject()">✗ Bulk reject</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr>
+                  <th style="width:30px"><input type="checkbox" class="chk" id="checkAll" onchange="toggleAllChecks(this)"></th>
+                  <th>Member</th><th>Branch</th><th>Status</th><th>Actions</th>
+                </tr></thead>
+                <tbody id="pendingTable"><tr><td colspan="5"><div class="loader">Loading...</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="panel">
+              <div class="panel-head"><div class="panel-title">Member distribution</div></div>
+              <div id="distBars"><div class="loader">Loading...</div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div class="panel-title">Upcoming events</div><button class="btn btn-ghost btn-sm" onclick="openAddEventModal()">+ New</button></div>
+              <div id="dashEvents"><div class="loader">Loading...</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">All members</div><button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button></div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Name</th><th>Branch</th><th>Role</th><th>Status</th><th>Points</th><th>Actions</th></tr></thead>
+                <tbody id="allMembersTable"><tr><td colspan="6"><div class="loader">Loading...</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">Announcements</div><button class="btn btn-ghost btn-sm" onclick="openAddAnnModal()">+ New</button></div>
+            <div id="dashAnn"><div class="loader">Loading...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="page" id="page-members">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Member Management</div>
+            <div class="panel-actions">
+              <select id="statusFilter" onchange="filterMembersTable(document.getElementById('adminSearch').value)" style="padding:5px 8px;border-radius:6px;border:1px solid var(--border2);font-size:11px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--ink)">
+                <option value="">All statuses</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="openAddMemberModal()">+ Add</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr>
+                <th style="width:30px"><input type="checkbox" class="chk" onchange="toggleAllChecks(this)"></th>
+                <th>Member</th><th>Email</th><th>Branch</th><th>Year</th><th>Role</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="membersFullTable"><tr><td colspan="8"><div class="loader">Loading...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="page" id="page-events">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Event Management</div><button class="btn btn-primary" onclick="openAddEventModal()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5"/></svg>Add Event</button></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Title</th><th>Date</th><th>Type</th><th>Location</th><th>Registered</th><th>Attended</th><th>Actions</th></tr></thead>
+              <tbody id="eventsTable"><tr><td colspan="7"><div class="loader">Loading...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div class="page" id="page-attendance">
+        <div id="attEventList">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">Select event to take attendance</div></div>
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Event</th><th>Date</th><th>Type</th><th>Registered</th><th>Attended</th><th>Action</th></tr></thead>
+                <tbody id="attEventsTable"><tr><td colspan="6"><div class="loader">Loading...</div></td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div id="attScanner" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('attEventList').style.display='block';document.getElementById('attScanner').style.display='none'">← All events</button>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px" id="scannerEventTitle">Attendance Scanner</div>
+            <span style="background:var(--gl);color:#065f46;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 1.5s infinite;display:inline-block"></span>Live</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div class="scanner-wrap">
+                <div class="scan-frame">
+                  <div class="sf-tr"></div><div class="sf-bl"></div>
+                  <div class="scan-line"></div>
+                </div>
+                <div class="scan-label">Camera scanner active<br><small style="font-size:10px;opacity:.6">html5-qrcode library</small></div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:600">Manual entry</div>
+                <div style="display:flex;gap:8px">
+                  <input id="manualMemberId" type="text" placeholder="Member ID or email" style="flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--border2);font-size:12px;font-family:'DM Sans',sans-serif;outline:none">
+                  <button class="btn btn-green btn-sm" onclick="markAttendanceManual()">Mark</button>
+                </div>
+              </div>
+              <div class="att-stats" style="border-radius:12px;overflow:hidden;border:1px solid var(--border)">
+                <div class="att-stat"><div class="att-stat-v" id="attTotal">0</div><div class="att-stat-l">Registered</div></div>
+                <div class="att-stat"><div class="att-stat-v" style="color:var(--g)" id="attPresent">0</div><div class="att-stat-l">Present</div></div>
+                <div class="att-stat"><div class="att-stat-v" style="color:var(--a)" id="attPending">0</div><div class="att-stat-l">Pending</div></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div class="panel-title">Attendance log</div><button class="btn btn-ghost btn-sm" onclick="exportAttCSV()">Export</button></div>
+              <div style="overflow-x:auto;max-height:500px;overflow-y:auto">
+                <table>
+                  <thead style="position:sticky;top:0"><tr><th>Member</th><th>Time</th><th>Status</th></tr></thead>
+                  <tbody id="attTable"><tr><td colspan="3"><div class="loader">Select event to begin</div></td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="page" id="page-announcements">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Announcements</div><button class="btn btn-primary" onclick="openAddAnnModal()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5"/></svg>New</button></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Title</th><th>Priority</th><th>Created by</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="annTable"><tr><td colspan="5"><div class="loader">Loading...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div class="page" id="page-resources">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Resources</div><button class="btn btn-primary" onclick="openAddResModal()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5"/></svg>Add</button></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Title</th><th>Category</th><th>Link</th><th>Actions</th></tr></thead>
+              <tbody id="resTable"><tr><td colspan="4"><div class="loader">Loading...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="page" id="page-projects">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Projects</div><button class="btn btn-primary" onclick="openAddProjModal()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5"/></svg>Add</button></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Title</th><th>Lead</th><th>Status</th><th>Tech Stack</th><th>Actions</th></tr></thead>
+              <tbody id="projTable"><tr><td colspan="5"><div class="loader">Loading...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- ADD MEMBER -->
+<div class="modal-overlay" id="addMemberModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addMemberModal')">×</button>
+    <div class="modal-title">Add Member</div>
+    <div class="modal-sub">Manually add a new member to the club.</div>
+    <div class="form-group"><label>Full Name</label><input type="text" id="nm-name" placeholder="Full name"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="nm-email" placeholder="email@university.edu"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Branch</label><select id="nm-branch"><option value="">Select</option><option>CSE</option><option>ECE</option><option>IT</option><option>MECH</option><option>EEE</option></select></div>
+      <div class="form-group"><label>Year</label><select id="nm-year"><option value="">Select</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Role</label><select id="nm-role"><option value="member">Member</option><option value="admin">Admin</option></select></div>
+      <div class="form-group"><label>Status</label><select id="nm-status"><option value="active">Active</option><option value="pending">Pending</option></select></div>
+    </div>
+    <div class="form-group"><label>Phone</label><input type="tel" id="nm-phone" placeholder="+91 XXXXX XXXXX"></div>
+    <div class="form-group"><label>Skills (comma separated)</label><input type="text" id="nm-skills" placeholder="React, Python, ML"></div>
+    <button class="form-submit" onclick="submitAddMember()">Add Member</button>
+  </div>
+</div>
+
+<!-- ADD EVENT -->
+<div class="modal-overlay" id="addEventModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addEventModal')">×</button>
+    <div class="modal-title" id="evModalTitle">Add Event</div>
+    <div class="modal-sub">Create a new event for members to register.</div>
+    <input type="hidden" id="ev-id">
+    <div class="form-group"><label>Title</label><input type="text" id="ev-title" placeholder="Event title"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Date</label><input type="date" id="ev-date"></div>
+      <div class="form-group"><label>Type</label><select id="ev-type"><option>Workshop</option><option>Hackathon</option><option>Seminar</option><option>Meetup</option><option>Competition</option></select></div>
+    </div>
+    <div class="form-group"><label>Location</label><input type="text" id="ev-location" placeholder="Hall A, Lab Complex..."></div>
+    <div class="form-group"><label>Description</label><textarea id="ev-desc" placeholder="Event description..."></textarea></div>
+    <button class="form-submit" onclick="submitEvent()">Save Event</button>
+  </div>
+</div>
+
+<!-- ADD ANNOUNCEMENT -->
+<div class="modal-overlay" id="addAnnModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addAnnModal')">×</button>
+    <div class="modal-title">New Announcement</div>
+    <div class="modal-sub">Post an announcement for all members.</div>
+    <input type="hidden" id="ann-id">
+    <div class="form-group"><label>Title</label><input type="text" id="ann-title" placeholder="Announcement title"></div>
+    <div class="form-group"><label>Content</label><textarea id="ann-content" placeholder="Full announcement text..."></textarea></div>
+    <div class="form-group"><label>Priority</label><select id="ann-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+    <button class="form-submit" onclick="submitAnn()">Post Announcement</button>
+  </div>
+</div>
+
+<!-- ADD RESOURCE -->
+<div class="modal-overlay" id="addResModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addResModal')">×</button>
+    <div class="modal-title">Add Resource</div>
+    <input type="hidden" id="res-id">
+    <div class="form-group"><label>Title</label><input type="text" id="res-title" placeholder="Resource name"></div>
+    <div class="form-group"><label>URL</label><input type="url" id="res-link" placeholder="https://..."></div>
+    <div class="form-group"><label>Category</label><select id="res-cat"><option>Tutorial</option><option>Documentation</option><option>Tool</option><option>Course</option><option>Article</option><option>General</option></select></div>
+    <button class="form-submit" onclick="submitRes()">Save Resource</button>
+  </div>
+</div>
+
+<!-- ADD PROJECT -->
+<div class="modal-overlay" id="addProjModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addProjModal')">×</button>
+    <div class="modal-title">Add Project</div>
+    <input type="hidden" id="proj-id">
+    <div class="form-group"><label>Title</label><input type="text" id="proj-title" placeholder="Project name"></div>
+    <div class="form-group"><label>Description</label><textarea id="proj-desc" placeholder="What does this project do?"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Lead</label><input type="text" id="proj-lead" placeholder="Lead developer"></div>
+      <div class="form-group"><label>Status</label><select id="proj-status"><option>Active</option><option>Planning</option><option>Completed</option></select></div>
+    </div>
+    <div class="form-group"><label>Team Members</label><input type="text" id="proj-members" placeholder="Comma separated names"></div>
+    <div class="form-group"><label>Tech Stack</label><input type="text" id="proj-techstack" placeholder="React, Node.js, MongoDB..."></div>
+    <button class="form-submit" onclick="submitProj()">Save Project</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+<script>
+const SCRIPT_URL = localStorage.getItem('innovexa_script_url') || 'https://script.google.com/macros/s/AKfycbyGsvbNzNVQSKoNQgaF0-qyTwXHFpe34DlghNDnhTE8pC_GDrhoh4H7aQzxmzaecMwX/exec';
+let currentAdmin = JSON.parse(localStorage.getItem('innovexa_user') || 'null');
+let allMembers = [], allEvents = [], allAnn = [], allRes = [], allProj = [], allAtt = [];
+let currentEventForAtt = null;
+
+// Allow hardcoded admin
+if (!currentAdmin) {
+  currentAdmin = JSON.parse(localStorage.getItem('innovexa_user') || 'null');
+}
+if (!currentAdmin || currentAdmin.Role !== 'admin') {
+  showToast('Admin access required', 'error');
+  setTimeout(() => window.location.href = 'index.html', 2000);
+} else {
+  const ini = initials(currentAdmin.FullName);
+  document.getElementById('adminAv').textContent = ini;
+  document.getElementById('adminName').textContent = currentAdmin.FullName;
+}
+
+async function api(action, params = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL');
+  const p = new URLSearchParams({ action, ...params });
+  const res = await fetch(`${SCRIPT_URL}?${p}`);
+  return res.json();
+}
+async function apiPost(action, data = {}) {
+  if (!SCRIPT_URL) throw new Error('No script URL');
+  const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...data }), mode: 'no-cors' });
+  return { success: true };
+}
+function initials(n) { return (n||'').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+const AV = ['a1','a2','a3','a4','a5'];
+
+// ─── LOAD ALL ───
+async function loadAll() {
+  try {
+    const [md, ed, annd, resd, projd] = await Promise.all([
+      api('getAllMembers'), api('getEvents'), api('getAnnouncements'), api('getResources'), api('getProjects')
+    ]);
+    allMembers = md.members || [];
+    allEvents = ed.events || [];
+    allAnn = annd.announcements || [];
+    allRes = resd.resources || [];
+    allProj = projd.projects || [];
+
+    renderStats();
+    renderPendingTable();
+    renderAllMembersTable(allMembers);
+    renderMembersFullTable(allMembers);
+    renderEventsTable();
+    renderDashEvents();
+    renderDistBars();
+    renderAnnTable();
+    renderDashAnn();
+    renderResTable();
+    renderProjTable();
+    renderAttEventsTable();
+
+    document.getElementById('pendingBadge').textContent = allMembers.filter(m => m.Status === 'pending').length;
+  } catch(e) {
+    loadFallback();
+  }
+}
+
+function loadFallback() {
+  allMembers = [
+    {ID:'IH-001',FullName:'Priya Reddy',Email:'p.reddy@uni.edu',Branch:'ECE',Year:'Year 2',Role:'member',Status:'active',Points:240},
+    {ID:'IH-002',FullName:'Kiran Sharma',Email:'k.sharma@uni.edu',Branch:'CSE',Year:'Year 3',Role:'member',Status:'active',Points:185},
+    {ID:'IH-003',FullName:'Neha Mishra',Email:'n.mishra@uni.edu',Branch:'IT',Year:'Year 1',Role:'member',Status:'pending',Points:0},
+    {ID:'IH-004',FullName:'Rahul Sen',Email:'r.sen@uni.edu',Branch:'CSE',Year:'Year 2',Role:'member',Status:'pending',Points:0},
+    {ID:'IH-005',FullName:'Vishal Kumar',Email:'v.kumar@uni.edu',Branch:'MECH',Year:'Year 4',Role:'admin',Status:'active',Points:165},
+    {ID:'IH-006',FullName:'Deepa Singh',Email:'d.singh@uni.edu',Branch:'EEE',Year:'Year 2',Role:'member',Status:'active',Points:130},
+  ];
+  allEvents = [
+    {ID:'ev1',Title:'Web3 & Blockchain Workshop',Date:'2026-05-08',Type:'Workshop',Location:'Hall A',Registered:18,Attended:14},
+    {ID:'ev2',Title:'InnoHack 2026',Date:'2026-05-15',Type:'Hackathon',Location:'Lab Complex',Registered:38,Attended:0},
+    {ID:'ev3',Title:'AI/ML Trends Seminar',Date:'2026-05-22',Type:'Seminar',Location:'Auditorium',Registered:21,Attended:0},
+  ];
+  allAnn = [
+    {ID:'a1',Title:'InnoHack 2026 registration open!',Content:'Register your teams before May 10.',Date:'2026-05-01',Priority:'High',CreatedBy:'Vishal Kumar'},
+    {ID:'a2',Title:'New learning resources added',Content:'Check out 5 new ML tutorials.',Date:'2026-04-28',Priority:'Medium',CreatedBy:'Priya Reddy'},
+    {ID:'a3',Title:'Club photo session reminder',Content:'Saturday at 10 AM near main gate.',Date:'2026-04-25',Priority:'Low',CreatedBy:'Arjun Rao'},
+  ];
+  allRes = [
+    {ID:'r1',Title:'React Documentation',Link:'https://react.dev',Category:'Documentation'},
+    {ID:'r2',Title:'Full Stack Open',Link:'https://fullstackopen.com',Category:'Course'},
+    {ID:'r3',Title:'Docker Docs',Link:'https://docs.docker.com',Category:'Documentation'},
+  ];
+  allProj = [
+    {ID:'p1',Title:'Campus Lost & Found App',Lead:'Kiran Sharma',Status:'Active',TechStack:'Flutter,Firebase'},
+    {ID:'p2',Title:'Smart Attendance System',Lead:'Vishal Kumar',Status:'Completed',TechStack:'Arduino,RFID'},
+  ];
+  renderStats(); renderPendingTable(); renderAllMembersTable(allMembers); renderMembersFullTable(allMembers);
+  renderEventsTable(); renderDashEvents(); renderDistBars(); renderAnnTable(); renderDashAnn();
+  renderResTable(); renderProjTable(); renderAttEventsTable();
+  document.getElementById('pendingBadge').textContent = allMembers.filter(m=>m.Status==='pending').length;
+}
+
+// ─── STATS ───
+function renderStats() {
+  const total = allMembers.length, active = allMembers.filter(m=>m.Status==='active').length, pending = allMembers.filter(m=>m.Status==='pending').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-total-t').textContent = `+${Math.floor(total*.1)} this month`;
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-active-t').textContent = Math.round(active/total*100)+'% of total';
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-events').textContent = allEvents.length;
+  document.getElementById('stat-events-t').textContent = allEvents.filter(e=>new Date(e.Date)>=new Date()).length+' upcoming';
+}
+
+function renderDistBars() {
+  const total = allMembers.length || 1;
+  const active = allMembers.filter(m=>m.Status==='active').length;
+  const pending = allMembers.filter(m=>m.Status==='pending').length;
+  const rej = allMembers.filter(m=>m.Status==='rejected').length;
+  document.getElementById('distBars').innerHTML = [
+    {label:'Active',val:active,pct:Math.round(active/total*100),color:'var(--g)'},
+    {label:'Pending',val:pending,pct:Math.round(pending/total*100),color:'var(--a)'},
+    {label:'Rejected',val:rej,pct:Math.round(rej/total*100),color:'var(--r)'},
+  ].map(r=>`<div class="prog-row"><div class="prog-label"><span class="prog-name">${r.label}</span><span class="prog-val">${r.val} · ${r.pct}%</span></div><div class="prog-bar"><div class="prog-fill" style="width:${r.pct}%;background:${r.color}"></div></div></div>`).join('');
+}
+
+// ─── MEMBERS ───
+function memberRow(m, i) {
+  const statusClass = {active:'b-active',pending:'b-pending',rejected:'b-rejected',admin:'b-admin'};
+  const sc = statusClass[m.Status] || 'b-pending';
+  return `<tr>
+    <td><input type="checkbox" class="chk mem-check" data-id="${m.ID}"></td>
+    <td><div class="mc"><div class="av-sm ${AV[i%5]}">${initials(m.FullName)}</div><div><div style="font-weight:500">${m.FullName}</div><div style="font-size:10px;color:var(--muted)">${m.ID||''}</div></div></div></td>
+    <td style="font-size:11px;color:var(--muted)">${m.Branch||''} · ${m.Year||''}</td>
+    <td><span class="badge ${statusClass[m.Role]==='b-admin'?'b-admin':sc}"><span class="bdot"></span>${(m.Status||'').charAt(0).toUpperCase()+(m.Status||'').slice(1)}</span></td>
+    <td class="act-btns">
+      ${m.Status==='pending'?`<button class="btn btn-green btn-sm" onclick="updateMemberStatus('${m.ID}','active')">✓</button><button class="btn btn-red btn-sm" onclick="updateMemberStatus('${m.ID}','rejected')">✗</button>`:''}
+      ${m.Status==='active'?`<button class="btn btn-ghost btn-sm" onclick="updateMemberStatus('${m.ID}','rejected')">Revoke</button>`:''}
+      ${m.Status==='rejected'?`<button class="btn btn-green btn-sm" onclick="updateMemberStatus('${m.ID}','active')">Restore</button>`:''}
+      ${m.Role!=='admin'?`<button class="btn btn-ghost btn-sm" onclick="promoteAdmin('${m.ID}')">Admin↑</button>`:''}
+    </td>
+  </tr>`;
+}
+function fullMemberRow(m, i) {
+  const sc = {active:'b-active',pending:'b-pending',rejected:'b-rejected'};
+  return `<tr>
+    <td><input type="checkbox" class="chk mem-check" data-id="${m.ID}"></td>
+    <td><div class="mc"><div class="av-sm ${AV[i%5]}">${initials(m.FullName)}</div><span>${m.FullName}</span></div></td>
+    <td style="font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis">${m.Email||''}</td>
+    <td style="font-size:11px">${m.Branch||''}</td>
+    <td style="font-size:11px">${m.Year||''}</td>
+    <td><span class="badge ${m.Role==='admin'?'b-admin':'b-active'}"><span class="bdot"></span>${m.Role||'member'}</span></td>
+    <td><span class="badge ${sc[m.Status]||'b-pending'}"><span class="bdot"></span>${(m.Status||'').charAt(0).toUpperCase()+(m.Status||'').slice(1)}</span></td>
+    <td class="act-btns">
+      ${m.Status==='pending'?`<button class="btn btn-green btn-sm" onclick="updateMemberStatus('${m.ID}','active')">Approve</button><button class="btn btn-red btn-sm" onclick="updateMemberStatus('${m.ID}','rejected')">Reject</button>`:
+        m.Status==='active'?`<button class="btn btn-ghost btn-sm" onclick="updateMemberStatus('${m.ID}','rejected')">Revoke</button>`:
+        `<button class="btn btn-green btn-sm" onclick="updateMemberStatus('${m.ID}','active')">Restore</button>`}
+    </td>
+  </tr>`;
+}
+function renderPendingTable() {
+  const pending = allMembers.filter(m=>m.Status==='pending');
+  document.getElementById('pendingTable').innerHTML = pending.length ? pending.map(memberRow).join('') : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">No pending approvals</td></tr>';
+}
+function renderAllMembersTable(members) {
+  document.getElementById('allMembersTable').innerHTML = members.slice(0,8).map((m,i)=>`
+    <tr>
+      <td><div class="mc"><div class="av-sm ${AV[i%5]}">${initials(m.FullName)}</div>${m.FullName}</div></td>
+      <td style="font-size:10px;color:var(--muted)">${m.Branch||''} · ${m.Year||''}</td>
+      <td><span class="badge ${m.Role==='admin'?'b-admin':'b-active'}"><span class="bdot"></span>${m.Role||'member'}</span></td>
+      <td><span class="badge ${m.Status==='active'?'b-active':m.Status==='pending'?'b-pending':'b-rejected'}"><span class="bdot"></span>${(m.Status||'').charAt(0).toUpperCase()+(m.Status||'').slice(1)}</span></td>
+      <td style="font-weight:700;color:var(--v);font-size:12px">${m.Points||10}</td>
+      <td class="act-btns">
+        ${m.Status==='pending'?`<button class="btn btn-green btn-sm" onclick="updateMemberStatus('${m.ID}','active')">Approve</button><button class="btn btn-red btn-sm" onclick="updateMemberStatus('${m.ID}','rejected')">Reject</button>`:
+          `<button class="btn btn-ghost btn-sm" onclick="updateMemberStatus('${m.ID}',${m.Status==='active'?`'rejected'`:`'active'`})">${m.Status==='active'?'Revoke':'Restore'}</button>`}
+      </td>
+    </tr>`).join('');
+}
+function renderMembersFullTable(members) {
+  document.getElementById('membersFullTable').innerHTML = members.map(fullMemberRow).join('') || '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No members found</td></tr>';
+}
+function filterMembersTable(q) {
+  const sf = document.getElementById('statusFilter')?.value || '';
+  let filtered = allMembers;
+  if (q) filtered = filtered.filter(m=>(m.FullName+m.Email+m.Branch).toLowerCase().includes(q.toLowerCase()));
+  if (sf) filtered = filtered.filter(m=>m.Status===sf);
+  renderMembersFullTable(filtered);
+  renderAllMembersTable(filtered);
+}
+function toggleAllChecks(masterChk) { document.querySelectorAll('.mem-check').forEach(c=>c.checked=masterChk.checked); }
+
+async function updateMemberStatus(id, status) {
+  showToast(`Updating member status to ${status}...`);
+  try {
+    await apiPost('updateMemberStatus', { id, status });
+    const m = allMembers.find(m=>m.ID===id); if(m) m.Status = status;
+    renderPendingTable(); renderAllMembersTable(allMembers); renderMembersFullTable(allMembers);
+    renderStats(); renderDistBars();
+    document.getElementById('pendingBadge').textContent = allMembers.filter(m=>m.Status==='pending').length;
+    showToast(`Member ${status === 'active' ? 'approved' : status === 'rejected' ? 'rejected' : 'updated'} successfully!`, 'success');
+  } catch(e) {
+    allMembers.find(m=>m.ID===id) && (allMembers.find(m=>m.ID===id).Status = status);
+    renderPendingTable(); renderAllMembersTable(allMembers); renderMembersFullTable(allMembers);
+    renderStats(); renderDistBars();
+    document.getElementById('pendingBadge').textContent = allMembers.filter(m=>m.Status==='pending').length;
+    showToast('Status updated (offline mode)', 'success');
+  }
+}
+async function promoteAdmin(id) {
+  await apiPost('updateMemberRole', { id, role: 'admin' });
+  const m = allMembers.find(m=>m.ID===id); if(m) m.Role = 'admin';
+  renderMembersFullTable(allMembers);
+  showToast('Member promoted to admin!', 'success');
+}
+function bulkApprove() {
+  const ids = [...document.querySelectorAll('.mem-check:checked')].map(c=>c.dataset.id);
+  if (!ids.length) { showToast('Select members first', 'error'); return; }
+  ids.forEach(id => updateMemberStatus(id, 'active'));
+}
+function bulkReject() {
+  const ids = [...document.querySelectorAll('.mem-check:checked')].map(c=>c.dataset.id);
+  if (!ids.length) { showToast('Select members first', 'error'); return; }
+  ids.forEach(id => updateMemberStatus(id, 'rejected'));
+}
+async function submitAddMember() {
+  const data = { name: document.getElementById('nm-name').value, email: document.getElementById('nm-email').value, branch: document.getElementById('nm-branch').value, year: document.getElementById('nm-year').value, role: document.getElementById('nm-role').value, status: document.getElementById('nm-status').value, phone: document.getElementById('nm-phone').value, skills: document.getElementById('nm-skills').value };
+  if (!data.name || !data.email) { showToast('Name and email required', 'error'); return; }
+  await apiPost('addMember', data);
+  const newM = { ID: 'IH-'+Date.now().toString().slice(-4), FullName: data.name, Email: data.email, Branch: data.branch, Year: data.year, Role: data.role, Status: data.status, Points: 10 };
+  allMembers.push(newM);
+  renderMembersFullTable(allMembers); renderAllMembersTable(allMembers); renderPendingTable(); renderStats(); renderDistBars();
+  document.getElementById('pendingBadge').textContent = allMembers.filter(m=>m.Status==='pending').length;
+  closeModal('addMemberModal');
+  showToast('Member added successfully!', 'success');
+}
+
+// ─── EVENTS ───
+const EV_TC = {Workshop:'t-ws',Hackathon:'t-hk',Seminar:'t-sm',Meetup:'t-mt',Competition:'t-hk'};
+function renderEventsTable() {
+  document.getElementById('eventsTable').innerHTML = allEvents.map(ev=>`
+    <tr>
+      <td style="font-weight:500">${ev.Title}</td>
+      <td style="font-size:11px;color:var(--muted)">${formatDate(ev.Date)}</td>
+      <td><span class="ev-badge ${EV_TC[ev.Type]||'t-ws'}">${ev.Type||'Event'}</span></td>
+      <td style="font-size:11px">${ev.Location||'—'}</td>
+      <td style="font-weight:600;color:var(--v)">${ev.Registered||0}</td>
+      <td style="font-weight:600;color:var(--g)">${ev.Attended||0}</td>
+      <td class="act-btns">
+        <button class="btn btn-ghost btn-sm" onclick="openEditEventModal('${ev.ID}')">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="deleteEvent('${ev.ID}')">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No events yet</td></tr>';
+}
+function renderDashEvents() {
+  document.getElementById('dashEvents').innerHTML = allEvents.slice(0,4).map(ev=>`
+    <div class="ev-item">
+      <div class="ev-date-box"><div class="ev-mon">${formatMonth(ev.Date)}</div><div class="ev-day">${formatDay(ev.Date)}</div></div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:500;margin-bottom:2px">${ev.Title}</div><div style="font-size:10px;color:var(--muted)">${ev.Registered||0} registered &nbsp;<span class="ev-badge ${EV_TC[ev.Type]||'t-ws'}">${ev.Type}</span></div></div>
+      <button class="btn btn-ghost btn-sm" onclick="openScanner('${ev.ID}','${ev.Title}')">Scan</button>
+    </div>`).join('') || '<div class="loader">No events</div>';
+}
+function renderAttEventsTable() {
+  document.getElementById('attEventsTable').innerHTML = allEvents.map(ev=>`
+    <tr>
+      <td style="font-weight:500">${ev.Title}</td>
+      <td style="font-size:11px;color:var(--muted)">${formatDate(ev.Date)}</td>
+      <td><span class="ev-badge ${EV_TC[ev.Type]||'t-ws'}">${ev.Type||'Event'}</span></td>
+      <td style="font-weight:600;color:var(--v)">${ev.Registered||0}</td>
+      <td style="font-weight:600;color:var(--g)">${ev.Attended||0}</td>
+      <td><button class="btn btn-violet btn-sm" onclick="openScanner('${ev.ID}','${ev.Title}')">Open Scanner</button></td>
+    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">No events</td></tr>';
+}
+function openAddEventModal() { document.getElementById('evModalTitle').textContent='Add Event'; document.getElementById('ev-id').value=''; document.getElementById('ev-title').value=''; document.getElementById('ev-date').value=''; document.getElementById('ev-desc').value=''; document.getElementById('ev-location').value=''; openModal('addEventModal'); }
+function openEditEventModal(id) {
+  const ev = allEvents.find(e=>e.ID===id); if(!ev) return;
+  document.getElementById('evModalTitle').textContent='Edit Event';
+  document.getElementById('ev-id').value=ev.ID; document.getElementById('ev-title').value=ev.Title;
+  document.getElementById('ev-date').value=ev.Date?.substring(0,10)||''; document.getElementById('ev-type').value=ev.Type||'Workshop';
+  document.getElementById('ev-location').value=ev.Location||''; document.getElementById('ev-desc').value=ev.Description||'';
+  openModal('addEventModal');
+}
+async function submitEvent() {
+  const id = document.getElementById('ev-id').value;
+  const data = { id, title: document.getElementById('ev-title').value, date: document.getElementById('ev-date').value, type: document.getElementById('ev-type').value, location: document.getElementById('ev-location').value, description: document.getElementById('ev-desc').value };
+  if (!data.title || !data.date) { showToast('Title and date required', 'error'); return; }
+  await apiPost(id ? 'updateEvent' : 'addEvent', data);
+  if (id) { const e = allEvents.find(e=>e.ID===id); if(e){e.Title=data.title;e.Date=data.date;e.Type=data.type;e.Location=data.location;e.Description=data.description;} }
+  else { allEvents.push({ID:'ev'+Date.now(),Title:data.title,Date:data.date,Type:data.type,Location:data.location,Description:data.description,Registered:0,Attended:0}); }
+  renderEventsTable(); renderDashEvents(); renderAttEventsTable(); renderStats();
+  closeModal('addEventModal'); showToast(id?'Event updated!':'Event added!','success');
+}
+async function deleteEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  await apiPost('deleteEvent', { id });
+  allEvents = allEvents.filter(e=>e.ID!==id);
+  renderEventsTable(); renderDashEvents(); renderAttEventsTable(); renderStats();
+  showToast('Event deleted', 'success');
+}
+
+// ─── ATTENDANCE SCANNER ───
+async function openScanner(eventId, eventTitle) {
+  currentEventForAtt = { id: eventId, title: eventTitle };
+  document.getElementById('scannerEventTitle').textContent = 'Attendance: ' + eventTitle;
+  document.getElementById('attEventList').style.display = 'none';
+  document.getElementById('attScanner').style.display = 'block';
+  showPage('attendance');
+  loadAttendance(eventId);
+}
+async function loadAttendance(eventId) {
+  try {
+    const data = await api('getEventAttendance', { eventId });
+    allAtt = data.attendance || [];
+  } catch(e) { allAtt = []; }
+  renderAttTable();
+}
+function renderAttTable() {
+  const ev = allEvents.find(e=>e.ID===currentEventForAtt?.id);
+  const total = ev?.Registered||0, present = allAtt.filter(a=>a.Attended).length;
+  document.getElementById('attTotal').textContent = total;
+  document.getElementById('attPresent').textContent = present;
+  document.getElementById('attPending').textContent = Math.max(0, total - present);
+  document.getElementById('attTable').innerHTML = allAtt.map((a,i)=>`
+    <tr>
+      <td><div class="mc"><div class="av-sm ${AV[i%5]}">${initials(a.MemberName)}</div>${a.MemberName}</div></td>
+      <td style="font-size:11px;color:var(--muted)">${a.Attended ? formatTime(a.AttendedAt) : '—'}</td>
+      <td><span class="badge ${a.Attended?'b-active':'b-pending'}"><span class="bdot"></span>${a.Attended?'Present':'Registered'}</span></td>
+    </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--muted)">No registrations yet</td></tr>';
+}
+async function markAttendanceManual() {
+  const val = document.getElementById('manualMemberId').value.trim();
+  if (!val) { showToast('Enter member ID or email','error'); return; }
+  const member = allMembers.find(m=>m.ID===val||m.Email===val);
+  if (!member) { showToast('Member not found','error'); return; }
+  try {
+    await apiPost('markAttendance', { eventId: currentEventForAtt.id, eventTitle: currentEventForAtt.title, memberId: member.ID, memberName: member.FullName, memberEmail: member.Email });
+    const existing = allAtt.find(a=>a.MemberID===member.ID);
+    if (existing) existing.Attended = true; else allAtt.push({MemberID:member.ID,MemberName:member.FullName,Email:member.Email,Attended:true,AttendedAt:new Date().toISOString()});
+    renderAttTable();
+    document.getElementById('manualMemberId').value = '';
+    showToast(`✓ ${member.FullName} marked present!`,'success');
+  } catch(e) { showToast('Marked locally (offline mode)','success'); }
+}
+
+// ─── ANNOUNCEMENTS ───
+function renderAnnTable() {
+  const prio = {High:'p-hi',Medium:'p-md',Low:'p-lo'};
+  document.getElementById('annTable').innerHTML = allAnn.map(a=>`
+    <tr>
+      <td style="font-weight:500">${a.Title}</td>
+      <td><span class="badge ${prio[a.Priority]||'p-lo'}">${a.Priority||'Low'}</span></td>
+      <td style="font-size:11px">${a.CreatedBy||'—'}</td>
+      <td style="font-size:11px;color:var(--muted)">${formatDate(a.Date)}</td>
+      <td class="act-btns">
+        <button class="btn btn-ghost btn-sm" onclick="openEditAnnModal('${a.ID}')">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="deleteAnn('${a.ID}')">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">No announcements</td></tr>';
+}
+function renderDashAnn() {
+  const barColor = {High:'var(--r)',Medium:'var(--a)',Low:'var(--g)'};
+  document.getElementById('dashAnn').innerHTML = allAnn.slice(0,4).map(a=>`
+    <div class="ann-item">
+      <div class="ann-bar" style="background:${barColor[a.Priority]||'var(--g)'}"></div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:500">${a.Title}</div><div style="font-size:10px;color:var(--muted)">By ${a.CreatedBy||'Admin'} · ${formatDate(a.Date)}</div></div>
+      <button class="btn btn-red btn-sm" onclick="deleteAnn('${a.ID}')">×</button>
+    </div>`).join('') || '<div class="loader">No announcements</div>';
+}
+function openAddAnnModal() { document.getElementById('ann-id').value=''; document.getElementById('ann-title').value=''; document.getElementById('ann-content').value=''; openModal('addAnnModal'); }
+function openEditAnnModal(id) { const a=allAnn.find(a=>a.ID===id); if(!a) return; document.getElementById('ann-id').value=a.ID; document.getElementById('ann-title').value=a.Title; document.getElementById('ann-content').value=a.Content||''; document.getElementById('ann-priority').value=a.Priority||'Medium'; openModal('addAnnModal'); }
+async function submitAnn() {
+  const id = document.getElementById('ann-id').value;
+  const data = { id, title: document.getElementById('ann-title').value, content: document.getElementById('ann-content').value, priority: document.getElementById('ann-priority').value, createdBy: currentAdmin.FullName, date: new Date().toISOString() };
+  if (!data.title) { showToast('Title required','error'); return; }
+  await apiPost(id?'updateAnnouncement':'addAnnouncement', data);
+  if (id) { const a=allAnn.find(a=>a.ID===id); if(a){a.Title=data.title;a.Content=data.content;a.Priority=data.priority;} }
+  else allAnn.unshift({ID:'ann'+Date.now(),...data});
+  renderAnnTable(); renderDashAnn();
+  closeModal('addAnnModal'); showToast(id?'Updated!':'Posted!','success');
+}
+async function deleteAnn(id) { await apiPost('deleteAnnouncement',{id}); allAnn=allAnn.filter(a=>a.ID!==id); renderAnnTable(); renderDashAnn(); showToast('Deleted','success'); }
+
+// ─── RESOURCES ───
+function renderResTable() {
+  document.getElementById('resTable').innerHTML = allRes.map(r=>`
+    <tr>
+      <td style="font-weight:500">${r.Title}</td>
+      <td><span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;background:var(--v4);color:var(--v)">${r.Category||'General'}</span></td>
+      <td><a href="${r.Link}" target="_blank" style="font-size:11px;color:var(--c)">${(r.Link||'').substring(0,40)}...</a></td>
+      <td class="act-btns">
+        <button class="btn btn-ghost btn-sm" onclick="openEditResModal('${r.ID}')">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="deleteRes('${r.ID}')">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No resources</td></tr>';
+}
+function openAddResModal() { document.getElementById('res-id').value=''; document.getElementById('res-title').value=''; document.getElementById('res-link').value=''; openModal('addResModal'); }
+function openEditResModal(id) { const r=allRes.find(r=>r.ID===id); if(!r) return; document.getElementById('res-id').value=r.ID; document.getElementById('res-title').value=r.Title; document.getElementById('res-link').value=r.Link||''; document.getElementById('res-cat').value=r.Category||'General'; openModal('addResModal'); }
+async function submitRes() {
+  const id=document.getElementById('res-id').value;
+  const data={id,title:document.getElementById('res-title').value,link:document.getElementById('res-link').value,category:document.getElementById('res-cat').value};
+  if (!data.title||!data.link){showToast('Title and URL required','error');return;}
+  await apiPost(id?'updateResource':'addResource',data);
+  if(id){const r=allRes.find(r=>r.ID===id);if(r){r.Title=data.title;r.Link=data.link;r.Category=data.category;}}
+  else allRes.push({ID:'res'+Date.now(),Title:data.title,Link:data.link,Category:data.category});
+  renderResTable(); closeModal('addResModal'); showToast(id?'Updated!':'Added!','success');
+}
+async function deleteRes(id){await apiPost('deleteResource',{id});allRes=allRes.filter(r=>r.ID!==id);renderResTable();showToast('Deleted','success');}
+
+// ─── PROJECTS ───
+function renderProjTable() {
+  const sc={Active:'b-active',Completed:'b-admin',Planning:'b-pending'};
+  document.getElementById('projTable').innerHTML = allProj.map(p=>`
+    <tr>
+      <td style="font-weight:500">${p.Title}</td>
+      <td style="font-size:11px">${p.Lead||'—'}</td>
+      <td><span class="badge ${sc[p.Status]||'b-pending'}"><span class="bdot"></span>${p.Status||'Planning'}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${(p.TechStack||'').substring(0,40)}</td>
+      <td class="act-btns">
+        <button class="btn btn-ghost btn-sm" onclick="openEditProjModal('${p.ID}')">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="deleteProj('${p.ID}')">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">No projects</td></tr>';
+}
+function openAddProjModal(){document.getElementById('proj-id').value='';['proj-title','proj-desc','proj-lead','proj-members','proj-techstack'].forEach(id=>document.getElementById(id).value='');openModal('addProjModal');}
+function openEditProjModal(id){const p=allProj.find(p=>p.ID===id);if(!p)return;document.getElementById('proj-id').value=p.ID;document.getElementById('proj-title').value=p.Title;document.getElementById('proj-desc').value=p.Description||'';document.getElementById('proj-lead').value=p.Lead||'';document.getElementById('proj-members').value=p.Members||'';document.getElementById('proj-status').value=p.Status||'Active';document.getElementById('proj-techstack').value=p.TechStack||'';openModal('addProjModal');}
+async function submitProj(){const id=document.getElementById('proj-id').value;const data={id,title:document.getElementById('proj-title').value,description:document.getElementById('proj-desc').value,lead:document.getElementById('proj-lead').value,members:document.getElementById('proj-members').value,status:document.getElementById('proj-status').value,techStack:document.getElementById('proj-techstack').value};if(!data.title){showToast('Title required','error');return;}await apiPost(id?'updateProject':'addProject',data);if(id){const p=allProj.find(p=>p.ID===id);if(p){p.Title=data.title;p.Description=data.description;p.Lead=data.lead;p.Members=data.members;p.Status=data.status;p.TechStack=data.techStack;}}else allProj.push({ID:'proj'+Date.now(),Title:data.title,Description:data.description,Lead:data.lead,Members:data.members,Status:data.status,TechStack:data.techStack});renderProjTable();closeModal('addProjModal');showToast(id?'Updated!':'Added!','success');}
+async function deleteProj(id){await apiPost('deleteProject',{id});allProj=allProj.filter(p=>p.ID!==id);renderProjTable();showToast('Deleted','success');}
+
+// ─── EXPORT ───
+function exportCSV() {
+  const header = 'ID,Name,Email,Branch,Year,Role,Status,Points\n';
+  const rows = allMembers.map(m=>`${m.ID},"${m.FullName}","${m.Email}",${m.Branch},${m.Year},${m.Role},${m.Status},${m.Points||0}`).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(header+rows); a.download = 'innovexa_members.csv'; a.click();
+}
+function exportAttCSV() {
+  const header = 'MemberName,Email,Status,Time\n';
+  const rows = allAtt.map(a=>`"${a.MemberName}","${a.Email||''}",${a.Attended?'Present':'Registered'},"${a.AttendedAt||''}"`).join('\n');
+  const el = document.createElement('a'); el.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(header+rows); el.download = 'attendance.csv'; el.click();
+}
+
+// ─── NAVIGATION ───
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>{ if(i.getAttribute('onclick')?.includes(name)) i.classList.add('active'); });
+  const titles = {dashboard:'Admin Dashboard',members:'Member Management',events:'Event Management',attendance:'Attendance Scanner',announcements:'Announcements',resources:'Resource Library',projects:'Projects'};
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+  if(name==='attendance'){ document.getElementById('attEventList').style.display='block'; document.getElementById('attScanner').style.display='none'; }
+}
+
+// ─── UTILS ───
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3500);}
+function formatDate(d){if(!d)return'';try{return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d;}}
+function formatMonth(d){if(!d)return'';try{return new Date(d).toLocaleDateString('en-IN',{month:'short'});}catch(e){return'';}}
+function formatDay(d){if(!d)return'';try{return new Date(d).getDate();}catch(e){return'';}}
+function formatTime(d){if(!d)return'—';try{return new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}catch(e){return d;}}
+function openAddMemberModal(){openModal('addMemberModal')}
+
+if (SCRIPT_URL) loadAll(); else loadFallback();
+</script>
+</body>
+</html>
