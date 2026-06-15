@@ -1,1 +1,1 @@
-# Innovexa-hub
+# Innovexa Labs

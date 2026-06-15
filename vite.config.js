@@ -6,10 +6,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        community: resolve(__dirname, 'community.html'),
-        admin: resolve(__dirname, 'admin.html'),
-        packetRoute: resolve(__dirname, 'packet-route.html'),
+        main:     resolve(__dirname, 'index.html'),
+        register: resolve(__dirname, 'register.html'),
+        status:   resolve(__dirname, 'status.html'),
+        portal:   resolve(__dirname, 'portal.html'),
+        atlas:    resolve(__dirname, 'atlas.html'),
+        pathfinder: resolve(__dirname, 'pathfinder.html'),
       }
     }
   }

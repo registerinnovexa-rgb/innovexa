@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Innovexa Atlas — Role-First. Long-Term. Peer-Led.</title>
+  <meta name="description" content="Innovexa Atlas is a role-first, long-term peer mentorship programme. Know your role. We build the road."/>
+  <link rel="icon" href="/logo-icon.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/animations.css"/>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --ink:      #0C1220;
+      --paper:    #F7F5F0;
+      --orange:   #C8490A;
+      --blue:     #1A4A8A;
+      --muted:    #7A7670;
+      --rule:     #D6D0C6;
+      --white:    #ffffff;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+
+    body {
+      font-family:'Inter', system-ui, sans-serif;
+      background:var(--paper);
+      color:var(--ink);
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+
+    /* ═══════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════ */
+    .atlas-header {
+      background:#fff;
+      border-bottom:1px solid var(--rule);
+      padding:0 48px;
+      height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      position:sticky; top:0; z-index:100;
+    }
+    .header-left {
+      display:flex;
+      align-items:center;
+      gap:16px;
+    }
+    .header-org {
+      font-family:'Inter', sans-serif;
+      font-size:.65rem;
+      font-weight:700;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .header-divider {
+      width:1px;
+      height:20px;
+      background:var(--rule);
+    }
+    .header-brand {
+      font-family:'Instrument Serif', serif;
+      font-size:1.1rem;
+      color:var(--ink);
+      letter-spacing:-.01em;
+    }
+    .header-brand em {
+      font-style:italic;
+      color:var(--orange);
+    }
+    .header-right {
+      font-size:.6rem;
+      font-weight:600;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    .atlas-hero {
+      position:relative;
+      height:420px;
+      background:var(--ink);
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+    }
+
+    /* Canvas behind everything */
+    #heroCanvas {
+      position:absolute;
+      inset:0;
+      width:100%; height:100%;
+    }
+
+    /* Glowing bottom rule */
+    .hero-glow-rule {
+      position:absolute;
+      bottom:0; left:0; right:0;
+      height:1px;
+      background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(200,73,10,.3) 20%,
+        rgba(200,73,10,.7) 50%,
+        rgba(200,73,10,.3) 80%,
+        transparent 100%
+      );
+      box-shadow:0 0 18px 2px rgba(200,73,10,.25);
+      z-index:5;
+    }
+
+    /* Floating role chips */
+    .chips-container {
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:4;
+    }
+    .role-chip {
+      position:absolute;
+      bottom:-48px;
+      right:50%;
+      transform:translateX(50%);
+      padding:6px 14px;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:500;
+      letter-spacing:.02em;
+      white-space:nowrap;
+      opacity:0;
+      animation:chipRise var(--dur) var(--delay) ease-in-out infinite;
+    }
+    .role-chip.default {
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      color:rgba(255,255,255,.65);
+    }
+    .role-chip.hot {
+      background:rgba(200,73,10,.12);
+      border:1px solid rgba(200,73,10,.25);
+      color:rgba(200,130,80,.85);
+    }
+    .role-chip.cool {
+      background:rgba(26,74,138,.15);
+      border:1px solid rgba(26,74,138,.3);
+      color:rgba(100,150,220,.85);
+    }
+    @keyframes chipRise {
+      0%   { opacity:0;   transform:translateY(0); }
+      15%  { opacity:.9; }
+      75%  { opacity:.7; }
+      95%  { opacity:0; }
+      100% { opacity:0;   transform:translateY(calc(-1 * var(--dist))); }
+    }
+
+    /* Hero text */
+    .hero-text {
+      position:absolute;
+      bottom:48px; left:48px;
+      z-index:6;
+      max-width:520px;
+    }
+    .hero-eyebrow {
+      font-family:'Inter', sans-serif;
+      font-size:.65rem;
+      font-weight:600;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:var(--orange);
+      margin-bottom:16px;
+      opacity:0;
+      transform:translateY(20px);
+      animation:riseIn .8s .1s ease forwards;
+    }
+    .hero-headline {
+      font-family:'Instrument Serif', serif;
+      font-size:3.4rem;
+      line-height:1.1;
+      color:#fff;
+      letter-spacing:-.02em;
+      margin-bottom:16px;
+      opacity:0;
+      transform:translateY(20px);
+      animation:riseIn .8s .25s ease forwards;
+    }
+    .hero-headline em {
+      font-style:italic;
+      color:var(--orange);
+    }
+    .hero-desc {
+      font-size:.9rem;
+      color:rgba(255,255,255,.5);
+      line-height:1.65;
+      max-width:42ch;
+      opacity:0;
+      transform:translateY(20px);
+      animation:riseIn .8s .4s ease forwards;
+    }
+    @keyframes riseIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════
+       MANIFESTO STRIP
+    ═══════════════════════════════════════ */
+    .manifesto-strip {
+      background:var(--ink);
+      border-top:1px solid rgba(255,255,255,.05);
+      border-bottom:1px solid rgba(255,255,255,.05);
+      padding:22px 48px;
+      display:flex;
+      align-items:center;
+      gap:0;
+    }
+    .manifesto-item {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      padding:0 24px;
+    }
+    .manifesto-item:first-child { padding-left:0; }
+    .manifesto-item:last-child { padding-right:0; }
+    .manifesto-dot {
+      width:5px; height:5px;
+      border-radius:50%;
+      background:var(--orange);
+      flex-shrink:0;
+    }
+    .manifesto-text {
+      font-size:.72rem;
+      color:rgba(255,255,255,.45);
+      font-weight:400;
+      letter-spacing:.02em;
+      line-height:1.4;
+    }
+    .manifesto-text strong { color:rgba(255,255,255,.7); font-weight:500; }
+    .manifesto-sep {
+      width:1px; height:28px;
+      background:rgba(255,255,255,.08);
+      flex-shrink:0;
+    }
+
+    /* ═══════════════════════════════════════
+       MAIN SECTION
+    ═══════════════════════════════════════ */
+    .atlas-main {
+      max-width:1200px;
+      margin:0 auto;
+      padding:64px 48px 96px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:48px;
+      align-items:start;
+    }
+
+    /* ── LEFT: Role Explorer ── */
+    .role-explorer {}
+    .explorer-label {
+      font-size:.65rem;
+      font-weight:700;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:24px;
+    }
+    .role-category {
+      border-bottom:1px solid var(--rule);
+    }
+    .category-toggle {
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      background:none;
+      border:none;
+      cursor:pointer;
+      text-align:left;
+      transition:color .2s;
+    }
+    .category-toggle:hover .cat-name { color:var(--orange); }
+    .cat-name {
+      font-size:.85rem;
+      font-weight:600;
+      color:var(--ink);
+      transition:color .2s;
+    }
+    .cat-arrow {
+      width:18px; height:18px;
+      color:var(--muted);
+      transition:transform .25s ease;
+      flex-shrink:0;
+    }
+    .cat-arrow.open { transform:rotate(180deg); }
+
+    .category-roles {
+      overflow:hidden;
+      max-height:0;
+      transition:max-height .35s ease;
+    }
+    .category-roles.open {
+      max-height:600px;
+    }
+    .role-item {
+      padding:10px 0 10px 16px;
+      border-left:2px solid transparent;
+      cursor:pointer;
+      transition:all .2s;
+      margin-bottom:2px;
+    }
+    .role-item:hover { border-left-color:var(--rule); }
+    .role-item.selected {
+      border-left-color:var(--orange);
+      background:rgba(200,73,10,.04);
+    }
+    .role-item.selected .role-name { color:var(--orange); }
+    .role-name {
+      font-size:.85rem;
+      font-weight:500;
+      color:var(--ink);
+      transition:color .2s;
+    }
+    .role-desc-text {
+      font-size:.75rem;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.45;
+    }
+
+    /* ── RIGHT: Interest Form ── */
+    .interest-form-wrap {
+      background:#fff;
+      border:1px solid var(--rule);
+      border-radius:16px;
+      padding:40px;
+      position:sticky;
+      top:72px;
+    }
+    .form-title {
+      font-family:'Instrument Serif', serif;
+      font-size:1.6rem;
+      color:var(--ink);
+      margin-bottom:6px;
+    }
+    .form-subtitle {
+      font-size:.8rem;
+      color:var(--muted);
+      margin-bottom:28px;
+      line-height:1.5;
+    }
+
+    .field-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .field-group {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:14px;
+    }
+    .field-group label {
+      font-size:.7rem;
+      font-weight:600;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      width:100%;
+      padding:10px 14px;
+      border:1.5px solid var(--rule);
+      border-radius:8px;
+      font-family:'Inter', sans-serif;
+      font-size:.875rem;
+      color:var(--ink);
+      background:#fff;
+      outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color:var(--ink);
+      box-shadow:0 0 0 3px rgba(12,18,32,.06);
+    }
+    .field-group input.error,
+    .field-group select.error,
+    .field-group textarea.error {
+      border-color:var(--orange);
+      box-shadow:0 0 0 3px rgba(200,73,10,.08);
+    }
+    .field-group textarea { resize:vertical; min-height:88px; }
+    /* Role display field */
+    .role-display-field {
+      width:100%;
+      padding:10px 14px;
+      border:1.5px solid var(--rule);
+      border-radius:8px;
+      font-family:'Inter', sans-serif;
+      font-size:.875rem;
+      color:var(--muted);
+      background:#fafafa;
+      cursor:default;
+      transition:all .2s;
+      min-height:40px;
+    }
+    .role-display-field.filled {
+      border-color:rgba(200,73,10,.3);
+      background:rgba(200,73,10,.03);
+      color:var(--orange);
+      font-weight:500;
+    }
+
+    /* Commit radio options */
+    .commit-options {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .commit-option {
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:12px 16px;
+      border:1.5px solid var(--rule);
+      border-radius:10px;
+      cursor:pointer;
+      transition:all .2s;
+      user-select:none;
+    }
+    .commit-option:hover { border-color:var(--muted); }
+    .commit-option.selected {
+      border-color:var(--ink);
+      background:rgba(12,18,32,.03);
+    }
+    .commit-radio-dot {
+      width:18px; height:18px;
+      border-radius:50%;
+      border:2px solid var(--rule);
+      flex-shrink:0;
+      margin-top:1px;
+      display:flex; align-items:center; justify-content:center;
+      transition:all .2s;
+    }
+    .commit-option.selected .commit-radio-dot {
+      border-color:var(--ink);
+    }
+    .commit-radio-dot-inner {
+      width:8px; height:8px;
+      border-radius:50%;
+      background:var(--ink);
+      transform:scale(0);
+      transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+    }
+    .commit-option.selected .commit-radio-dot-inner { transform:scale(1); }
+    .commit-text-wrap {}
+    .commit-label {
+      font-size:.82rem;
+      font-weight:600;
+      color:var(--ink);
+      line-height:1.3;
+    }
+
+    /* Submit button */
+    .submit-btn {
+      width:100%;
+      padding:14px;
+      background:var(--ink);
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      font-family:'Inter', sans-serif;
+      font-size:.72rem;
+      font-weight:700;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:all .25s ease;
+      margin-top:6px;
+    }
+    .submit-btn:hover { background:var(--orange); }
+    .submit-btn:active { transform:scale(.99); }
+    .submit-btn:disabled { opacity:.6; cursor:not-allowed; }
+
+    .form-footer-note {
+      font-size:.7rem;
+      color:var(--muted);
+      text-align:center;
+      margin-top:16px;
+      line-height:1.5;
+    }
+
+    /* ── Success state ── */
+    .form-success {
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:40px 20px;
+      gap:16px;
+    }
+    .success-icon {
+      width:56px; height:56px;
+      border-radius:50%;
+      border:2px solid var(--orange);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--orange);
+      font-size:1.5rem;
+    }
+    .success-heading {
+      font-family:'Instrument Serif', serif;
+      font-size:1.6rem;
+      color:var(--ink);
+    }
+    .success-desc {
+      font-size:.85rem;
+      color:var(--muted);
+      max-width:30ch;
+      line-height:1.6;
+    }
+
+
+    /* ═══════════════════════════════════════
+       PAGE FOOTER
+    ═══════════════════════════════════════ */
+    .atlas-footer {
+      border-top:1px solid var(--rule);
+      padding:28px 48px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:var(--paper);
+    }
+    .atlas-footer p {
+      font-size:.68rem;
+      color:var(--muted);
+      letter-spacing:.04em;
+    }
+    .back-link {
+      font-size:.72rem;
+      font-weight:500;
+      color:var(--muted);
+      text-decoration:none;
+      display:flex; align-items:center; gap:6px;
+      transition:color .2s;
+    }
+    .back-link:hover { color:var(--ink); }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════ */
+    @media(max-width:900px) {
+      .atlas-main { grid-template-columns:1fr; padding:40px 24px 64px; gap:32px; }
+      .manifesto-strip { flex-direction:column; gap:16px; padding:24px; }
+      .manifesto-item { padding:0; }
+      .manifesto-sep { width:80%; height:1px; }
+      .atlas-header { padding:0 24px; }
+      .hero-text { left:24px; bottom:32px; }
+      .hero-headline { font-size:2.4rem; }
+      .interest-form-wrap { position:static; padding:28px 20px; }
+      .atlas-footer { flex-direction:column; gap:12px; text-align:center; padding:24px; }
+    }
+    @media(max-width:600px) {
+      .field-row { grid-template-columns:1fr; }
+      .header-right { display:none; }
+      .hero-headline { font-size:2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orbs" style="z-index:-1; opacity:0.5;">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="atlas-header">
+  <div class="header-left">
+    <span class="header-org">Innovexa Labs</span>
+    <div class="header-divider"></div>
+    <span class="header-brand">Innovexa <em>Atlas</em></span>
+  </div>
+  <div class="header-right">Role-First &nbsp;·&nbsp; Long-Term &nbsp;·&nbsp; Peer-Led</div>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="atlas-hero">
+  <!-- Canvas for particles -->
+  <canvas id="heroCanvas"></canvas>
+
+  <!-- Floating role chips -->
+  <div class="chips-container" id="chipsContainer"></div>
+
+  <!-- Bottom glow rule -->
+  <div class="hero-glow-rule"></div>
+
+  <!-- Hero text -->
+  <div class="hero-text">
+    <p class="hero-eyebrow">Innovexa Atlas</p>
+    <h1 class="hero-headline">You know the role.<br/><em>We build the road.</em></h1>
+    <p class="hero-desc">A long-term, role-first peer mentorship programme. Small cohorts. Real depth. Every milestone ships.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ MANIFESTO STRIP ═══════════════════ -->
+<div class="manifesto-strip">
+  <div class="manifesto-item">
+    <div class="manifesto-dot"></div>
+    <div class="manifesto-text"><strong>Role-first</strong> — not company-first</div>
+  </div>
+  <div class="manifesto-sep"></div>
+  <div class="manifesto-item">
+    <div class="manifesto-dot"></div>
+    <div class="manifesto-text"><strong>Small cohorts</strong> — 8 to 12 people max per role</div>
+  </div>
+  <div class="manifesto-sep"></div>
+  <div class="manifesto-item">
+    <div class="manifesto-dot"></div>
+    <div class="manifesto-text"><strong>3–4 year roadmap</strong> — real depth, not shortcuts</div>
+  </div>
+  <div class="manifesto-sep"></div>
+  <div class="manifesto-item">
+    <div class="manifesto-dot"></div>
+    <div class="manifesto-text"><strong>Public portfolio</strong> — every milestone ships</div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main class="atlas-main">
+
+  <!-- LEFT: Role Explorer -->
+  <div class="role-explorer">
+    <p class="explorer-label">Choose your role track</p>
+
+    <div id="roleCategories"></div>
+  </div>
+
+  <!-- RIGHT: Interest Form -->
+  <div class="interest-form-wrap">
+    <!-- Form content -->
+    <div id="formContent">
+      <h2 class="form-title">Express your interest</h2>
+      <p class="form-subtitle">No application. No fees. We'll reach out when your cohort forms.</p>
+
+      <form id="atlasForm" novalidate>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" placeholder="Aarav" required/>
+          </div>
+          <div class="field-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" placeholder="Sharma" required/>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="email">University Email</label>
+          <input type="email" id="email" placeholder="you@university.edu" required/>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="+91 9876543210" required/>
+          </div>
+          <div class="field-group">
+            <label for="operativeId">Operative ID</label>
+            <input type="text" id="operativeId" placeholder="OP-XXXX" required/>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="year">Current Year</label>
+          <select id="year" required>
+            <option value="">Select year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>Role You're Building Toward</label>
+          <div class="role-display-field" id="roleDisplay">← Select a role from the explorer</div>
+          <input type="hidden" id="selectedRole" required/>
+        </div>
+
+        <div class="field-group">
+          <label>Commitment Level</label>
+          <div class="commit-options">
+            <div class="commit-option" data-value="serious" onclick="selectCommit(this)">
+              <div class="commit-radio-dot">
+                <div class="commit-radio-dot-inner"></div>
+              </div>
+              <div class="commit-text-wrap">
+                <div class="commit-label">Serious — I'm ready to commit to a 3–4 year roadmap</div>
+              </div>
+            </div>
+            <div class="commit-option" data-value="exploring" onclick="selectCommit(this)">
+              <div class="commit-radio-dot">
+                <div class="commit-radio-dot-inner"></div>
+              </div>
+              <div class="commit-text-wrap">
+                <div class="commit-label">Exploring — I want to learn more before deciding</div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="commitment" required/>
+        </div>
+
+        <div class="field-group">
+          <label for="whyRole">Why this role? <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="whyRole" placeholder="What draws you to this path?"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Express Interest</button>
+        <p class="form-footer-note">No fees. No obligation. We'll contact you when your cohort forms.</p>
+      </form>
+    </div>
+
+    <!-- Success state -->
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon">✓</div>
+      <h2 class="success-heading">You're on the map.</h2>
+      <p class="success-desc">We've received your interest. We'll reach out when your cohort begins forming.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="atlas-footer">
+  <p>© 2026 Innovexa Labs · Innovexa Atlas Programme</p>
+  <a href="index.html" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="m12 5-7 7 7 7"/></svg>
+    Back to Innovexa Labs
+  </a>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════
+   GOOGLE SHEETS ENDPOINT
+   Replace with your deployed Apps Script URL
+═══════════════════════════════════════ */
+const ATLAS_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwe01NccRHDXm0xo4GFMZcnB_HgPbltDxoF9KQSu2G86_O5XqoDXDBmtFWutLHmWO6U/exec';
+
+/* ═══════════════════════════════════════
+   ROLE DATA
+═══════════════════════════════════════ */
+const ROLE_CATEGORIES = [
+  {
+    name: 'AI & Machine Learning',
+    roles: [
+      { name: 'Machine Learning Engineer', desc: 'Build and deploy ML models at scale.' },
+      { name: 'AI Research Engineer', desc: 'Advance the frontiers of AI systems.' },
+      { name: 'MLOps Engineer', desc: 'Own the ML infrastructure and deployment pipeline.' },
+      { name: 'Data Scientist', desc: 'Extract insights and build predictive models.' },
+    ]
+  },
+  {
+    name: 'Software Engineering',
+    roles: [
+      { name: 'Backend Engineer', desc: 'Design resilient, scalable server-side systems.' },
+      { name: 'Frontend Engineer', desc: 'Craft exceptional user interfaces and experiences.' },
+      { name: 'Full-Stack Engineer', desc: 'Own the full product, end to end.' },
+    ]
+  },
+  {
+    name: 'Infrastructure & DevOps',
+    roles: [
+      { name: 'DevOps Engineer', desc: 'Automate and optimise the delivery pipeline.' },
+      { name: 'Cloud Engineer', desc: 'Architect and manage cloud infrastructure.' },
+      { name: 'Site Reliability Engineer', desc: 'Keep systems fast, stable, and observable.' },
+    ]
+  },
+  {
+    name: 'Security & Systems',
+    roles: [
+      { name: 'Cybersecurity Engineer', desc: 'Protect systems and data from threats.' },
+      { name: 'Embedded Systems Engineer', desc: 'Program at the hardware-software boundary.' },
+    ]
+  },
+  {
+    name: 'Data & Analytics',
+    roles: [
+      { name: 'Data Engineer', desc: 'Build the pipelines that power data products.' },
+      { name: 'Analytics Engineer', desc: 'Transform raw data into trusted metrics.' },
+    ]
+  },
+];
+
+// All chips for animation
+const ALL_ROLE_NAMES = ROLE_CATEGORIES.flatMap(c => c.roles.map(r => r.name));
+const CHIP_TYPES = ['default','default','hot','cool','default','hot','cool'];
+
+/* ═══════════════════════════════════════
+   BUILD ROLE EXPLORER
+═══════════════════════════════════════ */
+function buildRoleExplorer() {
+  const container = document.getElementById('roleCategories');
+  ROLE_CATEGORIES.forEach((cat, ci) => {
+    const catEl = document.createElement('div');
+    catEl.className = 'role-category';
+
+    const toggle = document.createElement('button');
+    toggle.className = 'category-toggle';
+    toggle.setAttribute('aria-expanded', ci === 0 ? 'true' : 'false');
+    toggle.innerHTML = `
+      <span class="cat-name">${cat.name}</span>
+      <svg class="cat-arrow ${ci === 0 ? 'open' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m6 9 6 6 6-6"/>
+      </svg>`;
+
+    const rolesDiv = document.createElement('div');
+    rolesDiv.className = `category-roles ${ci === 0 ? 'open' : ''}`;
+
+    cat.roles.forEach(role => {
+      const item = document.createElement('div');
+      item.className = 'role-item';
+      item.dataset.role = role.name;
+      item.innerHTML = `
+        <div class="role-name">${role.name}</div>
+        <div class="role-desc-text">${role.desc}</div>`;
+      item.addEventListener('click', () => selectRole(role.name, item));
+      rolesDiv.appendChild(item);
+    });
+
+    toggle.addEventListener('click', () => {
+      const isOpen = rolesDiv.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen);
+      toggle.querySelector('.cat-arrow').classList.toggle('open', isOpen);
+    });
+
+    catEl.appendChild(toggle);
+    catEl.appendChild(rolesDiv);
+    container.appendChild(catEl);
+  });
+}
+
+function selectRole(name, itemEl) {
+  document.querySelectorAll('.role-item').forEach(el => el.classList.remove('selected'));
+  itemEl.classList.add('selected');
+  document.getElementById('selectedRole').value = name;
+  const display = document.getElementById('roleDisplay');
+  display.textContent = name;
+  display.classList.add('filled');
+  display.classList.remove('error-disp');
+}
+
+/* ═══════════════════════════════════════
+   COMMIT RADIO
+═══════════════════════════════════════ */
+function selectCommit(el) {
+  document.querySelectorAll('.commit-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('commitment').value = el.dataset.value;
+}
+
+/* ═══════════════════════════════════════
+   CANVAS PARTICLES + LINES
+═══════════════════════════════════════ */
+(function initCanvas() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Particles
+  const PARTICLE_COUNT = 110;
+  const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    x: Math.random() * 100, // percent
+    y: Math.random() * 100,
+    r: Math.random() * 1.4 + 0.4,
+    speed: Math.random() * 0.12 + 0.04,
+    color: (() => {
+      const rnd = Math.random();
+      if (rnd < .5)  return `rgba(200,73,10,${(Math.random()*.3+.1).toFixed(2)})`;
+      if (rnd < .75) return `rgba(26,74,138,${(Math.random()*.3+.1).toFixed(2)})`;
+      return `rgba(255,255,255,${(Math.random()*.2+.05).toFixed(2)})`;
+    })()
+  }));
+
+  // Rising lines
+  const LINE_COUNT = 28;
+  const lines = Array.from({ length: LINE_COUNT }, () => ({
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    speed: Math.random() * 0.08 + 0.03,
+    height: Math.random() * 60 + 30,
+    opacity: Math.random() * 0.12 + 0.03,
+  }));
+
+  function draw() {
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Draw lines
+    lines.forEach(l => {
+      l.y -= l.speed;
+      if (l.y < -l.height / h * 100) l.y = 100 + Math.random() * 20;
+      const x = l.x / 100 * w;
+      const y = l.y / 100 * h;
+      const grad = ctx.createLinearGradient(x, y + l.height, x, y);
+      grad.addColorStop(0, `rgba(200,73,10,0)`);
+      grad.addColorStop(0.5, `rgba(200,73,10,${l.opacity})`);
+      grad.addColorStop(1, `rgba(200,73,10,0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y + l.height);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      p.y -= p.speed;
+      if (p.y < -2) p.y = 102;
+      const px = p.x / 100 * w;
+      const py = p.y / 100 * h;
+      ctx.beginPath();
+      ctx.arc(px, py, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ═══════════════════════════════════════
+   FLOATING CHIPS
+═══════════════════════════════════════ */
+(function initChips() {
+  const container = document.getElementById('chipsContainer');
+  const heroW = document.querySelector('.atlas-hero').offsetWidth;
+
+  ALL_ROLE_NAMES.forEach((name, i) => {
+    const chip = document.createElement('div');
+    const type = CHIP_TYPES[i % CHIP_TYPES.length];
+    chip.className = `role-chip ${type}`;
+    chip.textContent = name;
+
+    // Place in right half
+    const rightOffset = Math.random() * (heroW * 0.55) + heroW * 0.02;
+    const dur = (Math.random() * 3 + 4).toFixed(1) + 's';
+    const delay = (Math.random() * 3).toFixed(1) + 's';
+    const dist = Math.floor(Math.random() * 220 + 160) + 'px';
+
+    chip.style.cssText = `
+      --dur:${dur}; --delay:${delay}; --dist:${dist};
+      right:${rightOffset}px; left:auto;
+    `;
+
+    container.appendChild(chip);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   FORM SUBMIT
+═══════════════════════════════════════ */
+document.getElementById('atlasForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fields = {
+    firstName:  document.getElementById('firstName'),
+    lastName:   document.getElementById('lastName'),
+    email:      document.getElementById('email'),
+    phone:      document.getElementById('phone'),
+    operativeId:document.getElementById('operativeId'),
+    year:       document.getElementById('year'),
+    role:       document.getElementById('selectedRole'),
+    commitment: document.getElementById('commitment'),
+  };
+
+  // Validate
+  let valid = true;
+  Object.entries(fields).forEach(([key, el]) => {
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      valid = false;
+    } else {
+      el.classList.remove('error');
+    }
+  });
+
+  // Role display error
+  const roleDisplay = document.getElementById('roleDisplay');
+  if (!fields.role.value) {
+    roleDisplay.style.borderColor = 'var(--orange)';
+    roleDisplay.style.boxShadow = '0 0 0 3px rgba(200,73,10,.08)';
+  } else {
+    roleDisplay.style.borderColor = '';
+    roleDisplay.style.boxShadow = '';
+  }
+
+  if (!valid) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const payload = {
+    firstName:  fields.firstName.value.trim(),
+    lastName:   fields.lastName.value.trim(),
+    email:      fields.email.value.trim(),
+    phone:      fields.phone.value.trim(),
+    operativeId:fields.operativeId.value.trim(),
+    year:       fields.year.value,
+    role:       fields.role.value,
+    commitment: fields.commitment.value,
+    why:        document.getElementById('whyRole').value.trim(),
+    timestamp:  new Date().toISOString(),
+    programme:  'Innovexa Atlas'
+  };
+
+  try {
+    await fetch(ATLAS_SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(_) {}
+
+  // Show success
+  document.getElementById('formContent').style.display = 'none';
+  const success = document.getElementById('formSuccess');
+  success.style.display = 'flex';
+});
+
+// Remove error style on input
+document.querySelectorAll('#atlasForm input, #atlasForm select, #atlasForm textarea').forEach(el => {
+  el.addEventListener('input', () => el.classList.remove('error'));
+});
+
+// Build explorer
+buildRoleExplorer();
+</script>
+<script type="module">
+  import { initCustomCursor } from '/js/animations.js';
+  initCustomCursor();
+</script>
+</body>
+</html>

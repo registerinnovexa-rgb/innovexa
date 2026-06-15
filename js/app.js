@@ -59,13 +59,27 @@ async function route() {
         renderLogin(app); break
       }
       case 'portal': case 'portal-events': case 'portal-posts':
-      case 'portal-announcements': case 'portal-chat': case 'portal-contact': {
+      case 'portal-announcements': case 'portal-chat': case 'portal-contact':
+      case 'portal-documents': {
         if (!user) { navigateTo('login'); return }
+        if (profile?.role === 'pending') {
+          app.innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--bg);color:var(--text);text-align:center;padding:20px;">
+              <h2 style="margin-bottom:10px;color:var(--accent);">Registration Pending</h2>
+              <p style="margin-bottom:24px;color:var(--text-muted);max-width:400px;">Your account has been created but is waiting for admin approval. Once approved, you will be granted access.</p>
+              <button class="btn btn-secondary" id="pending-logout">Log Out</button>
+            </div>
+          `;
+          document.getElementById('pending-logout').onclick = () => signOut();
+          return;
+        }
         const { renderPortal } = await import('./pages/portal.js')
         renderPortal(app, hash); break
       }
       case 'admin': case 'admin-members': case 'admin-events':
-      case 'admin-posts': case 'admin-announcements': {
+      case 'admin-posts': case 'admin-announcements':
+      case 'admin-payments': case 'admin-documents':
+      case 'admin-credentials': {
         if (!user) { navigateTo('login'); return }
         const { renderAdmin } = await import('./pages/admin.js')
         renderAdmin(app, hash); break

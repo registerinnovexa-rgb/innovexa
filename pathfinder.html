@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pathfinder — Innovexa Labs</title>
+  <meta name="description" content="Beginner to advanced roadmaps and free resources for all tech roles."/>
+  <link rel="icon" href="/logo-icon.png"/>
+  
+  <!-- Global Theme CSS -->
+  <link rel="stylesheet" href="/css/theme.css"/>
+  <link rel="stylesheet" href="/css/animations.css"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  
+  <style>
+    /* Pathfinder Specific Styles */
+    .page-header { text-align:center; padding: 120px 24px 60px; max-width:800px; margin:0 auto; }
+    .page-header h1 { font-size:3rem; margin-bottom:16px; font-family:'Space Grotesk', sans-serif; letter-spacing:-0.03em; color:var(--text); }
+    .page-header p { font-size:1.1rem; color:var(--text2); line-height:1.6; }
+
+    /* Layout */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    
+    /* Quiz Section */
+    .quiz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; margin-bottom: 60px; text-align:center; box-shadow: var(--shadow-sm); }
+    .quiz-options { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+    .quiz-btn { background: var(--bg); border: 1px solid var(--border2); padding: 12px 24px; border-radius: 12px; color: var(--text); font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .quiz-btn:hover { border-color: var(--accent); background: rgba(30,77,183,0.05); color: var(--accent); }
+    #quiz-result { margin-top: 24px; padding: 16px; border-radius: 12px; background: rgba(14, 159, 110, 0.1); color: var(--green); font-weight: 600; display: none; }
+
+    /* Roadmap Grid */
+    .roadmap-wrapper { display: grid; grid-template-columns: 280px 1fr; gap: 40px; margin-bottom: 80px; }
+    @media (max-width: 800px) { .roadmap-wrapper { grid-template-columns: 1fr; } }
+    
+    /* Sidebar */
+    .role-sidebar { display: flex; flex-direction: column; gap: 8px; position: sticky; top: 100px; }
+    .role-tab { text-align: left; background: transparent; border: none; padding: 12px 16px; border-radius: 12px; color: var(--text2); font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+    .role-tab:hover { background: var(--surface); color: var(--text); }
+    .role-tab.active { background: var(--accent); color: white; }
+    .role-tab .icon { font-size: 1.2rem; }
+
+    /* Content Area */
+    .role-content { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; }
+    .role-content h2 { font-size: 2rem; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    
+    /* Timeline */
+    .phase-card { position: relative; padding-left: 32px; padding-bottom: 40px; border-left: 2px solid var(--border2); margin-left: 16px; }
+    .phase-card:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .phase-card::before { content: ''; position: absolute; left: -7px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
+    .phase-title { font-weight: 700; font-size: 1.1rem; color: var(--text); margin-bottom: 8px; }
+    .phase-topics { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text2); margin-bottom: 16px; background: rgba(0,0,0,0.03); padding: 8px 12px; border-radius: 8px; }
+    .dark .phase-topics { background: rgba(255,255,255,0.05); }
+    
+    .resources-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .resources-list li a { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+    .resources-list li a:hover { text-decoration: underline; }
+    
+    /* Open Source Section */
+    .os-section { background: linear-gradient(135deg, rgba(30,77,183,0.05), rgba(14,159,110,0.05)); border: 1px solid var(--border2); border-radius: 24px; padding: 40px; margin-bottom: 80px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+    .os-content { max-width: 600px; }
+    .os-content h3 { font-size: 1.8rem; margin-bottom: 12px; }
+    .os-content p { color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+    
+    /* Black Book */
+    .black-book-trigger { text-align: center; margin-bottom: 40px; }
+    .black-book-btn { background: transparent; border: none; color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; cursor: pointer; transition: color 0.3s; padding: 10px; }
+    .black-book-btn:hover { color: var(--red); }
+    
+    .black-book-content { display: none; background: #0C1220; color: #fff; border: 1px solid rgba(255,50,50,0.2); border-radius: 24px; padding: 40px; margin-bottom: 80px; box-shadow: 0 0 40px rgba(255,50,50,0.1); }
+    .black-book-content.active { display: block; animation: toastIn 0.5s ease; }
+    .bb-title { font-family: 'JetBrains Mono', monospace; color: #ff4444; font-size: 1.5rem; margin-bottom: 16px; border-bottom: 1px dashed rgba(255,50,50,0.3); padding-bottom: 16px; }
+    .bb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 24px; }
+    .bb-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; }
+    .bb-card h4 { color: #fff; margin-bottom: 8px; }
+    .bb-card p { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 12px; }
+    .bb-card a { color: #ff4444; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+    .bb-card a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body class="light">
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+  
+  <nav id="mainNav">
+    <div class="inner">
+      <a href="index.html" class="brand">
+        <img src="/logo-icon.png" alt="Innovexa Labs"/>
+        <span class="brand-name">Innovexa<span>Labs</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html#about">About</a>
+        <a href="pathfinder.html" style="color:var(--accent);">Pathfinder</a>
+        <a href="status.html">Check Status</a>
+      </div>
+      <div class="nav-cta">
+        <a href="register.html" class="btn btn-primary">Join Now →</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="page-header">
+      <span class="sec-label">// THE PATHFINDER</span>
+      <h1>Your Tech Career Roadmap</h1>
+      <p>From absolute beginner to advanced architecture. Explore comprehensive roadmaps for every major tech role, curated entirely with the best free resources on the internet.</p>
+    </header>
+
+    <div class="container">
+      
+      <!-- Quiz Section -->
+      <section class="quiz-card" id="quiz-section">
+        <h2 style="font-size:1.5rem; margin-bottom:8px;">Not sure where to start? 🤔</h2>
+        <p style="color:var(--text2); margin-bottom:24px;">Take the 1-question rapid quiz to find your ideal tech role.</p>
+        <div id="quiz-question">
+          <p style="font-weight:600; font-size:1.1rem;">What sounds most exciting to you?</p>
+          <div class="quiz-options">
+            <button class="quiz-btn" onclick="solveQuiz('frontend')">Designing beautiful visual interfaces 🎨</button>
+            <button class="quiz-btn" onclick="solveQuiz('backend')">Building hidden logic & databases ⚙️</button>
+            <button class="quiz-btn" onclick="solveQuiz('ai')">Training AI models & finding patterns 🤖</button>
+            <button class="quiz-btn" onclick="solveQuiz('cyber')">Hacking, breaking, and securing systems 🛡️</button>
+          </div>
+        </div>
+        <div id="quiz-result"></div>
+      </section>
+
+      <!-- Roadmaps Section -->
+      <section class="roadmap-wrapper">
+        <aside class="role-sidebar" id="role-sidebar">
+          <!-- Populated by JS -->
+        </aside>
+        
+        <article class="role-content">
+          <h2 id="content-title"><span class="icon">✨</span> Select a Role</h2>
+          <p id="content-desc" style="color:var(--text2); margin-bottom:40px;">Choose a path from the sidebar to view the beginner-to-advanced roadmap and free learning resources.</p>
+          
+          <div id="timeline-container">
+            <!-- Populated by JS -->
+          </div>
+        </article>
+      </section>
+
+      <!-- Open Source Starter Kit -->
+      <section class="os-section">
+        <div class="os-content">
+          <h3>The Open Source Starter Kit 🛠️</h3>
+          <p>Tutorials are great, but real developers write code for real projects. Making your first Open Source contribution is the best way to prove your skills, learn Git, and stand out.</p>
+          <div style="display:flex; gap:16px; flex-wrap:wrap;">
+            <a href="https://github.com/firstcontributions/first-contributions" target="_blank" class="btn btn-primary">Make Your First PR →</a>
+            <a href="https://goodfirstissue.dev/" target="_blank" class="btn btn-outline">Find Beginner Issues</a>
+          </div>
+        </div>
+        <div style="font-size:5rem;">🐙</div>
+      </section>
+
+      <!-- Black Book Toggle -->
+      <div class="black-book-trigger">
+        <button class="black-book-btn" onclick="toggleBlackBook()">[ initialize_black_book.sh ]</button>
+      </div>
+
+      <!-- Black Book Section -->
+      <section class="black-book-content" id="black-book">
+        <div class="bb-title">&gt; THE BLACK BOOK // CLASSIFIED RESOURCES</div>
+        <p style="color:rgba(255,255,255,0.7); max-width:600px;">You found the hidden directory. These are advanced, niche, and highly technical resources for operatives looking to push past standard web development.</p>
+        
+        <div class="bb-grid">
+          <div class="bb-card">
+            <h4>HackTheBox (Cyber)</h4>
+            <p>A massive playground for penetration testers. Hack virtual machines to learn real-world exploits.</p>
+            <a href="https://www.hackthebox.com/" target="_blank">Access HTB →</a>
+          </div>
+          <div class="bb-card">
+            <h4>OSSU (Computer Science)</h4>
+            <p>A complete, free, self-taught education in Computer Science using courses from MIT, Stanford, etc.</p>
+            <a href="https://github.com/ossu/computer-science" target="_blank">View Curriculum →</a>
+          </div>
+          <div class="bb-card">
+            <h4>ByteByteGo (System Design)</h4>
+            <p>Advanced system architecture and design patterns for scaling applications to millions of users.</p>
+            <a href="https://bytebytego.com/" target="_blank">Learn Architecture →</a>
+          </div>
+          <div class="bb-card">
+            <h4>Kaggle (AI/ML)</h4>
+            <p>The world's largest data science community. Compete in ML challenges and access massive datasets.</p>
+            <a href="https://www.kaggle.com/" target="_blank">Enter Kaggle →</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // --- Data: Job Roles Roadmaps ---
+    const roadmaps = {
+      frontend: {
+        title: "Frontend Developer",
+        icon: "🎨",
+        desc: "Master the art of building beautiful, interactive user interfaces for the web.",
+        phases: [
+          {
+            name: "Phase 1: The Basics (Beginner)",
+            topics: "HTML5, CSS3, JavaScript Fundamentals, DOM Manipulation.",
+            resources: [
+              { name: "FreeCodeCamp: Responsive Web Design", url: "https://www.freecodecamp.org/" },
+              { name: "The Odin Project (Foundations)", url: "https://www.theodinproject.com/" },
+              { name: "MDN Web Docs", url: "https://developer.mozilla.org/" }
+            ]
+          },
+          {
+            name: "Phase 2: Modern Frameworks (Intermediate)",
+            topics: "React.js, TailwindCSS, State Management, Consuming REST APIs, Git/GitHub.",
+            resources: [
+              { name: "Full Stack Open (React)", url: "https://fullstackopen.com/en/" },
+              { name: "React Official Tutorial", url: "https://react.dev/learn" }
+            ]
+          },
+          {
+            name: "Phase 3: Production & Architecture (Advanced)",
+            topics: "Next.js (SSR/SSG), TypeScript, Web Performance, Accessibility (a11y).",
+            resources: [
+              { name: "Next.js Foundations", url: "https://nextjs.org/learn" },
+              { name: "Web.dev Learn", url: "https://web.dev/learn" }
+            ]
+          }
+        ]
+      },
+      backend: {
+        title: "Backend Developer",
+        icon: "⚙️",
+        desc: "Architect the hidden logic, databases, and APIs that power the modern web.",
+        phases: [
+          {
+            name: "Phase 1: The Basics (Beginner)",
+            topics: "JavaScript/Python, Node.js basics, HTTP protocols, Basic SQL.",
+            resources: [
+              { name: "FreeCodeCamp: Backend & APIs", url: "https://www.freecodecamp.org/" },
+              { name: "SQLBolt (Interactive SQL)", url: "https://sqlbolt.com/" }
+            ]
+          },
+          {
+            name: "Phase 2: Architecture & Databases (Intermediate)",
+            topics: "Express.js/FastAPI, PostgreSQL/MongoDB, Authentication (JWT), ORMs/Prisma.",
+            resources: [
+              { name: "Full Stack Open (Node.js)", url: "https://fullstackopen.com/en/" },
+              { name: "PostgreSQL Tutorial", url: "https://www.postgresqltutorial.com/" }
+            ]
+          },
+          {
+            name: "Phase 3: Scaling & Cloud (Advanced)",
+            topics: "Docker, Redis Caching, Microservices, CI/CD pipelines, AWS/GCP basics.",
+            resources: [
+              { name: "Docker Curriculum", url: "https://docker-curriculum.com/" },
+              { name: "AWS Skill Builder (Free)", url: "https://skillbuilder.aws/" }
+            ]
+          }
+        ]
+      },
+      fullstack: {
+        title: "Full-Stack Developer",
+        icon: "🌐",
+        desc: "The complete package. Handle both the frontend UI and the backend servers.",
+        phases: [
+          {
+            name: "Phase 1: The MERN Stack (Beginner to Intermediate)",
+            topics: "MongoDB, Express, React, Node.js. Building full CRUD applications.",
+            resources: [
+              { name: "The Odin Project (Full Stack JS)", url: "https://www.theodinproject.com/" },
+              { name: "Full Stack Open", url: "https://fullstackopen.com/en/" }
+            ]
+          },
+          {
+            name: "Phase 2: The Modern Stack (Advanced)",
+            topics: "Next.js App Router, tRPC, Prisma, Serverless databases (Supabase).",
+            resources: [
+              { name: "Next.js Learn", url: "https://nextjs.org/learn" },
+              { name: "Supabase Crash Courses", url: "https://supabase.com/docs" }
+            ]
+          }
+        ]
+      },
+      ai: {
+        title: "AI & ML Engineer",
+        icon: "🤖",
+        desc: "Train models, find data patterns, and build the future of artificial intelligence.",
+        phases: [
+          {
+            name: "Phase 1: Data & Math (Beginner)",
+            topics: "Python, Numpy, Pandas, Jupyter Notebooks, Linear Algebra basics.",
+            resources: [
+              { name: "Kaggle Python Course", url: "https://www.kaggle.com/learn/python" },
+              { name: "3Blue1Brown (Math for ML)", url: "https://www.youtube.com/c/3blue1brown" }
+            ]
+          },
+          {
+            name: "Phase 2: Classic ML (Intermediate)",
+            topics: "Scikit-Learn, Regression, Classification, Random Forests.",
+            resources: [
+              { name: "Google Machine Learning Crash Course", url: "https://developers.google.com/machine-learning/crash-course" },
+              { name: "Fast.ai (Practical Deep Learning)", url: "https://course.fast.ai/" }
+            ]
+          },
+          {
+            name: "Phase 3: Deep Learning & GenAI (Advanced)",
+            topics: "PyTorch, Neural Networks, NLP, LLM Fine-tuning, HuggingFace.",
+            resources: [
+              { name: "HuggingFace NLP Course", url: "https://huggingface.co/learn/nlp-course/chapter1/1" },
+              { name: "DeepLearning.AI (Coursera Audit)", url: "https://www.deeplearning.ai/" }
+            ]
+          }
+        ]
+      },
+      cyber: {
+        title: "Cybersecurity Analyst",
+        icon: "🛡️",
+        desc: "Protect networks, find vulnerabilities, and secure applications against threats.",
+        phases: [
+          {
+            name: "Phase 1: Systems & Networking (Beginner)",
+            topics: "Linux Command Line, TCP/IP, OSI Model, Bash Scripting.",
+            resources: [
+              { name: "Linux Journey", url: "https://linuxjourney.com/" },
+              { name: "TryHackMe (Pre-Security)", url: "https://tryhackme.com/" }
+            ]
+          },
+          {
+            name: "Phase 2: Web Exploitation (Intermediate)",
+            topics: "OWASP Top 10, Burp Suite, SQL Injection, XSS.",
+            resources: [
+              { name: "PortSwigger Web Security Academy", url: "https://portswigger.net/web-security" },
+              { name: "OverTheWire (Bandit)", url: "https://overthewire.org/wargames/bandit/" }
+            ]
+          },
+          {
+            name: "Phase 3: Pentesting & Blue Team (Advanced)",
+            topics: "Privilege Escalation, Active Directory attacks, Incident Response.",
+            resources: [
+              { name: "HackTheBox (Free Tier)", url: "https://www.hackthebox.com/" },
+              { name: "TCM Security (Free YouTube Courses)", url: "https://www.youtube.com/c/TCMSecurityAcademy" }
+            ]
+          }
+        ]
+      },
+      uiux: {
+        title: "UI/UX Designer",
+        icon: "✨",
+        desc: "Design intuitive, engaging, and beautiful user experiences for software.",
+        phases: [
+          {
+            name: "Phase 1: Design Fundamentals (Beginner)",
+            topics: "Figma basics, Color Theory, Typography, Wireframing.",
+            resources: [
+              { name: "Figma Learn", url: "https://help.figma.com/hc/en-us/categories/360002042553-Figma-design" },
+              { name: "Laws of UX", url: "https://lawsofux.com/" }
+            ]
+          },
+          {
+            name: "Phase 2: Product Design (Intermediate)",
+            topics: "Prototyping, Auto-layout, User Research, Design Systems.",
+            resources: [
+              { name: "Google UX Design (Coursera Audit)", url: "https://www.coursera.org/professional-certificates/google-ux-design" },
+              { name: "Nielsen Norman Group Articles", url: "https://www.nngroup.com/articles/" }
+            ]
+          }
+        ]
+      }
+    };
+
+    // --- Init Page ---
+    document.addEventListener("DOMContentLoaded", () => {
+      // Setup Sidebar
+      const sidebar = document.getElementById("role-sidebar");
+      Object.keys(roadmaps).forEach((key, index) => {
+        const role = roadmaps[key];
+        const btn = document.createElement("button");
+        btn.className = "role-tab";
+        if(index === 0) btn.classList.add("active");
+        btn.innerHTML = `<span class="icon">${role.icon}</span> ${role.title}`;
+        btn.onclick = () => loadRole(key, btn);
+        sidebar.appendChild(btn);
+      });
+      
+      // Load first role by default
+      const firstKey = Object.keys(roadmaps)[0];
+      if(firstKey) loadRole(firstKey, sidebar.firstChild);
+    });
+
+    // --- Load Role Content ---
+    function loadRole(key, btnEl) {
+      // Update sidebar active state
+      document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+      if(btnEl) btnEl.classList.add('active');
+
+      const role = roadmaps[key];
+      document.getElementById('content-title').innerHTML = `<span class="icon">${role.icon}</span> ${role.title}`;
+      document.getElementById('content-desc').textContent = role.desc;
+      
+      const timeline = document.getElementById('timeline-container');
+      timeline.innerHTML = '';
+      
+      role.phases.forEach(phase => {
+        const pCard = document.createElement('div');
+        pCard.className = 'phase-card';
+        
+        let resourcesHtml = phase.resources.map(r => `<li><a href="${r.url}" target="_blank">${r.name} →</a></li>`).join('');
+        
+        pCard.innerHTML = `
+          <div class="phase-title">${phase.name}</div>
+          <div class="phase-topics">${phase.topics}</div>
+          <ul class="resources-list">
+            ${resourcesHtml}
+          </ul>
+        `;
+        timeline.appendChild(pCard);
+      });
+    }
+
+    // --- Quiz Logic ---
+    function solveQuiz(recommendedKey) {
+      const role = roadmaps[recommendedKey];
+      const resEl = document.getElementById("quiz-result");
+      resEl.innerHTML = `We recommend starting with: <strong>${role.icon} ${role.title}</strong>. <br><br>Select it from the sidebar below to view your roadmap!`;
+      resEl.style.display = "block";
+      
+      // Auto-click the correct sidebar button
+      const buttons = document.querySelectorAll('.role-tab');
+      buttons.forEach(btn => {
+        if(btn.textContent.includes(role.title)) {
+          btn.click();
+        }
+      });
+    }
+
+    // --- Black Book Logic ---
+    function toggleBlackBook() {
+      const bb = document.getElementById('black-book');
+      bb.classList.toggle('active');
+      if(bb.classList.contains('active')) {
+        bb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  </script>
+<script type="module">
+  import { initCustomCursor, initSpotlightCards } from '/js/animations.js';
+  initCustomCursor();
+  initSpotlightCards();
+</script>
+</body>
+</html>

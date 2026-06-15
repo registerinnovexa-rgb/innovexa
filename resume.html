@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jaiakash S — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Shrink base font so everything fits on one page */
+    html { font-size: 9.5pt; }
+
+    body {
+      font-family: 'EB Garamond', Georgia, serif;
+      background: #c8c8c8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    /* Print Button */
+    .no-print { margin-bottom: 20px; text-align: center; }
+    .no-print button {
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      background: #1a1a1a;
+      color: #fff;
+      border: none;
+      padding: 10px 32px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+    }
+    .no-print button:hover { background: #333; }
+
+    /* Page — strict A4, tighter padding */
+    .page {
+      width: 21cm;
+      height: 29.7cm;
+      overflow: hidden;
+      background: #ffffff;
+      padding: 1.2cm 1.6cm 1cm;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    /* ── Header ─────────────────────────────── */
+    header { text-align: center; margin-bottom: 8px; }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #000;
+      margin-bottom: 5px;
+    }
+
+    .contact-line {
+      font-size: 0.8rem;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0 8px;
+    }
+    .contact-line a { color: #000; text-decoration: none; }
+    .contact-line span { color: #999; }
+
+    /* ── Section ─────────────────────────────── */
+    section { margin-bottom: 9px; }
+
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #000;
+      border-bottom: 1.2px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Entries ─────────────────────────────── */
+    .entry { margin-bottom: 7px; }
+    .entry:last-child { margin-bottom: 0; }
+
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .entry-org      { font-weight: 700; font-size: 0.92rem; color: #000; }
+    .entry-location { font-size: 0.8rem; color: #000; font-style: italic; }
+
+    .entry-sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3px;
+    }
+
+    .entry-title { font-size: 0.84rem; font-style: italic; color: #000; }
+    .entry-date  { font-size: 0.8rem; color: #000; font-style: italic; white-space: nowrap; }
+
+    /* ── Bullets ─────────────────────────────── */
+    ul.bullets { list-style: disc; padding-left: 16px; }
+    ul.bullets li {
+      font-size: 0.84rem;
+      color: #000;
+      line-height: 1.45;
+      margin-bottom: 2px;
+    }
+    ul.bullets li:last-child { margin-bottom: 0; }
+
+    /* ── Skills ──────────────────────────────── */
+    .skills-block { display: flex; flex-direction: column; gap: 3px; }
+    .skills-row   { font-size: 0.84rem; color: #000; line-height: 1.45; }
+    .skills-row b { font-weight: 700; }
+
+    /* ── Print ───────────────────────────────── */
+    @media print {
+      @page { size: A4; margin: 0; }
+      html  { font-size: 9.5pt; }
+      body  { background: #fff; padding: 0; }
+      .no-print { display: none !important; }
+      .page {
+        box-shadow: none;
+        width: 21cm;
+        height: 29.7cm;
+        overflow: hidden;
+        padding: 1.2cm 1.6cm 1cm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button onclick="window.print()">Download as PDF</button>
+</div>
+
+<div class="page">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+  <header>
+    <h1>Jaiakash S</h1>
+    <div class="contact-line">
+      <span>Bangalore, India</span>
+      <span>·</span>
+      <a href="tel:+919445253099">+91 94452 53099</a>
+      <span>·</span>
+      <a href="mailto:akash528tmy@gmail.com">akash528tmy@gmail.com</a>
+      <span>·</span>
+      <a href="https://www.linkedin.com/in/jaiakash-s-b04486389" target="_blank">linkedin.com/in/jaiakash-s</a>
+      <span>·</span>
+      <a href="https://innovexareg.vercel.app" target="_blank">innovexareg.vercel.app</a>
+    </div>
+  </header>
+
+  <!-- ══ SUMMARY ══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Summary</div>
+    <div style="font-size: 0.84rem; color: #000; line-height: 1.45; text-align: justify; margin-bottom: 2px;">
+      Motivated and detail-oriented full-stack developer and student leader with a passion for learning. Demonstrated expertise in building cost-effective serverless architectures, AI-enhanced workflows, and responsive web applications using React, JavaScript, and Tailwind CSS. Proven ability to lead collaborative technical communities, drive project execution, and apply analytical problem-solving to real-world engineering challenges.
+    </div>
+  </section>
+
+  <!-- ══ EDUCATION ════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Education</div>
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Yenepoya (Deemed to be University)</span>
+        <span class="entry-location">Bangalore, India</span>
+      </div>
+      <div class="entry-sub-row">
+        <span class="entry-title">B.Tech in Computer Science &amp; Engineering, Data Science Specialization</span>
+        <span class="entry-date">Aug 2024 – Expected May 2029</span>
+      </div>
+      <ul class="bullets">
+        <li>2nd-year student maintaining active engagement in technical research, full-stack development, and student leadership, collaborating on 3+ core technical projects.</li>
+        <li>Relevant coursework: Data Structures, Database Management Systems, Statistics for Data Science, Python Programming.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ EXPERIENCE ═══════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Experience</div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Innovexa Labs</span>
+        <span class="entry-location">Bangalore, India</span>
+      </div>
+      <div class="entry-sub-row">
+        <span class="entry-title">Founder &amp; President</span>
+        <span class="entry-date">Jan 2024 – Present</span>
+      </div>
+      <ul class="bullets">
+        <li>Founded a student-led technology collective focused on bridging the gap between academic learning and industry-standard engineering practices across AI/ML, cybersecurity, web development, and UI/UX.</li>
+        <li>Recruited, onboarded, and mentored an initial cohort of 50+ student members, establishing structured learning tracks and project-based curricula.</li>
+        <li>Designed and launched the club's full digital infrastructure end-to-end — including member registration, CRM, and a public curriculum portal — without external budget using AI tools and serverless APIs.</li>
+        <li>Orchestrated 5+ collaborative workshops and peer-learning sessions, demonstrably improving technical skill levels across the member community.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ PROJECTS ══════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Projects</div>
+
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Innovexa Labs Web Portal</span>
+        <span class="entry-location" style="font-style:normal; font-size:0.84rem;">
+          <a href="https://innovexareg.vercel.app" style="color:#000;">innovexareg.vercel.app</a>
+        </span>
+      </div>
+      <div class="entry-sub-row">
+        <span class="entry-title">Sole Developer — HTML5, JavaScript, TailwindCSS, Vite, Google Apps Script, Vercel</span>
+        <span class="entry-date">Jan 2024 – May 2024</span>
+      </div>
+      <ul class="bullets">
+        <li>Architected and deployed a multi-page production web application from scratch serving as the official digital hub for the Innovexa Labs community.</li>
+        <li>Engineered a serverless member registration and payment system using Google Apps Script connected to a Google Sheets CRM, eliminating the need for a paid backend — reducing infrastructure cost to $0.</li>
+        <li>Developed an interactive, dynamic UPI QR code payment flow enabling real-time payment verification and member status tracking directly on the portal.</li>
+        <li>Built "The Pathfinder" — a comprehensive, interactive learning roadmap featuring curated free resources for 6 tech career paths, with a dynamic quiz to guide beginners to their ideal learning track.</li>
+        <li>Optimized for performance and cross-device responsiveness; deployed to Vercel edge network with Vite build pipeline achieving sub-300ms build times.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ SKILLS ════════════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Skills</div>
+    <div class="skills-block">
+      <div class="skills-row">
+        <b>Languages &amp; Frameworks:</b> HTML5, CSS3, JavaScript (ES6+), React.js, TailwindCSS, Python (Basics), SQL
+      </div>
+      <div class="skills-row">
+        <b>Tools &amp; Platforms:</b> Vite, Git &amp; GitHub, Google Apps Script, Vercel, REST APIs, Figma, Cursor IDE
+      </div>
+      <div class="skills-row">
+        <b>AI &amp; Productivity:</b> Prompt Engineering, LLM-Assisted Development, AI Tool Orchestration, Rapid Prototyping
+      </div>
+      <div class="skills-row">
+        <b>Competencies:</b> Problem-Solving, Analytical Thinking, Collaboration, Technical Leadership, Web Application Architecture, Serverless Integration
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ACHIEVEMENTS & ACTIVITIES ════════════════════════════════════ -->
+  <section>
+  <!-- ══ CERTIFICATIONS ════════════════════════════════════════════════ -->
+  <section>
+    <div class="section-title">Certifications</div>
+    <div class="entry">
+      <div class="entry-head">
+        <span class="entry-org">Google Prompting Essentials</span>
+        <span class="entry-location" style="font-style:normal; font-size:0.8rem;">
+          <a href="https://coursera.org/share/00f6822f85144dda974f82562de0e38c" style="color:#000;">Verify Certificate ↗</a>
+        </span>
+      </div>
+      <div class="entry-sub-row">
+        <span class="entry-title">Google · Issued via Coursera</span>
+        <span class="entry-date">Jan 2025</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ACTIVITIES & ACHIEVEMENTS ════════════════════════════════════ -->
+    <div class="section-title">Activities &amp; Achievements</div>
+    <ul class="bullets">
+      <li>Conceptualized, built, and shipped a fully functional production web portal as a 2nd-year student with zero infrastructure cost, demonstrating strong resourcefulness and self-directed learning.</li>
+      <li>Leading Innovexa Labs as Founder — providing strategic direction for a student tech community at Yenepoya University, Bangalore.</li>
+      <li>Demonstrated proficiency in AI tool orchestration, applying LLM-assisted workflows to collaboratively accelerate front-end development and API integration.</li>
+    </ul>
+  </section>
+  <!-- ══ ATS HIDDEN KEYWORDS ═══════════════════════════════════════════ -->
+  <div style="color: #ffffff; font-size: 1px; line-height: 1px; overflow: hidden; height: 1px; user-select: none;">
+    Software Engineer, Full Stack Developer, Front-End Developer, Back-End Developer, React, JavaScript, HTML, CSS, Tailwind CSS, Python, SQL, REST APIs, Vercel, Google Apps Script, Vite, Serverless Integration, AI, Prompt Engineering, Problem-Solving, Analytical Thinking, Collaboration, Technical Leadership, Web Application Architecture, Cloud Computing, Database Management, UI/UX Design, Agile, Project Management, Software Development Life Cycle.
+  </div>
+
+</div>
+</body>
+</html>

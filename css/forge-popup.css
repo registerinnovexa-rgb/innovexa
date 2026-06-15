@@ -1,0 +1,297 @@
+/* ═══════════════════════════════════════════════════════════
+   INNOVEXA FORGE — Textured Blue Editorial Style
+   Matches the main site theme with dot/grain textures
+   ═══════════════════════════════════════════════════════════ */
+
+.forge-notice {
+  position: relative;
+  max-width: 1100px;
+  margin: 40px auto 60px;
+  padding: 0 24px;
+}
+
+.forge-notice-inner {
+  position: relative;
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.15), 0 1px 4px rgba(0,0,0,.06);
+  transition: box-shadow 0.4s ease;
+}
+.forge-notice-inner:hover {
+  box-shadow: 0 12px 56px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.08);
+}
+/* Dot texture overlay on entire card */
+.forge-notice-inner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(0,107,255,.06) 1px, transparent 1px);
+  background-size: 14px 14px;
+  pointer-events: none; z-index: 1;
+}
+
+.forge-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative; z-index: 2;
+}
+
+/* ── Left panel ── */
+.forge-left {
+  padding: 48px 40px 48px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+/* Cross-hatch texture in corner */
+.forge-left::after {
+  content: '';
+  position: absolute;
+  bottom: 24px; right: 24px;
+  width: 60px; height: 60px;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,107,255,.08) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, rgba(0,107,255,.08) 0 1px, transparent 1px 8px);
+  pointer-events: none; opacity: 0.5;
+}
+
+.forge-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.forge-new-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(0,107,255,.1);
+  border: 1px solid rgba(0,107,255,.2);
+  color: #3388ff;
+}
+.forge-new-badge .pulse-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #006bff;
+  animation: forgePulse 2s ease-in-out infinite;
+}
+.forge-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+}
+
+.forge-heading {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 1.8rem; font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+.forge-heading .highlight {
+  color: #006bff;
+  -webkit-text-fill-color: #006bff;
+}
+.forge-sub-heading {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; font-weight: 500;
+  color: rgba(255,255,255,.45);
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.forge-description {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.5);
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 440px;
+}
+
+.forge-cta-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.forge-members-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+}
+.forge-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 30px;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem; font-weight: 600;
+  color: #0a0a0a;
+  background: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.forge-cta-btn:hover {
+  background: #f0f6ff;
+  transform: translateY(-1px);
+}
+.forge-cta-btn:active { transform: translateY(0); }
+.forge-cta-btn .btn-lock { font-size: 0.85rem; opacity: 0.7; }
+
+/* ── Right panel ── */
+.forge-right {
+  padding: 48px 48px 48px 36px;
+  background: rgba(255,255,255,.025);
+  border-left: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+/* Diagonal line texture on right panel */
+.forge-right::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg, rgba(0,107,255,.04) 0 1px, transparent 1px 18px
+  );
+  pointer-events: none;
+}
+
+.forge-detail-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+/* Stipple dots inside detail cards */
+.forge-detail-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,.04) 0.5px, transparent 0.5px);
+  background-size: 6px 6px;
+  pointer-events: none;
+}
+.forge-detail-card:hover {
+  background: rgba(0,107,255,.06);
+  border-color: rgba(0,107,255,.15);
+  transform: translateX(3px);
+}
+
+.forge-detail-card .detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.forge-detail-card .detail-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; flex-shrink: 0;
+  background: rgba(0,107,255,.08);
+}
+.forge-detail-card .detail-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+}
+.forge-detail-card .detail-value {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,.55);
+  line-height: 1.55;
+  padding-left: 42px;
+}
+
+.forge-chips-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.forge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 0.7rem; font-weight: 600;
+  background: rgba(0,107,255,.06);
+  border: 1px solid rgba(0,107,255,.12);
+  color: #3388ff;
+  transition: all 0.25s ease;
+}
+.forge-chip:hover {
+  background: rgba(0,107,255,.12);
+  border-color: rgba(0,107,255,.25);
+}
+
+/* ── Footer strip ── */
+.forge-footer-strip {
+  padding: 14px 48px;
+  background: rgba(255,255,255,.02);
+  border-top: 1px solid rgba(255,255,255,.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; z-index: 2;
+}
+.forge-footer-strip p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,.25);
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+@keyframes forgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+@media (max-width: 900px) {
+  .forge-layout { grid-template-columns: 1fr; }
+  .forge-right {
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding: 28px;
+  }
+  .forge-left { padding: 36px 28px 28px; }
+  .forge-left::after { display: none; }
+  .forge-heading { font-size: 1.45rem; }
+  .forge-cta-btn { width: 100%; justify-content: center; }
+  .forge-footer-strip { padding: 12px 28px; }
+  .forge-notice { padding: 0 16px; margin: 32px auto 40px; }
+}
+@media (max-width: 480px) {
+  .forge-left { padding: 28px 20px 24px; }
+  .forge-right { padding: 20px 20px 24px; }
+  .forge-heading { font-size: 1.25rem; }
+  .forge-footer-strip { padding: 10px 20px; }
+}

@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════════════════════
+   ULTRA-PREMIUM ANIMATIONS PHASE 2
+   Custom Cursor, Spotlight, Assembly, Holo, Glitch, Orbs
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Custom Trailing Cursor ── */
+body {
+  /* cursor: none; */ 
+}
+
+#cursor-dot {
+  position: fixed; top: -4px; left: -4px; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%; pointer-events: none;
+  z-index: 9999; transition: opacity 0.2s; mix-blend-mode: difference;
+}
+
+#cursor-ring {
+  position: fixed; top: -16px; left: -16px; width: 32px; height: 32px;
+  border: 1px solid rgba(0, 107, 255, 0.4); border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transition: width 0.3s, height 0.3s, top 0.3s, left 0.3s, background 0.3s, border-color 0.3s;
+}
+
+#cursor-ring.cursor-hover-btn {
+  width: 60px; height: 60px; top: -30px; left: -30px;
+  background: rgba(0, 107, 255, 0.1); border-color: transparent; backdrop-filter: blur(2px);
+}
+
+@media (pointer: coarse) {
+  #cursor-dot, #cursor-ring { display: none !important; }
+}
+
+/* ── Magnetic Buttons ── */
+.btn-primary, .forge-cta-btn {
+  transition: background-color 0.3s, box-shadow 0.3s, transform 0.1s cubic-bezier(0.2, 0, 0, 1) !important;
+  will-change: transform;
+}
+
+/* ── Spotlight Hover Effect ── */
+.forge-detail-card, .feat-card, .uni-card {
+  position: relative; overflow: hidden;
+}
+
+.forge-detail-card::after, .feat-card::after, .uni-card::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(600px circle at var(--mouse-x, -2000px) var(--mouse-y, -2000px), rgba(0, 107, 255, 0.06), transparent 40%);
+  pointer-events: none; z-index: 1; opacity: 0; transition: opacity 0.4s;
+}
+
+.forge-detail-card:hover::after, .feat-card:hover::after, .uni-card:hover::after {
+  opacity: 1;
+}
+
+/* ── Scroll-Linked Assembly ── */
+.assemble-item {
+  opacity: 0; transform: translateY(20px) scale(0.98);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--delay, 0s);
+}
+.assemble-item.assembled {
+  opacity: 1; transform: translateY(0) scale(1);
+}
+
+/* ── 1. Holographic / Glassmorphism Cards ── */
+.holo-card::before {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.3) 30%, rgba(0, 107, 255, 0.2) 40%, rgba(255, 0, 128, 0.1) 50%, transparent 60%);
+  background-size: 300% 300%;
+  background-position: 100% 100%;
+  opacity: 0; mix-blend-mode: color-dodge;
+  transition: opacity 0.4s, background-position 0.6s ease-out;
+}
+.holo-card:hover::before {
+  opacity: 1; background-position: 0% 0%;
+}
+
+/* ── 2. Fluid / Morphing Background Orbs ── */
+.bg-orbs {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  background: #F6F8FA; /* Base fallback */
+}
+.orb {
+  position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.6;
+  animation: floatOrb 20s ease-in-out infinite alternate;
+}
+.orb-1 { width: 600px; height: 600px; background: rgba(0, 107, 255, 0.15); top: -10%; left: -10%; animation-delay: 0s; }
+.orb-2 { width: 500px; height: 500px; background: rgba(138, 43, 226, 0.1); bottom: -10%; right: -5%; animation-delay: -5s; animation-duration: 25s; }
+.orb-3 { width: 400px; height: 400px; background: rgba(0, 200, 255, 0.1); top: 40%; left: 40%; animation-delay: -10s; animation-duration: 30s; }
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(100px, 50px) scale(1.1); }
+  100% { transform: translate(-50px, 100px) scale(0.9); }
+}
+
+/* ── 3. Cyberpunk "Glitch" Hovers ── */
+.glitch-hover { position: relative; display: inline-block; }
+.glitch-hover:hover {
+  animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+@keyframes glitch-anim {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 1px); text-shadow: -2px 0 red, 2px 0 blue; }
+  40% { transform: translate(-1px, -1px); text-shadow: 2px 0 red, -2px 0 blue; }
+  60% { transform: translate(2px, 1px); text-shadow: -2px 0 red, 2px 0 blue; }
+  80% { transform: translate(1px, -1px); text-shadow: 2px 0 red, -2px 0 blue; }
+  100% { transform: translate(0); text-shadow: none; }
+}
+
+/* ── 4. Parallax Floating 3D Objects ── */
+.floating-3d-obj {
+  position: absolute; pointer-events: none; z-index: 0; opacity: 0.4;
+  will-change: transform; transition: transform 0.1s linear;
+}
+
+/* ── 5. Hyperspace Page Transition ── */
+.hyperspace-overlay {
+  position: fixed; inset: 0; background: #000; z-index: 99999;
+  pointer-events: none; opacity: 0; visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.5s ease;
+}
+.hyperspace-overlay.active {
+  opacity: 1; visibility: visible; pointer-events: all;
+}
+.hyperspace-lines {
+  width: 200vw; height: 200vh; background: repeating-radial-gradient(circle at center, transparent 0, #006BFF 1px, transparent 2px, transparent 100px);
+  animation: warpSpeed 1s infinite linear; opacity: 0;
+  transform: scale(0.1);
+}
+.hyperspace-overlay.active .hyperspace-lines {
+  opacity: 1; animation: warpSpeed 0.8s forwards cubic-bezier(0.8, 0, 0.2, 1);
+}
+@keyframes warpSpeed {
+  0% { transform: scale(0.1) rotate(0deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(10) rotate(45deg); opacity: 0; }
+}

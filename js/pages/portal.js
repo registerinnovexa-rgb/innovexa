@@ -8,6 +8,7 @@ const TABS = [
   { id: 'portal-events', label: 'Events', icon: '📅' },
   { id: 'portal-posts', label: 'Posts', icon: '📝' },
   { id: 'portal-announcements', label: 'Announcements', icon: '📢' },
+  { id: 'portal-documents', label: 'Documents', icon: '📜' },
   { id: 'portal-chat', label: 'Chat', icon: '💬' },
   { id: 'portal-contact', label: 'Contact', icon: '📞' },
 ]
@@ -23,7 +24,7 @@ export async function renderPortal(app, tab = 'portal') {
   app.innerHTML = `
   <div class="shell">
     <aside class="sidebar">
-      <a class="sidebar-brand" href="#portal"><img src="/assets/logo.png" alt=""><span>Innovexa Hub</span></a>
+      <a class="sidebar-brand" href="#portal"><img src="/logo-icon.png" alt=""><span>Innovexa Labs</span></a>
       <ul class="sidebar-nav">
         ${TABS.map(t => `<li><a href="#${t.id}" class="${tab === t.id ? 'active' : ''}"><span class="nav-icon">${t.icon}</span>${t.label}</a></li>`).join('')}
         ${isAdmin ? `<li class="sidebar-divider"></li><li><a href="#admin"><span class="nav-icon">⚙️</span>Admin Panel</a></li>` : ''}
@@ -42,7 +43,7 @@ export async function renderPortal(app, tab = 'portal') {
         <div class="topbar-right"><div class="avatar avatar-sm">${init}</div>${p.name || user?.email}</div>
       </div>
       <div class="content" id="panel"></div>
-      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Hub. All rights reserved.</div>
+      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Labs. All rights reserved.</div>
     </div>
   </div>`
 
@@ -57,13 +58,14 @@ export async function renderPortal(app, tab = 'portal') {
     case 'portal-events': await renderEvents(panel); break
     case 'portal-posts': await renderPosts(panel); break
     case 'portal-announcements': await renderAnnouncements(panel); break
+    case 'portal-documents': renderDocuments(panel, p); break
     case 'portal-chat': await renderChat(panel, user, p); break
     case 'portal-contact': renderContact(panel); break
   }
 }
 
 function tabTitle(t) {
-  const map = { portal:'My Profile', 'portal-events':'Events', 'portal-posts':'Posts', 'portal-announcements':'Announcements', 'portal-chat':'Community Chat', 'portal-contact':'Contact' }
+  const map = { portal:'My Profile', 'portal-events':'Events', 'portal-posts':'Posts', 'portal-announcements':'Announcements', 'portal-documents':'My Documents', 'portal-chat':'Community Chat', 'portal-contact':'Contact' }
   return map[t] || ''
 }
 
@@ -177,7 +179,73 @@ function renderContact(el) {
     <div class="contact-body">
       <div class="contact-row"><span class="contact-label">📧 Email ID:</span><span class="contact-value">contact@innovexahub.com</span></div>
       <div class="contact-row"><span class="contact-label">📞 Contact Number:</span><span class="contact-value">+91 98765 43210</span></div>
-      <div class="contact-row"><span class="contact-label">📍 Address:</span><span class="contact-value">Innovexa Hub, Tech Park</span></div>
+      <div class="contact-row"><span class="contact-label">📍 Address:</span><span class="contact-value">Innovexa Labs, Tech Park</span></div>
     </div>
   </div>`
 }
+
+// ═══════════ DOCUMENTS (NOC) ═══════════
+function renderDocuments(el, p) {
+  el.innerHTML = `
+  <div class="card" style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;">
+    <div class="card-head" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+      <div class="card-icon" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">🎓</div>
+      <div>
+        <div class="card-title" style="font-size: 1.25rem; font-weight: 700;">Permission Letter (NOC)</div>
+        <div class="card-meta" style="color: var(--text-muted); font-size: 0.85rem;">Generate an official letter for your professor.</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top: 20px;">
+      <form id="noc-form">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">Event Name</label>
+          <input type="text" id="noc-event" class="form-control" placeholder="e.g. National Hackathon 2026" required style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 10px;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="form-group">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">Start Date</label>
+            <input type="date" id="noc-start" class="form-control" required style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 10px;">
+          </div>
+          <div class="form-group">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">End Date</label>
+            <input type="date" id="noc-end" class="form-control" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 10px;">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: var(--text-muted);">Reason / Note to Professor</label>
+          <textarea id="noc-note" class="form-control" placeholder="Optional. e.g. Requesting permission for early leave." style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; padding: 10px; min-height: 80px; resize: vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; background: linear-gradient(135deg, #6366f1, #a855f7); border: none;">Generate NOC</button>
+      </form>
+    </div>
+  </div>`
+
+  document.getElementById('noc-form').onsubmit = async (e) => {
+    e.preventDefault()
+    const btn = e.target.querySelector('button')
+    btn.disabled = true; btn.textContent = 'Generating...'
+    
+    // In a real scenario, this would use jspdf to create the document and download it,
+    // or send a request to the DB to create a document request for the admin.
+    import('../db.js').then(async ({ createDocument }) => {
+      try {
+        await createDocument({
+          member_id: p.id,
+          type: 'noc',
+          status: 'pending',
+          event_name: document.getElementById('noc-event').value,
+          start_date: document.getElementById('noc-start').value,
+          end_date: document.getElementById('noc-end').value || null,
+          note: document.getElementById('noc-note').value
+        })
+        toast('NOC Request submitted to Admin.', 'success')
+        e.target.reset()
+      } catch (err) {
+        toast('Failed to submit NOC request.', 'error')
+      } finally {
+        btn.disabled = false; btn.textContent = 'Generate NOC'
+      }
+    })
+  }
+}
+

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Hexagon outline -->
+  <polygon
+    points="50,5 91,27.5 91,72.5 50,95 9,72.5 9,27.5"
+    stroke="#9ca3af"
+    stroke-width="4.5"
+    fill="none"
+    stroke-linejoin="round"
+  />
+  <!-- Circuit traces inside -->
+  <!-- Left horizontal line from left edge to center junction -->
+  <line x1="20" y1="50" x2="42" y2="50" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <!-- Junction circle -->
+  <circle cx="42" cy="50" r="2.5" fill="#9ca3af"/>
+  <!-- Up-right trace from junction -->
+  <line x1="42" y1="50" x2="58" y2="38" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <!-- Right endpoint node -->
+  <circle cx="58" cy="38" r="4" fill="none" stroke="#9ca3af" stroke-width="3"/>
+  <!-- Down-right trace from junction -->
+  <line x1="42" y1="50" x2="58" y2="62" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <!-- Bottom endpoint dot -->
+  <circle cx="58" cy="62" r="2.5" fill="#9ca3af"/>
+  <!-- Short right tail from top node -->
+  <line x1="62" y1="38" x2="72" y2="38" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+</svg>

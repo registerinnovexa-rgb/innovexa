@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check Status — Innovexa Labs</title>
+  <meta name="description" content="Check your Innovexa Labs registration status."/>
+  <link rel="icon" href="/logo-icon.png"/>
+  <link rel="stylesheet" href="/css/theme.css"/>
+  <link rel="stylesheet" href="/css/animations.css"/>
+  <script src="/js/api.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+
+<nav id="mainNav">
+  <div class="inner">
+    <a href="index.html" class="brand">
+      <img src="/logo-icon.png" alt="Innovexa Labs"/>
+      <span class="brand-name">Innovexa<span>Labs</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#about">About</a>
+      <a href="pathfinder.html">Pathfinder</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="status.html">Check Status</a>
+    </div>
+    <div class="nav-cta">
+      <a href="register.html" class="btn btn-primary">Join Now →</a>
+    </div>
+  </div>
+</nav>
+
+<main class="page-wrapper">
+  <div style="max-width:460px;margin:0 auto">
+    <div class="page-header">
+      <span class="sec-label">// STATUS CHECK</span>
+      <h1>Registration Status</h1>
+      <p>Enter your email or Operative ID to check your registration status.</p>
+    </div>
+
+    <div class="card" style="padding:28px;margin-bottom:24px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <label>Email or Operative ID</label>
+          <input id="lookup-input" type="text" placeholder="you@example.com or INVX-XX" class="mono"/>
+        </div>
+        <button onclick="checkStatus()" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px">
+          <span id="spinner" class="spinner" style="display:none;width:16px;height:16px"></span>
+          <span id="btn-text">Check Status</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="result" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+async function checkStatus() {
+  const input = document.getElementById('lookup-input').value.trim();
+  if (!input) { showToast('Enter your email or Operative ID.', 'error'); return; }
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+  spinner.style.display='inline-block'; btnText.textContent = 'Checking…';
+  try {
+    const isEmail = input.includes('@');
+    const query = isEmail
+      ? `email=${encodeURIComponent(input.toLowerCase())}`
+      : `operativeId=${encodeURIComponent(input.toUpperCase())}`;
+    const data = await gasGet(`${SCRIPT_URL}?action=profile&${query}`);
+    renderResult(data);
+  } catch(e) { showToast('Network error.', 'error');
+  } finally { spinner.style.display='none'; btnText.textContent = 'Check Status'; }
+}
+
+function renderResult(data) {
+  const el = document.getElementById('result');
+  el.style.display = 'block';
+  if (!data || !data.success) {
+    el.innerHTML = `<div class="card" style="text-align:center;border-color:rgba(217,79,79,.15)">
+      <div style="font-size:2.5rem;margin-bottom:12px">😕</div>
+      <h3 style="color:var(--red);margin-bottom:6px">Not Found</h3>
+      <p style="color:var(--text3);font-size:.88rem">${data?.message || 'No record found. Check your email or ID.'}</p>
+    </div>`;
+    return;
+  }
+  const status = (data.status || 'Pending').toLowerCase();
+  const statusColor = status.includes('confirm') ? 'var(--green)' : status.includes('reject') ? 'var(--red)' : 'var(--accent)';
+  const statusBg = status.includes('confirm') ? 'rgba(45,159,111,.06)' : status.includes('reject') ? 'rgba(217,79,79,.06)' : 'rgba(198,123,60,.06)';
+  const statusLabel = status.includes('confirm') ? '✅ Confirmed' : status.includes('reject') ? '❌ Rejected' : '⏳ Pending Review';
+  const icon = status.includes('confirm') ? '🎉' : status.includes('reject') ? '😔' : '⏳';
+
+  el.innerHTML = `<div class="card" style="padding:0;overflow:hidden">
+    <div style="background:${statusBg};padding:24px;text-align:center;border-bottom:1px solid var(--border)">
+      <div style="font-size:2.5rem;margin-bottom:8px">${icon}</div>
+      <h3 style="color:${statusColor};font-size:1.2rem;margin-bottom:4px">${statusLabel}</h3>
+      <p style="color:var(--text3);font-size:.82rem">Registration status for your account</p>
+    </div>
+    <div style="padding:24px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Name</p>
+          <p style="font-weight:600">${data.name || '—'}</p>
+        </div>
+        <div>
+          <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Operative ID</p>
+          <p class="mono" style="font-weight:700;color:var(--accent)">${data.operativeId || '—'}</p>
+        </div>
+        <div>
+          <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Email</p>
+          <p style="font-size:.88rem">${data.email || '—'}</p>
+        </div>
+        <div>
+          <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Branch</p>
+          <p style="font-size:.88rem">${data.branch || '—'} · Year ${data.year || '—'}</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  if (status.includes('confirm')) {
+    const photoUrl = data.photoUrl || '/logo-icon.png';
+    const idCardHtml = `
+      <div class="mt-8 text-center" style="margin-top: 32px; display:flex; flex-direction:column; align-items:center;">
+        <h3 style="margin-bottom: 16px; font-weight: 600; font-size: 1.1rem; color: var(--ink);">Your Official Operative ID</h3>
+        <div id="id-card-wrapper" class="mx-auto" style="width: 350px; text-align: left; margin: 0 auto;">
+          <div id="id-card" style="background: linear-gradient(135deg, #0b0f15 0%, #1a202c 100%); border: 2px solid rgba(0,107,255,0.4); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); color: white; font-family: 'Inter', sans-serif;">
+            <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(0,107,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,107,255,0.1) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; position: relative; z-index: 1;">
+              <div>
+                <div style="font-size: 10px; color: #27c93f; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase;">Innovexa Labs</div>
+                <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">OPERATIVE ID</div>
+              </div>
+              <img src="/logo-icon.png" alt="Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(0,107,255,0.8));">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; margin-bottom: 24px;">
+              <div>
+                <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Operative ID</div>
+                <div style="font-size: 24px; font-weight: 800; color: #006BFF; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;">${data.operativeId || 'PENDING'}</div>
+              </div>
+              <div style="display: flex; gap: 24px;">
+                <div>
+                  <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Name</div>
+                  <div style="font-size: 15px; font-weight: 600; text-transform: uppercase;">${data.name || '—'}</div>
+                </div>
+                <div>
+                  <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Branch</div>
+                  <div style="font-size: 13px; color: #e2e8f0;">${data.branch || '—'} (Yr ${data.year || '—'})</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Clearance Level</div>
+                <div style="font-size: 13px; color: #27c93f; font-weight: 600;">${data.skillLevel || 'Operative'}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+              <div>
+                <div style="font-size: 9px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace;">ISSUED: ${new Date().toISOString().split('T')[0]}</div>
+              </div>
+              <div id="qrcode-container" style="background: white; padding: 4px; border-radius: 4px;"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="downloadIDCard()" class="btn btn-primary shadow-lg flex justify-center items-center" style="margin-top:20px; padding: 14px 20px; font-size: 0.95rem; width: 100%; max-width: 350px;">
+          <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:20px;height:20px;margin-right:8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download ID Card
+        </button>
+      </div>
+    `;
+    el.innerHTML += idCardHtml;
+
+    setTimeout(() => {
+      const qrData = `Operative: ${data.name}\nBranch: ${data.branch}\nLevel: ${data.skillLevel || 'Operative'}\nEmail: ${data.email}`;
+      new QRCode(document.getElementById("qrcode-container"), {
+        text: qrData,
+        width: 50,
+        height: 50,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.L
+      });
+    }, 100);
+  }
+}
+
+// Define download function globally if it doesn't exist
+if(typeof window.downloadIDCard === 'undefined') {
+  window.downloadIDCard = function() {
+    const idCard = document.getElementById('id-card');
+    const btn = document.querySelector('button[onclick="downloadIDCard()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Generating...';
+    
+    html2canvas(idCard, { 
+      scale: 3, 
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: false
+    }).then(canvas => {
+      const link = document.createElement('a');
+      const name = document.querySelector('.card p[style*="font-weight:600"]')?.textContent || 'Operative';
+      link.download = `Innovexa_ID_${name.replace(/\s+/g, '_')}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      btn.innerHTML = originalText;
+    }).catch(err => {
+      console.error('ID Card generation failed', err);
+      showToast('Failed to generate ID card. Please try again.', 'error');
+      btn.innerHTML = originalText;
+    });
+  };
+}
+
+function showToast(msg,type='info'){const c=document.getElementById('toast-container');const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),4000);}
+document.getElementById('lookup-input').addEventListener('keydown', e => { if(e.key==='Enter') checkStatus(); });
+</script>
+<script type="module">
+  import { initCustomCursor } from '/js/animations.js';
+  initCustomCursor();
+</script>
+</body>
+</html>

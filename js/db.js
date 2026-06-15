@@ -31,6 +31,28 @@ export const deleteMember = async (id) => {
   const { error } = await supabase.from('profiles').delete().eq('id', id)
   if (error) throw error
 }
+export const approveMember = async (id) => {
+  const { data: member, error: mErr } = await supabase.from('profiles').select('*').eq('id', id).single()
+  if (mErr) throw mErr
+  
+  let ticket_no = member.ticket_no
+  if (!ticket_no || ticket_no.toUpperCase() === 'PENDING') {
+    const { data: allMembers } = await supabase.from('profiles').select('ticket_no')
+    let maxNum = 0
+    if (allMembers) {
+      allMembers.forEach(m => {
+        if (m.ticket_no && m.ticket_no.toUpperCase().startsWith('INVX-')) {
+          const num = parseInt(m.ticket_no.split('-')[1])
+          if (!isNaN(num) && num > maxNum) maxNum = num
+        }
+      })
+    }
+    ticket_no = `INVX-${String(maxNum + 1).padStart(2, '0')}`
+  }
+
+  const { error } = await supabase.from('profiles').update({ role: 'member', ticket_no }).eq('id', id)
+  if (error) throw error
+}
 
 // ═══════════ EVENTS ═══════════
 export const getEvents = async () => {
@@ -95,4 +117,28 @@ export const getMessages = async (limit = 50) => {
 export const sendMessage = async (content, senderId) => {
   const { data, error } = await supabase.from('messages').insert({ content, sender_id: senderId }).select()
   if (error) throw error; return data[0]
+}
+
+// ═══════════ PAYMENTS ═══════════
+export const getPayments = async () => {
+  const { data, error } = await supabase.from('payments').select('*, profiles(name, email, ticket_no)').order('created_at', { ascending: false })
+  if (error) throw error; return data || []
+}
+export const updatePayment = async (id, updates) => {
+  const { data, error } = await supabase.from('payments').update(updates).eq('id', id).select()
+  if (error) throw error; return data
+}
+
+// ═══════════ DOCUMENTS ═══════════
+export const getDocuments = async () => {
+  const { data, error } = await supabase.from('documents').select('*, profiles(name, ticket_no)').order('created_at', { ascending: false })
+  if (error) throw error; return data || []
+}
+export const createDocument = async (doc) => {
+  const { data, error } = await supabase.from('documents').insert(doc).select()
+  if (error) throw error; return data
+}
+export const updateDocument = async (id, updates) => {
+  const { data, error } = await supabase.from('documents').update(updates).eq('id', id).select()
+  if (error) throw error; return data
 }

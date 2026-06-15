@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   INNOVEXA HUB — Professional Light Theme
+   INNOVEXA LABS — Professional Light Theme
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Reset ── */
@@ -114,7 +114,7 @@ button { cursor: pointer; font-family: inherit; }
 .auth-page {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #EFEBE9 0%, #FFF8E1 50%, #EFEBE9 100%);
+  background: linear-gradient(135deg, #EEF5FF 0%, #D6E8FF 50%, #EEF5FF 100%);
   padding: 24px;
 }
 .auth-card {
@@ -123,8 +123,8 @@ button { cursor: pointer; font-family: inherit; }
   box-shadow: var(--shadow-lg); animation: fadeUp 0.5s var(--ease);
 }
 .auth-logo { text-align: center; margin-bottom: 32px; }
-.auth-logo img { height: 48px; margin: 0 auto 16px; }
-.auth-logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--primary-darker); letter-spacing: -0.02em; }
+.auth-logo img { height: 52px; margin: 0 auto 16px; width: auto; object-fit: contain; }
+.auth-logo h1 { font-size: 1.5rem; font-weight: 800; color: #0A1628; letter-spacing: -0.02em; }
 .auth-logo p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
 
 /* ═══════════════ FORMS ═══════════════ */
@@ -154,8 +154,8 @@ button { cursor: pointer; font-family: inherit; }
   display: flex; align-items: center; gap: 12px;
   padding: 20px 20px 16px; text-decoration: none; cursor: pointer;
 }
-.sidebar-brand img { height: 32px; }
-.sidebar-brand span { font-weight: 800; font-size: 1rem; color: var(--primary-darker); letter-spacing: -0.01em; }
+.sidebar-brand img { height: 36px; width: auto; object-fit: contain; flex-shrink: 0; }
+.sidebar-brand span { font-weight: 800; font-size: 1rem; color: #0A1628; letter-spacing: -0.01em; }
 .sidebar-nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
 .sidebar-nav li { margin-bottom: 2px; }
 .sidebar-nav a {
@@ -165,7 +165,7 @@ button { cursor: pointer; font-family: inherit; }
   transition: var(--transition);
 }
 .sidebar-nav a:hover { background: var(--gray-100); color: var(--primary-dark); }
-.sidebar-nav a.active { background: var(--primary); color: var(--white); box-shadow: var(--shadow-sm); }
+.sidebar-nav a.active { background: linear-gradient(135deg, #1E4DB7, #2E63D4); color: #fff; box-shadow: 0 4px 12px rgba(30,77,183,0.3); }
 .sidebar-nav .nav-icon { width: 20px; text-align: center; flex-shrink: 0; }
 .sidebar-divider { height: 1px; background: var(--border-light); margin: 12px 0; }
 .sidebar-section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 8px 14px 4px; }
@@ -260,13 +260,14 @@ button { cursor: pointer; font-family: inherit; }
 /* ═══════════════ TABLE ═══════════════ */
 .table-wrap {
   background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden;
+  overflow-x: auto;
 }
 .table-top { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-light); }
 .table-top h3 { font-size: 1rem; font-weight: 600; }
 table { width: 100%; border-collapse: collapse; }
 thead { background: var(--gray-50); }
-th { padding: 10px 20px; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
-td { padding: 12px 20px; font-size: 0.875rem; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); }
+th { padding: 10px 20px; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+td { padding: 12px 20px; font-size: 0.875rem; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); vertical-align: middle; }
 tr:hover td { background: var(--gray-50); }
 .table-actions { display: flex; gap: 4px; }
 
