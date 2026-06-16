@@ -3,6 +3,6 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "pocketbase serve --http=0.0.0.0:8090 --dir=/data"
+startCommand = "pocketbase serve --http=0.0.0.0:${PORT:-8090} --dir=/data"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 30

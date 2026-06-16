@@ -18,4 +18,4 @@ COPY --from=builder /pb /usr/local/bin/pocketbase
 
 EXPOSE 8090
 
-CMD ["pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/data"]
+CMD pocketbase serve --http=0.0.0.0:${PORT:-8090} --dir=/data
