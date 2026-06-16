@@ -1,0 +1,23 @@
+{
+  "name": "messages",
+  "type": "base",
+  "schema": [
+    {
+      "name": "content",
+      "type": "text",
+      "required": true,
+      "options": { "min": 1, "max": 2000 }
+    },
+    {
+      "name": "sender",
+      "type": "relation",
+      "required": true,
+      "options": { "collectionId": "members", "maxSelect": 1 }
+    }
+  ],
+  "listRule": "",
+  "viewRule": "",
+  "createRule": "@request.auth.id = sender",
+  "updateRule": null,
+  "deleteRule": "@request.auth.role = 'admin'"
+}

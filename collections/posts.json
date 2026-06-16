@@ -1,0 +1,34 @@
+{
+  "name": "posts",
+  "type": "base",
+  "schema": [
+    {
+      "name": "title",
+      "type": "text",
+      "required": true,
+      "options": { "min": 2, "max": 200 }
+    },
+    {
+      "name": "content",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "author",
+      "type": "relation",
+      "required": true,
+      "options": { "collectionId": "members", "maxSelect": 1 }
+    },
+    {
+      "name": "image",
+      "type": "file",
+      "required": false,
+      "options": { "maxSelect": 1, "maxSize": 5242880, "mimeTypes": ["image/jpeg", "image/png", "image/webp"] }
+    }
+  ],
+  "listRule": "",
+  "viewRule": "",
+  "createRule": "@request.auth.role = 'admin' || @request.auth.id = author",
+  "updateRule": "@request.auth.role = 'admin'",
+  "deleteRule": "@request.auth.role = 'admin'"
+}

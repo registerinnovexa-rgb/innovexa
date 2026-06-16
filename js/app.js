@@ -1,44 +1,29 @@
 import { getSession, onAuthStateChange, signOut, getUserProfile } from './auth.js'
-import { supabase } from './lib/supabase.js'
 
 let user = null
 let profile = null
 let page = 'login'
-let announceSub = null
 
 export async function initApp() {
   const session = await getSession()
   if (session) {
     user = session.user
     try { profile = await getUserProfile(user.id) } catch (e) { console.warn('No profile') }
-    setupAnnouncementListener()
   }
 
   onAuthStateChange(async (ev, session) => {
     if (ev === 'SIGNED_IN' && session) {
       user = session.user
       try { profile = await getUserProfile(user.id) } catch (e) {}
-      setupAnnouncementListener()
       navigateTo(profile?.role === 'admin' ? 'admin' : 'portal')
     } else if (ev === 'SIGNED_OUT') {
       user = null; profile = null
-      if (announceSub) { supabase.removeChannel(announceSub); announceSub = null }
       navigateTo('login')
     }
   })
 
   window.addEventListener('hashchange', route)
   route()
-}
-
-function setupAnnouncementListener() {
-  if (announceSub) return
-  announceSub = supabase
-    .channel('rt-announcements')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, p => {
-      toast(`📢 New: ${p.new.title}`, 'info')
-    })
-    .subscribe()
 }
 
 export function getState() { return { user, profile, page } }

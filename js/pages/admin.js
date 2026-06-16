@@ -1,6 +1,7 @@
 import { getState, toast, modal, closeModal, fmtDate } from '../app.js'
 import { signOut } from '../auth.js'
 import { getMembers, createMember, updateMember, deleteMember, approveMember, getEvents, createEvent, updateEvent, deleteEvent, getPosts, createPost, updatePost, deletePost, getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement, getPayments, updatePayment, getDocuments, createDocument, updateDocument } from '../db.js'
+import { getFileUrl, pb } from '../lib/pocketbase.js'
 
 const TABS = [
   { id: 'admin', label: 'Dashboard', icon: '📊' },
@@ -79,7 +80,7 @@ async function renderDashboard(el) {
   </div>
   <div class="grid">
     <div class="card"><div class="card-head"><div class="card-icon">📢</div><div><div class="card-title">Recent Announcements</div></div></div>
-    <div class="card-body">${announcements.slice(0,3).map(a => `<div style="margin-bottom:8px"><strong>${a.title}</strong><br><span style="font-size:0.78rem;color:var(--text-muted)">${fmtDate(a.created_at)}</span></div>`).join('') || 'None'}</div></div>
+        <div class="card-body">${announcements.slice(0,3).map(a => `<div style="margin-bottom:8px"><strong>${a.title}</strong><br><span style="font-size:0.78rem;color:var(--text-muted)">${fmtDate(a.created)}</span></div>`).join('') || 'None'}</div></div>
     <div class="card"><div class="card-head"><div class="card-icon">📅</div><div><div class="card-title">Upcoming Events</div></div></div>
     <div class="card-body">${events.slice(0,3).map(e => `<div style="margin-bottom:8px"><strong>${e.title}</strong><br><span style="font-size:0.78rem;color:var(--text-muted)">${fmtDate(e.event_date)}</span></div>`).join('') || 'None'}</div></div>
   </div>`
@@ -94,7 +95,7 @@ async function renderMembersTab(el) {
     <table>
       <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Ticket No</th><th>Joined</th><th>Role</th><th></th></tr></thead>
       <tbody>${members.map(m => `<tr>
-        <td><strong>${m.name || '—'}</strong></td><td>${m.email || '—'}</td><td>${m.phone_number || '—'}</td>
+        <td><strong>${m.name || '—'}</strong></td><td>${m.email || '—'}</td><td>${m.phone || '—'}</td>
         <td>${m.ticket_no || '—'}</td><td>${fmtDate(m.date_of_joining)}</td><td><span class="badge badge-${m.role==='admin'?'accent':'primary'}">${m.role}</span></td>
         <td class="table-actions">
           <button class="btn btn-ghost btn-sm edit-m" data-id="${m.id}">Edit</button>
@@ -118,7 +119,7 @@ function showMemberModal(m = null) {
     <div class="form-group"><label>Email</label><input type="email" id="m-email" value="${m?.email || ''}" ${isEdit?'disabled':''}></div>
     ${!isEdit ? '<div class="form-group"><label>Password</label><input id="m-pass" placeholder="Welcome@123"></div>' : ''}
     <div class="form-row">
-      <div class="form-group"><label>Phone</label><input id="m-phone" value="${m?.phone_number || ''}"></div>
+      <div class="form-group"><label>Phone</label><input id="m-phone" value="${m?.phone || ''}"></div>
       <div class="form-group"><label>Ticket No</label><input id="m-ticket" value="${m?.ticket_no || ''}"></div>
     </div>
     <div class="form-row">
@@ -131,7 +132,7 @@ function showMemberModal(m = null) {
   o.querySelector('#save-member').onclick = async () => {
     const data = {
       name: o.querySelector('#m-name').value,
-      phone_number: o.querySelector('#m-phone').value,
+      phone: o.querySelector('#m-phone').value,
       ticket_no: o.querySelector('#m-ticket').value,
       date_of_joining: o.querySelector('#m-doj').value,
       role: o.querySelector('#m-role').value,
@@ -150,35 +151,12 @@ function showMemberModal(m = null) {
 // ═══════════ CREDENTIALS ═══════════
 async function renderCredentialsTab(el) {
   let members = []; try { members = await getMembers() } catch(e) {}
-  const { supabase } = await import('../lib/supabase.js')
-
-  const bulkSQL = `-- Run this in Supabase SQL Editor to set all passwords to 'invxlabs'
-UPDATE auth.users SET encrypted_password = crypt('invxlabs', gen_salt('bf')) WHERE id IN (
-  SELECT id FROM auth.users
-);`
 
   el.innerHTML = `
-  <!-- Bulk Reset Banner -->
-  <div style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1)); border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-    <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
-      <div style="font-size: 2rem;">🔐</div>
-      <div style="flex: 1; min-width: 280px;">
-        <div style="font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 4px;">Set All Passwords to <code style="background: rgba(0,0,0,0.06); padding: 2px 8px; border-radius: 4px; font-size: 0.9rem;">invxlabs</code></div>
-        <div style="color: var(--text-muted); font-size: 0.83rem; margin-bottom: 12px;">Paste the SQL below into your Supabase SQL Editor (Dashboard → SQL Editor → New Query). This sets every member's password to <strong>invxlabs</strong>.</div>
-        <div style="position: relative;">
-          <pre id="bulk-sql" style="background: #1e1e2e; color: #cdd6f4; padding: 14px 16px; border-radius: 8px; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; overflow-x: auto; white-space: pre-wrap; word-break: break-all;">${bulkSQL}</pre>
-          <button id="copy-sql" class="btn btn-sm" style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); color: #cdd6f4; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem;">Copy</button>
-        </div>
-        <a href="https://supabase.com/dashboard/project/ekqxnwnqbcbwuvrqyqqd/sql/new" target="_blank" class="btn btn-sm" style="margin-top: 10px; background: #6366f1; color: white; border: none; display: inline-flex;">Open Supabase SQL Editor ↗</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Members Credentials Table -->
   <div class="table-wrap">
     <div class="table-top">
       <h3>Member Login Credentials (${members.length})</h3>
-      <span style="font-size: 0.78rem; color: var(--text-muted);">Default: invxlabs · Send reset email per member below</span>
+      <span style="font-size: 0.78rem; color: var(--text-muted);">Send password reset email per member</span>
     </div>
     <table>
       <thead><tr>
@@ -199,12 +177,7 @@ UPDATE auth.users SET encrypted_password = crypt('invxlabs', gen_salt('bf')) WHE
     </table>
   </div>`
 
-  // Copy SQL
-  document.getElementById('copy-sql').onclick = () => {
-    navigator.clipboard.writeText(bulkSQL).then(() => toast('SQL copied!', 'success'))
-  }
-
-  // Send reset emails
+  // Send reset emails via PocketBase
   el.querySelectorAll('.send-reset').forEach(btn => {
     btn.onclick = async () => {
       const email = btn.dataset.email
@@ -213,10 +186,7 @@ UPDATE auth.users SET encrypted_password = crypt('invxlabs', gen_salt('bf')) WHE
       if (!confirm(`Send password reset email to ${name} (${email})?`)) return
       btn.disabled = true; btn.textContent = 'Sending...'
       try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/portal.html`
-        })
-        if (error) throw error
+        await pb.collection('members').requestPasswordReset(email)
         toast(`Reset email sent to ${name}!`, 'success')
         btn.textContent = '✅ Sent'
       } catch(e) {
@@ -246,14 +216,14 @@ async function renderPaymentsTab(el) {
       <tbody>
         ${payments.length === 0 ? '<tr><td colspan="6" style="text-align:center; padding: 30px; color: var(--text-muted);">No payments found.</td></tr>' : 
         payments.map(p => `<tr>
-        <td>${fmtDate(p.created_at)}</td>
-        <td><strong>${p.profiles?.name || 'Unknown'}</strong></td>
-        <td>${p.profiles?.email || '—'}</td>
-        <td><a href="${p.proof_url || '#'}" target="_blank" style="color: var(--accent); text-decoration: underline;">View Receipt</a></td>
+        <td>${fmtDate(p.created)}</td>
+        <td><strong>${p.expand?.member?.name || 'Unknown'}</strong></td>
+        <td>${p.expand?.member?.email || '—'}</td>
+        <td><a href="${p.proof ? getFileUrl(p, p.proof, 'payments') : '#'}" target="_blank" style="color: var(--accent); text-decoration: underline;">View Receipt</a></td>
         <td><span class="badge" style="background: ${p.status === 'pending' ? 'rgba(234,179,8,0.2); color: #facc15' : p.status === 'rejected' ? 'rgba(239,68,68,0.2); color: #f87171' : 'rgba(34,197,94,0.2); color: #4ade80'}">${p.status.toUpperCase()}</span></td>
         <td class="table-actions">
           ${p.status === 'pending' ? `
-            <button class="btn btn-primary btn-sm act-approve" data-id="${p.id}" data-member="${p.member_id}" style="background: #22c55e; border:none;">Approve</button>
+            <button class="btn btn-primary btn-sm act-approve" data-id="${p.id}" data-member="${p.member}" style="background: #22c55e; border:none;">Approve</button>
             <button class="btn btn-secondary btn-sm act-reject" data-id="${p.id}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">Reject</button>
           ` : '—'}
         </td></tr>`).join('')}
@@ -300,8 +270,8 @@ async function renderDocumentsTab(el) {
       <tbody>
         ${docs.length === 0 ? '<tr><td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">No document requests found.</td></tr>' : 
         docs.map(d => `<tr>
-        <td>${fmtDate(d.created_at)}</td>
-        <td><strong>${d.profiles?.name || 'Unknown'}</strong><br><span style="font-size:0.75rem;color:var(--text-muted)">${d.profiles?.ticket_no || ''}</span></td>
+        <td>${fmtDate(d.created)}</td>
+        <td><strong>${d.expand?.member?.name || 'Unknown'}</strong><br><span style="font-size:0.75rem;color:var(--text-muted)">${d.expand?.member?.ticket_no || ''}</span></td>
         <td>${d.event_name || '—'}</td>
         <td>${d.start_date || '—'} ${d.end_date ? 'to ' + d.end_date : ''}</td>
         <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${d.note || ''}">${d.note || '—'}</td>
@@ -340,9 +310,9 @@ async function renderDocumentsTab(el) {
 // ═══════════ GENERIC CRUD (Events / Posts / Announcements) ═══════════
 async function renderCrudTab(el, type) {
   const cfg = {
-    events: { get: getEvents, create: createEvent, update: updateEvent, del: deleteEvent, cols: ['title','event_date','location'], fields: [{k:'title',l:'Title',t:'text'},{k:'description',l:'Description',t:'textarea'},{k:'event_date',l:'Date',t:'datetime-local'},{k:'location',l:'Location',t:'text'}] },
-    posts: { get: getPosts, create: createPost, update: updatePost, del: deletePost, cols: ['title','created_at'], fields: [{k:'title',l:'Title',t:'text'},{k:'content',l:'Content',t:'textarea'}] },
-    announcements: { get: getAnnouncements, create: createAnnouncement, update: updateAnnouncement, del: deleteAnnouncement, cols: ['title','created_at'], fields: [{k:'title',l:'Title',t:'text'},{k:'content',l:'Content',t:'textarea'}] },
+    events: { get: getEvents, create: createEvent, update: updateEvent, del: deleteEvent, cols: ['title','event_date','location','image'], fields: [{k:'title',l:'Title',t:'text'},{k:'description',l:'Description',t:'textarea'},{k:'event_date',l:'Date',t:'datetime-local'},{k:'location',l:'Location',t:'text'},{k:'image',l:'Image',t:'file'}] },
+    posts: { get: getPosts, create: createPost, update: updatePost, del: deletePost, cols: ['title','image','created'], fields: [{k:'title',l:'Title',t:'text'},{k:'content',l:'Content',t:'textarea'},{k:'image',l:'Image',t:'file'}] },
+    announcements: { get: getAnnouncements, create: createAnnouncement, update: updateAnnouncement, del: deleteAnnouncement, cols: ['title','image','created'], fields: [{k:'title',l:'Title',t:'text'},{k:'content',l:'Content',t:'textarea'},{k:'image',l:'Image',t:'file'}] },
   }
   const c = cfg[type]
   let items = []; try { items = await c.get() } catch(e) {}
@@ -354,7 +324,10 @@ async function renderCrudTab(el, type) {
     <table>
       <thead><tr>${c.cols.map(col => `<th>${col.replace('_',' ')}</th>`).join('')}<th></th></tr></thead>
       <tbody>${items.map(item => `<tr>
-        ${c.cols.map(col => `<td>${col.includes('date') || col.includes('created') ? fmtDate(item[col]) : (item[col] || '—')}</td>`).join('')}
+        ${c.cols.map(col => {
+          if (col === 'image') return `<td>${item[col] ? `<img src="${getFileUrl(item, item[col])}" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">` : '—'}</td>`
+          return `<td>${col.includes('date') || col.includes('created') ? fmtDate(item[col]) : (item[col] || '—')}</td>`
+        }).join('')}
         <td class="table-actions">
           <button class="btn btn-ghost btn-sm edit-i" data-id="${item.id}">Edit</button>
           <button class="btn btn-ghost btn-sm del-i" data-id="${item.id}" style="color:var(--error)">Del</button>
@@ -375,14 +348,29 @@ function showCrudModal(c, type, el, item = null) {
   const body = c.fields.map(f => {
     const val = item?.[f.k] || ''
     if (f.t === 'textarea') return `<div class="form-group"><label>${f.l}</label><textarea id="f-${f.k}">${val}</textarea></div>`
+    if (f.t === 'file') {
+      const hasImage = item && item[f.k]
+      return `<div class="form-group"><label>${f.l}</label>
+        ${hasImage ? `<div style="margin-bottom:6px"><img src="${getFileUrl(item, item[f.k])}" style="max-width:120px;max-height:80px;border-radius:4px;object-fit:cover;"></div>` : ''}
+        <input type="file" id="f-${f.k}" accept="image/jpeg,image/png,image/webp"></div>`
+    }
     return `<div class="form-group"><label>${f.l}</label><input type="${f.t}" id="f-${f.k}" value="${val}"></div>`
   }).join('')
   const footer = `<button class="btn btn-secondary close-m">Cancel</button><button class="btn btn-primary" id="save-item">${isEdit ? 'Update' : 'Create'}</button>`
   const o = modal(isEdit ? `Edit ${type}` : `Add ${type}`, body, footer)
 
   o.querySelector('#save-item').onclick = async () => {
-    const data = {}
-    c.fields.forEach(f => { data[f.k] = o.querySelector(`#f-${f.k}`).value })
+    const hasFile = c.fields.some(f => f.t === 'file' && o.querySelector(`#f-${f.k}`).files.length > 0)
+    const data = hasFile ? new FormData() : {}
+    c.fields.forEach(f => {
+      const input = o.querySelector(`#f-${f.k}`)
+      if (f.t === 'file') {
+        if (input.files.length > 0) data.append(f.k, input.files[0])
+      } else {
+        if (hasFile) data.append(f.k, input.value)
+        else data[f.k] = input.value
+      }
+    })
     try {
       if (isEdit) await c.update(item.id, data); else await c.create(data)
       toast(isEdit ? 'Updated!' : 'Created!', 'success')

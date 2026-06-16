@@ -1,0 +1,139 @@
+{
+  "name": "members",
+  "type": "auth",
+  "schema": [
+    {
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "options": {
+        "min": 2,
+        "max": 100
+      }
+    },
+    {
+      "name": "phone",
+      "type": "text",
+      "required": true,
+      "options": {
+        "pattern": "^[+]?[0-9\\s\\-]{10,15}$"
+      }
+    },
+    {
+      "name": "year",
+      "type": "select",
+      "required": true,
+      "options": {
+        "maxSelect": 1,
+        "values": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ]
+      }
+    },
+    {
+      "name": "branch",
+      "type": "select",
+      "required": true,
+      "options": {
+        "maxSelect": 1,
+        "values": [
+          "B.Tech CSE",
+          "B.Tech AI/ML",
+          "B.Tech ECE",
+          "B.Tech ME",
+          "BCA",
+          "MCA",
+          "BBA",
+          "MBA",
+          "B.Sc",
+          "M.Sc",
+          "Other"
+        ]
+      }
+    },
+    {
+      "name": "skill_level",
+      "type": "select",
+      "required": true,
+      "options": {
+        "maxSelect": 1,
+        "values": [
+          "Beginner",
+          "Intermediate",
+          "Advanced"
+        ]
+      }
+    },
+    {
+      "name": "dob",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "interests",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "avatar",
+      "type": "file",
+      "required": false,
+      "options": {
+        "maxSelect": 1,
+        "maxSize": 5242880,
+        "mimeTypes": [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ]
+      }
+    },
+    {
+      "name": "directory_opt_in",
+      "type": "bool",
+      "required": false,
+      "default": false
+    },
+    {
+      "name": "ticket_no",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "date_of_joining",
+      "type": "date",
+      "required": false
+    },
+    {
+      "name": "role",
+      "type": "select",
+      "required": true,
+      "default": "pending",
+      "options": {
+        "maxSelect": 1,
+        "values": [
+          "pending",
+          "member",
+          "admin"
+        ]
+      }
+    }
+  ],
+  "options": {
+    "allowEmailAuth": true,
+    "allowUsernameAuth": false,
+    "allowOAuth2Auth": false,
+    "exceptEmailDomains": null,
+    "onlyEmailDomains": null,
+    "onlyVerified": false,
+    "minPasswordLength": 8
+  },
+  "listRule": "",
+  "viewRule": "",
+  "createRule": "",
+  "updateRule": "@request.auth.id = id",
+  "deleteRule": "@request.auth.id = id"
+}

@@ -1,0 +1,48 @@
+{
+  "name": "payments",
+  "type": "base",
+  "schema": [
+    {
+      "name": "member",
+      "type": "relation",
+      "required": true,
+      "options": { "collectionId": "members", "cascadeDelete": true, "maxSelect": 1 }
+    },
+    {
+      "name": "utr",
+      "type": "text",
+      "required": true,
+      "options": { "min": 8, "max": 22 }
+    },
+    {
+      "name": "amount",
+      "type": "number",
+      "required": true,
+      "default": 599,
+      "options": { "min": 0 }
+    },
+    {
+      "name": "proof",
+      "type": "file",
+      "required": true,
+      "options": { "maxSelect": 1, "maxSize": 5242880, "mimeTypes": ["image/jpeg", "image/png", "image/webp"] }
+    },
+    {
+      "name": "status",
+      "type": "select",
+      "required": true,
+      "default": "pending",
+      "options": { "maxSelect": 1, "values": ["pending", "confirmed", "rejected"] }
+    },
+    {
+      "name": "notes",
+      "type": "text",
+      "required": false
+    }
+  ],
+  "listRule": "@request.auth.role = 'admin' || member = @request.auth.id",
+  "viewRule": "@request.auth.role = 'admin' || member = @request.auth.id",
+  "createRule": "@request.auth.id != ''",
+  "updateRule": "@request.auth.role = 'admin'",
+  "deleteRule": "@request.auth.role = 'admin'"
+}

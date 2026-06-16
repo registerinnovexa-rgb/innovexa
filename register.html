@@ -494,7 +494,7 @@
 </main>
 
 <script type="module">
-import { supabase } from '/js/lib/supabase.js';
+import { registerMember, requestMagicLink } from '/js/lib/pocketbase.js';
 
 const UPI_ID = 'gpay-12200845070@okbizaxis';
 const UPI_NAME = 'Jaiakash S';
@@ -674,53 +674,6 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
       registrationForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
-    // ─── Cloudinary Configuration ────────────────────────────
-    const CLOUDINARY_CLOUD_NAME = 'dpatypekd';
-    const CLOUDINARY_UPLOAD_PRESET = 'innovexa_uploads';
-
-    // Upload a file to Cloudinary and return the secure URL
-    async function uploadToCloudinary(file, folder = 'innovexa') {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-      fd.append('folder', folder);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: fd,
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        console.error('Cloudinary error:', json);
-        throw new Error(json.error?.message || 'Cloudinary upload failed');
-      }
-      return json.secure_url;
-    }
-
-    // Fallback: compress image to base64 for GAS direct upload
-    function compressImageToBase64(file, maxDim = 600, quality = 0.5) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = reject;
-        reader.onload = () => {
-          const img = new Image();
-          img.onerror = reject;
-          img.onload = () => {
-            let w = img.width, h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-              else { w = Math.round(w * maxDim / h); h = maxDim; }
-            }
-            const c = document.createElement('canvas');
-            c.width = w; c.height = h;
-            c.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(c.toDataURL('image/jpeg', quality));
-          };
-          img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
     // File Label Helper
     function updateFileLabel(inputId, labelId) {
       const file = document.getElementById(inputId).files[0];
@@ -736,7 +689,7 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
     }
 
     // ═══════════════════════════════════════════════════════════
-    //  SUBMIT REGISTRATION → POST TO GOOGLE APPS SCRIPT
+    //  SUBMIT REGISTRATION → POCKETBASE
     // ═══════════════════════════════════════════════════════════
 
     document.getElementById('btn-submit-registration').addEventListener('click', async () => {
@@ -744,7 +697,6 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
       const utrError = document.getElementById('utr-error');
       const utr = utrInput.value.trim();
 
-      // Validate UTR
       const result = validateUTR(utr);
       if (!result.valid) {
         utrError.textContent = result.error;
@@ -753,15 +705,13 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
         setTimeout(() => utrInput.classList.remove('!border-red-400'), 2500);
         return;
       }
-      // Check Payment Proof
       const paymentFile = document.getElementById('payment-input').files[0];
       if (!paymentFile) {
         showToast('Please upload your payment proof screenshot.', 'error');
         return;
       }
 
-      // Validate file sizes (max 5MB each — Cloudinary handles large files)
-      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      const MAX_SIZE = 5 * 1024 * 1024;
       const photoFile = document.getElementById('photo-input').files[0];
       if (photoFile && photoFile.size > MAX_SIZE) {
         showToast('Photo is too large. Please use an image under 5MB.', 'error');
@@ -772,111 +722,37 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
         return;
       }
 
-      // Show loading state
       const btn = document.getElementById('btn-submit-registration');
       const btnText = document.getElementById('submit-btn-text');
       const spinner = document.getElementById('submit-spinner');
       btn.disabled = true;
-      btnText.textContent = 'Uploading Assets...';
+      btnText.textContent = 'Creating Account...';
       spinner.classList.remove('hidden');
 
       try {
-        let photoUrl = '';
-        let paymentUrl = '';
-        try {
-          // Try Cloudinary first (preferred — stores image)
-          btnText.textContent = 'Uploading Photo...';
-          if (photoFile) photoUrl = await uploadToCloudinary(photoFile, 'innovexa/photos');
-          btnText.textContent = 'Uploading Payment Proof...';
-          paymentUrl = await uploadToCloudinary(paymentFile, 'innovexa/payments');
-        } catch (uploadErr) {
-          // Fallback: compress to base64 and embed directly
-          console.warn('Cloudinary failed, using base64 fallback:', uploadErr.message);
-          showToast('Cloud upload failed — using compressed fallback...', 'info');
-          btnText.textContent = 'Compressing images...';
-          if (photoFile) photoUrl = await compressImageToBase64(photoFile, 500, 0.5);
-          paymentUrl = await compressImageToBase64(paymentFile, 500, 0.5);
-        }
-
-        btnText.textContent = 'Submitting Data...';
-
-        const payload = {
-          fullName: currentFormData.fullName,
-          email: currentFormData.email,
-          phone: currentFormData.phone,
-          year: currentFormData.year,
-          branch: currentFormData.branch,
-          skillLevel: currentFormData.skillLevel,
-          dob: currentFormData.dob,
-          interests: currentFormData.interests,
-          utr: result.cleaned,
-          amount: FEE_LABEL,
-          photoUrl: photoUrl,
-          paymentUrl: paymentUrl,
+        btnText.textContent = 'Registering...';
+        const record = await registerMember({
+          ...currentFormData,
+          photoFile,
           directoryOptIn: document.getElementById('directory-opt-in')?.checked || false
-        };
+        });
 
-        let finalOpId = 'PENDING';
-        try {
-          // 1. Create auth account
-          const { data: authData, error: authErr } = await supabase.auth.signUp({
-            email: currentFormData.email,
-            password: 'invxlabs',
-            options: { data: { name: currentFormData.fullName } }
-          });
-          if (authErr && authErr.message !== 'User already registered') throw authErr;
+        btnText.textContent = 'Uploading Payment Proof...';
+        const paymentFormData = new FormData();
+        paymentFormData.append('proof', paymentFile);
+        paymentFormData.append('member', record.id);
+        paymentFormData.append('utr', result.cleaned);
+        paymentFormData.append('amount', FEE);
+        paymentFormData.append('status', 'pending');
+        const { pb } = await import('/js/lib/pocketbase.js');
+        await pb.collection('payments').create(paymentFormData);
 
-          const userId = authData?.user?.id;
-          if (!userId) {
-            // If user exists but we didn't get user object (because confirm email is enabled maybe)
-            throw new Error('Please log in or contact admin to reset your existing account.');
-          }
-
-          // 2. Insert into profiles
-          const { error: profErr } = await supabase.from('profiles').upsert({
-            id: userId,
-            name: currentFormData.fullName,
-            email: currentFormData.email,
-            phone_number: currentFormData.phone,
-            year: currentFormData.year,
-            branch: currentFormData.branch,
-            skill_level: currentFormData.skillLevel,
-            dob: currentFormData.dob,
-            interests: currentFormData.interests,
-            photo_url: photoUrl,
-            directory_opt_in: document.getElementById('directory-opt-in')?.checked || false,
-            role: 'pending',
-            date_of_joining: new Date().toISOString().split('T')[0]
-          });
-          if (profErr) throw profErr;
-
-          // 3. Insert payment
-          const { error: payErr } = await supabase.from('payments').insert({
-            member_id: userId,
-            utr: result.cleaned,
-            amount: FEE,
-            proof_url: paymentUrl,
-            status: 'pending'
-          });
-          if (payErr) throw payErr;
-
-          console.log('✅ Registration successfully sent to Supabase.');
-          
-          // Sign them out automatically so they don't enter portal until approved
-          await supabase.auth.signOut();
-
-        } catch(regErr) { 
-          console.error('Submission warning:', regErr); 
-          throw regErr; // bubble up to outer catch
-        }
-
-        showSuccessScreen(currentFormData, result.cleaned, finalOpId);
-        showToast(`Registration submitted! Welcome, ${currentFormData.fullName.split(' ')[0]}! 🚀`, 'success');
+        showVerificationScreen(currentFormData, result.cleaned, record.email);
+        showToast(`Registration submitted! Check your email, ${currentFormData.fullName.split(' ')[0]}! 📧`, 'success');
 
       } catch (err) {
-        console.error('❌ Submission error:', err);
-        showSuccessScreen(currentFormData, result.cleaned, 'PENDING');
-        showToast('Submitted! Your data may take a moment to sync.', 'info');
+        console.error('Submission error:', err);
+        showToast(err.message || 'Registration failed. Please try again.', 'error');
       } finally {
         btn.disabled = false;
         btnText.textContent = 'Submit Registration';
@@ -919,129 +795,79 @@ if (upiDisplay) upiDisplay.textContent = UPI_ID;
     });
 
     // ═══════════════════════════════════════════════════════════
-    //  SUCCESS SCREEN
+    //  VERIFICATION SCREEN (email verification flow)
     // ═══════════════════════════════════════════════════════════
 
-    function showSuccessScreen(data, transactionId, operativeId) {
-      // Hide form + payment
+    function showVerificationScreen(data, transactionId, email) {
       registrationForm.classList.add('hidden');
       paymentSection.classList.add('hidden');
-
-      // Show success section
       successSection.classList.remove('hidden');
+
       successSection.innerHTML = `
-        <div class="text-center py-6 animate-fade-in">
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-neutral-800 mb-2">
-            Welcome to the Network
+        <div class="text-center py-10 animate-fade-in">
+          <div class="text-6xl mb-5">📧</div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-neutral-800 mb-3">
+            Verify Your Email
           </h2>
-          <p class="text-neutral-500 text-sm max-w-md mx-auto mb-8">
-            Your registration is pending verification. Download your official Operative ID below.
+          <p class="text-neutral-500 text-sm max-w-lg mx-auto mb-2">
+            We've sent a verification email to <strong>${email}</strong>.
+          </p>
+          <p class="text-neutral-400 text-xs max-w-md mx-auto mb-8">
+            Click the link in the email to verify your account. After verification, you'll receive a magic link to sign in.
           </p>
 
-          <!-- The ID Card -->
-          <div id="id-card-wrapper" class="mx-auto" style="width: 350px; text-align: left;">
-            <div id="id-card" style="background: linear-gradient(135deg, #0b0f15 0%, #1a202c 100%); border: 2px solid rgba(0,107,255,0.4); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); color: white; font-family: 'Inter', sans-serif;">
-              <!-- Grid Background inside card -->
-              <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(0,107,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,107,255,0.1) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
-              
-              <!-- Header -->
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; position: relative; z-index: 1;">
-                <div>
-                  <div style="font-size: 10px; color: #27c93f; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase;">Innovexa Labs</div>
-                  <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">OPERATIVE ID</div>
-                </div>
-                <img src="/logo-icon.png" alt="Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(0,107,255,0.8));">
-              </div>
+          <div class="max-w-sm mx-auto space-y-4">
+            <button id="btn-resend-verification" class="btn btn-primary w-full flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm py-4 rounded-xl shadow-glow hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Resend Verification / Get Magic Link</span>
+            </button>
 
-              <!-- Body -->
-              <div style="display: flex; gap: 16px; position: relative; z-index: 1; margin-bottom: 24px;">
-                <div style="width: 90px; height: 110px; background: #000; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); overflow: hidden; flex-shrink: 0;">
-                  <img src="\${photoUrl || '/logo-icon.png'}" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
-                </div>
-                <div style="display: flex; flex-direction: column; justify-content: center; gap: 8px;">
-                  <div>
-                    <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Name</div>
-                    <div style="font-size: 15px; font-weight: 600; text-transform: uppercase;">\${data.fullName}</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Branch</div>
-                    <div style="font-size: 13px; color: #e2e8f0;">\${data.branch} (Yr \${data.year})</div>
-                  </div>
-                  <div>
-                    <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Clearance Level</div>
-                    <div style="font-size: 13px; color: #27c93f; font-weight: 600;">\${data.skillLevel}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Footer with QR -->
-              <div style="display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
-                <div>
-                  <div style="font-size: 9px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace;">TRX ID: \${transactionId}</div>
-                  <div style="font-size: 9px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; margin-top: 4px;">ISSUED: \${new Date().toISOString().split('T')[0]}</div>
-                </div>
-                <div id="qrcode-container" style="background: white; padding: 4px; border-radius: 4px;"></div>
-              </div>
+            <div class="bg-surface-50 rounded-xl border border-neutral-200/60 p-4 text-left">
+              <p class="text-xs text-neutral-500 font-medium mb-2">📋 What happens next?</p>
+              <ol class="text-xs text-neutral-400 space-y-1.5 ml-4 list-decimal">
+                <li>Check your inbox (and spam) for the verification email</li>
+                <li>Click "Verify Email" — your account is confirmed</li>
+                <li>Come back here and click the button above for a magic link</li>
+                <li>Click the magic link to sign in and access the portal</li>
+                <li>Admin approves your membership — you're an Operative!</li>
+              </ol>
             </div>
-          </div>
 
-          <!-- Buttons -->
-          <div class="mt-8 flex flex-col gap-3 max-w-[350px] mx-auto">
-            <button onclick="downloadIDCard()" class="btn btn-primary w-full shadow-lg flex justify-center items-center" style="padding: 14px 20px; font-size: 0.95rem;">
-              <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Download ID Card
-            </button>
-            <button type="button" onclick="switchTab('status')" class="text-sm font-medium text-accent-600 hover:text-accent-700 transition-colors mt-2">
-              Check Status →
-            </button>
+            <div class="pt-4 border-t border-neutral-100">
+              <p class="text-xs text-neutral-400 mb-2">Transaction Reference</p>
+              <p class="text-sm font-mono font-semibold text-neutral-600">${transactionId}</p>
+            </div>
+
+            <a href="status.html" class="block text-center text-sm font-medium text-accent-600 hover:text-accent-700 transition-colors mt-2">
+              Check Registration Status →
+            </a>
           </div>
         </div>
-      \`;
+      `;
 
-      // Generate QR Code
-      setTimeout(() => {
-        const qrData = \`Operative: \${data.fullName}\\nBranch: \${data.branch}\\nLevel: \${data.skillLevel}\\nEmail: \${data.email}\`;
-        new QRCode(document.getElementById("qrcode-container"), {
-          text: qrData,
-          width: 50,
-          height: 50,
-          colorDark : "#000000",
-          colorLight : "#ffffff",
-          correctLevel : QRCode.CorrectLevel.L
-        });
-      }, 100);
+      document.getElementById('btn-resend-verification').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-resend-verification');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Sending...';
+        try {
+          await requestMagicLink(email);
+          showToast('Magic link sent! Check your email.', 'success');
+          btn.querySelector('span').textContent = '✅ Sent!';
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Resend Verification / Get Magic Link';
+          }, 5000);
+        } catch (err) {
+          showToast(err.message || 'Failed to send.', 'error');
+          btn.disabled = false;
+          btn.querySelector('span').textContent = 'Resend Verification / Get Magic Link';
+        }
+      });
 
-      // Define download function globally if it doesn't exist
-      if(typeof window.downloadIDCard === 'undefined') {
-        window.downloadIDCard = function() {
-          const idCard = document.getElementById('id-card');
-          const btn = document.querySelector('button[onclick="downloadIDCard()"]');
-          const originalText = btn.innerHTML;
-          btn.innerHTML = 'Generating...';
-          
-          html2canvas(idCard, { 
-            scale: 3, 
-            backgroundColor: null,
-            useCORS: true,
-            allowTaint: false
-          }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = \`Innovexa_ID_\${data.fullName.replace(/\\s+/g, '_')}.png\`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            btn.innerHTML = originalText;
-            showToast('ID Card downloaded successfully!', 'success');
-          }).catch(err => {
-            console.error(err);
-            btn.innerHTML = originalText;
-            showToast('Error generating ID card. Try again.', 'error');
-          });
-        };
-      }
-
-      // Scroll to top
       successSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } // end showSuccessScreen
+    }
 </script>
 <script type="module">
   import { initCustomCursor, initSpotlightCards } from '/js/animations.js';

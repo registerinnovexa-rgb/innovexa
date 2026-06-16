@@ -1,7 +1,7 @@
 import { getState, toast, navigateTo, fmtDate, fmtTime } from '../app.js'
 import { signOut } from '../auth.js'
 import { getEvents, getAnnouncements, getPosts, getMessages, sendMessage } from '../db.js'
-import { supabase } from '../lib/supabase.js'
+import { getFileUrl } from '../lib/pocketbase.js'
 
 const TABS = [
   { id: 'portal', label: 'Profile', icon: '👤' },
@@ -12,8 +12,6 @@ const TABS = [
   { id: 'portal-chat', label: 'Chat', icon: '💬' },
   { id: 'portal-contact', label: 'Contact', icon: '📞' },
 ]
-
-let chatSub = null
 
 export async function renderPortal(app, tab = 'portal') {
   const { user, profile: prof } = getState()
@@ -48,9 +46,6 @@ export async function renderPortal(app, tab = 'portal') {
   </div>`
 
   document.getElementById('logout-btn').onclick = () => signOut()
-
-  // Clean chat sub when leaving chat
-  if (tab !== 'portal-chat' && chatSub) { supabase.removeChannel(chatSub); chatSub = null }
 
   const panel = document.getElementById('panel')
   switch (tab) {
@@ -93,7 +88,7 @@ async function renderEvents(el) {
   el.innerHTML = items.length === 0
     ? '<div class="empty"><h3>No events yet</h3><p>Check back for upcoming events!</p></div>'
     : `<div class="grid">${items.map(e => `
-      <div class="card"><div class="card-head"><div class="card-icon">📅</div><div><div class="card-title">${e.title}</div><div class="card-meta">${fmtDate(e.event_date)}${e.location ? ` · 📍 ${e.location}` : ''}</div></div></div>
+      <div class="card">${e.image ? `<img src="${getFileUrl(e, e.image)}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px 8px 0 0;">` : ''}<div class="card-head"><div class="card-icon">📅</div><div><div class="card-title">${e.title}</div><div class="card-meta">${fmtDate(e.event_date)}${e.location ? ` · 📍 ${e.location}` : ''}</div></div></div>
       <div class="card-body">${e.description || ''}</div></div>`).join('')}</div>`
 }
 
@@ -103,7 +98,7 @@ async function renderPosts(el) {
   el.innerHTML = items.length === 0
     ? '<div class="empty"><h3>No posts yet</h3><p>Community posts will appear here.</p></div>'
     : `<div class="grid">${items.map(p => `
-      <div class="card"><div class="card-head"><div class="card-icon">📝</div><div><div class="card-title">${p.title}</div><div class="card-meta">${p.profiles?.name || 'Anonymous'} · ${fmtDate(p.created_at)}</div></div></div>
+      <div class="card">${p.image ? `<img src="${getFileUrl(p, p.image)}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px 8px 0 0;">` : ''}<div class="card-head"><div class="card-icon">📝</div><div><div class="card-title">${p.title}</div><div class="card-meta">${p.expand?.author?.name || 'Anonymous'} · ${fmtDate(p.created)}</div></div></div>
       <div class="card-body">${p.content || ''}</div></div>`).join('')}</div>`
 }
 
@@ -113,7 +108,7 @@ async function renderAnnouncements(el) {
   el.innerHTML = items.length === 0
     ? '<div class="empty"><h3>No announcements</h3><p>Stay tuned for updates!</p></div>'
     : `<div class="grid">${items.map(a => `
-      <div class="card"><div class="card-head"><div class="card-icon">📢</div><div><div class="card-title">${a.title}</div><div class="card-meta">${fmtDate(a.created_at)}</div></div></div>
+      <div class="card">${a.image ? `<img src="${getFileUrl(a, a.image)}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px 8px 0 0;">` : ''}<div class="card-head"><div class="card-icon">📢</div><div><div class="card-title">${a.title}</div><div class="card-meta">${fmtDate(a.created)}</div></div></div>
       <div class="card-body">${a.content || ''}</div></div>`).join('')}</div>`
 }
 
@@ -131,15 +126,15 @@ async function renderChat(el, currentUser, prof) {
   const feed = document.getElementById('chat-feed')
 
   const addMsg = (m) => {
-    const me = m.sender_id === currentUser.id
-    const name = m.profiles?.name || 'Member'
-    const adminBadge = m.profiles?.role === 'admin' ? '<span class="chat-admin-badge">Admin</span>' : ''
+    const me = m.sender === currentUser.id
+    const name = m.expand?.sender?.name || m.sender_name || 'Member'
+    const adminBadge = m.expand?.sender?.role === 'admin' ? '<span class="chat-admin-badge">Admin</span>' : ''
     const atBottom = feed.scrollHeight - feed.clientHeight <= feed.scrollTop + 60
     const d = document.createElement('div')
     d.className = `chat-msg ${me ? 'me' : 'other'}`
     d.innerHTML = `${!me ? `<div class="chat-sender">${name} ${adminBadge}</div>` : ''}
       <div class="chat-bubble">${m.content}</div>
-      <div class="chat-ts">${fmtTime(m.created_at)}</div>`
+      <div class="chat-ts">${fmtTime(m.created)}</div>`
     feed.appendChild(d)
     if (atBottom || me) feed.scrollTop = feed.scrollHeight
   }
@@ -150,15 +145,6 @@ async function renderChat(el, currentUser, prof) {
     if (msgs.length === 0) { feed.innerHTML = '<div class="empty">No messages yet. Start the conversation!</div>' }
     else { msgs.forEach(addMsg); feed.scrollTop = feed.scrollHeight }
   } catch (e) { feed.innerHTML = '<div class="empty">Could not load messages</div>' }
-
-  if (!chatSub) {
-    chatSub = supabase.channel('rt-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async (payload) => {
-        const { data: sp } = await supabase.from('profiles').select('name, role').eq('id', payload.new.sender_id).single()
-        addMsg({ ...payload.new, profiles: sp })
-        feed.querySelector('.empty')?.remove()
-      }).subscribe()
-  }
 
   document.getElementById('chat-form').onsubmit = async (e) => {
     e.preventDefault()
@@ -230,7 +216,7 @@ function renderDocuments(el, p) {
     import('../db.js').then(async ({ createDocument }) => {
       try {
         await createDocument({
-          member_id: p.id,
+          member: p.id,
           type: 'noc',
           status: 'pending',
           event_name: document.getElementById('noc-event').value,

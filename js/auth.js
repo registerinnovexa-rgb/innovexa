@@ -1,27 +1,39 @@
-import { supabase } from './lib/supabase.js'
+import { pb } from './lib/pocketbase.js'
 
 export async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw error
-  return data
+  const authData = await pb.collection('members').authWithPassword(email, password)
+  return authData
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
+  pb.authStore.clear()
 }
 
 export async function getSession() {
-  const { data: { session } } = await supabase.auth.getSession()
-  return session
+  if (pb.authStore.isValid) {
+    return { user: pb.authStore.model }
+  }
+  try {
+    pb.authStore.loadFromCookie(document.cookie || '')
+  } catch {}
+  return pb.authStore.isValid ? { user: pb.authStore.model } : null
 }
 
 export async function getUserProfile(id) {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single()
-  if (error) throw error
-  return data
+  try {
+    return await pb.collection('members').getOne(id)
+  } catch {
+    // If not authenticated, try without auth
+    return await pb.collection('members').getOne(id)
+  }
 }
 
 export function onAuthStateChange(cb) {
-  supabase.auth.onAuthStateChange(cb)
+  pb.authStore.onChange((token, model) => {
+    if (model) {
+      cb('SIGNED_IN', { user: model })
+    } else {
+      cb('SIGNED_OUT', null)
+    }
+  }, true)
 }

@@ -8,7 +8,6 @@
   <link rel="icon" href="/logo-icon.png"/>
   <link rel="stylesheet" href="/css/theme.css"/>
   <link rel="stylesheet" href="/css/animations.css"/>
-  <script src="/js/api.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -64,8 +63,13 @@
   </div>
 </main>
 
-<script>
-async function checkStatus() {
+<script type="module">
+import { pb, getFileUrl } from '/js/lib/pocketbase.js';
+import { initCustomCursor } from '/js/animations.js';
+
+initCustomCursor();
+
+window.checkStatus = async function() {
   const input = document.getElementById('lookup-input').value.trim();
   if (!input) { showToast('Enter your email or Operative ID.', 'error'); return; }
   const spinner = document.getElementById('spinner');
@@ -73,31 +77,33 @@ async function checkStatus() {
   spinner.style.display='inline-block'; btnText.textContent = 'Checking…';
   try {
     const isEmail = input.includes('@');
-    const query = isEmail
-      ? `email=${encodeURIComponent(input.toLowerCase())}`
-      : `operativeId=${encodeURIComponent(input.toUpperCase())}`;
-    const data = await gasGet(`${SCRIPT_URL}?action=profile&${query}`);
-    renderResult(data);
-  } catch(e) { showToast('Network error.', 'error');
+    const filter = isEmail
+      ? `email = "${input.toLowerCase()}"`
+      : `ticket_no = "${input.toUpperCase()}"`;
+    const members = await pb.collection('members').getFullList({ filter });
+    renderResult(members[0] || null);
+  } catch(e) { showToast('Network error.', 'error'); console.error(e);
   } finally { spinner.style.display='none'; btnText.textContent = 'Check Status'; }
 }
 
-function renderResult(data) {
+function renderResult(member) {
   const el = document.getElementById('result');
   el.style.display = 'block';
-  if (!data || !data.success) {
+  if (!member) {
     el.innerHTML = `<div class="card" style="text-align:center;border-color:rgba(217,79,79,.15)">
       <div style="font-size:2.5rem;margin-bottom:12px">😕</div>
       <h3 style="color:var(--red);margin-bottom:6px">Not Found</h3>
-      <p style="color:var(--text3);font-size:.88rem">${data?.message || 'No record found. Check your email or ID.'}</p>
+      <p style="color:var(--text3);font-size:.88rem">No record found. Check your email or ID.</p>
     </div>`;
     return;
   }
-  const status = (data.status || 'Pending').toLowerCase();
-  const statusColor = status.includes('confirm') ? 'var(--green)' : status.includes('reject') ? 'var(--red)' : 'var(--accent)';
-  const statusBg = status.includes('confirm') ? 'rgba(45,159,111,.06)' : status.includes('reject') ? 'rgba(217,79,79,.06)' : 'rgba(198,123,60,.06)';
-  const statusLabel = status.includes('confirm') ? '✅ Confirmed' : status.includes('reject') ? '❌ Rejected' : '⏳ Pending Review';
-  const icon = status.includes('confirm') ? '🎉' : status.includes('reject') ? '😔' : '⏳';
+  const role = (member.role || 'pending').toLowerCase();
+  const isConfirmed = role === 'member' || role === 'admin';
+  const isRejected = role === 'rejected';
+  const statusColor = isConfirmed ? 'var(--green)' : isRejected ? 'var(--red)' : 'var(--accent)';
+  const statusBg = isConfirmed ? 'rgba(45,159,111,.06)' : isRejected ? 'rgba(217,79,79,.06)' : 'rgba(198,123,60,.06)';
+  const statusLabel = isConfirmed ? '✅ Confirmed' : isRejected ? '❌ Rejected' : '⏳ Pending Review';
+  const icon = isConfirmed ? '🎉' : isRejected ? '😔' : '⏳';
 
   el.innerHTML = `<div class="card" style="padding:0;overflow:hidden">
     <div style="background:${statusBg};padding:24px;text-align:center;border-bottom:1px solid var(--border)">
@@ -109,33 +115,32 @@ function renderResult(data) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div>
           <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Name</p>
-          <p style="font-weight:600">${data.name || '—'}</p>
+          <p style="font-weight:600">${member.name || '—'}</p>
         </div>
         <div>
           <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Operative ID</p>
-          <p class="mono" style="font-weight:700;color:var(--accent)">${data.operativeId || '—'}</p>
+          <p class="mono" style="font-weight:700;color:var(--accent)">${member.ticket_no || '—'}</p>
         </div>
         <div>
           <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Email</p>
-          <p style="font-size:.88rem">${data.email || '—'}</p>
+          <p style="font-size:.88rem">${member.email || '—'}</p>
         </div>
         <div>
           <p style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Branch</p>
-          <p style="font-size:.88rem">${data.branch || '—'} · Year ${data.year || '—'}</p>
+          <p style="font-size:.88rem">${member.branch || '—'} · Year ${member.year || '—'}</p>
         </div>
       </div>
     </div>
   </div>`;
 
-  if (status.includes('confirm')) {
-    const photoUrl = data.photoUrl || '/logo-icon.png';
+  if (isConfirmed) {
+    const avatarUrl = member.avatar ? getFileUrl(member, member.avatar, 'members') : '/logo-icon.png';
     const idCardHtml = `
       <div class="mt-8 text-center" style="margin-top: 32px; display:flex; flex-direction:column; align-items:center;">
         <h3 style="margin-bottom: 16px; font-weight: 600; font-size: 1.1rem; color: var(--ink);">Your Official Operative ID</h3>
         <div id="id-card-wrapper" class="mx-auto" style="width: 350px; text-align: left; margin: 0 auto;">
           <div id="id-card" style="background: linear-gradient(135deg, #0b0f15 0%, #1a202c 100%); border: 2px solid rgba(0,107,255,0.4); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); color: white; font-family: 'Inter', sans-serif;">
             <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(0,107,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,107,255,0.1) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
-            
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; position: relative; z-index: 1;">
               <div>
                 <div style="font-size: 10px; color: #27c93f; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase;">Innovexa Labs</div>
@@ -143,28 +148,26 @@ function renderResult(data) {
               </div>
               <img src="/logo-icon.png" alt="Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(0,107,255,0.8));">
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; margin-bottom: 24px;">
               <div>
                 <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Operative ID</div>
-                <div style="font-size: 24px; font-weight: 800; color: #006BFF; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;">${data.operativeId || 'PENDING'}</div>
+                <div style="font-size: 24px; font-weight: 800; color: #006BFF; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;">${member.ticket_no || 'PENDING'}</div>
               </div>
               <div style="display: flex; gap: 24px;">
                 <div>
                   <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Name</div>
-                  <div style="font-size: 15px; font-weight: 600; text-transform: uppercase;">${data.name || '—'}</div>
+                  <div style="font-size: 15px; font-weight: 600; text-transform: uppercase;">${member.name || '—'}</div>
                 </div>
                 <div>
                   <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Branch</div>
-                  <div style="font-size: 13px; color: #e2e8f0;">${data.branch || '—'} (Yr ${data.year || '—'})</div>
+                  <div style="font-size: 13px; color: #e2e8f0;">${member.branch || '—'} (Yr ${member.year || '—'})</div>
                 </div>
               </div>
               <div>
                 <div style="font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Clearance Level</div>
-                <div style="font-size: 13px; color: #27c93f; font-weight: 600;">${data.skillLevel || 'Operative'}</div>
+                <div style="font-size: 13px; color: #27c93f; font-weight: 600;">${member.skill_level || 'Operative'}</div>
               </div>
             </div>
-
             <div style="display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
               <div>
                 <div style="font-size: 9px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace;">ISSUED: ${new Date().toISOString().split('T')[0]}</div>
@@ -173,16 +176,17 @@ function renderResult(data) {
             </div>
           </div>
         </div>
-        <button onclick="downloadIDCard()" class="btn btn-primary shadow-lg flex justify-center items-center" style="margin-top:20px; padding: 14px 20px; font-size: 0.95rem; width: 100%; max-width: 350px;">
+        <button id="download-id-btn" class="btn btn-primary shadow-lg flex justify-center items-center" style="margin-top:20px; padding: 14px 20px; font-size: 0.95rem; width: 100%; max-width: 350px;">
           <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:20px;height:20px;margin-right:8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Download ID Card
         </button>
-      </div>
-    `;
+      </div>`;
     el.innerHTML += idCardHtml;
 
+    document.getElementById('download-id-btn').onclick = downloadIDCard;
+
     setTimeout(() => {
-      const qrData = `Operative: ${data.name}\nBranch: ${data.branch}\nLevel: ${data.skillLevel || 'Operative'}\nEmail: ${data.email}`;
+      const qrData = `Operative: ${member.name}\nBranch: ${member.branch}\nLevel: ${member.skill_level || 'Operative'}\nEmail: ${member.email}`;
       new QRCode(document.getElementById("qrcode-container"), {
         text: qrData,
         width: 50,
@@ -195,40 +199,44 @@ function renderResult(data) {
   }
 }
 
-// Define download function globally if it doesn't exist
-if(typeof window.downloadIDCard === 'undefined') {
-  window.downloadIDCard = function() {
-    const idCard = document.getElementById('id-card');
-    const btn = document.querySelector('button[onclick="downloadIDCard()"]');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generating...';
-    
-    html2canvas(idCard, { 
-      scale: 3, 
-      backgroundColor: null,
-      useCORS: true,
-      allowTaint: false
-    }).then(canvas => {
-      const link = document.createElement('a');
-      const name = document.querySelector('.card p[style*="font-weight:600"]')?.textContent || 'Operative';
-      link.download = `Innovexa_ID_${name.replace(/\s+/g, '_')}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      btn.innerHTML = originalText;
-    }).catch(err => {
-      console.error('ID Card generation failed', err);
-      showToast('Failed to generate ID card. Please try again.', 'error');
-      btn.innerHTML = originalText;
-    });
-  };
+function downloadIDCard() {
+  const idCard = document.getElementById('id-card');
+  const btn = document.getElementById('download-id-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = 'Generating...';
+  html2canvas(idCard, {
+    scale: 3,
+    backgroundColor: null,
+    useCORS: true,
+    allowTaint: false
+  }).then(canvas => {
+    const link = document.createElement('a');
+    const nameEl = document.querySelector('.card p[style*="font-weight:600"]');
+    const name = nameEl?.textContent || 'Operative';
+    link.download = `Innovexa_ID_${name.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.innerHTML = originalText;
+    showToast('ID Card downloaded!', 'success');
+  }).catch(err => {
+    console.error(err);
+    btn.innerHTML = originalText;
+    showToast('Failed to generate ID card.', 'error');
+  });
 }
 
-function showToast(msg,type='info'){const c=document.getElementById('toast-container');const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),4000);}
-document.getElementById('lookup-input').addEventListener('keydown', e => { if(e.key==='Enter') checkStatus(); });
-</script>
-<script type="module">
-  import { initCustomCursor } from '/js/animations.js';
-  initCustomCursor();
+function showToast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast toast-' + type;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+document.getElementById('lookup-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkStatus();
+});
 </script>
 </body>
 </html>
