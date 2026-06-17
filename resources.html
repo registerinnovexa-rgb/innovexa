@@ -503,7 +503,7 @@
       <div class="tab-scroll-wrap flex items-center justify-center mb-12">
         <div class="inline-flex bg-white border border-neutral-200 rounded-2xl p-1.5 shadow-soft">
           <a  href="register.html" id="tab-register"
-            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-accent-600 cursor-pointer transition-all">
+            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -527,7 +527,7 @@
             <span>Status</span>
           </a>
           <a  href="resources.html" id="tab-resources"
-            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
+            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-accent-600 cursor-pointer transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -546,310 +546,37 @@
       </div>
 
       
-<div id="view-register" class="view-enter">
-
+<div id="view-resources" class="view-enter">
         <div class="text-center mb-12">
           <span
             class="inline-block font-mono text-xs text-neutral-400 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
-            &gt;_ new Operative()
+            &gt;_ resources.load()
           </span>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">
-            Membership Registration
-          </h2>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Tech Resource Hub</h2>
           <p class="mt-3 text-neutral-500 text-sm max-w-md mx-auto">
-            Complete the fields below, select your tech stack, and deploy your membership.
+            Curated roadmaps, cheat sheets, and tools for every tech stack .
           </p>
         </div>
 
-        <!-- ── REGISTRATION FORM ──────────────────────────── -->
-        <form id="innovexa-registration-form" class="space-y-10" novalidate>
+        <!-- Filter Chips -->
+        <div id="resource-filters" class="flex flex-wrap gap-2 mb-8 justify-center"></div>
 
-          <!-- SECTION 1: Personal Details -->
-          <fieldset class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 space-y-6">
-            <legend class="flex items-center gap-2 text-sm font-semibold text-neutral-700 -ml-1">
-              <span
-                class="flex items-center justify-center w-6 h-6 rounded-lg bg-accent-50 text-neutral-400 text-xs font-mono font-bold">01</span>
-              Personal Details
-            </legend>
-
-            <div>
-              <label for="full-name" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                Full Name <span class="text-red-400">*</span>
-              </label>
-              <input type="text" id="full-name" name="fullName" required autocomplete="name"
-                placeholder="e.g. Rahul Sharma"
-                class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm placeholder:text-neutral-300 outline-none transition-all duration-200" />
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label for="email" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Email <span class="text-red-400">*</span>
-                </label>
-                <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com"
-                  class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm placeholder:text-neutral-300 outline-none transition-all duration-200" />
-              </div>
-              <div>
-                <label for="phone" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Phone Number <span class="text-red-400">*</span>
-                </label>
-                <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="+91 98765 43210"
-                  class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm placeholder:text-neutral-300 outline-none transition-all duration-200" />
-              </div>
-            </div>
-
-            <div class="max-w-xs">
-              <label for="year-of-study" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                Year of Study <span class="text-red-400">*</span>
-              </label>
-              <select id="year-of-study" name="yearOfStudy" required
-                class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm text-neutral-700 outline-none transition-all duration-200 cursor-pointer">
-                <option value="" disabled selected>Select year</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label for="branch" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Branch / Department <span class="text-red-400">*</span>
-                </label>
-                <select id="branch" name="branch" required
-                  class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm text-neutral-700 outline-none transition-all duration-200 cursor-pointer">
-                  <option value="" disabled selected>Select branch</option>
-                  <option value="B.Tech CSE">B.Tech CSE</option>
-                  <option value="B.Tech AI/ML">B.Tech AI/ML</option>
-                  <option value="B.Tech ECE">B.Tech ECE</option>
-                  <option value="B.Tech ME">B.Tech ME</option>
-                  <option value="BCA">BCA</option>
-                  <option value="MCA">MCA</option>
-                  <option value="BBA">BBA</option>
-                  <option value="MBA">MBA</option>
-                  <option value="B.Sc">B.Sc</option>
-                  <option value="M.Sc">M.Sc</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label for="skill-level" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Tech Skill Level <span class="text-red-400">*</span>
-                </label>
-                <select id="skill-level" name="skillLevel" required
-                  class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm text-neutral-700 outline-none transition-all duration-200 cursor-pointer">
-                  <option value="" disabled selected>Select level</option>
-                  <option value="Beginner">🌱 Beginner</option>
-                  <option value="Intermediate">⚡ Intermediate</option>
-                  <option value="Advanced">🚀 Advanced</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="max-w-xs">
-              <label for="dob" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                Date of Birth <span class="text-red-400">*</span>
-              </label>
-              <input type="date" id="dob" name="dob" required
-                class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm text-neutral-700 outline-none transition-all duration-200" />
-            </div>
-
-            <!-- Professional Photo Upload -->
-            <div class="col-span-full">
-              <label class="block text-sm font-medium text-neutral-600 mb-1.5">
-                Professional Photo <span class="text-xs text-neutral-400 font-normal">(For ID Card)</span> <span class="text-red-400">*</span>
-              </label>
-              <div class="relative group">
-                <input type="file" id="photo-input" accept="image/*" class="hidden" onchange="updateFileLabel('photo-input', 'photo-label')" />
-                <label for="photo-input" id="photo-label" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neutral-200 rounded-2xl bg-surface-50/50 hover:bg-white hover:border-accent-300 transition-all cursor-pointer group">
-                  <svg class="w-8 h-8 text-neutral-400 group-hover:text-accent-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                  <span class="text-xs font-medium text-neutral-500">Tap to upload professional photo</span>
-                </label>
-              </div>
-            </div>
-          </fieldset>
-
-          <!-- SECTION 2: Tech Stack Interests -->
-          <fieldset class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 space-y-5">
-            <legend class="flex items-center gap-2 text-sm font-semibold text-neutral-700 -ml-1">
-              <span
-                class="flex items-center justify-center w-6 h-6 rounded-lg bg-accent-50 text-neutral-400 text-xs font-mono font-bold">02</span>
-              Tech Stack Interests
-            </legend>
-            <p class="text-xs text-neutral-400">Select all that apply — these help us assign you to the right working
-              groups.</p>
-
-            <div id="interests-grid" class="flex flex-wrap gap-3"></div>
-            <input type="hidden" id="selected-interests" name="interests" />
-          </fieldset>
-
-          <!-- SECTION 3: Proceed to Pay -->
-          <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <p class="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                  <span
-                    class="flex items-center justify-center w-6 h-6 rounded-lg bg-accent-50 text-neutral-400 text-xs font-mono font-bold">03</span>
-                  Registration Fee
-                </p>
-                <p class="text-xs text-neutral-400 mt-1 ml-8">Membership fee via UPI</p>
-              </div>
-              <div class="ml-8 sm:ml-0">
-                <span class="text-3xl font-bold text-neutral-800">₹599</span>
-                <span class="text-sm text-neutral-400 ml-1">/Year</span>
-              </div>
-            </div>
-
-            <div class="h-px bg-neutral-100 mb-6"></div>
-
-            <button type="submit" id="btn-proceed-pay"
-              class="btn-deploy w-full flex items-center justify-center gap-3 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm py-4 rounded-xl shadow-glow hover:shadow-lg transition-all duration-300 cursor-pointer">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span>Proceed to Pay ₹499</span>
-            </button>
-
-            <p class="text-center text-[11px] text-neutral-300 mt-4 flex items-center justify-center gap-1.5">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Direct UPI Payment · Zero gateway fees · Instant
-            </p>
-          </div>
-        </form>
-
-        <!-- ═══════════════════════════════════════════════════
-             PAYMENT UI (hidden initially, shown after form validates)
-             ═══════════════════════════════════════════════════ -->
-        <div id="payment-section" class="hidden space-y-8 view-enter">
-
-          <!-- Back to Form -->
-          <button type="button" id="btn-back-to-form"
-            class="flex items-center gap-2 text-sm text-neutral-400 hover:text-neutral-600 cursor-pointer transition-colors group">
-            <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor"
-              stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to form
-          </button>
-
-          <!-- QR Code Payment Card -->
-          <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card overflow-hidden">
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-accent-500 to-blue-600 px-6 py-5 text-white">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="font-mono text-xs text-white/60 uppercase tracking-wider">Payment Gateway</p>
-                  <h3 class="text-lg font-bold mt-0.5">Complete Payment</h3>
-                </div>
-                <div class="text-right">
-                  <p class="text-3xl font-bold">₹599</p>
-                  <p class="text-xs text-white/60">Registration Fee</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-6 space-y-6">
-              <!-- Dynamic QR Code -->
-              <div class="flex flex-col items-center">
-                <p class="text-sm text-neutral-500 mb-4">Scan the QR code with any UPI app to pay:</p>
-                <div class="bg-surface-50 p-5 rounded-2xl border border-neutral-100 inline-block">
-                  <img id="qr-code-img" alt="UPI QR Code" class="w-52 h-52" />
-                </div>
-                <p class="text-[10px] text-neutral-400 font-medium tracking-wide mt-3 uppercase">Works with GPay ·
-                  PhonePe · Paytm · Any UPI App</p>
-              </div>
-
-
-              <!-- UPI ID display -->
-              <div class="bg-surface-50 rounded-xl border border-neutral-200/60 p-4 flex items-center justify-between">
-                <div>
-                  <p class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">UPI ID</p>
-                  <p class="text-sm font-mono font-semibold text-neutral-700 mt-0.5" id="display-upi-id"></p>
-                </div>
-                <button type="button" id="copy-upi-btn"
-                  class="text-xs font-medium text-neutral-400 hover:text-accent-700 bg-accent-50 hover:bg-accent-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
-                  Copy
-                </button>
-              </div>
-
-              <!-- Divider -->
-              <div class="flex items-center gap-3">
-                <div class="h-px bg-neutral-100 flex-1"></div>
-                <span class="text-[10px] font-mono text-neutral-300 uppercase tracking-wider">after payment</span>
-                <div class="h-px bg-neutral-100 flex-1"></div>
-              </div>
-
-              <!-- UTR Input Section -->
-              <div>
-                <label for="utr-input" class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Enter 12-Digit UTR / Transaction ID <span class="text-red-400">*</span>
-                </label>
-                <input type="text" id="utr-input" maxlength="22" required placeholder="e.g. 412345678901"
-                  class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm font-mono placeholder:text-neutral-300 outline-none transition-all duration-200 tracking-wider" />
-                <p id="utr-error" class="hidden text-xs text-red-500 mt-1.5"></p>
-
-                <!-- Where to find UTR -->
-                <details class="mt-3 group">
-                  <summary
-                    class="text-xs text-neutral-400 cursor-pointer hover:text-accent-700 font-medium flex items-center gap-1">
-                    <svg class="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor"
-                      stroke-width="2.5" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                    Where do I find the UTR number?
-                  </summary>
-                  <div
-                    class="mt-2 text-xs text-neutral-500 bg-surface-50 rounded-lg p-3 border border-neutral-100 space-y-1.5">
-                    <p><strong class="text-neutral-600">GPay:</strong> Activity → Payment → "UPI transaction ID"</p>
-                    <p><strong class="text-neutral-600">PhonePe:</strong> History → Transaction → "UTR"</p>
-                    <p><strong class="text-neutral-600">Paytm:</strong> Passbook → Transaction → "Reference No"</p>
-                    <p class="text-neutral-400 mt-1">It's usually a 12-digit number starting with digits.</p>
-                  </div>
-                </details>
-              </div>
-
-              <!-- Payment Proof Upload -->
-              <div>
-                <label class="block text-sm font-medium text-neutral-600 mb-1.5">
-                  Upload Payment Proof <span class="text-red-400">*</span>
-                </label>
-                <div class="relative group">
-                  <input type="file" id="payment-input" accept="image/*" class="hidden" onchange="updateFileLabel('payment-input', 'payment-label')" />
-                  <label for="payment-input" id="payment-label" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neutral-200 rounded-2xl bg-surface-50/50 hover:bg-white hover:border-accent-300 transition-all cursor-pointer group">
-                    <svg class="w-8 h-8 text-neutral-400 group-hover:text-accent-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    <span class="text-xs font-medium text-neutral-500">Upload transaction screenshot</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Submit Registration Button -->
-              <button type="button" id="btn-submit-registration"
-                class="btn-deploy w-full flex items-center justify-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm py-3.5 rounded-xl shadow-glow hover:shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span id="submit-btn-text">Submit Registration</span>
-                <svg id="submit-spinner" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z">
-                  </path>
-                </svg>
-              </button>
-            </div>
-          </div>
+        <!-- Loading -->
+        <div id="resources-loading" class="flex flex-col items-center py-12">
+          <svg class="animate-spin h-8 w-8 text-accent-500 mb-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <p class="text-sm text-neutral-400 font-mono">loading_resources...</p>
         </div>
 
-        <!-- ═══════════════════════════════════════════════════
-             SUCCESS SCREEN (hidden initially)
-             ═══════════════════════════════════════════════════ -->
-        <div id="success-section" class="view-enter"></div>
+        <!-- Grid -->
+        <div id="resources-container" class="grid grid-cols-1 md:grid-cols-2 gap-5 hidden"></div>
 
+        <!-- Empty -->
+        <div id="resources-empty" class="hidden text-center py-12">
+          <p class="text-neutral-500 font-mono text-sm">No resources found. Add rows to Sheet3.</p>
+        </div>
       </div>
   </main>
 
