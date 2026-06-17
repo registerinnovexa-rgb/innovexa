@@ -502,6 +502,7 @@
       <!-- ── Tab Navigation ──────────────────────────────── -->
       <div class="tab-scroll-wrap flex items-center justify-center mb-12">
         <div class="inline-flex bg-white border border-neutral-200 rounded-2xl p-1.5 shadow-soft">
+          
           <a  href="register.html" id="tab-register"
             class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -509,14 +510,6 @@
                 d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
             <span>Register</span>
-          </a>
-          <a  href="events.html" id="tab-events"
-            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>Event Log</span>
           </a>
           <a  href="status.html" id="tab-status"
             class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
@@ -526,195 +519,55 @@
             </svg>
             <span>Status</span>
           </a>
-          <a  href="resources.html" id="tab-resources"
+          <a  href="pathfinder.html" id="tab-pathfinder"
             class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-neutral-400 cursor-pointer transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13 10V3L4 14h7v8l9-11h-7z" />
+            </svg>
+            <span>Pathfinder</span>
+          </a>
+          <a  href="atlas.html" id="tab-atlas"
+            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-accent-600 active cursor-pointer transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            <span>Resources</span>
+            <span>Atlas</span>
           </a>
-          <a  href="documents.html" id="tab-documents"
-            class="tab-btn flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-accent-600 cursor-pointer transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>My Docs</span>
-          </a>
+
         </div>
       </div>
 
       
-<div id="view-documents" class="view-enter">
-        <div class="text-center mb-12">
-          <span class="inline-block font-mono text-xs text-neutral-400 bg-accent-50 border border-accent-200/60 px-3 py-1 rounded-full mb-4 tracking-wider uppercase">
-            &gt;_ documents.generate()
-          </span>
-          <h2 class="text-3xl md:text-4xl font-bold tracking-tight">My Documents</h2>
-          <p class="mt-3 text-neutral-500 text-sm max-w-md mx-auto">
-            Generate official Innovexa Hub documents instantly — membership certificates, NOCs, and permission letters for your professors.
-          </p>
-        </div>
 
-        <!-- Permission Letter / NOC Request Card -->
-        <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 mb-6">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-xl">🎓</div>
-            <div>
-              <h3 class="font-bold text-neutral-800">Permission Letter for Professor</h3>
-              <p class="text-xs text-neutral-400 mt-0.5">Submit a request — admin will approve, then you can download</p>
-            </div>
-          </div>
-          <div id="portal-noc-form">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Full Name *</label>
-                <input type="text" id="portal-pub-name" placeholder="e.g. Ravi Kumar" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Email *</label>
-                <input type="email" id="portal-pub-email" placeholder="you@example.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Branch / Department *</label>
-                <input type="text" id="portal-pub-branch" placeholder="e.g. Computer Science" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Year</label>
-                <select id="portal-pub-year" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all">
-                  <option>1st</option><option>2nd</option><option>3rd</option><option>4th</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Your Role in Innovexa</label>
-                <input type="text" id="portal-pub-role" placeholder="e.g. Member, Core Team" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Event / Activity Name *</label>
-                <input type="text" id="portal-pub-event" placeholder="e.g. National Hackathon 2026" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Start Date</label>
-                <input type="date" id="portal-pub-date-start" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">End Date <span class="normal-case font-normal">(optional, for range)</span></label>
-                <input type="date" id="portal-pub-date-end" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-              </div>
-            </div>
-            <!-- Note / Additional Request -->
-            <div class="mb-4">
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">📝 Note / Additional Request</label>
-              <select id="portal-pub-note-preset" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all mb-2" onchange="if(this.value)document.getElementById('portal-pub-note').value=this.value;">
-                <option value="">— Select a template or type custom below —</option>
-                <option value="Kindly permit the student to leave the class early for event preparation.">Request early leave for event preparation</option>
-                <option value="The student may need to be absent from regular classes during the event hours. Kindly grant permission.">Request class absence during event</option>
-                <option value="Please allow the student to carry a laptop/equipment to the event venue.">Allow laptop/equipment at venue</option>
-                <option value="The student is part of the organizing committee and requires additional time for setup and coordination.">Organizing committee — extra time needed</option>
-                <option value="This event is a national-level competition and requires travel. Kindly grant leave for the travel dates.">Travel leave for national-level event</option>
-                <option value="The student will represent Yenepoya University at an external institution. Kindly grant necessary permissions.">Representing university externally</option>
-              </select>
-              <textarea id="portal-pub-note" placeholder="Type any additional note or request for the professor here... (optional)" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all" style="min-height:70px;resize:vertical;line-height:1.6;"></textarea>
-            </div>
-            <button onclick="portalSubmitNOCRequest()" class="btn-deploy flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-glow transition-all cursor-pointer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-              Submit Request for Approval
-            </button>
-          </div>
-          <div id="portal-noc-submitted" class="hidden text-center py-6">
-            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">✅</div>
-            <p class="font-bold text-neutral-700 mb-1">Request Submitted!</p>
-            <p class="text-sm text-neutral-400 mb-2">Your Request ID: <strong id="portal-req-id-display" class="text-neutral-400 font-mono">—</strong></p>
-            <p class="text-xs text-neutral-400">The admin will review your request. Check status below.</p>
-          </div>
+<div id="view-atlas" class="view-enter min-h-[60vh] flex flex-col items-center justify-center text-center p-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-100 text-purple-600 text-xs font-bold tracking-wider uppercase mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        Atlas Library
+    </div>
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900 mb-6">The Knowledge Core</h1>
+    <p class="text-lg text-neutral-500 max-w-2xl mb-12">A centralized repository of verified resources, roadmaps, and tools curated specifically for Innovexa operatives.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full text-left">
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all text-center">
+            <h3 class="text-lg font-bold mb-2">Web Architecture</h3>
+            <p class="text-neutral-400 text-sm mb-4">React, Node.js, and Modern Web Design roadmaps.</p>
+            <button class="text-purple-600 font-semibold text-sm hover:text-purple-700">Explore &rarr;</button>
         </div>
-
-        <!-- Check Request Status -->
-        <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-xl">🔍</div>
-            <div>
-              <h3 class="font-bold text-neutral-800">Check Request Status</h3>
-              <p class="text-xs text-neutral-400 mt-0.5">Enter your email or Request ID to see if your letter is approved</p>
-              <span class="inline-block mt-2 text-[10px] uppercase tracking-wider font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md">Note: Only for Registered Members</span>
-            </div>
-          </div>
-          <div class="flex gap-3 flex-wrap mb-4">
-            <input type="text" id="portal-status-query" placeholder="Your email or Request ID (DOC-...)" class="form-input flex-1 min-w-[200px] px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-            <button onclick="portalCheckDocStatus()" class="btn-deploy flex items-center gap-2 bg-neutral-800 hover:bg-neutral-900 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-all cursor-pointer">Check</button>
-          </div>
-          <div id="portal-status-results" class="hidden space-y-3"></div>
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all text-center">
+            <h3 class="text-lg font-bold mb-2">Machine Learning</h3>
+            <p class="text-neutral-400 text-sm mb-4">TensorFlow, PyTorch, and Data Science models.</p>
+            <button class="text-purple-600 font-semibold text-sm hover:text-purple-700">Explore &rarr;</button>
         </div>
-
-        <!-- Membership Certificate Card -->
-        <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-accent-50 flex items-center justify-center text-xl">🏅</div>
-            <div>
-              <h3 class="font-bold text-neutral-800">Membership Certificate</h3>
-              <p class="text-xs text-neutral-400 mt-0.5">Verify your identity — all data is pulled from your registration</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Operative ID *</label>
-              <input type="text" id="portal-cert-opid" placeholder="INVX-01" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm font-mono outline-none transition-all" style="text-transform:uppercase"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Email *</label>
-              <input type="email" id="portal-cert-email" placeholder="your@email.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Phone *</label>
-              <input type="tel" id="portal-cert-phone" placeholder="9876543210" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-            </div>
-          </div>
-          <div id="portal-cert-status" class="hidden mb-4 p-3 rounded-xl text-sm"></div>
-          <button onclick="portalDownloadCert()" class="btn-deploy flex items-center gap-2 bg-accent-500 hover:bg-accent-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-glow transition-all cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-            Verify &amp; Download Certificate
-          </button>
+        <div class="bg-white p-6 rounded-2xl border border-neutral-200 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all text-center">
+            <h3 class="text-lg font-bold mb-2">Cyber Operations</h3>
+            <p class="text-neutral-400 text-sm mb-4">Network security, cryptography, and CTF challenges.</p>
+            <button class="text-purple-600 font-semibold text-sm hover:text-purple-700">Explore &rarr;</button>
         </div>
-
-        <!-- Event Certificate Card -->
-        <div class="bg-white rounded-2xl border border-neutral-200/70 shadow-card p-6 md:p-8 mt-6">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-xl">🎓</div>
-            <div>
-              <h3 class="font-bold text-neutral-800">Event Certificate</h3>
-              <p class="text-xs text-neutral-400 mt-0.5">Request a participation certificate for events you attended</p>
-            </div>
-          </div>
-          <!-- Request Form -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Select Event *</label>
-              <select id="portal-evt-select" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all">
-                <option value="">Loading events...</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-neutral-500 mb-1.5 uppercase tracking-wide">Your Registered Email *</label>
-              <input type="email" id="portal-evt-email" placeholder="your@email.com" class="form-input w-full px-4 py-3 rounded-xl border border-neutral-200 bg-surface-50 text-sm outline-none transition-all"/>
-            </div>
-          </div>
-          <div id="portal-evt-status" class="hidden mb-4 p-3 rounded-xl text-sm"></div>
-          <div class="flex flex-wrap gap-3">
-            <button onclick="portalSubmitCertReq()" class="btn-deploy flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-glow transition-all cursor-pointer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-              Submit Request
-            </button>
-            <button onclick="portalCheckCertStatus()" class="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-sm px-6 py-3 rounded-xl transition-all cursor-pointer">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-              Check Status
-            </button>
-          </div>
-          <!-- Status results -->
-          <div id="portal-evt-results" class="hidden mt-5"></div>
-        </div>
-      </div>
-  </main>
+    </div>
+</div>
+</main>
 
 
   <!-- ════════════════════════════════════════════════════════
