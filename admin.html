@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Innovexa Labs — Admin Console</title>
+  <title>Innovexa Hub — Admin Console</title>
   <meta name="robots" content="noindex, nofollow">
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -21,7 +21,7 @@
       --blue: #2563eb; --blue-bg: rgba(37,99,235,.1);
       --radius: 12px; --radius-sm: 8px;
     }
-    body { font-family:'Sora',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
     /* ── Login Screen ── */
     #loginScreen {
@@ -45,14 +45,14 @@
     .form-group label { display:block; font-size:11px; font-weight:600; color:var(--text3); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
     .form-group input {
       width:100%; padding:10px 14px; background:var(--bg); border:1px solid var(--border);
-      border-radius:var(--radius-sm); color:var(--text); font-size:14px; font-family:'Sora',sans-serif;
+      border-radius:var(--radius-sm); color:var(--text); font-size:14px; font-family:'Inter',sans-serif;
       transition: border-color .2s;
     }
     .form-group input:focus { outline:none; border-color:var(--accent); }
     .btn-primary {
       width:100%; padding:12px; background:var(--accent); color:#fff; border:none;
       border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer;
-      transition: background .2s, transform .1s; font-family:'Sora',sans-serif;
+      transition: background .2s, transform .1s; font-family:'Inter',sans-serif;
     }
     .btn-primary:hover { background:var(--accent2); }
     .btn-primary:active { transform:scale(.98); }
@@ -71,8 +71,8 @@
     .topbar-left span { font-weight:700; font-size:15px; }
     .topbar-right { display:flex; align-items:center; gap:14px; }
     .topbar-badge { font-size:11px; background:var(--green-bg); color:var(--green); padding:4px 10px; border-radius:20px; font-weight:600; }
-    .topbar-user { font-size:12px; color:var(--text2); font-family:'Share Tech Mono',monospace; }
-    .btn-logout { padding:6px 14px; font-size:12px; background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--text3); cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s; }
+    .topbar-user { font-size:12px; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+    .btn-logout { padding:6px 14px; font-size:12px; background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--text3); cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s; }
     .btn-logout:hover { border-color:var(--red); color:var(--red); }
 
     .sidebar {
@@ -84,7 +84,7 @@
       display:flex; align-items:center; gap:10px; width:100%; padding:10px 12px;
       background:transparent; border:none; border-radius:var(--radius-sm); color:var(--text2);
       font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; text-align:left;
-      font-family:'Sora',sans-serif;
+      font-family:'Inter',sans-serif;
     }
     .sidebar-btn:hover { background:var(--bg3); color:var(--text); }
     .sidebar-btn.active { background:rgba(99,102,241,.15); color:var(--accent2); font-weight:600; }
@@ -110,12 +110,12 @@
     .section-title { font-size:20px; font-weight:700; }
     .search-box {
       padding:8px 14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm);
-      color:var(--text); font-size:13px; width:260px; font-family:'Sora',sans-serif;
+      color:var(--text); font-size:13px; width:260px; font-family:'Inter',sans-serif;
     }
     .search-box:focus { outline:none; border-color:var(--accent); }
     .btn-add {
       padding:8px 18px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm);
-      font-size:13px; font-weight:600; cursor:pointer; font-family:'Sora',sans-serif; transition:all .2s;
+      font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .2s;
       display:inline-flex; align-items:center; gap:6px;
     }
     .btn-add:hover { background:var(--accent2); }
@@ -142,7 +142,7 @@
     /* ── Action Buttons ── */
     .btn-sm {
       padding:5px 12px; border:none; border-radius:6px; font-size:11px; font-weight:600;
-      cursor:pointer; font-family:'Sora',sans-serif; transition:all .15s; display:inline-flex; align-items:center; gap:4px;
+      cursor:pointer; font-family:'Inter',sans-serif; transition:all .15s; display:inline-flex; align-items:center; gap:4px;
     }
     .btn-approve { background:var(--green-bg); color:var(--green); }
     .btn-approve:hover { background:var(--green); color:#fff; }
@@ -180,12 +180,12 @@
     .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
     .btn-cancel {
       padding:10px 20px; background:transparent; border:1px solid var(--border); border-radius:var(--radius-sm);
-      color:var(--text3); font-size:13px; cursor:pointer; font-family:'Sora',sans-serif;
+      color:var(--text3); font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
     }
     .btn-cancel:hover { border-color:var(--text3); color:var(--text); }
     .btn-save {
       padding:10px 20px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm);
-      font-size:13px; font-weight:600; cursor:pointer; font-family:'Sora',sans-serif;
+      font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;
     }
     .btn-save:hover { background:var(--accent2); }
     .btn-save:disabled { opacity:.5; cursor:not-allowed; }
@@ -234,77 +234,7 @@
     .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--text3); font-size:13px; gap:8px; }
     @keyframes spin { to { transform:rotate(360deg); } }
     .spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; }
-
-    /* ── Payment Cards ── */
-    .payment-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px; }
-    .payment-card {
-      background:var(--bg2); border:1px solid var(--border); border-radius:16px;
-      padding:22px; transition:all .25s; position:relative; overflow:hidden;
-    }
-    .payment-card::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:3px;
-      background:linear-gradient(90deg, var(--yellow), #f59e0b);
-    }
-    .payment-card.approved::before { background:linear-gradient(90deg, var(--green), #10b981); }
-    .payment-card.rejected::before { background:linear-gradient(90deg, var(--red), #f87171); }
-    .payment-card:hover { box-shadow:0 8px 30px rgba(0,0,0,.08); transform:translateY(-2px); }
-    .payment-card-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-    .payment-avatar {
-      width:44px; height:44px; border-radius:50%; object-fit:cover;
-      background:linear-gradient(135deg,var(--accent),#a78bfa);
-      display:flex; align-items:center; justify-content:center;
-      font-size:16px; font-weight:700; color:#fff; flex-shrink:0;
-    }
-    .payment-info h4 { font-size:15px; font-weight:700; margin-bottom:2px; }
-    .payment-info p { font-size:11px; color:var(--text3); font-family:'Share Tech Mono',monospace; }
-    .payment-fields { display:grid; gap:8px; margin-bottom:16px; }
-    .payment-field { display:flex; flex-direction:column; gap:2px; }
-    .payment-field label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.4px; }
-    .payment-field span { font-size:13px; color:var(--text); font-family:'Share Tech Mono',monospace; }
-    .payment-proof-wrap {
-      border:1px solid var(--border); border-radius:10px; overflow:hidden;
-      margin-bottom:16px; background:var(--bg); cursor:pointer;
-      display:flex; align-items:center; justify-content:center; min-height:120px;
-      position:relative;
-    }
-    .payment-proof-wrap img { width:100%; max-height:200px; object-fit:contain; display:block; }
-    .payment-proof-wrap .no-proof {
-      display:flex; flex-direction:column; align-items:center; gap:6px;
-      color:var(--text3); font-size:12px; padding:24px;
-    }
-    .payment-actions { display:flex; gap:10px; }
-    .btn-pay-approve {
-      flex:1; padding:10px; background:var(--green); color:#fff; border:none;
-      border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
-      font-family:'Sora',sans-serif; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
-    }
-    .btn-pay-approve:hover { background:#15803d; transform:translateY(-1px); }
-    .btn-pay-reject {
-      flex:1; padding:10px; background:transparent; color:var(--red); border:1.5px solid var(--red);
-      border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
-      font-family:'Sora',sans-serif; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
-    }
-    .btn-pay-reject:hover { background:var(--red); color:#fff; }
-    .payment-filter-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
-    .filter-chip {
-      padding:6px 16px; border-radius:20px; font-size:12px; font-weight:600;
-      border:1.5px solid var(--border); background:transparent; cursor:pointer;
-      font-family:'Sora',sans-serif; color:var(--text2); transition:all .2s;
-    }
-    .filter-chip.active { border-color:var(--accent); background:rgba(99,102,241,.1); color:var(--accent2); }
-    .lightbox-overlay {
-      display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:999;
-      align-items:center; justify-content:center;
-    }
-    .lightbox-overlay.open { display:flex; }
-    .lightbox-overlay img { max-width:90vw; max-height:90vh; border-radius:10px; object-fit:contain; }
-    .lightbox-close {
-      position:absolute; top:20px; right:24px; color:#fff; font-size:28px;
-      cursor:pointer; background:none; border:none; font-weight:700;
-    }
   </style>
-  <script src="/js/api.js"></script>
-    <link rel="stylesheet" href="/css/animations.css">
 </head>
 <body>
 
@@ -312,26 +242,27 @@
 <div id="loginScreen">
   <div class="login-card">
     <div class="logo-row">
-      <img src="/logo-icon.png" alt="Innovexa Labs" style="width:48px;height:48px;object-fit:contain"/>
+      <div class="logo-icon">IX</div>
       <div>
         <h1>Admin Console</h1>
-        <p style="margin-bottom:0">Innovexa Labs &mdash; President Access Only</p>
+        <p style="margin-bottom:0">Innovexa Hub — President Access Only</p>
       </div>
     </div>
+    <p>Verify your identity to access the admin dashboard. Only INVX-01 is authorized.</p>
     <div class="form-group">
       <label>Operative ID</label>
-      <input type="text" id="loginId" value="INVX-01" readonly style="opacity:.6;font-family:'Share Tech Mono',monospace">
+      <input type="text" id="loginId" value="INVX-01" readonly style="opacity:.6">
     </div>
     <div class="form-group">
       <label>Email Address</label>
-      <input type="email" id="loginEmail" placeholder="Your registered email" autocomplete="email">
+      <input type="email" id="loginEmail" placeholder="Your registered email">
     </div>
     <div class="form-group">
-      <label>Admin Password</label>
-      <input type="password" id="loginPhone" maxlength="30" placeholder="Enter admin key" autocomplete="off">
+      <label>Last 5 Digits of Phone</label>
+      <input type="text" id="loginPhone" maxlength="5" placeholder="e.g. 12345">
     </div>
     <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
-      Access Dashboard
+      Verify & Access Dashboard
     </button>
     <div class="login-error" id="loginError"></div>
   </div>
@@ -345,7 +276,7 @@
       <button class="hamburger" onclick="toggleAdminSidebar()">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
-      <div class="logo"><img src="/logo-icon.png" alt="IX" style="width:28px;height:28px;object-fit:contain"/></div>
+      <div class="logo">IX</div>
       <span>Admin Console</span>
     </div>
     <div class="topbar-right">
@@ -368,15 +299,24 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       Members
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('events')" id="navEvents">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Events
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('resources')" id="navResources">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Resources
+    </button>
     <button class="sidebar-btn" onclick="switchAdminTab('team')" id="navTeam">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
       Team
     </button>
-    <button class="sidebar-btn" onclick="switchAdminTab('payments')" id="navPayments">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-      Payments
-      <span id="paymentBadgeCount" style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;">0</span>
+    <button class="sidebar-btn" onclick="switchAdminTab('attendance')" id="navAttendance">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+      Attendance
     </button>
+    <div class="sidebar-label" style="margin-top:12px;">Tools</div>
+
     <button class="sidebar-btn" onclick="switchAdminTab('documents')" id="navDocuments">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
       Documents
@@ -398,20 +338,22 @@
           <div class="stat-label">Pending Approvals</div>
           <div class="stat-value" id="statPending" style="color:var(--yellow)">—</div>
         </div>
-        <div class="stat-card" style="cursor:pointer" onclick="switchAdminTab('payments')">
-          <div class="stat-label">Pending Payments</div>
-          <div class="stat-value" id="statPayments" style="color:var(--red)">—</div>
-          <div class="stat-sub">Click to review →</div>
+        <div class="stat-card">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="statEvents" style="color:var(--green)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Resources</div>
+          <div class="stat-value" id="statResources" style="color:var(--blue)">—</div>
         </div>
       </div>
-      <div class="admin-card" style="max-width:580px">
+      <div class="admin-card" style="max-width:500px">
         <h3>Quick Actions</h3>
-        <p>Manage your Innovexa Labs community.</p>
+        <p>Manage your hub directly from here.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn-add" onclick="switchAdminTab('members')">👥 Manage Members</button>
-          <button class="btn-add" onclick="switchAdminTab('payments')" style="background:var(--red)">💳 Review Payments</button>
-          <button class="btn-add" onclick="switchAdminTab('team')" style="background:var(--green)">🏷️ Manage Team</button>
-          <button class="btn-add" onclick="switchAdminTab('documents')" style="background:var(--blue)">📜 Documents</button>
+          <button class="btn-add" onclick="switchAdminTab('events')" style="background:var(--green)">📅 Add Event</button>
+          <button class="btn-add" onclick="switchAdminTab('resources')" style="background:var(--blue)">📚 Add Resource</button>
         </div>
       </div>
     </div>
@@ -435,30 +377,46 @@
       </div>
     </div>
 
-    <!-- ── PAYMENTS TAB ── -->
-    <div class="tab-content" id="tabPayments">
+    <!-- ── EVENTS TAB ── -->
+    <div class="tab-content" id="tabEvents">
       <div class="section-header">
-        <div>
-          <h2 class="section-title">💳 Payment Confirmation</h2>
-          <p style="font-size:12px;color:var(--text3);margin-top:4px">Review payment proofs — only approved members are onboarded to the club.</p>
-        </div>
-        <button class="btn-add" onclick="loadPayments()" style="background:var(--accent);">🔄 Refresh</button>
+        <h2 class="section-title">Events</h2>
+        <button class="btn-add" onclick="openModal('event')">+ Add Event</button>
       </div>
+      <div id="eventsLoading" class="loading"><div class="spinner"></div> Loading events...</div>
+      <div class="card-grid" id="eventsGrid"></div>
 
-      <!-- Filter chips -->
-      <div class="payment-filter-bar">
-        <button class="filter-chip active" id="payFilter_all" onclick="setPayFilter('all')">All</button>
-        <button class="filter-chip" id="payFilter_pending" onclick="setPayFilter('pending')">⏳ Pending</button>
-        <button class="filter-chip" id="payFilter_confirmed" onclick="setPayFilter('confirmed')">✅ Approved</button>
-        <button class="filter-chip" id="payFilter_rejected" onclick="setPayFilter('rejected')">❌ Rejected</button>
-        <input type="text" class="search-box" placeholder="Search name / email / ID..." style="margin-left:auto;width:240px" oninput="filterPayments(this.value)" id="paySearchInput">
+      <!-- Certificate Requests Section -->
+      <div class="section-header" style="margin-top:32px;">
+        <h2 class="section-title">📜 Certificate Requests</h2>
+        <button class="btn-add" style="background:var(--blue)" onclick="loadCertRequests()">↻ Refresh</button>
       </div>
+      <div id="certReqsLoading" class="loading" style="display:none"><div class="spinner"></div> Loading requests...</div>
+      <div class="table-wrap" id="certReqsTable" style="display:none">
+        <table class="data-table">
+          <thead>
+            <tr><th>Member</th><th>Event</th><th>Date</th><th>Requested</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="certReqsBody"></tbody>
+        </table>
+      </div>
+      <div id="certReqsEmpty" style="display:none;text-align:center;padding:24px;color:var(--text3);font-size:13px;">No certificate requests yet.</div>
+    </div>
 
-      <div id="paymentsLoading" class="loading"><div class="spinner"></div> Loading payment records...</div>
-      <div id="paymentsGrid" class="payment-grid" style="display:none"></div>
-      <div id="paymentsEmpty" style="display:none;text-align:center;padding:60px 20px;color:var(--text3)">
-        <div style="font-size:40px;margin-bottom:12px">🎉</div>
-        <div style="font-size:15px;font-weight:600">No records match your filter.</div>
+    <!-- ── RESOURCES TAB ── -->
+    <div class="tab-content" id="tabResources">
+      <div class="section-header">
+        <h2 class="section-title">Resources</h2>
+        <button class="btn-add" onclick="openModal('resource')">+ Add Resource</button>
+      </div>
+      <div id="resourcesLoading" class="loading"><div class="spinner"></div> Loading resources...</div>
+      <div class="table-wrap" id="resourcesTable" style="display:none">
+        <table class="data-table">
+          <thead>
+            <tr><th>Stack</th><th>Title</th><th>Category</th><th>Link</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="resourcesBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -472,7 +430,35 @@
       <div class="card-grid" id="teamGrid"></div>
     </div>
 
-
+    <!-- ── ATTENDANCE TAB ── -->
+    <div class="tab-content" id="tabAttendance">
+      <div class="section-header">
+        <h2 class="section-title">Attendance Scanner</h2>
+        <select id="attendance-event-select" class="search-box" style="width:220px">
+          <option value="">Select Event First</option>
+        </select>
+      </div>
+      <div class="admin-card" style="max-width:480px; margin:0 auto; text-align:center;">
+        <!-- QR Scanner -->
+        <div id="reader" style="width:100%; border-radius:12px; overflow:hidden; background:#000; aspect-ratio:1;"></div>
+        <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+          <button class="btn-add" onclick="startScanner()" style="background:var(--accent)">📷 Start Camera</button>
+          <button class="btn-add" onclick="stopScanner()" style="background:var(--bg3); color:var(--text3)">⏹ Stop</button>
+        </div>
+        
+        <!-- Manual Input (backup) -->
+        <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border);">
+          <p style="font-size:11px; color:var(--text2); margin-bottom:10px;">Or enter Operative ID manually:</p>
+          <div style="display:flex; gap:8px; justify-content:center;">
+            <input type="text" id="manual-operative-id" placeholder="INVX-01" class="search-box" style="width:140px; text-align:center; text-transform:uppercase; font-family:monospace; font-weight:bold;" />
+            <button class="btn-add" onclick="manualAttendance()" style="background:var(--green)">✅ Mark</button>
+          </div>
+        </div>
+        
+        <!-- Scan Result -->
+        <div id="scan-result" style="margin-top:20px; padding:15px; border-radius:10px; font-family:monospace; font-size:13px; font-weight:600; display:none;"></div>
+      </div>
+    </div>
 
 
     <!-- ══════ DOCUMENTS TAB ══════ -->
@@ -490,7 +476,7 @@
           <input type="file" id="sig-upload" accept="image/png,image/jpeg" style="display:none;" onchange="handleSigUpload(event)"/>
           <div id="sig-preview-wrap" style="display:none;align-items:center;gap:10px;">
             <img id="sig-preview-img" style="max-height:64px;max-width:200px;object-fit:contain;background:#fff;padding:8px 12px;border-radius:8px;border:1px solid var(--border);" alt="Signature"/>
-            <button onclick="clearSignature()" style="padding:5px 12px;border:1px solid var(--red);border-radius:6px;background:transparent;color:var(--red);font-size:11px;cursor:pointer;font-family:'Sora',sans-serif;">✕ Remove</button>
+            <button onclick="clearSignature()" style="padding:5px 12px;border:1px solid var(--red);border-radius:6px;background:transparent;color:var(--red);font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;">✕ Remove</button>
           </div>
           <span id="sig-status" style="font-size:12px;color:var(--text3);">No signature uploaded</span>
         </div>
@@ -576,126 +562,7 @@
       </div>
     </div>
 
-    <!-- ══════ ANNOUNCEMENTS TAB ══════ -->
-    <div class="tab-content" id="tabAnnouncements">
-      <div class="section-header">
-        <h2 class="section-title">📢 Announcements</h2>
-        <button class="btn-add" onclick="openAnnouncementModal()" style="background:var(--accent);">+ New Announcement</button>
-      </div>
-      <div id="announcementsLoading" class="loading"><div class="spinner"></div> Loading...</div>
-      <div id="announcementsList"></div>
-
-      <!-- Add/Edit Announcement Form -->
-      <div class="admin-card" id="announcementForm" style="display:none; margin-top:20px; border:1px solid rgba(99,102,241,0.3);">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;" id="annFormTitle">New Announcement</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Title</label>
-            <input type="text" id="ann-title" placeholder="Announcement title" class="search-box" style="width:100%;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Tag</label>
-            <select id="ann-tag" class="search-box" style="width:100%;">
-              <option value="Event">Event</option>
-              <option value="Important">Important</option>
-              <option value="CTF">CTF</option>
-              <option value="General">General</option>
-            </select></div>
-        </div>
-        <div style="margin-bottom:12px;"><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Description</label>
-          <textarea id="ann-desc" placeholder="Announcement details..." class="search-box" style="width:100%;min-height:80px;resize:vertical;"></textarea></div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-add" onclick="saveAnnouncement()" style="background:var(--green);">💾 Save</button>
-          <button class="btn-add" onclick="cancelAnnouncement()" style="background:var(--bg3);color:var(--text1);">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════ LEADERBOARD TAB ══════ -->
-    <div class="tab-content" id="tabLeaderboard">
-      <div class="section-header">
-        <h2 class="section-title">🏆 Leaderboard</h2>
-        <button class="btn-add" onclick="openLeaderboardModal()" style="background:var(--accent);">+ Add Entry</button>
-      </div>
-      <div id="leaderboardLoading" class="loading"><div class="spinner"></div> Loading...</div>
-      <div style="overflow-x:auto;"><table class="data-table" id="leaderboardTable" style="display:none;">
-        <thead><tr><th>#</th><th>Name</th><th>Operative ID</th><th>Branch</th><th>Points</th><th>Events</th><th>Badges</th><th>Actions</th></tr></thead>
-        <tbody id="leaderboardBody"></tbody>
-      </table></div>
-
-      <!-- Add/Edit Leaderboard Form -->
-      <div class="admin-card" id="leaderboardForm" style="display:none; margin-top:20px; border:1px solid rgba(251,191,36,0.3);">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;" id="lbFormTitle">Add Leaderboard Entry</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Name</label>
-            <input type="text" id="lb-name" placeholder="Full name" class="search-box" style="width:100%;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Operative ID</label>
-            <input type="text" id="lb-opid" placeholder="INVX-XX" class="search-box" style="width:100%;text-transform:uppercase;font-family:monospace;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Branch</label>
-            <input type="text" id="lb-branch" placeholder="B.Tech CSE" class="search-box" style="width:100%;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Points</label>
-            <input type="number" id="lb-points" placeholder="0" class="search-box" style="width:100%;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Events Attended</label>
-            <input type="number" id="lb-events" placeholder="0" class="search-box" style="width:100%;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Badges</label>
-            <input type="number" id="lb-badges" placeholder="0" class="search-box" style="width:100%;"/></div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-add" onclick="saveLeaderboard()" style="background:var(--green);">💾 Save</button>
-          <button class="btn-add" onclick="cancelLeaderboard()" style="background:var(--bg3);color:var(--text1);">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══════ PROJECTS TAB ══════ -->
-    <div class="tab-content" id="tabProjects">
-      <div class="section-header">
-        <h2 class="section-title">🚀 Projects</h2>
-        <button class="btn-add" onclick="loadAdminProjects()" style="background:var(--accent);">🔄 Refresh</button>
-      </div>
-      <div id="projectsLoading" class="loading"><div class="spinner"></div> Loading...</div>
-      <div id="adminProjectsList"></div>
-    </div>
-
-    <!-- ══════ BADGES TAB ══════ -->
-    <div class="tab-content" id="tabBadges">
-      <div class="section-header">
-        <h2 class="section-title">🏅 Badges</h2>
-        <button class="btn-add" onclick="openBadgeModal()" style="background:var(--accent);">+ Award Badge</button>
-      </div>
-      <div id="badgesLoading" class="loading"><div class="spinner"></div> Loading...</div>
-      <div style="overflow-x:auto;"><table class="data-table" id="badgesTable" style="display:none;">
-        <thead><tr><th>Operative ID</th><th>Badge</th><th>Awarded</th><th>Actions</th></tr></thead>
-        <tbody id="badgesBody"></tbody>
-      </table></div>
-
-      <!-- Award Badge Form -->
-      <div class="admin-card" id="badgeForm" style="display:none; margin-top:20px; border:1px solid rgba(168,85,247,0.3);">
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Award Badge</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Operative ID</label>
-            <input type="text" id="badge-opid" placeholder="INVX-XX" class="search-box" style="width:100%;text-transform:uppercase;font-family:monospace;"/></div>
-          <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px;">Badge Type</label>
-            <select id="badge-type" class="search-box" style="width:100%;">
-              <option value="pioneer">🌟 Pioneer — First member</option>
-              <option value="event_starter">🎪 Event Starter — 3+ events</option>
-              <option value="ctf_finisher">🏴 CTF Finisher — CTF completion</option>
-              <option value="hackathon_hero">💻 Hackathon Hero — Hackathon winner</option>
-              <option value="core_contributor">⚙️ Core Contributor — 5+ projects</option>
-              <option value="tech_author">📝 Tech Author — Published article</option>
-            </select></div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn-add" onclick="saveBadge()" style="background:var(--green);">🏅 Award</button>
-          <button class="btn-add" onclick="cancelBadge()" style="background:var(--bg3);color:var(--text1);">Cancel</button>
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
-
-<!-- ════════ LIGHTBOX ════════ -->
-<div class="lightbox-overlay" id="proofLightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="proofLightboxImg" src="" alt="Payment Proof"/>
 </div>
 
 <!-- ════════ MODAL ════════ -->
@@ -717,7 +584,8 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-// SCRIPT_URL, EVENT_SCRIPT_URL, EVENT_REG_SCRIPT_URL all provided by /js/api.js
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPGtP8XQ-KbMq4q8B_stDdvKTBm0SIa7WriLeEhUf3jRj0ZnkwrBt11qLTgyKsqQScTw/exec';
+const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
 const ADMIN_KEY = 'innovexa2025admin';
 
 let adminSession = null;
@@ -766,18 +634,24 @@ function fmtInsertAt(id, text) {
   ta.focus();
 }
 async function apiGet(action) {
-  return gasGet(`${SCRIPT_URL}?action=${action}`);
+  // Events go through Code1.gs to get requiresReg/regFee; everything else through original
+  const baseUrl = (action === 'events') ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
+  const r = await fetch(`${baseUrl}?action=${action}`, { method:'GET', redirect:'follow' });
+  return r.json();
 }
 
 async function apiWrite(op, payload) {
   payload.op = op;
-  payload.action = 'adminWrite';
-  payload.target = payload.target || op;
   payload.adminKey = ADMIN_KEY;
   payload.adminId = adminSession.id;
   payload.adminEmail = adminSession.email;
   payload.adminPhone = adminSession.phone;
-  return gasPost(SCRIPT_URL, payload);
+  // Event writes go through Code1.gs (supports requiresReg + regFee columns)
+  const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus','markAttendance'].includes(op);
+  const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
+  const url = `${baseUrl}?action=adminWrite&data=${encodeURIComponent(JSON.stringify(payload))}`;
+  const r = await fetch(url, { method: 'GET', redirect: 'follow' });
+  return r.json();
 }
 
 function statusBadge(s) {
@@ -797,49 +671,20 @@ async function handleLogin() {
   const btn = document.getElementById('loginBtn');
 
   if (!email || !phone) { err.textContent = 'Please fill all fields.'; return; }
-
-  // Accept either: last-5-digits of registered phone OR the admin passphrase
-  const isAdminKey = phone === ADMIN_KEY || phone === '2025a' || phone.length === 5;
-  if (!isAdminKey) { err.textContent = 'Enter exactly 5 digits of your phone or the admin key.'; return; }
+  if (phone.length !== 5) { err.textContent = 'Enter exactly 5 digits.'; return; }
 
   btn.disabled = true; btn.textContent = 'Verifying...'; err.textContent = '';
 
-  // If they entered the full admin key, grant access directly (no sheet lookup needed)
-  if (phone === ADMIN_KEY || phone === 'innovexa2025admin') {
-    adminSession = { id: 'INVX-01', email: email, phone: phone, name: 'President' };
-    sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-    showDashboard();
-    return;
-  }
-
-  // Otherwise verify via GAS (email + last 5 of phone)
   try {
     const data = await apiGet(`verifyChat&id=INVX-01&email=${encodeURIComponent(email)}&phone=${phone}`);
-    if (data && data.success) {
-      adminSession = { id: 'INVX-01', email: email, phone: phone, name: data.name || 'President' };
-      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-      showDashboard();
-    } else {
-      // Fallback: if sheet lookup fails, check admin key prefix
-      if (phone.length === 5) {
-        adminSession = { id: 'INVX-01', email: email, phone: phone, name: 'President' };
-        sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-        showDashboard();
-      } else {
-        err.textContent = data?.message || 'Verification failed.';
-        btn.disabled = false; btn.textContent = 'Verify & Access Dashboard';
-      }
-    }
+    if (!data.success) { err.textContent = data.message || 'Verification failed.'; btn.disabled = false; btn.textContent = 'Verify & Access Dashboard'; return; }
+
+    adminSession = { id: 'INVX-01', email: email, phone: phone, name: data.name || 'President' };
+    sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+    showDashboard();
   } catch(e) {
-    // Network error fallback — grant access if phone is 5 digits
-    if (phone.length === 5 && email.includes('@')) {
-      adminSession = { id: 'INVX-01', email: email, phone: phone, name: 'President' };
-      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-      showDashboard();
-    } else {
-      err.textContent = 'Verification failed. Try again.';
-      btn.disabled = false; btn.textContent = 'Verify & Access Dashboard';
-    }
+    err.textContent = 'Network error.';
+    btn.disabled = false; btn.textContent = 'Verify & Access Dashboard';
   }
 }
 
@@ -867,184 +712,6 @@ function logout() {
 })();
 
 // ══════════════════════════════════════════════════════════════
-//  PAYMENT CONFIRMATION
-// ══════════════════════════════════════════════════════════════
-let allPaymentMembers = [];
-let payCurrentFilter = 'all';
-let payCurrentSearch = '';
-
-async function loadPayments() {
-  document.getElementById('paymentsLoading').style.display = 'flex';
-  document.getElementById('paymentsGrid').style.display = 'none';
-  document.getElementById('paymentsEmpty').style.display = 'none';
-  try {
-    const data = await gasGet(`${SCRIPT_URL}?action=adminMembers&adminKey=${ADMIN_KEY}`);
-    allPaymentMembers = (data && data.members) ? data.members : [];
-    renderPaymentCards();
-    // Update badge count
-    const pending = allPaymentMembers.filter(m => (m.status||'').toLowerCase() === 'pending').length;
-    const badge = document.getElementById('paymentBadgeCount');
-    if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
-    else { badge.style.display = 'none'; }
-    const statEl = document.getElementById('statPayments');
-    if (statEl) statEl.textContent = pending;
-  } catch(e) {
-    document.getElementById('paymentsLoading').style.display = 'none';
-    showToast('Failed to load members.', 'error');
-  }
-}
-
-function setPayFilter(f) {
-  payCurrentFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  document.getElementById('payFilter_' + f).classList.add('active');
-  renderPaymentCards();
-}
-
-function filterPayments(q) {
-  payCurrentSearch = q.toLowerCase();
-  renderPaymentCards();
-}
-
-function renderPaymentCards() {
-  let members = allPaymentMembers;
-  if (payCurrentFilter !== 'all') {
-    members = members.filter(m => {
-      const s = (m.status||'').toLowerCase();
-      if (payCurrentFilter === 'pending') return s === 'pending' || s === '';
-      if (payCurrentFilter === 'confirmed') return s.includes('confirm');
-      if (payCurrentFilter === 'rejected') return s.includes('reject');
-      return true;
-    });
-  }
-  if (payCurrentSearch) {
-    members = members.filter(m =>
-      (m.name||'').toLowerCase().includes(payCurrentSearch) ||
-      (m.email||'').toLowerCase().includes(payCurrentSearch) ||
-      (m.operativeId||'').toLowerCase().includes(payCurrentSearch) ||
-      (m.utr||'').toLowerCase().includes(payCurrentSearch)
-    );
-  }
-  document.getElementById('paymentsLoading').style.display = 'none';
-  const grid = document.getElementById('paymentsGrid');
-  const empty = document.getElementById('paymentsEmpty');
-  if (!members.length) { grid.style.display = 'none'; empty.style.display = 'block'; return; }
-  grid.style.display = 'grid';
-  empty.style.display = 'none';
-  grid.innerHTML = members.map(m => buildPaymentCard(m)).join('');
-}
-
-function buildPaymentCard(m) {
-  const status = (m.status||'pending').toLowerCase();
-  const isConfirmed = status.includes('confirm');
-  const isRejected = status.includes('reject');
-  const cardClass = isConfirmed ? 'approved' : isRejected ? 'rejected' : '';
-  const initials = (m.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  const photoHtml = m.photoUrl
-    ? `<img src="${escHtml(m.photoUrl)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">`
-    : `<div class="payment-avatar">${escHtml(initials)}</div>`;
-
-  const proofHtml = m.paymentUrl
-    ? `<img src="${escHtml(m.paymentUrl)}" alt="Payment Proof" onclick="openLightbox('${escHtml(m.paymentUrl)}')"
-        style="width:100%;max-height:200px;object-fit:contain;cursor:zoom-in;"
-        onerror="this.parentElement.innerHTML='<div class=\'no-proof\'><span style=\'font-size:28px\'>🖼️</span><span>Image failed to load</span></div>'">`
-    : `<div class="no-proof"><span style="font-size:28px">📎</span><span>No payment proof uploaded</span></div>`;
-
-  const actionsHtml = (isConfirmed || isRejected)
-    ? `<div style="text-align:center;padding:10px;font-size:13px;font-weight:600;color:${
-        isConfirmed ? 'var(--green)' : 'var(--red)'
-      }">✔ ${isConfirmed ? 'Approved — Member Onboarded' : 'Rejected'}</div>`
-    : `<div class="payment-actions">
-        <button class="btn-pay-approve" onclick="approvePayment(${m.row},'${escHtml(m.operativeId)}','${escHtml(m.email)}')">✅ Approve &amp; Onboard</button>
-        <button class="btn-pay-reject" onclick="rejectPayment(${m.row},'${escHtml(m.email)}')">❌ Reject</button>
-      </div>`;
-
-  return `
-  <div class="payment-card ${cardClass}" id="pcard_${m.row}">
-    <div class="payment-card-header">
-      ${photoHtml}
-      <div class="payment-info">
-        <h4>${escHtml(m.name||'—')}</h4>
-        <p>${escHtml(m.operativeId||'No ID')} &nbsp;·&nbsp; ${escHtml(m.email||'—')}</p>
-      </div>
-    </div>
-    <div class="payment-fields">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="payment-field">
-          <label>Transaction / UTR ID</label>
-          <span>${escHtml(m.utr||'—')}</span>
-        </div>
-        <div class="payment-field">
-          <label>Amount</label>
-          <span>${escHtml(m.amount||'—')}</span>
-        </div>
-        <div class="payment-field">
-          <label>Phone</label>
-          <span>${escHtml(m.phone||'—')}</span>
-        </div>
-        <div class="payment-field">
-          <label>Status</label>
-          <span>${statusBadge(m.status)}</span>
-        </div>
-      </div>
-    </div>
-    <div class="payment-proof-wrap">${proofHtml}</div>
-    ${actionsHtml}
-  </div>`;
-}
-
-async function approvePayment(row, operativeId, email) {
-  if (!confirm(`Approve payment and onboard ${operativeId} (${email}) to the club?`)) return;
-  try {
-    const res = await apiWrite('approve', { row, operativeId, status: 'Confirmed' });
-    if (res && res.success) {
-      showToast(`✅ ${operativeId} approved & onboarded!`, 'success');
-      // Update card in place
-      const card = document.getElementById('pcard_' + row);
-      if (card) {
-        card.classList.add('approved');
-        const m = allPaymentMembers.find(x => x.row === row);
-        if (m) m.status = 'Confirmed';
-        renderPaymentCards();
-      }
-      loadOverview();
-    } else {
-      showToast(res?.message || 'Approval failed.', 'error');
-    }
-  } catch(e) {
-    showToast('Network error. Try again.', 'error');
-  }
-}
-
-async function rejectPayment(row, email) {
-  const reason = prompt('Reason for rejection (optional):');
-  if (reason === null) return; // cancelled
-  try {
-    const res = await apiWrite('reject', { row, status: 'Rejected', reason });
-    if (res && res.success) {
-      showToast('❌ Payment rejected.', 'error');
-      const m = allPaymentMembers.find(x => x.row === row);
-      if (m) m.status = 'Rejected';
-      renderPaymentCards();
-      loadOverview();
-    } else {
-      showToast(res?.message || 'Rejection failed.', 'error');
-    }
-  } catch(e) {
-    showToast('Network error. Try again.', 'error');
-  }
-}
-
-function openLightbox(url) {
-  document.getElementById('proofLightboxImg').src = url;
-  document.getElementById('proofLightbox').classList.add('open');
-}
-function closeLightbox() {
-  document.getElementById('proofLightbox').classList.remove('open');
-  document.getElementById('proofLightboxImg').src = '';
-}
-
-// ══════════════════════════════════════════════════════════════
 //  TAB SWITCHING
 // ══════════════════════════════════════════════════════════════
 function switchAdminTab(tab) {
@@ -1063,11 +730,6 @@ function switchAdminTab(tab) {
   if (tab === 'team') loadTeam();
   if (tab === 'assets') loadAssets();
   if (tab === 'documents') initDocuments();
-  if (tab === 'announcements') loadAdminAnnouncements();
-  if (tab === 'leaderboard') loadAdminLeaderboard();
-  if (tab === 'projects') loadAdminProjects();
-  if (tab === 'badges') loadAdminBadges();
-  if (tab === 'payments') loadPayments();
 }
 
 let html5QrCode = null;
@@ -1179,43 +841,20 @@ function manualAttendance() {
   document.getElementById('manual-operative-id').value = '';
 }
 
-let _lastQRLink = '';
-function generateEventQR() {
-  const eventId = document.getElementById('qr-event-id').value.trim();
-  if (!eventId) { showToast('Enter an Event ID first', 'error'); return; }
-  const baseUrl = window.location.origin;
-  const attendUrl = `${baseUrl}/attend.html?event=${encodeURIComponent(eventId)}`;
-  _lastQRLink = attendUrl;
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(attendUrl)}`;
-  document.getElementById('qr-generated-img').src = qrApiUrl;
-  document.getElementById('qr-url-label').textContent = attendUrl;
-  document.getElementById('qr-output').style.display = 'block';
-  showToast('QR generated! Members can scan to check in.', 'success');
-}
-
-function copyQRLink() {
-  if (!_lastQRLink) return;
-  navigator.clipboard.writeText(_lastQRLink).then(() => {
-    showToast('Check-in link copied!', 'success');
-  }).catch(() => prompt('Copy this link:', _lastQRLink));
-}
-
 // ══════════════════════════════════════════════════════════════
 //  OVERVIEW
 // ══════════════════════════════════════════════════════════════
 async function loadOverview() {
   try {
-    const membersData = await apiGet('adminMembers');
+    const [membersData, eventsData, resourcesData] = await Promise.all([
+      apiGet('adminMembers'), apiGet('events'), apiGet('resources')
+    ]);
     const members = membersData.members || [];
     const pending = members.filter(m => (m.status||'').toLowerCase().includes('pending')).length;
-    const confirmed = members.filter(m => (m.status||'').toLowerCase().includes('confirm')).length;
-    document.getElementById('statMembers').textContent = confirmed;
+    document.getElementById('statMembers').textContent = members.length;
     document.getElementById('statPending').textContent = pending;
-    const statPayEl = document.getElementById('statPayments');
-    if (statPayEl) statPayEl.textContent = pending;
-    // Update sidebar payment badge
-    const badge = document.getElementById('paymentBadgeCount');
-    if (badge) { if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; } else { badge.style.display = 'none'; } }
+    document.getElementById('statEvents').textContent = (eventsData.events || []).length;
+    document.getElementById('statResources').textContent = (resourcesData.resources || []).length;
   } catch(e) { console.error(e); }
 }
 
@@ -1226,16 +865,10 @@ async function loadMembers() {
   document.getElementById('membersLoading').style.display = 'flex';
   document.getElementById('membersTable').style.display = 'none';
   try {
-    console.log('[Admin] Loading members...');
     const data = await apiGet('adminMembers');
-    console.log('[Admin] Members response:', data ? data.members?.length + ' members' : 'no data');
     cachedMembers = data.members || [];
     renderMembers(cachedMembers);
-  } catch(e) {
-    console.error('[Admin] loadMembers error:', e);
-    document.getElementById('membersLoading').style.display = 'none';
-    showToast('Failed to load members: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('Failed to load members', 'error'); }
 }
 
 function renderMembers(members) {
@@ -1246,20 +879,19 @@ function renderMembers(members) {
     <tr>
       <td><strong style="color:var(--accent2)">${escHtml(m.operativeId)}</strong></td>
       <td>
-        ${(m.photoUrl||m.avatar) ? `<img src="${m.photoUrl||m.avatar}" onclick="window.open(this.src)" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid var(--border);" title="Click to view full photo"/>` : '<span style="color:var(--text3);font-size:10px;">None</span>'}
+        ${m.avatar ? `<img src="${m.avatar}" onclick="window.open(this.src)" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid var(--border);" title="Click to view full photo"/>` : '<span style="color:var(--text3);font-size:10px;">None</span>'}
       </td>
       <td style="color:var(--text)">${escHtml(m.name)}</td>
       <td>${escHtml(m.email)}</td>
-      <td>${escHtml(String(m.phone||''))}</td>
+      <td>${escHtml(m.phone)}</td>
       <td>
-        ${(m.paymentUrl||m.paymentProof) ? `<button onclick="window.open('${m.paymentUrl||m.paymentProof}')" class="btn-sm" style="background:var(--blue-bg);color:var(--blue);font-size:9px;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;">📄 View Proof</button>` : '<span style="color:var(--text3);font-size:10px;">—</span>'}
+        ${m.paymentProof ? `<button onclick="window.open('${m.paymentProof}')" class="btn-sm" style="background:var(--blue-bg);color:var(--blue);font-size:9px;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;">📄 View Proof</button>` : '<span style="color:var(--text3);font-size:10px;">—</span>'}
       </td>
       <td>${statusBadge(m.status)}</td>
       <td>
         <div class="btn-actions">
-          ${!(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.row||m.rowIndex},'Confirmed ')">✓ Approve</button>` : ''}
-          ${(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.row||m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
-          ${m.phone ? `<a href="https://wa.me/${String(m.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'91')}?text=${encodeURIComponent('Hi ' + (m.name||'') + '! 🎉 Welcome to Innovexa Labs. Your registration has been confirmed. Your Operative ID is: ' + (m.operativeId||'') + '. Keep this ID safe!')}" target="_blank" class="btn-sm" style="background:rgba(37,211,102,.1);color:#25D366;border:1px solid rgba(37,211,102,.2);text-decoration:none">💬 WhatsApp</a>` : ''}
+          ${!(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.rowIndex},'Confirmed ')">✓ Approve</button>` : ''}
+          ${(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
         </div>
       </td>
     </tr>
@@ -1275,7 +907,7 @@ function filterMembers(q) {
 
 async function updateStatus(rowIndex, status) {
   try {
-    const data = await apiWrite('status', { target: 'status', row: rowIndex, status: status });
+    const data = await apiWrite('updateStatus', { rowIndex, status });
     if (data.success) { showToast(data.message); loadMembers(); loadOverview(); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
@@ -1545,7 +1177,7 @@ function openModal(type, prefill) {
         <button type="button" onclick="fmtLine('mf_${f.key}','- ')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer" title="Bullet Point">• List</button>
         <button type="button" onclick="fmtInsertAt('mf_${f.key}','\\n---\\n')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer" title="Divider">― Line</button>
       </div>` : '';
-      inputHtml = `${toolbar}<textarea id="mf_${f.key}" placeholder="${f.placeholder}" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:'Sora',sans-serif;min-height:${isDesc ? '160' : '80'}px;resize:vertical">${escHtml(val)}</textarea>`;
+      inputHtml = `${toolbar}<textarea id="mf_${f.key}" placeholder="${f.placeholder}" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;min-height:${isDesc ? '160' : '80'}px;resize:vertical">${escHtml(val)}</textarea>`;
     } else {
       inputHtml = `<input type="${f.type || 'text'}" id="mf_${f.key}" placeholder="${f.placeholder}" value="${escHtml(val)}">`;
     }
@@ -1792,7 +1424,6 @@ function initDocuments() {
   document.getElementById('doc-type').onchange = updateDocFields;
   updateDocFields();
   renderSigPreview();
-  fetchDocRequests();
 }
 
 function updateDocFields() {
@@ -1817,7 +1448,7 @@ function _docHeader() {
   return `<div style="display:flex;align-items:center;gap:18px;border-bottom:3px solid #1e3a5f;padding-bottom:16px;margin-bottom:26px;">
     ${logo}
     <div>
-      <div style="font-size:22px;font-weight:900;color:#1e3a5f;letter-spacing:2px;">INNOVEXA LABS</div>
+      <div style="font-size:22px;font-weight:900;color:#1e3a5f;letter-spacing:2px;">INNOVEXA HUB</div>
       <div style="font-size:9px;color:#888;letter-spacing:1.5px;margin-top:2px;">YENEPOYA UNIVERSITY · BANGALORE CAMPUS</div>
       
     </div>
@@ -1834,7 +1465,7 @@ function _docSignature(opId, type) {
       ${sigImg}
       <div style="border-top:2px solid #222;width:180px;padding-top:5px;margin-top:2px;">
         <div style="font-size:13px;font-weight:800;color:#1e3a5f;">${PRESIDENT_NAME}</div>
-        <div style="font-size:11px;font-weight:600;color:#333;">President, Innovexa Labs</div>
+        <div style="font-size:11px;font-weight:600;color:#333;">President, Innovexa Hub</div>
         <div style="font-size:9px;color:#888;">Authorized Signatory</div>
       </div>
     </div>
@@ -1845,7 +1476,7 @@ function _docSignature(opId, type) {
     </div>
   </div>
   <div style="text-align:center;margin-top:24px;padding-top:10px;border-top:1px solid #eee;">
-    <div style="font-size:8px;color:#bbb;">Digitally generated official document — Innovexa Labs Management System</div>
+    <div style="font-size:8px;color:#bbb;">Digitally generated official document — Innovexa Hub Management System</div>
   </div>`;
 }
 
@@ -1891,7 +1522,7 @@ function buildDocHTML(member, type) {
 
   if (type === 'membership') {
     return hdr + _titleBlock('CERTIFICATE OF MEMBERSHIP') +
-      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, studying in <strong>${year} Year, ${branch}</strong> at Yenepoya University, Bangalore Campus, is an active and verified member of <strong>Innovexa Labs</strong> — the official innovation and technology community.</p>
+      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, studying in <strong>${year} Year, ${branch}</strong> at Yenepoya University, Bangalore Campus, is an active and verified member of <strong>Innovexa Hub</strong> — the official innovation and technology community.</p>
       <p style="${p}">As a member, the individual has demonstrated commitment to collaborative learning, technical development, and community engagement through active participation in hub activities, workshops, and events.</p>
       <p style="${p}">This certificate is issued upon request for academic and professional reference purposes.</p>` + sig;
   }
@@ -1901,7 +1532,7 @@ function buildDocHTML(member, type) {
       `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
       <p style="${p}">To Whom It May Concern,</p>
       <p style="${p}">I am writing to recommend <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), a ${year} Year ${branch} student at Yenepoya University, Bangalore.</p>
-      <p style="${p}">During their tenure at Innovexa Labs, ${name.split(' ')[0]} has shown exceptional dedication in <strong>${ctx}</strong>. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.</p>
+      <p style="${p}">During their tenure at Innovexa Hub, ${name.split(' ')[0]} has shown exceptional dedication in <strong>${ctx}</strong>. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.</p>
       <p style="${p}">I strongly recommend ${name.split(' ')[0]} for any opportunity that values technical capability, leadership, and a collaborative spirit.</p>
       <p style="${p}">Warm regards,</p>` + sig;
   }
@@ -1913,13 +1544,13 @@ function buildDocHTML(member, type) {
     return hdr + _titleBlock('NO OBJECTION CERTIFICATE') +
       `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
       <p style="${p}">To Whom It May Concern,</p>
-      <p style="${p}">This is to confirm that <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), ${year} Year ${branch} student, is required to attend <strong>"${ev}"</strong> on <strong>${ed}</strong> as part of Innovexa Labs activities.</p>
-      <p style="${p}">We request that the concerned authorities grant permission for the same. Innovexa Labs takes full responsibility for the student's participation during the event hours.</p>
+      <p style="${p}">This is to confirm that <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), ${year} Year ${branch} student, is required to attend <strong>"${ev}"</strong> on <strong>${ed}</strong> as part of Innovexa Hub activities.</p>
+      <p style="${p}">We request that the concerned authorities grant permission for the same. Innovexa Hub takes full responsibility for the student's participation during the event hours.</p>
       <p style="${p}">We appreciate your kind cooperation.</p>` + sig;
   }
   if (type === 'attendance_cert') {
     return hdr + _titleBlock('ATTENDANCE CERTIFICATE') +
-      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, has been an active participant in Innovexa Labs events and workshops during the academic year ${new Date().getFullYear()}.</p>
+      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, has been an active participant in Innovexa Hub events and workshops during the academic year ${new Date().getFullYear()}.</p>
       <p style="${p}">The member has maintained regular attendance and has actively contributed to the growth and activities of the hub. This certificate is issued for the purpose of academic records and institutional documentation.</p>` + sig;
   }
   return '<p>Unknown document type</p>';
@@ -1954,7 +1585,7 @@ async function downloadDocument() {
   // Header text next to logo
   doc.setTextColor(30, 58, 95);
   doc.setFontSize(20); doc.setFont('helvetica', 'bold');
-  doc.text('INNOVEXA LABS', 42, 18);
+  doc.text('INNOVEXA HUB', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.setTextColor(120, 120, 120);
   doc.text('YENEPOYA UNIVERSITY · BANGALORE CAMPUS · ', 42, 24);
@@ -1980,14 +1611,14 @@ async function downloadDocument() {
   function addPara(t) { const ls = doc.splitTextToSize(t, rm - lm); ls.forEach(l => { doc.text(l, lm, y); y += lineH; }); y += 4; }
 
   if (type === 'membership') {
-    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', studying in ' + year + ' Year, ' + branch + ' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Labs \u2014 the official innovation and technology community.');
+    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', studying in ' + year + ' Year, ' + branch + ' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Hub \u2014 the official innovation and technology community.');
     addPara('As a member, the individual has demonstrated commitment to collaborative learning, technical development, and community engagement through active participation in hub activities, workshops, and events.');
     addPara('This certificate is issued upon request for academic and professional reference purposes.');
   } else if (type === 'lor') {
     const ctx = document.getElementById('doc-lor-context')?.value || 'various hub activities';
     doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
     addPara('I am writing to recommend ' + name + ' (Operative ID: ' + opId + '), a ' + year + ' Year ' + branch + ' student at Yenepoya University, Bangalore.');
-    addPara('During their tenure at Innovexa Labs, ' + name.split(' ')[0] + ' has shown exceptional dedication in ' + ctx + '. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.');
+    addPara('During their tenure at Innovexa Hub, ' + name.split(' ')[0] + ' has shown exceptional dedication in ' + ctx + '. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.');
     addPara('I strongly recommend ' + name.split(' ')[0] + ' for any opportunity that values technical capability, leadership, and a collaborative spirit.');
     doc.text('Warm regards,', lm, y); y += lineH;
   } else if (type === 'noc') {
@@ -1996,11 +1627,11 @@ async function downloadDocument() {
     const _de=document.getElementById('doc-noc-date-end')?.value||'';
     const ed=_ds?(_de&&_de!==_ds?_fmtRange(_ds,_de):_fmtDate(_ds)):today;
     doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
-    addPara('This is to confirm that ' + name + ' (Operative ID: ' + opId + '), ' + year + ' Year ' + branch + ' student, is required to attend "' + ev + '" on ' + ed + ' as part of Innovexa Labs activities.');
-    addPara('We request that the concerned authorities grant permission for the same. Innovexa Labs takes full responsibility for the student\'s participation during the event hours.');
+    addPara('This is to confirm that ' + name + ' (Operative ID: ' + opId + '), ' + year + ' Year ' + branch + ' student, is required to attend "' + ev + '" on ' + ed + ' as part of Innovexa Hub activities.');
+    addPara('We request that the concerned authorities grant permission for the same. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.');
     addPara('We appreciate your kind cooperation.');
   } else if (type === 'attendance_cert') {
-    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', has been an active participant in Innovexa Labs events and workshops during the academic year ' + new Date().getFullYear() + '.');
+    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', has been an active participant in Innovexa Hub events and workshops during the academic year ' + new Date().getFullYear() + '.');
     addPara('The member has maintained regular attendance and has actively contributed to the growth and activities of the hub. This certificate is issued for the purpose of academic records and institutional documentation.');
   }
 
@@ -2020,14 +1651,14 @@ async function downloadDocument() {
   doc.text(PRESIDENT_NAME, 20, y + 6);
   doc.setFontSize(9); doc.setFont('helvetica', 'normal');
   doc.setTextColor(50, 50, 50);
-  doc.text('President, Innovexa Labs', 20, y + 11);
+  doc.text('President, Innovexa Hub', 20, y + 11);
   doc.setFontSize(7); doc.setTextColor(140, 140, 140);
   doc.text('Authorized Signatory', 20, y + 15);
 
   // Footer
   doc.setFillColor(245, 245, 245); doc.rect(0, 280, 210, 17, 'F');
   doc.setTextColor(160, 160, 160); doc.setFontSize(7);
-  doc.text('Digitally generated official document \u2014 Innovexa Labs Management System', 105, 288, { align: 'center' });
+  doc.text('Digitally generated official document \u2014 Innovexa Hub Management System', 105, 288, { align: 'center' });
 
   doc.save(opId + '_' + type + '_innovexa.pdf');
   showToast('PDF downloaded!', 'success');
@@ -2040,32 +1671,33 @@ async function fetchDocRequests() {
   const wrap = document.getElementById('doc-requests-list');
   wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Loading...</div>';
   try {
-    const data = await gasGet(SCRIPT_URL + '?action=docrequests');
+    const res = await fetch(SCRIPT_URL + '?action=docrequests', { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
     if (!data.success || !data.requests || data.requests.length === 0) {
       wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">No requests found.</div>';
       return;
     }
+    // Show newest first
     const reqs = data.requests.reverse();
     wrap.innerHTML = reqs.map(r => {
-      const isPending = (r.status || '').toLowerCase() === 'pending';
-      const isApproved = (r.status || '').toLowerCase().includes('approved');
+      const isPending = r.status === 'Pending';
+      const isApproved = r.status === 'Approved';
       const badge = isApproved ? '<span style="background:var(--green);color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">Approved</span>'
         : isPending ? '<span style="background:#f59e0b;color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">Pending</span>'
-        : '<span style="background:var(--red);color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">' + (r.status||'Rejected') + '</span>';
-      const typeLabel = (r.docType||'').toUpperCase() === 'LOR' ? '📄 LOR' : (r.docType||'').toUpperCase() === 'NOC' ? '📋 NOC' : r.docType;
+        : '<span style="background:var(--red);color:#fff;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;">' + r.status + '</span>';
       const actions = isPending ? `<div style="display:flex;gap:6px;margin-top:8px;">
-        <button onclick="approveDocReq(${r.row},'Approved')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">✅ Approve</button>
-        <button onclick="approveDocReq(${r.row},'Rejected')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">❌ Reject</button>
+        <button onclick="approveDocReq('${r.requestId}','Approved')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">✅ Approve</button>
+        <button onclick="approveDocReq('${r.requestId}','Rejected')" style="padding:5px 14px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">❌ Reject</button>
       </div>` : '';
       return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:12px;font-weight:700;color:var(--accent);">${typeLabel}</span>
+          <span style="font-family:monospace;font-size:11px;color:var(--accent);">${r.requestId}</span>
           ${badge}
         </div>
-        <div style="font-weight:700;color:var(--text);">${r.name || '—'}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${r.email || ''} · ${r.operativeId || ''}</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:4px;">📌 <strong>${r.event || '—'}</strong>${r.eventDate ? ' — ' + r.eventDate : ''}</div>
-        ${r.reason ? '<div style="font-size:11px;color:var(--text3);margin-top:2px;font-style:italic;">"' + r.reason + '"</div>' : ''}
+        <div style="font-weight:700;color:var(--text);">${r.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">${r.email} · ${r.branch} · ${r.year} Year</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px;">📌 <strong>${r.event}</strong> — ${r.dates || '—'}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;">Role: ${r.role}</div>
         ${actions}
       </div>`;
     }).join('');
@@ -2074,10 +1706,14 @@ async function fetchDocRequests() {
   }
 }
 
-async function approveDocReq(row, status) {
+async function approveDocReq(reqId, status) {
   try {
-    await gasPost(SCRIPT_URL, { action: 'docApprove', adminKey: ADMIN_KEY, row: row, status: status });
-    showToast('Row ' + row + ' → ' + status, status === 'Approved' ? 'success' : 'error');
+    await fetch(SCRIPT_URL, {
+      method: 'POST', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'docApprove', requestId: reqId, status: status })
+    });
+    showToast(reqId + ' → ' + status, status === 'Approved' ? 'success' : 'error');
     setTimeout(() => fetchDocRequests(), 1500);
   } catch (e) {
     showToast('Error updating request', 'error');
@@ -2104,9 +1740,9 @@ function _buildPublicNOCHTML() {
   return { html: _docHeader() + _titleBlock('PERMISSION LETTER') +
     `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
     <p style="${p}">To Whom It May Concern,</p>
-    <p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${nm}</strong>, ${yr} Year, <strong>${br}</strong> student at Yenepoya University, Bangalore Campus, is a <strong>${rl}</strong> of <strong>Innovexa Labs</strong> — the official innovation and technology community of the university.</p>
-    <p style="${p}">The above-mentioned student is required to attend <strong>"${ev}"</strong> on <strong>${dt}</strong> as part of Innovexa Labs activities.</p>
-    <p style="${p}">We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Labs takes full responsibility for the student's participation during the event hours.</p>
+    <p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${nm}</strong>, ${yr} Year, <strong>${br}</strong> student at Yenepoya University, Bangalore Campus, is a <strong>${rl}</strong> of <strong>Innovexa Hub</strong> — the official innovation and technology community of the university.</p>
+    <p style="${p}">The above-mentioned student is required to attend <strong>"${ev}"</strong> on <strong>${dt}</strong> as part of Innovexa Hub activities.</p>
+    <p style="${p}">We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student's participation during the event hours.</p>
     ${noteHtml}
     <p style="${p}">We appreciate your kind cooperation.</p>` +
     _docSignature('MBR', 'NOC'), name: nm, branch: br, year: yr, event: ev, date: dt, role: rl, note: note };
@@ -2128,7 +1764,7 @@ function downloadPublicNOC() {
 
   try { doc.addImage(INNOVEXA_LOGO_B64, 'PNG', 15, 8, 22, 22); } catch(e) {}
   doc.setTextColor(30, 58, 95); doc.setFontSize(20); doc.setFont('helvetica', 'bold');
-  doc.text('INNOVEXA LABS', 42, 18);
+  doc.text('INNOVEXA HUB', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
   doc.text('YENEPOYA UNIVERSITY \xb7 BANGALORE CAMPUS \xb7 ', 42, 24);
   doc.setDrawColor(30, 58, 95); doc.setLineWidth(1); doc.line(15, 33, 195, 33);
@@ -2145,9 +1781,9 @@ function downloadPublicNOC() {
   function addP(t) { const ls = doc.splitTextToSize(t, rm - lm); ls.forEach(l => { doc.text(l, lm, y); y += lineH; }); y += 4; }
 
   doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
-  addP('This is to certify that ' + res.name + ', ' + res.year + ' Year, ' + res.branch + ' student at Yenepoya University, Bangalore Campus, is a ' + res.role + ' of Innovexa Labs \u2014 the official innovation and technology community of the university.');
-  addP('The above-mentioned student is required to attend "' + res.event + '" on ' + res.date + ' as part of Innovexa Labs activities.');
-  addP('We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Labs takes full responsibility for the student\'s participation during the event hours.');
+  addP('This is to certify that ' + res.name + ', ' + res.year + ' Year, ' + res.branch + ' student at Yenepoya University, Bangalore Campus, is a ' + res.role + ' of Innovexa Hub \u2014 the official innovation and technology community of the university.');
+  addP('The above-mentioned student is required to attend "' + res.event + '" on ' + res.date + ' as part of Innovexa Hub activities.');
+  addP('We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.');
   if (res.note) { addP('Note: ' + res.note); }
   addP('We appreciate your kind cooperation.');
 
@@ -2157,13 +1793,13 @@ function downloadPublicNOC() {
   doc.setTextColor(30, 58, 95); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text(PRESIDENT_NAME, 20, y + 6);
   doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50);
-  doc.text('President, Innovexa Labs', 20, y + 11);
+  doc.text('President, Innovexa Hub', 20, y + 11);
   doc.setFontSize(7); doc.setTextColor(140, 140, 140);
   doc.text('Authorized Signatory', 20, y + 15);
 
   doc.setFillColor(245, 245, 245); doc.rect(0, 280, 210, 17, 'F');
   doc.setTextColor(160, 160, 160); doc.setFontSize(7);
-  doc.text('Digitally generated official document \u2014 Innovexa Labs Management System', 105, 288, { align: 'center' });
+  doc.text('Digitally generated official document \u2014 Innovexa Hub Management System', 105, 288, { align: 'center' });
 
   doc.save('permission_letter_' + res.name.replace(/\s+/g, '_') + '.pdf');
   showToast('Permission Letter PDF downloaded!', 'success');
@@ -2177,7 +1813,8 @@ async function loadCertRequests() {
   const body = document.getElementById('certReqsBody');
   loading.style.display = 'flex'; table.style.display = 'none'; empty.style.display = 'none';
   try {
-    const data = await gasGet(SCRIPT_URL + '?action=certreqs');
+    const res = await fetch(SCRIPT_URL + '?action=certreqs', { method: 'GET', redirect: 'follow' });
+    const data = await res.json();
     loading.style.display = 'none';
     const reqs = data.requests || [];
     if (reqs.length === 0) { empty.style.display = 'block'; return; }
@@ -2206,16 +1843,14 @@ async function loadCertRequests() {
 async function certReqAction(rowIndex, status) {
   if (!confirm(status === 'Approved' ? 'Approve this certificate request?' : 'Reject this certificate request?')) return;
   try {
-    const data = await gasPost(SCRIPT_URL, { action: 'certApprove', rowIndex: rowIndex, status: status });
+    const res = await fetch(SCRIPT_URL, { method: 'POST', redirect: 'follow', headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({ action: 'certApprove', rowIndex: rowIndex, status: status })
+    });
+    const data = await res.json();
     showToast(data.message, data.success ? 'success' : 'error');
     loadCertRequests();
   } catch(e) { showToast('Error updating request', 'error'); }
 }
 </script>
-
-<!-- ═══════════════════════════════════════════════════════════
-     FIREBASE ADMIN — Announcements, Leaderboard, Projects, Badges
-     ═══════════════════════════════════════════════════════════ -->
-  <script type="module" src="/js/animations.js"></script>
 </body>
 </html>
