@@ -1,75 +1,64 @@
 /**
- * Innovexa Labs — Shared API Helper
+ * Innovexa Hub — Shared API Helper
  * Routes all Google Apps Script requests through /api/proxy
  * to avoid browser CORS issues in production.
  */
 
 // ── GAS Endpoint URLs ──────────────────────────────────────────
-const SCRIPT_URL          = 'https://script.google.com/macros/s/AKfycbw8PGXXPJTEzD8NpkBuC9uPkGxzo7KQWV8ITuIORyuCHwn5kY6l6_5-caz1Rji82ml1LA/exec';
-const EVENT_SCRIPT_URL    = SCRIPT_URL;
-const EVENT_REG_SCRIPT_URL = SCRIPT_URL; // alias — all routes through single Code.gs now
+const SCRIPT_URL           = 'https://script.google.com/macros/s/AKfycbw8PGXXPJTEzD8NpkBuC9uPkGxzo7KQWV8ITuIORyuCHwn5kY6l6_5-caz1Rji82ml1LA/exec';
+const EVENT_SCRIPT_URL     = SCRIPT_URL;
+const EVENT_REG_SCRIPT_URL = SCRIPT_URL;
 
-// ── GET helper ─────────────────────────────────────────────────
+// ── GET helper ──────────────────────────────────────────────────
 async function gasGet(url) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
-    const r = await fetch('/api/proxy?url=' + encodeURIComponent(url), { signal: ctrl.signal });
-    const data = await r.json();
-    if (data && data.error && typeof data.error === 'string' && data.error.includes('Non-JSON')) throw new Error(data.error);
+    const proxyUrl = '/api/proxy?url=' + encodeURIComponent(url);
+    const r = await fetch(proxyUrl, { signal: ctrl.signal });
     clearTimeout(timer);
-    return data;
-  } catch (e) {
+    return await r.json();
+  } catch (err) {
     clearTimeout(timer);
-    // Fallback: direct fetch (may work if GAS allows CORS)
+    // Fallback: direct fetch (for dev / non-proxied environments)
     try {
-      const ctrl2 = new AbortController();
-      const t2 = setTimeout(() => ctrl2.abort(), 10000);
-      const r2 = await fetch(url, { redirect: 'follow', signal: ctrl2.signal });
-      clearTimeout(t2);
+      const r2 = await fetch(url, { method: 'GET', redirect: 'follow' });
       const text = await r2.text();
-      const m = text.match(/\{[\s\S]*\}/);
-      return JSON.parse(m ? m[0] : text);
-    } catch (e2) {
-      throw new Error('GAS fetch failed: ' + e.message);
+      return JSON.parse(text);
+    } catch (e) {
+      throw err;
     }
   }
 }
 
-// ── POST helper ────────────────────────────────────────────────
-async function gasPost(url, body) {
+// ── POST helper ─────────────────────────────────────────────────
+async function gasPost(url, payload) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 20000);
   try {
-    const r = await fetch('/api/proxy?url=' + encodeURIComponent(url), {
+    // Try proxy first
+    const proxyUrl = '/api/proxy';
+    const r = await fetch(proxyUrl, {
       method: 'POST',
-      signal: ctrl.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: typeof body === 'string' ? body : JSON.stringify(body),
+      body: JSON.stringify({ targetUrl: url, payload }),
+      signal: ctrl.signal
     });
-    const data = await r.json();
     clearTimeout(timer);
-    return data;
-  } catch (e) {
+    return await r.json();
+  } catch (err) {
     clearTimeout(timer);
-    // Fallback: fire-and-forget via no-cors (can't read response)
+    // Fallback: direct no-cors POST (data goes through, response is opaque)
     try {
       await fetch(url, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
-        body: typeof body === 'string' ? body : JSON.stringify(body),
+        body: JSON.stringify(payload)
       });
       return { success: true, message: 'Submitted (no-cors fallback)' };
-    } catch (e2) {
-      throw new Error('GAS POST failed: ' + e.message);
+    } catch (e) {
+      throw err;
     }
   }
 }
-
-// Export for global use (non-module scripts)
-window.gasGet = gasGet;
-window.gasPost = gasPost;
-window.SCRIPT_URL = SCRIPT_URL;
-window.EVENT_SCRIPT_URL = EVENT_SCRIPT_URL;
-window.EVENT_REG_SCRIPT_URL = EVENT_REG_SCRIPT_URL;
