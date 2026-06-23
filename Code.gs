@@ -137,12 +137,8 @@ function doPost(e) {
     const nextId = lastRow;
     const operativeId = 'INVX-' + String(nextId).padStart(2, '0');
 
-    // ── Image URLs (Cloudinary) ────────────────────────────────
-    let photoUrl = data.photoUrl || data.photoBase64 || '';
-    let paymentUrl = data.paymentUrl || data.paymentBase64 || '';
-
     // ── Append New Row ───────────────────────────────────────
-    // Columns: [Timestamp, Name, Email, Phone, Year, Branch, SkillLevel, DOB, Interests, UTR, Status, Amount, OperativeID, LinkedIn, GitHub, Bio, Avatar (Photo URL), Skills, Payment Proof URL]
+    // Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id
     sheet.appendRow([
       new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),  // A: Timestamp
       data.fullName   || '',                                              // B: Name
@@ -156,13 +152,7 @@ function doPost(e) {
       data.utr        || '',                                              // J: UTR
       'Pending',                                                          // K: Status
       data.amount     || '',                                              // L: Amount
-      operativeId,                                                        // M: Operative ID
-      '',                                                                 // N: LinkedIn
-      '',                                                                 // O: GitHub
-      '',                                                                 // P: Bio
-      photoUrl,                                                           // Q: Avatar (Photo URL)
-      '',                                                                 // R: Skills
-      paymentUrl                                                          // S: Payment Proof URL
+      operativeId                                                         // M: Operative_id
     ]);
 
     // ── Send Google Calendar Invite ──────────────────────────
@@ -223,34 +213,8 @@ function sendCalendarInvite(email, name) {
  *  Searches Column M for the operative ID and updates columns N-R.
  */
 function handleUpdateProfile(sheet, data) {
-  const opId = (data.operativeId || '').trim().toUpperCase();
-  if (!opId) {
-    return createJsonResponse(false, 'Missing operativeId.');
-  }
-
-  const allData = sheet.getDataRange().getValues();
-
-  for (let i = 1; i < allData.length; i++) {
-    const rowOpId = (allData[i][12] || '').toString().trim().toUpperCase(); // Column M = index 12
-    if (rowOpId === opId) {
-      const rowNum = i + 1; // Sheet rows are 1-indexed
-
-      // Update LinkedIn (Column N = 14)
-      if (data.linkedin !== undefined) sheet.getRange(rowNum, 14).setValue(data.linkedin);
-      // Update GitHub (Column O = 15)
-      if (data.github !== undefined)   sheet.getRange(rowNum, 15).setValue(data.github);
-      // Update Bio (Column P = 16)
-      if (data.bio !== undefined)      sheet.getRange(rowNum, 16).setValue(data.bio);
-      // Update Avatar (Column Q = 17)
-      if (data.avatar !== undefined)   sheet.getRange(rowNum, 17).setValue(data.avatar);
-      // Update Skills (Column R = 18)
-      if (data.skills !== undefined)   sheet.getRange(rowNum, 18).setValue(data.skills);
-
-      return createJsonResponse(true, 'Profile updated successfully!');
-    }
-  }
-
-  return createJsonResponse(false, 'Operative ID not found: ' + opId);
+  // Sheet only has 13 columns (A-M). No extra profile columns to update.
+  return createJsonResponse(false, 'Profile update not supported — sheet has no extended profile columns.');
 }
 
 
@@ -529,7 +493,7 @@ function handleGetProfile(sheet, params) {
   const allData = sheet.getDataRange().getValues();
 
   for (let i = 1; i < allData.length; i++) {
-    const rowOpId = (allData[i][12] || '').toString().trim().toUpperCase(); // Column M
+    const rowOpId = (allData[i][12] || '').toString().trim().toUpperCase(); // Column M: Operative_id
     if (rowOpId === profileId) {
       return createJsonResponse(true, 'Profile found.', {
         name:        (allData[i][1]  || '').toString().trim(),  // B: Name
@@ -537,15 +501,13 @@ function handleGetProfile(sheet, params) {
         phone:       (allData[i][3]  || '').toString().trim(),  // D: Phone
         year:        (allData[i][4]  || '').toString().trim(),  // E: Year
         branch:      (allData[i][5]  || '').toString().trim(),  // F: Branch
+        skillLevel:  (allData[i][6]  || '').toString().trim(),  // G: SkillLevel
+        dob:         (allData[i][7]  || '').toString().trim(),  // H: DOB
         interests:   (allData[i][8]  || '').toString().trim(),  // I: Interests
+        utr:         (allData[i][9]  || '').toString().trim(),  // J: UTR
         status:      (allData[i][10] || '').toString().trim(),  // K: Status
-        operativeId: rowOpId,                                    // M: Operative ID
-        linkedin:    (allData[i][13] || '').toString().trim(),  // N: LinkedIn
-        github:      (allData[i][14] || '').toString().trim(),  // O: GitHub
-        bio:         (allData[i][15] || '').toString().trim(),  // P: Bio
-        avatar:      (allData[i][16] || '').toString().trim(),  // Q: Avatar
-        skills:      (allData[i][17] || '').toString().trim(),  // R: Skills
-        dob:         (allData[i][7]  || '').toString().trim()   // H: DOB
+        amount:      (allData[i][11] || '').toString().trim(),  // L: Amount
+        operativeId: rowOpId                                     // M: Operative_id
       });
     }
   }
@@ -678,9 +640,10 @@ function handleAdminMembers(sheet) {
   const allData = sheet.getDataRange().getValues();
   const members = [];
 
+  // Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id
   for (let i = 1; i < allData.length; i++) {
     members.push({
-      rowIndex:    i + 1,  // 1-indexed for sheet operations
+      rowIndex:    i + 1,
       timestamp:   (allData[i][0]  || '').toString(),
       name:        (allData[i][1]  || '').toString().trim(),
       email:       (allData[i][2]  || '').toString().trim(),
@@ -693,9 +656,7 @@ function handleAdminMembers(sheet) {
       utr:         (allData[i][9]  || '').toString().trim(),
       status:      (allData[i][10] || '').toString().trim(),
       amount:      (allData[i][11] || '').toString().trim(),
-      operativeId: (allData[i][12] || '').toString().trim(),
-      avatar:      (allData[i][16] || '').toString().trim(),
-      paymentProof: (allData[i][18] || '').toString().trim()
+      operativeId: (allData[i][12] || '').toString().trim()
     });
   }
 
@@ -852,17 +813,23 @@ function handleGetProfileByEmail(sheet, params) {
     return createJsonResponse(false, 'Missing email parameter.');
   }
   var allData = sheet.getDataRange().getValues();
+  // Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id
   for (var i = 1; i < allData.length; i++) {
     var rowEmail = (allData[i][2] || '').toString().trim().toLowerCase();
     if (rowEmail === email) {
       return createJsonResponse(true, 'Profile found.', {
-        name:        (allData[i][1]  || '').toString().trim(),
-        email:       (allData[i][2]  || '').toString().trim(),
-        phone:       (allData[i][3]  || '').toString().trim(),
-        year:        (allData[i][4]  || '').toString().trim(),
-        branch:      (allData[i][5]  || '').toString().trim(),
-        operativeId: (allData[i][12] || '').toString().trim(),
-        status:      (allData[i][10] || '').toString().trim()
+        name:        (allData[i][1]  || '').toString().trim(),  // B
+        email:       (allData[i][2]  || '').toString().trim(),  // C
+        phone:       (allData[i][3]  || '').toString().trim(),  // D
+        year:        (allData[i][4]  || '').toString().trim(),  // E
+        branch:      (allData[i][5]  || '').toString().trim(),  // F
+        skillLevel:  (allData[i][6]  || '').toString().trim(),  // G
+        dob:         (allData[i][7]  || '').toString().trim(),  // H
+        interests:   (allData[i][8]  || '').toString().trim(),  // I
+        utr:         (allData[i][9]  || '').toString().trim(),  // J
+        status:      (allData[i][10] || '').toString().trim(),  // K
+        amount:      (allData[i][11] || '').toString().trim(),  // L
+        operativeId: (allData[i][12] || '').toString().trim()   // M
       });
     }
   }
