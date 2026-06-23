@@ -407,7 +407,7 @@
        ════════════════════════════════════════════════════════ -->
   <nav id="navbar" class="fixed top-0 inset-x-0 z-40 bg-white/80 backdrop-blur-xl border-b border-neutral-200/60">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="#" class="flex items-center gap-3 group" id="nav-logo">
+      <a href="index.html" class="flex items-center gap-3 group" id="nav-logo">
         <img src="assets/logo.png" alt="Innovexa Hub Logo" class="h-9 w-9 object-contain rounded-lg" />
         <span class="font-bold text-lg tracking-tight">
           Innovexa<span class="text-accent-500">Hub</span>
@@ -786,45 +786,8 @@
     // ═══════════════════════════════════════════════════════════
 
     const tabRegister = document.getElementById('tab-register');
-    const tabEvents = document.getElementById('tab-events');
-    const tabStatus = document.getElementById('tab-status');
-    const tabResources = document.getElementById('tab-resources');
-    const tabDocuments = document.getElementById('tab-documents');
-    function switchTab(tab) {
-      [tabRegister, tabEvents, tabStatus, tabResources, tabDocuments].forEach(t => t.classList.remove('active', 'text-neutral-400'));
-      [tabRegister, tabEvents, tabStatus, tabResources, tabDocuments].forEach(t => t.classList.add('text-neutral-400'));
-      [viewRegister, viewEvents, viewStatus, viewResources, viewDocuments].forEach(v => v.classList.add('hidden'));
-
-      if (tab === 'register') {
-        tabRegister.classList.add('active', 'text-neutral-400');
-        tabRegister.classList.remove('text-neutral-400');
-        viewRegister.classList.remove('hidden');
-      } else if (tab === 'events') {
-        tabEvents.classList.add('active', 'text-neutral-400');
-        tabEvents.classList.remove('text-neutral-400');
-        viewEvents.classList.remove('hidden');
-        fetchEvents();
-      } else if (tab === 'status') {
-        tabStatus.classList.add('active', 'text-neutral-400');
-        tabStatus.classList.remove('text-neutral-400');
-        viewStatus.classList.remove('hidden');
-      } else if (tab === 'resources') {
-        tabResources.classList.add('active', 'text-neutral-400');
-        tabResources.classList.remove('text-neutral-400');
-        viewResources.classList.remove('hidden');
-        fetchResources();
-      } else if (tab === 'documents') {
-        tabDocuments.classList.add('active', 'text-neutral-400');
-        tabDocuments.classList.remove('text-neutral-400');
-        viewDocuments.classList.remove('hidden');
-      }
-
-      if (tab !== 'register') {
-        history.replaceState(null, '', '#' + tab);
-      } else {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-    }
+        const tabStatus = document.getElementById('tab-status');
+            // switchTab removed — site uses separate HTML pages
 
     (function initHashRouting() {
       const hash = window.location.hash.replace('#', '');
@@ -1555,120 +1518,10 @@
     }
 
     // File Label Helper
-    function updateFileLabel(inputId, labelId) {
-      const file = document.getElementById(inputId).files[0];
-      const label = document.getElementById(labelId);
-      if (file) {
-        label.innerHTML = `
-          <div class="flex items-center gap-2 text-neutral-400">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            <span class="text-xs font-bold">${file.name}</span>
-          </div>
-        `;
-      }
-    }
-
     // ═══════════════════════════════════════════════════════════
     //  SUBMIT REGISTRATION → POST TO GOOGLE APPS SCRIPT
     // ═══════════════════════════════════════════════════════════
-
-    document.getElementById('btn-submit-registration').addEventListener('click', async () => {
-      const utrInput = document.getElementById('utr-input');
-      const utrError = document.getElementById('utr-error');
-      const utr = utrInput.value.trim();
-
-      // Validate UTR
-      const result = validateUTR(utr);
-      if (!result.valid) {
-        utrError.textContent = result.error;
-        utrError.classList.remove('hidden');
-        utrInput.classList.add('!border-red-400');
-        setTimeout(() => utrInput.classList.remove('!border-red-400'), 2500);
-        return;
-      }
-      // Check Payment Proof
-      const paymentFile = document.getElementById('payment-input').files[0];
-      if (!paymentFile) {
-        showToast('Please upload your payment proof screenshot.', 'error');
-        return;
-      }
-
-      // Validate file sizes (max 2MB each to avoid Apps Script limits)
-      const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-      const photoFile = document.getElementById('photo-input').files[0];
-      if (photoFile && photoFile.size > MAX_SIZE) {
-        showToast('Photo is too large. Please use an image under 2MB.', 'error');
-        return;
-      }
-      if (paymentFile.size > MAX_SIZE) {
-        showToast('Payment proof is too large. Please use an image under 2MB.', 'error');
-        return;
-      }
-
-      // Show loading state
-      const btn = document.getElementById('btn-submit-registration');
-      const btnText = document.getElementById('submit-btn-text');
-      const spinner = document.getElementById('submit-spinner');
-      btn.disabled = true;
-      btnText.textContent = 'Uploading Assets...';
-      spinner.classList.remove('hidden');
-
-      try {
-        // Compress images client-side (max 400px, JPEG 40%) to fit in Google Sheets cells (50k char limit)
-        btnText.textContent = 'Compressing Photo...';
-        let photoBase64 = '';
-        if (photoFile) {
-          photoBase64 = await compressImageToBase64(photoFile, 400, 0.4);
-        }
-        btnText.textContent = 'Compressing Payment Proof...';
-        const paymentBase64 = await compressImageToBase64(paymentFile, 400, 0.4);
-
-        btnText.textContent = 'Submitting Data...';
-
-        // Build payload
-        const payload = {
-          fullName: currentFormData.fullName,
-          email: currentFormData.email,
-          phone: currentFormData.phone,
-          year: currentFormData.year,
-          branch: currentFormData.branch,
-          skillLevel: currentFormData.skillLevel,
-          dob: currentFormData.dob,
-          interests: currentFormData.interests,
-          utr: result.cleaned,
-          amount: FEE_LABEL,
-          photoBase64: photoBase64,
-          photoType: 'image/jpeg',
-          paymentBase64: paymentBase64,
-          paymentType: 'image/jpeg'
-        };
-
-        // POST to Google Apps Script (text/plain avoids CORS preflight)
-        if (SCRIPT_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
-          await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload),
-          });
-          console.log('✅ Registration data sent to Google Sheets.');
-        }
-
-        // Show success screen
-        showSuccessScreen(currentFormData, result.cleaned);
-        showToast(`Registration submitted! Welcome, ${currentFormData.fullName.split(' ')[0]}! 🚀`, 'success');
-
-      } catch (err) {
-        console.error('❌ Submission error:', err);
-        showSuccessScreen(currentFormData, result.cleaned);
-        showToast('Submitted! Your data may take a moment to sync.', 'info');
-
-      } finally {
-        btn.disabled = false;
-        btnText.textContent = 'Submit Registration';
-        spinner.classList.add('hidden');
-      }
-    });
+;
 
     // Enter key submits UTR
     document.getElementById('utr-input').addEventListener('keydown', (e) => {
