@@ -1,0 +1,71 @@
+/* ── Premium Background Orbs ──────────────────────────── */
+.bg-orbs-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  background: #ffffff;
+  pointer-events: none;
+}
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  animation: floatOrb 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-orb-1 { width: 400px; height: 400px; background: rgba(59, 130, 246, 0.2); top: -100px; left: -100px; animation-delay: 0s; }
+.bg-orb-2 { width: 500px; height: 500px; background: rgba(147, 197, 253, 0.2); bottom: -150px; right: -100px; animation-delay: -5s; }
+.bg-orb-3 { width: 300px; height: 300px; background: rgba(219, 234, 254, 0.3); top: 40%; left: 50%; animation-delay: -10s; }
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(40px, 30px) scale(1.05); }
+}
+
+/* ── Magnetic Custom Cursor ───────────────────────────── */
+body { cursor: none; }
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(59, 130, 246, 0.6);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
+  mix-blend-mode: multiply;
+}
+#custom-cursor-follower {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(59, 130, 246, 0.4);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out, width 0.2s, height 0.2s;
+}
+
+/* Interactive States */
+.cursor-hover {
+  width: 40px !important;
+  height: 40px !important;
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+.follower-hover {
+  width: 60px !important;
+  height: 60px !important;
+  border-color: rgba(59, 130, 246, 0.8) !important;
+}
