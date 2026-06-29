@@ -845,12 +845,15 @@
       hideResultPanel();
 
       try {
+        // GAS doGet handles ?email= and ?utr= as direct params (no action= needed)
         const url = currentMode === 'email'
-          ? SCRIPT_URL + '?action=checkStatus&email=' + encodeURIComponent(query)
-          : SCRIPT_URL + '?action=checkStatus&utr=' + encodeURIComponent(query);
+          ? SCRIPT_URL + '?email=' + encodeURIComponent(query)
+          : SCRIPT_URL + '?utr='   + encodeURIComponent(query);
 
-        const data = await gasGet(url);
-        renderResult(data);
+        const res  = await gasGet(url);
+        // GAS returns { success, message, data: { name, email, status, ... } }
+        const member = (res && res.data) ? res.data : res;
+        renderResult(member);
       } catch (err) {
         showState('error');
         document.getElementById('error-msg-text').textContent =
@@ -865,13 +868,14 @@
 
     // ── Render Result ─────────────────────────────────
     function renderResult(data) {
-      if (!data || data.error || !data.status) {
+      // Handle GAS response: success=false means not found
+      if (!data || data.success === false || (!data.status && !data.email)) {
         showState('not-found');
         showResultPanel();
         return;
       }
 
-      const status = (data.status || '').toLowerCase().trim();
+      const status = (data.status || 'pending').toLowerCase().trim();
       const name   = data.name  || '—';
       const email  = data.email || '—';
 
