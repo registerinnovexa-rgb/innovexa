@@ -845,14 +845,24 @@
       hideResultPanel();
 
       try {
-        // GAS doGet handles ?email= and ?utr= as direct params (no action= needed)
-        const url = currentMode === 'email'
-          ? SCRIPT_URL + '?email=' + encodeURIComponent(query)
-          : SCRIPT_URL + '?utr='   + encodeURIComponent(query);
+        // Build query URL — proxy strips SCRIPT_URL, only passes params
+        const param = currentMode === 'email'
+          ? 'email=' + encodeURIComponent(query)
+          : 'utr='   + encodeURIComponent(query);
 
-        const res  = await gasGet(url);
-        // GAS returns { success, message, data: { name, email, status, ... } }
-        const member = (res && res.data) ? res.data : res;
+        const res = await gasGet(SCRIPT_URL + '?' + param);
+
+        // Normalise response — handle BOTH GAS formats:
+        // OLD: { found:true, name, email, status, ... }
+        // NEW: { success:true, data:{ name, email, status, ... } }
+        let member;
+        if (res && res.data && typeof res.data === 'object') {
+          member = res.data;                     // new Code.gs format
+        } else if (res && res.found === true) {
+          member = res;                          // old Code.gs format
+        } else {
+          member = null;                         // not found
+        }
         renderResult(member);
       } catch (err) {
         showState('error');
@@ -868,14 +878,12 @@
 
     // ── Render Result ─────────────────────────────────
     function renderResult(data) {
-      // Handle GAS response: success=false means not found
-      if (!data || data.success === false || (!data.status && !data.email)) {
+      if (!data || (!data.status && !data.email && !data.name)) {
         showState('not-found');
         showResultPanel();
         return;
       }
-
-      const status = (data.status || 'pending').toLowerCase().trim();
+      const status = (data.status || data.Status || 'pending').toLowerCase().trim();
       const name   = data.name  || '—';
       const email  = data.email || '—';
 
