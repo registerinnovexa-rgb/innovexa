@@ -1,4 +1,4 @@
-// Innovexa Hub — Google Apps Script Backend
+// Innovexa Labs — Google Apps Script Backend
 // Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id N:PhotoURL O:PaymentProofURL
 
 function doGet(e) {
@@ -111,8 +111,8 @@ function doPost(e) {
     try {
       MailApp.sendEmail({
         to:      data.email,
-        subject: 'Innovexa Hub — Registration Received! ID: ' + operativeId,
-        body:    'Hi ' + (data.fullName || '') + ',\n\nYour Operative ID: ' + operativeId + '\n\nCheck status: https://innovexareg.vercel.app/status.html\n\n— Innovexa Hub'
+        subject: 'Innovexa Labs — Registration Received! ID: ' + operativeId,
+        body:    'Hi ' + (data.fullName || '') + ',\n\nYour Operative ID: ' + operativeId + '\n\nCheck status: https://innovexareg.vercel.app/status.html\n\n— Innovexa Labs'
       });
     } catch (_) {}
 

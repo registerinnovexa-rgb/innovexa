@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Innovexa Hub — Admin Console</title>
+  <title>Innovexa Labs — Admin Console</title>
   <meta name="robots" content="noindex, nofollow">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode"></script>
@@ -245,7 +245,7 @@
       <div class="logo-icon">IX</div>
       <div>
         <h1>Admin Console</h1>
-        <p style="margin-bottom:0">Innovexa Hub — President Access Only</p>
+        <p style="margin-bottom:0">Innovexa Labs — President Access Only</p>
       </div>
     </div>
     <p>Verify your identity to access the admin dashboard. Only INVX-01 is authorized.</p>
@@ -1448,7 +1448,7 @@ function _docHeader() {
   return `<div style="display:flex;align-items:center;gap:18px;border-bottom:3px solid #1e3a5f;padding-bottom:16px;margin-bottom:26px;">
     ${logo}
     <div>
-      <div style="font-size:22px;font-weight:900;color:#1e3a5f;letter-spacing:2px;">INNOVEXA HUB</div>
+      <div style="font-size:22px;font-weight:900;color:#1e3a5f;letter-spacing:2px;">INNOVEXA LABS</div>
       <div style="font-size:9px;color:#888;letter-spacing:1.5px;margin-top:2px;">YENEPOYA UNIVERSITY · BANGALORE CAMPUS</div>
       
     </div>
@@ -1465,7 +1465,7 @@ function _docSignature(opId, type) {
       ${sigImg}
       <div style="border-top:2px solid #222;width:180px;padding-top:5px;margin-top:2px;">
         <div style="font-size:13px;font-weight:800;color:#1e3a5f;">${PRESIDENT_NAME}</div>
-        <div style="font-size:11px;font-weight:600;color:#333;">President, Innovexa Hub</div>
+        <div style="font-size:11px;font-weight:600;color:#333;">President, Innovexa Labs</div>
         <div style="font-size:9px;color:#888;">Authorized Signatory</div>
       </div>
     </div>
@@ -1476,7 +1476,7 @@ function _docSignature(opId, type) {
     </div>
   </div>
   <div style="text-align:center;margin-top:24px;padding-top:10px;border-top:1px solid #eee;">
-    <div style="font-size:8px;color:#bbb;">Digitally generated official document — Innovexa Hub Management System</div>
+    <div style="font-size:8px;color:#bbb;">Digitally generated official document — Innovexa Labs Management System</div>
   </div>`;
 }
 
@@ -1522,7 +1522,7 @@ function buildDocHTML(member, type) {
 
   if (type === 'membership') {
     return hdr + _titleBlock('CERTIFICATE OF MEMBERSHIP') +
-      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, studying in <strong>${year} Year, ${branch}</strong> at Yenepoya University, Bangalore Campus, is an active and verified member of <strong>Innovexa Hub</strong> — the official innovation and technology community.</p>
+      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, studying in <strong>${year} Year, ${branch}</strong> at Yenepoya University, Bangalore Campus, is an active and verified member of <strong>Innovexa Labs</strong> — the official innovation and technology community.</p>
       <p style="${p}">As a member, the individual has demonstrated commitment to collaborative learning, technical development, and community engagement through active participation in hub activities, workshops, and events.</p>
       <p style="${p}">This certificate is issued upon request for academic and professional reference purposes.</p>` + sig;
   }
@@ -1532,7 +1532,7 @@ function buildDocHTML(member, type) {
       `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
       <p style="${p}">To Whom It May Concern,</p>
       <p style="${p}">I am writing to recommend <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), a ${year} Year ${branch} student at Yenepoya University, Bangalore.</p>
-      <p style="${p}">During their tenure at Innovexa Hub, ${name.split(' ')[0]} has shown exceptional dedication in <strong>${ctx}</strong>. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.</p>
+      <p style="${p}">During their tenure at Innovexa Labs, ${name.split(' ')[0]} has shown exceptional dedication in <strong>${ctx}</strong>. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.</p>
       <p style="${p}">I strongly recommend ${name.split(' ')[0]} for any opportunity that values technical capability, leadership, and a collaborative spirit.</p>
       <p style="${p}">Warm regards,</p>` + sig;
   }
@@ -1544,13 +1544,13 @@ function buildDocHTML(member, type) {
     return hdr + _titleBlock('NO OBJECTION CERTIFICATE') +
       `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
       <p style="${p}">To Whom It May Concern,</p>
-      <p style="${p}">This is to confirm that <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), ${year} Year ${branch} student, is required to attend <strong>"${ev}"</strong> on <strong>${ed}</strong> as part of Innovexa Hub activities.</p>
-      <p style="${p}">We request that the concerned authorities grant permission for the same. Innovexa Hub takes full responsibility for the student's participation during the event hours.</p>
+      <p style="${p}">This is to confirm that <strong style="color:#1e3a5f;">${name}</strong> (Operative ID: <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>), ${year} Year ${branch} student, is required to attend <strong>"${ev}"</strong> on <strong>${ed}</strong> as part of Innovexa Labs activities.</p>
+      <p style="${p}">We request that the concerned authorities grant permission for the same. Innovexa Labs takes full responsibility for the student's participation during the event hours.</p>
       <p style="${p}">We appreciate your kind cooperation.</p>` + sig;
   }
   if (type === 'attendance_cert') {
     return hdr + _titleBlock('ATTENDANCE CERTIFICATE') +
-      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, has been an active participant in Innovexa Hub events and workshops during the academic year ${new Date().getFullYear()}.</p>
+      `<p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${name}</strong>, Operative ID <strong style="font-family:monospace;color:#6366f1;">${opId}</strong>, has been an active participant in Innovexa Labs events and workshops during the academic year ${new Date().getFullYear()}.</p>
       <p style="${p}">The member has maintained regular attendance and has actively contributed to the growth and activities of the hub. This certificate is issued for the purpose of academic records and institutional documentation.</p>` + sig;
   }
   return '<p>Unknown document type</p>';
@@ -1585,7 +1585,7 @@ async function downloadDocument() {
   // Header text next to logo
   doc.setTextColor(30, 58, 95);
   doc.setFontSize(20); doc.setFont('helvetica', 'bold');
-  doc.text('INNOVEXA HUB', 42, 18);
+  doc.text('INNOVEXA LABS', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.setTextColor(120, 120, 120);
   doc.text('YENEPOYA UNIVERSITY · BANGALORE CAMPUS · ', 42, 24);
@@ -1611,14 +1611,14 @@ async function downloadDocument() {
   function addPara(t) { const ls = doc.splitTextToSize(t, rm - lm); ls.forEach(l => { doc.text(l, lm, y); y += lineH; }); y += 4; }
 
   if (type === 'membership') {
-    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', studying in ' + year + ' Year, ' + branch + ' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Hub \u2014 the official innovation and technology community.');
+    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', studying in ' + year + ' Year, ' + branch + ' at Yenepoya University, Bangalore Campus, is an active and verified member of Innovexa Labs \u2014 the official innovation and technology community.');
     addPara('As a member, the individual has demonstrated commitment to collaborative learning, technical development, and community engagement through active participation in hub activities, workshops, and events.');
     addPara('This certificate is issued upon request for academic and professional reference purposes.');
   } else if (type === 'lor') {
     const ctx = document.getElementById('doc-lor-context')?.value || 'various hub activities';
     doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
     addPara('I am writing to recommend ' + name + ' (Operative ID: ' + opId + '), a ' + year + ' Year ' + branch + ' student at Yenepoya University, Bangalore.');
-    addPara('During their tenure at Innovexa Hub, ' + name.split(' ')[0] + ' has shown exceptional dedication in ' + ctx + '. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.');
+    addPara('During their tenure at Innovexa Labs, ' + name.split(' ')[0] + ' has shown exceptional dedication in ' + ctx + '. They have consistently demonstrated strong problem-solving abilities, effective teamwork, and initiative in driving project outcomes.');
     addPara('I strongly recommend ' + name.split(' ')[0] + ' for any opportunity that values technical capability, leadership, and a collaborative spirit.');
     doc.text('Warm regards,', lm, y); y += lineH;
   } else if (type === 'noc') {
@@ -1627,11 +1627,11 @@ async function downloadDocument() {
     const _de=document.getElementById('doc-noc-date-end')?.value||'';
     const ed=_ds?(_de&&_de!==_ds?_fmtRange(_ds,_de):_fmtDate(_ds)):today;
     doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
-    addPara('This is to confirm that ' + name + ' (Operative ID: ' + opId + '), ' + year + ' Year ' + branch + ' student, is required to attend "' + ev + '" on ' + ed + ' as part of Innovexa Hub activities.');
-    addPara('We request that the concerned authorities grant permission for the same. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.');
+    addPara('This is to confirm that ' + name + ' (Operative ID: ' + opId + '), ' + year + ' Year ' + branch + ' student, is required to attend "' + ev + '" on ' + ed + ' as part of Innovexa Labs activities.');
+    addPara('We request that the concerned authorities grant permission for the same. Innovexa Labs takes full responsibility for the student\'s participation during the event hours.');
     addPara('We appreciate your kind cooperation.');
   } else if (type === 'attendance_cert') {
-    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', has been an active participant in Innovexa Hub events and workshops during the academic year ' + new Date().getFullYear() + '.');
+    addPara('This is to certify that ' + name + ', Operative ID ' + opId + ', has been an active participant in Innovexa Labs events and workshops during the academic year ' + new Date().getFullYear() + '.');
     addPara('The member has maintained regular attendance and has actively contributed to the growth and activities of the hub. This certificate is issued for the purpose of academic records and institutional documentation.');
   }
 
@@ -1651,14 +1651,14 @@ async function downloadDocument() {
   doc.text(PRESIDENT_NAME, 20, y + 6);
   doc.setFontSize(9); doc.setFont('helvetica', 'normal');
   doc.setTextColor(50, 50, 50);
-  doc.text('President, Innovexa Hub', 20, y + 11);
+  doc.text('President, Innovexa Labs', 20, y + 11);
   doc.setFontSize(7); doc.setTextColor(140, 140, 140);
   doc.text('Authorized Signatory', 20, y + 15);
 
   // Footer
   doc.setFillColor(245, 245, 245); doc.rect(0, 280, 210, 17, 'F');
   doc.setTextColor(160, 160, 160); doc.setFontSize(7);
-  doc.text('Digitally generated official document \u2014 Innovexa Hub Management System', 105, 288, { align: 'center' });
+  doc.text('Digitally generated official document \u2014 Innovexa Labs Management System', 105, 288, { align: 'center' });
 
   doc.save(opId + '_' + type + '_innovexa.pdf');
   showToast('PDF downloaded!', 'success');
@@ -1740,9 +1740,9 @@ function _buildPublicNOCHTML() {
   return { html: _docHeader() + _titleBlock('PERMISSION LETTER') +
     `<p style="font-size:12px;color:#888;margin-bottom:16px;">Date: ${today}</p>
     <p style="${p}">To Whom It May Concern,</p>
-    <p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${nm}</strong>, ${yr} Year, <strong>${br}</strong> student at Yenepoya University, Bangalore Campus, is a <strong>${rl}</strong> of <strong>Innovexa Hub</strong> — the official innovation and technology community of the university.</p>
-    <p style="${p}">The above-mentioned student is required to attend <strong>"${ev}"</strong> on <strong>${dt}</strong> as part of Innovexa Hub activities.</p>
-    <p style="${p}">We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student's participation during the event hours.</p>
+    <p style="${p}">This is to certify that <strong style="color:#1e3a5f;">${nm}</strong>, ${yr} Year, <strong>${br}</strong> student at Yenepoya University, Bangalore Campus, is a <strong>${rl}</strong> of <strong>Innovexa Labs</strong> — the official innovation and technology community of the university.</p>
+    <p style="${p}">The above-mentioned student is required to attend <strong>"${ev}"</strong> on <strong>${dt}</strong> as part of Innovexa Labs activities.</p>
+    <p style="${p}">We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Labs takes full responsibility for the student's participation during the event hours.</p>
     ${noteHtml}
     <p style="${p}">We appreciate your kind cooperation.</p>` +
     _docSignature('MBR', 'NOC'), name: nm, branch: br, year: yr, event: ev, date: dt, role: rl, note: note };
@@ -1764,7 +1764,7 @@ function downloadPublicNOC() {
 
   try { doc.addImage(INNOVEXA_LOGO_B64, 'PNG', 15, 8, 22, 22); } catch(e) {}
   doc.setTextColor(30, 58, 95); doc.setFontSize(20); doc.setFont('helvetica', 'bold');
-  doc.text('INNOVEXA HUB', 42, 18);
+  doc.text('INNOVEXA LABS', 42, 18);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
   doc.text('YENEPOYA UNIVERSITY \xb7 BANGALORE CAMPUS \xb7 ', 42, 24);
   doc.setDrawColor(30, 58, 95); doc.setLineWidth(1); doc.line(15, 33, 195, 33);
@@ -1781,9 +1781,9 @@ function downloadPublicNOC() {
   function addP(t) { const ls = doc.splitTextToSize(t, rm - lm); ls.forEach(l => { doc.text(l, lm, y); y += lineH; }); y += 4; }
 
   doc.text('To Whom It May Concern,', lm, y); y += lineH * 2;
-  addP('This is to certify that ' + res.name + ', ' + res.year + ' Year, ' + res.branch + ' student at Yenepoya University, Bangalore Campus, is a ' + res.role + ' of Innovexa Hub \u2014 the official innovation and technology community of the university.');
-  addP('The above-mentioned student is required to attend "' + res.event + '" on ' + res.date + ' as part of Innovexa Hub activities.');
-  addP('We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Hub takes full responsibility for the student\'s participation during the event hours.');
+  addP('This is to certify that ' + res.name + ', ' + res.year + ' Year, ' + res.branch + ' student at Yenepoya University, Bangalore Campus, is a ' + res.role + ' of Innovexa Labs \u2014 the official innovation and technology community of the university.');
+  addP('The above-mentioned student is required to attend "' + res.event + '" on ' + res.date + ' as part of Innovexa Labs activities.');
+  addP('We kindly request the concerned faculty/authorities to grant necessary permission for the same. Innovexa Labs takes full responsibility for the student\'s participation during the event hours.');
   if (res.note) { addP('Note: ' + res.note); }
   addP('We appreciate your kind cooperation.');
 
@@ -1793,13 +1793,13 @@ function downloadPublicNOC() {
   doc.setTextColor(30, 58, 95); doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text(PRESIDENT_NAME, 20, y + 6);
   doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(50, 50, 50);
-  doc.text('President, Innovexa Hub', 20, y + 11);
+  doc.text('President, Innovexa Labs', 20, y + 11);
   doc.setFontSize(7); doc.setTextColor(140, 140, 140);
   doc.text('Authorized Signatory', 20, y + 15);
 
   doc.setFillColor(245, 245, 245); doc.rect(0, 280, 210, 17, 'F');
   doc.setTextColor(160, 160, 160); doc.setFontSize(7);
-  doc.text('Digitally generated official document \u2014 Innovexa Hub Management System', 105, 288, { align: 'center' });
+  doc.text('Digitally generated official document \u2014 Innovexa Labs Management System', 105, 288, { align: 'center' });
 
   doc.save('permission_letter_' + res.name.replace(/\s+/g, '_') + '.pdf');
   showToast('Permission Letter PDF downloaded!', 'success');

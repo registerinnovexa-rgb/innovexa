@@ -1,5 +1,5 @@
 /**
- * Innovexa Hub — Shared API Helper
+ * Innovexa Labs — Shared API Helper
  * Uses /api/proxy (Vercel serverless) for GET requests to avoid CORS.
  * Uses no-cors direct POST for write operations.
  * Load as plain script: <script src="/js/api.js"></script>

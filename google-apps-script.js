@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════
- *  INNOVEXA HUB — Google Apps Script Backend (Code.gs)
+ *  INNOVEXA LABS — Google Apps Script Backend (Code.gs)
  * ═══════════════════════════════════════════════════════════════════
  *
  *  This script handles two types of requests:
@@ -16,7 +16,7 @@
  *  Step 1: Create the Google Sheet
  *  ───────────────────────────────
  *  1. Go to https://sheets.google.com → Create a new spreadsheet
- *  2. Name it "Innovexa Hub - Registrations"
+ *  2. Name it "Innovexa Labs - Registrations"
  *  3. In Row 1, add these 8 column headers:
  *     A1: Timestamp
  *     B1: Name
@@ -37,7 +37,7 @@
  *  ─────────────────────────
  *  7. Click Deploy → New Deployment
  *  8. Click the gear icon → Select type: "Web app"
- *  9. Set "Description": "Innovexa Hub Registration API"
+ *  9. Set "Description": "Innovexa Labs Registration API"
  * 10. Set "Execute as": Me (your Google account)
  * 11. Set "Who has access": Anyone
  * 12. Click Deploy
@@ -152,7 +152,7 @@ function doGet(e) {
 
     // Check if we have query parameters
     if (!e || !e.parameter) {
-      return createJsonResponse(true, 'Innovexa Hub Registration API is running. Use ?email= or ?utr= or ?action=count to query.');
+      return createJsonResponse(true, 'Innovexa Labs Registration API is running. Use ?email= or ?utr= or ?action=count to query.');
     }
 
     // Handle Member Count Request

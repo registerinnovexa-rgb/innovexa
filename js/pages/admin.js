@@ -18,7 +18,7 @@ export async function renderAdmin(app, tab = 'admin') {
   app.innerHTML = `
   <div class="shell">
     <aside class="sidebar">
-      <a class="sidebar-brand" href="#admin"><img src="/assets/logo.png" alt=""><span>Innovexa Hub</span></a>
+      <a class="sidebar-brand" href="#admin"><img src="/assets/logo.png" alt=""><span>Innovexa Labs</span></a>
       <div class="sidebar-section-label">Admin Panel</div>
       <ul class="sidebar-nav">
         ${TABS.map(t => `<li><a href="#${t.id}" class="${tab === t.id ? 'active' : ''}"><span class="nav-icon">${t.icon}</span>${t.label}</a></li>`).join('')}
@@ -39,7 +39,7 @@ export async function renderAdmin(app, tab = 'admin') {
         <div class="topbar-right"><div class="avatar avatar-sm">${init}</div>${p.name || 'Admin'}</div>
       </div>
       <div class="content" id="panel"></div>
-      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Hub. All rights reserved.</div>
+      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Labs. All rights reserved.</div>
     </div>
   </div>`
 
