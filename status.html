@@ -896,7 +896,7 @@
         document.getElementById('pending-details').innerHTML = detailsHtml;
         showState('pending');
 
-      } else if (status === 'approved') {
+      } else if (status === 'approved' || status === 'confirmed' || status === 'active') {
         document.getElementById('approved-name').textContent  = name;
         document.getElementById('approved-email').textContent = email;
         document.getElementById('approved-details').innerHTML = detailsHtml;
@@ -928,7 +928,11 @@
         showState('rejected');
 
       } else {
-        showState('not-found');
+        // Fallback for unknown status (treat as pending)
+        document.getElementById('pending-name').textContent  = name;
+        document.getElementById('pending-email').textContent = email;
+        document.getElementById('pending-details').innerHTML = detailsHtml;
+        showState('pending');
       }
 
       showResultPanel();

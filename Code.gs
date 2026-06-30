@@ -1,14 +1,31 @@
-// Innovexa Hub — Minimal Status Check Script
-// Paste this in Apps Script, save, then Deploy > New deployment > Web App > Anyone > Deploy
+// Innovexa Hub — Google Apps Script Backend
+// Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id N:PhotoURL O:PaymentProofURL
 
 function doGet(e) {
   try {
-    var ss    = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('Sheet1') || ss.getSheets()[0];
-    var rows  = sheet.getDataRange().getValues();
-    var p     = e.parameter || {};
+    var ss     = SpreadsheetApp.getActiveSpreadsheet();
+    var sheets = ss.getSheets();
+    var sheet  = ss.getSheetByName('Members') || ss.getSheetByName('Sheet1') || sheets[0];
+    var p      = e.parameter || {};
 
-    // ?action=count — return member count
+    // Debug — list all sheet names
+    if (p.action === 'debug') {
+      var names = sheets.map(function(s) { return s.getName(); });
+      return respond({ success: true, sheets: names, total: sheets.length });
+    }
+
+    var rows = sheet.getDataRange().getValues();
+
+    // Debug — see first 5 emails
+    if (p.action === 'debugemails') {
+      var emails = [];
+      for (var j = 1; j < Math.min(6, rows.length); j++) {
+        emails.push({ row: j+1, colC: rows[j][2], colJ: rows[j][9] });
+      }
+      return respond({ success: true, samples: emails });
+    }
+
+    // Count members
     if (p.action === 'count' || (!p.email && !p.utr && !p.action)) {
       return respond({ success: true, data: { count: Math.max(0, rows.length - 1) } });
     }
@@ -55,21 +72,21 @@ function doGet(e) {
 function doPost(e) {
   try {
     var ss    = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName('Sheet1') || ss.getSheets()[0];
+    var sheet = ss.getSheetByName('Members') || ss.getSheetByName('Sheet1') || ss.getSheets()[0];
     var data  = JSON.parse(e.postData.contents || '{}');
 
-    // Duplicate email check
+    // Duplicate email / UTR check
     var rows = sheet.getDataRange().getValues();
     for (var i = 1; i < rows.length; i++) {
       if (String(rows[i][2]).toLowerCase() === String(data.email || '').toLowerCase()) {
         return respond({ success: false, message: 'Email already registered.' });
       }
-      if (String(rows[i][9]) === String(data.utr || '')) {
+      if (data.utr && String(rows[i][9]).trim() === String(data.utr).trim()) {
         return respond({ success: false, message: 'UTR already submitted.' });
       }
     }
 
-    var nextNum     = sheet.getLastRow(); // row count including header
+    var nextNum     = sheet.getLastRow();
     var operativeId = 'INVX-' + String(nextNum).padStart(3, '0');
     var timestamp   = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
