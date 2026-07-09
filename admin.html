@@ -474,6 +474,18 @@ function fmtInsertAt(id, text) {
   ta.value = ta.value.substring(0, start) + text + ta.value.substring(ta.selectionEnd);
   ta.focus();
 }
+
+// Convert any Google Drive share/view URL to a direct image URL
+function driveImgUrl(url) {
+  if (!url) return '';
+  if (url.includes('uc?')) return url;
+  const m1 = url.match(/\/file\/d\/([^/]+)/);
+  if (m1) return `https://drive.google.com/uc?export=view&id=${m1[1]}`;
+  const m2 = url.match(/[?&]id=([^&]+)/);
+  if (m2) return `https://drive.google.com/uc?export=view&id=${m2[1]}`;
+  return url;
+}
+
 async function apiGet(action) {
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
@@ -859,13 +871,13 @@ function renderMembersHTML(members) {
       <td><input type="checkbox" class="member-checkbox" value="${m.rowIndex}" onchange="updateBulkActions()"></td>
       <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openProfileModal('${mData}')">${escHtml(m.operativeId)}</strong></td>
       <td>
-        ${m.avatar ? `<img src="${m.avatar}" onclick="window.open(this.src)" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid var(--border);" title="Click to view full photo"/>` : '<span style="color:var(--text3);font-size:10px;">None</span>'}
+        ${m.photoUrl ? `<img src="${driveImgUrl(m.photoUrl)}" onclick="window.open(driveImgUrl('${m.photoUrl}'))" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid var(--border);" title="Click to view full photo"/>` : '<span style="color:var(--text3);font-size:10px;">None</span>'}
       </td>
       <td style="color:var(--text);cursor:pointer;" onclick="openProfileModal('${mData}')">${escHtml(m.name)}</td>
       <td>${escHtml(m.email)}</td>
       <td>${escHtml(m.phone)}</td>
       <td>
-        ${m.paymentProof ? `<button onclick="window.open('${m.paymentProof}')" class="btn-sm" style="background:var(--blue-bg);color:var(--blue);font-size:9px;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;">📄 View Proof</button>` : '<span style="color:var(--text3);font-size:10px;">—</span>'}
+        ${m.paymentProofUrl ? `<button onclick="window.open('${m.paymentProofUrl}')" class="btn-sm" style="background:var(--blue-bg);color:var(--blue);font-size:9px;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;">📄 View Proof</button>` : '<span style="color:var(--text3);font-size:10px;">—</span>'}
       </td>
       <td>${statusBadge(m.status)}</td>
       <td>
@@ -1030,7 +1042,7 @@ function openProfileModal(encodedData) {
 
   const html = `
     <div style="display:flex; gap:20px; align-items:flex-start; margin-bottom:20px;">
-      ${m.avatar ? `<img src="${m.avatar}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid var(--accent);"/>` : `<div style="width:100px;height:100px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);">No Photo</div>`}
+      ${m.photoUrl ? `<img src="${driveImgUrl(m.photoUrl)}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); cursor:pointer;" onclick="window.open(driveImgUrl('${m.photoUrl}'))"/>` : `<div style="width:100px;height:100px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);">No Photo</div>`}
       <div>
         <h3 style="font-size:20px; margin-bottom:4px; color:var(--accent2);">${escHtml(m.operativeId)}</h3>
         <h2 style="font-size:24px; margin-bottom:8px;">${escHtml(m.name)}</h2>
@@ -1057,10 +1069,10 @@ function openProfileModal(encodedData) {
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">UTR Number</span><br><strong style="font-family:monospace; color:var(--green);">${escHtml(m.utr)}</strong></div>
     </div>
     
-    ${m.paymentProof ? `
+    ${m.paymentProofUrl ? `
       <div class="admin-card" style="margin:0; text-align:center;">
         <span style="font-size:11px;color:var(--text3);display:block;margin-bottom:10px;">Payment Proof</span>
-        <img src="${m.paymentProof}" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--border); cursor:pointer;" onclick="window.open(this.src)"/>
+        <img src="${driveImgUrl(m.paymentProofUrl)}" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--border); cursor:pointer;" onclick="window.open(driveImgUrl('${m.paymentProofUrl}'))"/>>
       </div>
     ` : ''}
   `;
