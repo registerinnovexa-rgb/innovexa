@@ -916,11 +916,13 @@
             <div class="prof-name">${escHtml(s.name)}</div>
             <div style="font-family:var(--fm);font-size:12px;color:var(--accent);margin-top:6px;">${escHtml(s.operativeId)}</div>
           </div>`).join('');
-      } else {
+      } else if (res.success) {
         grid.innerHTML = '<div class="empty-state">No apprentices linked to you yet. Ask admin to link members.</div>';
+      } else {
+        grid.innerHTML = `<div class="empty-state" style="color:var(--red);">⚠ Error: ${escHtml(res.message)}</div>`;
       }
     } catch(e) {
-      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load squad.</div>';
+      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load squad (Network error).</div>';
     }
   }
 
