@@ -474,16 +474,17 @@ function fmtInsertAt(id, text) {
 async function apiGet(action) {
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  const gasUrl = `${baseUrl}?action=${action}`;
+  // Add timestamp to bust GAS cache
+  const gasUrl = `${baseUrl}?action=${action}&_t=${Date.now()}`;
   
   try {
     const proxyUrl = `/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`;
-    const r = await fetch(proxyUrl);
+    const r = await fetch(proxyUrl, { cache: 'no-store' });
     if (!r.ok) throw new Error('Proxy error');
     return await r.json();
   } catch(e) {
     // Fallback for local development if proxy is unavailable
-    const r = await fetch(gasUrl, { method:'GET', redirect:'follow' });
+    const r = await fetch(gasUrl, { method:'GET', redirect:'follow', cache:'no-store' });
     return await r.json();
   }
 }
