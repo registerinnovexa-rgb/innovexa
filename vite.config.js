@@ -13,6 +13,7 @@ export default defineConfig({
         community: resolve(__dirname, 'community.html'),
         admin: resolve(__dirname, 'admin.html'),
         packetRoute: resolve(__dirname, 'packet-route.html'),
+        forge: resolve(__dirname, 'forge.html'),
       }
     }
   }
