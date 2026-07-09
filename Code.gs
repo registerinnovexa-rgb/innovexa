@@ -243,6 +243,22 @@ function doGet(e) {
       return respond({ success: true, data: apprentices });
     }
 
+    // FORGE: Get all roles for Admin Panel
+    if (action === 'forge_get_all_roles') {
+      var rows = sheet.getDataRange().getValues();
+      var rolesMap = {};
+      for (var i = 1; i < rows.length; i++) {
+        var opId = String(rows[i][12] || '').trim();
+        if (opId) {
+          rolesMap[opId] = {
+            forgeRole: String(rows[i][16] || '').trim(),
+            linkedMentor: String(rows[i][17] || '').trim()
+          };
+        }
+      }
+      return respond({ success: true, data: rolesMap });
+    }
+
     return respond({ success: false, message: 'Unknown action.' });
 
   } catch (err) {

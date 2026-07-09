@@ -782,7 +782,23 @@ async function loadMembers() {
   document.getElementById('membersTable').style.display = 'none';
   try {
     const data = await apiGet('adminMembers');
-    cachedMembers = data.members || [];
+    const members = data.members || [];
+    
+    // Merge Forge Roles from proxy script
+    try {
+      const fRes = await fetch('/api/proxy?action=forge_get_all_roles');
+      const fData = await fRes.json();
+      if (fData.success && fData.data) {
+        members.forEach(m => {
+          if (fData.data[m.operativeId]) {
+            m.forgeRole = fData.data[m.operativeId].forgeRole;
+            m.linkedMentor = fData.data[m.operativeId].linkedMentor;
+          }
+        });
+      }
+    } catch(e) { console.error('Error fetching forge roles:', e); }
+
+    cachedMembers = members;
     renderMembers(cachedMembers);
   } catch(e) { showToast('Failed to load members', 'error'); }
 }
@@ -1083,24 +1099,44 @@ function openProfileModal(encodedData) {
 
 async function updateForgeRole(operativeId) {
   const role = document.getElementById('forgeRoleSelect').value;
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
   try {
     const payload = { action: 'forge_set_role', operativeId: operativeId, forgeRole: role };
     const r = await fetch('/api/proxy', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({payload}) });
     const res = await r.json();
-    if(res.success) showToast('Role updated!', 'success');
-    else showToast('Failed to update', 'error');
+    if(res.success) {
+      showToast('Role updated!', 'success');
+      const m = cachedMembers.find(x => x.operativeId === operativeId);
+      if (m) m.forgeRole = role;
+      renderMembers(cachedMembers);
+    }
+    else showToast('Failed to update: ' + res.message, 'error');
   } catch(e) { showToast('Error', 'error'); }
+  btn.disabled = false;
+  btn.textContent = 'Update Role';
 }
 
 async function updateForgeMentor(operativeId) {
   const mentorId = document.getElementById('forgeMentorId').value.trim();
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Linking...';
   try {
     const payload = { action: 'forge_link_mentor', memberOperativeId: operativeId, mentorOperativeId: mentorId };
     const r = await fetch('/api/proxy', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({payload}) });
     const res = await r.json();
-    if(res.success) showToast('Mentor linked!', 'success');
-    else showToast('Failed to link', 'error');
+    if(res.success) {
+      showToast('Mentor linked!', 'success');
+      const m = cachedMembers.find(x => x.operativeId === operativeId);
+      if (m) m.linkedMentor = mentorId;
+      renderMembers(cachedMembers);
+    }
+    else showToast('Failed to link: ' + res.message, 'error');
   } catch(e) { showToast('Error', 'error'); }
+  btn.disabled = false;
+  btn.textContent = 'Link Mentor';
 }
 
 async function generateIDCard(encodedData, autoSave = true) {
