@@ -718,7 +718,15 @@
         body: JSON.stringify(payload)
       });
       
-      const genId = 'INVX-' + Math.floor(Math.random()*900 + 100);
+      // Fetch current member count to assign next sequential ID
+      let nextNum = '??';
+      try {
+        const countRes = await fetch('/api/proxy?action=count&_t=' + Date.now(), { cache: 'no-store' });
+        const countData = await countRes.json();
+        const count = parseInt(countData.count || countData.data || 0);
+        if (!isNaN(count)) nextNum = String(count + 1).padStart(2, '0');
+      } catch(_) {}
+      const genId = 'INVX-' + nextNum;
       document.getElementById('generated-id').textContent = genId;
       document.getElementById('form-container').classList.add('hidden');
       document.getElementById('success-screen').classList.remove('hidden');
