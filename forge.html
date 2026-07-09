@@ -3,50 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Innovexa Forge</title>
-  <link rel="stylesheet" href="css/design.css">
+  <title>Innovexa Forge — Operative Portal</title>
+  <meta name="description" content="Innovexa Forge — Restricted access portal for approved operatives.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #0d0c12;
-      --bg2: rgba(255, 255, 255, 0.05);
-      --bg3: rgba(255, 255, 255, 0.08);
-      --text-1: #f0eeff;
-      --text-2: rgba(240, 238, 255, 0.6);
-      --text-3: rgba(240, 238, 255, 0.4);
-      --accent: #a78bfa;
-      --accent-hover: #8b5cf6;
-      --border: rgba(167, 139, 250, 0.15);
-      --font-s: 'Inter', sans-serif;
-      --font-d: 'JetBrains Mono', monospace;
-      --radius: 12px;
-      --glass-bg: rgba(13, 12, 18, 0.6);
+      --bg:      #0d0c12;
+      --bg2:     rgba(255,255,255,0.05);
+      --bg3:     rgba(255,255,255,0.08);
+      --text-1:  #f0eeff;
+      --text-2:  rgba(240,238,255,0.65);
+      --text-3:  rgba(240,238,255,0.38);
+      --accent:  #a78bfa;
+      --accent2: #8b5cf6;
+      --border:  rgba(167,139,250,0.18);
+      --green:   #10b981;
+      --red:     #ef4444;
+      --yellow:  #eab308;
+      --blue:    #3b82f6;
+      --fs:      'Inter', sans-serif;
+      --fm:      'JetBrains Mono', monospace;
     }
 
     body {
       background: var(--bg);
       color: var(--text-1);
-      font-family: var(--font-s);
-      margin: 0;
+      font-family: var(--fs);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      position: relative;
       overflow-x: hidden;
     }
 
-    /* Background effects */
+    /* ── BG ── */
     .forge-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background: 
-        radial-gradient(circle at 15% 50%, rgba(167, 139, 250, 0.1), transparent 40%),
-        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 40%);
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 50%, rgba(167,139,250,0.1), transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(139,92,246,0.08), transparent 40%);
     }
 
-    /* Views */
+    /* ── VIEWS ── */
     #login-view {
       flex: 1;
       display: flex;
@@ -54,944 +53,887 @@
       justify-content: center;
       padding: 24px;
     }
-    #dashboard-view {
-      display: none;
-    }
+    #dashboard-view { display: none; flex-direction: column; flex: 1; }
 
-    /* ─── LOGIN VIEW ─── */
+    /* ── LOGIN CARD ── */
     .login-card {
-      background: var(--bg2);
+      background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 40px;
       width: 100%;
       max-width: 420px;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
     }
-    .login-logo {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 24px;
-    }
-    .login-title {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: var(--text-1);
-    }
-    .login-subtitle {
-      font-size: 14px;
-      color: var(--text-2);
-      margin-bottom: 32px;
-    }
-    .form-group {
-      text-align: left;
-      margin-bottom: 16px;
-    }
-    .form-label {
-      display: block;
-      font-family: var(--font-d);
-      font-size: 11px;
-      color: var(--text-2);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-1);
-      font-family: var(--font-d);
-      font-size: 14px;
-      transition: all 0.3s;
-      box-sizing: border-box;
-    }
-    .form-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: rgba(0,0,0,0.5);
-    }
-    .btn-forge {
-      width: 100%;
-      padding: 12px;
-      background: var(--accent);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-family: var(--font-d);
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 16px;
-    }
-    .btn-forge:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-    }
-    .btn-forge:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .login-error {
-      color: #ef4444;
-      font-size: 13px;
-      margin-top: 16px;
-      min-height: 20px;
-    }
-    .back-to-hub {
-      display: inline-block;
-      margin-top: 24px;
-      color: var(--text-3);
-      font-size: 13px;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .back-to-hub:hover {
-      color: var(--text-2);
-    }
+    .login-logo { width: 52px; height: 52px; object-fit: contain; margin-bottom: 20px; border-radius: 10px; }
+    .login-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .login-subtitle { font-size: 13px; color: var(--text-2); margin-bottom: 28px; line-height: 1.5; }
 
-    /* ─── DASHBOARD VIEW ─── */
-    .forge-nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(13, 12, 18, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-    }
-    .forge-logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-    }
-    .forge-logo-text {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--text-1);
-    }
-    .forge-logo-text span {
-      color: var(--accent);
-    }
-    .forge-nav-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .user-badge {
-      background: rgba(167, 139, 250, 0.1);
+    .form-group { text-align: left; margin-bottom: 14px; }
+    .form-label { display: block; font-family: var(--fm); font-size: 10px; color: var(--text-3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .form-input {
+      width: 100%; padding: 11px 14px;
+      background: rgba(0,0,0,0.35);
       border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-family: var(--font-d);
-      font-size: 12px;
-      color: var(--accent);
+      border-radius: 8px;
+      color: var(--text-1);
+      font-family: var(--fm);
+      font-size: 14px;
+      transition: border 0.25s, box-shadow 0.25s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
+    textarea.form-input { resize: vertical; }
+    select.form-input { cursor: pointer; }
+
+    .btn-primary {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      border: none; border-radius: 10px;
+      font-weight: 700; font-family: var(--fm); font-size: 14px;
+      cursor: pointer; transition: all 0.3s;
+      letter-spacing: 0.4px; margin-top: 12px;
+      box-shadow: 0 4px 16px rgba(139,92,246,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.45); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; min-height: 18px; }
+    .back-link { display: inline-block; margin-top: 22px; color: var(--text-3); font-size: 13px; text-decoration: none; transition: color 0.2s; }
+    .back-link:hover { color: var(--text-2); }
+
+    /* ── FORGE NAV ── */
+    .forge-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,12,18,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+    }
+    .forge-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .forge-brand img { width: 26px; height: 26px; object-fit: contain; border-radius: 6px; }
+    .forge-brand-text { font-weight: 700; font-size: 17px; color: var(--text-1); }
+    .forge-brand-text span { color: var(--accent); }
+    .forge-nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-badge {
+      background: rgba(167,139,250,0.1);
+      border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 6px;
+      font-family: var(--fm); font-size: 11px; color: var(--accent);
     }
     .btn-logout {
-      background: transparent;
-      border: 1px solid var(--text-3);
-      color: var(--text-2);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: transparent; border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-2); padding: 6px 14px; border-radius: 8px;
+      font-size: 13px; cursor: pointer; transition: all 0.2s;
     }
-    .btn-logout:hover {
-      background: rgba(255,255,255,0.1);
-      color: var(--text-1);
-    }
+    .btn-logout:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
 
-    .dashboard-container {
-      display: flex;
-      flex: 1;
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
-    }
+    /* ── DASHBOARD LAYOUT ── */
+    .dash-body { display: flex; flex: 1; }
     .sidebar {
-      width: 280px;
+      width: 260px; flex-shrink: 0;
       border-right: 1px solid var(--border);
-      padding: 24px;
-      background: rgba(255,255,255,0.02);
+      padding: 24px 16px;
+      background: rgba(255,255,255,0.01);
     }
-    
     .profile-widget {
       text-align: center;
-      padding-bottom: 24px;
+      padding-bottom: 20px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .profile-avatar {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 800;
-      margin: 0 auto 12px;
+    .prof-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: #fff;
+      margin: 0 auto 10px;
     }
-    .profile-name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .profile-role {
+    .prof-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .prof-role-badge {
       display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: var(--font-d);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-top: 8px;
+      padding: 3px 10px; border-radius: 20px;
+      font-family: var(--fm); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
     }
-    .role-mentor { background: rgba(16, 163, 74, 0.15); color: #10a34a; }
-    .role-member { background: rgba(167, 139, 250, 0.15); color: var(--accent); }
-    .role-none { background: rgba(255, 255, 255, 0.1); color: var(--text-3); }
-    .linked-mentor {
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--text-2);
-      background: rgba(0,0,0,0.3);
-      padding: 8px;
-      border-radius: 6px;
+    .badge-mentor { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge-member { background: rgba(167,139,250,0.15); color: var(--accent); }
+    .badge-none   { background: rgba(255,255,255,0.08); color: var(--text-3); }
+    .linked-mentor-info {
+      margin-top: 10px; font-size: 12px; color: var(--text-2);
+      background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px;
+      border: 1px solid var(--border); line-height: 1.4;
     }
 
-    .nav-pill {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      color: var(--text-2);
-      text-decoration: none;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      font-weight: 500;
-      font-size: 14px;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: 1px solid transparent;
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 8px; margin-bottom: 4px;
+      color: var(--text-2); font-size: 14px; font-weight: 500;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all 0.2s; text-decoration: none;
+      background: transparent;
+      width: 100%; text-align: left;
     }
-    .nav-pill:hover {
-      background: var(--bg2);
-      color: var(--text-1);
-    }
-    .nav-pill.active {
-      background: rgba(167, 139, 250, 0.1);
-      color: var(--accent);
-      border-color: rgba(167, 139, 250, 0.2);
-    }
+    .nav-item:hover { background: var(--bg2); color: var(--text-1); }
+    .nav-item.active { background: rgba(167,139,250,0.1); color: var(--accent); border-color: rgba(167,139,250,0.2); }
 
-    .main-content {
-      flex: 1;
-      padding: 32px;
-    }
-    .panel {
-      display: none;
-    }
-    .panel.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    /* ── MAIN CONTENT ── */
+    .main-content { flex: 1; padding: 32px; overflow-y: auto; }
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeUp 0.35s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
-    .panel-header {
-      margin-bottom: 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .panel-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .panel-sub {
-      color: var(--text-2);
-      font-size: 14px;
-    }
+    .panel-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+    .panel-title { font-size: 26px; font-weight: 800; }
+    .panel-sub { color: var(--text-2); font-size: 13px; margin-top: 4px; }
 
-    /* Terminal Feed */
-    .terminal-box {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      height: 500px;
-      overflow-y: auto;
-      padding: 20px;
-      font-family: var(--font-d);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .log-entry { margin-bottom: 8px; }
-    .log-time { color: var(--text-3); margin-right: 8px; }
-    .log-SOS { color: #ef4444; }
-    .log-SOS_RESOLVED { color: #10b981; }
-    .log-BOUNTY_POSTED { color: #eab308; }
-    .log-BOUNTY_CLAIMED { color: #10b981; }
-    .log-BOUNTY_COMPLETED { color: #8b5cf6; }
-    .log-ROLE_ASSIGNED { color: #3b82f6; }
-    .log-MENTOR_LINKED { color: #a78bfa; }
-    .cursor-blink { animation: blink 1s step-end infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    /* Cards */
-    .grid-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 24px;
-    }
-    .forge-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-    .card-badge {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-family: var(--font-d);
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 700;
-    }
-    .badge-open { background: rgba(234,179,8,0.15); color: #eab308; }
-    .badge-claimed { background: rgba(59,130,246,0.15); color: #3b82f6; }
-    .badge-resolved { background: rgba(16,163,74,0.15); color: #10b981; }
-
-    .card-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; padding-right: 60px; }
-    .card-meta { font-size: 12px; color: var(--text-3); margin-bottom: 16px; font-family: var(--font-d); }
-    .card-desc { font-size: 14px; color: var(--text-2); margin-bottom: 24px; flex: 1; line-height: 1.5; }
+    /* ── BUTTONS ── */
     .btn-sm {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.06);
       border: 1px solid var(--border);
       color: var(--text-1);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
-    .btn-sm:hover { background: rgba(255,255,255,0.1); }
-    .btn-accent { background: rgba(167, 139, 250, 0.15); color: var(--accent); border-color: rgba(167, 139, 250, 0.3); }
-    .btn-accent:hover { background: rgba(167, 139, 250, 0.25); }
+    .btn-sm:hover { background: rgba(255,255,255,0.12); }
+    .btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-accent { background: rgba(167,139,250,0.15); color: var(--accent); border-color: rgba(167,139,250,0.3); }
+    .btn-accent:hover { background: rgba(167,139,250,0.25); }
+    .btn-green  { background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3); }
+    .btn-green:hover  { background: rgba(16,185,129,0.25); }
 
-    /* Modals */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+    /* ── TERMINAL ── */
+    .terminal-box {
+      background: rgba(0,0,0,0.55);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      height: 480px; overflow-y: auto;
+      padding: 20px;
+      font-family: var(--fm); font-size: 12.5px; line-height: 1.65;
     }
-    .modal-overlay.active { display: flex; }
+    .log-entry { margin-bottom: 6px; }
+    .log-time { color: var(--text-3); margin-right: 8px; }
+    .log-SOS           { color: var(--red); }
+    .log-SOS_RESOLVED  { color: var(--green); }
+    .log-BOUNTY_POSTED { color: var(--yellow); }
+    .log-BOUNTY_CLAIMED{ color: var(--green); }
+    .log-BOUNTY_COMPLETED{ color: var(--accent); }
+    .log-ROLE_ASSIGNED { color: var(--blue); }
+    .log-MENTOR_LINKED { color: var(--accent); }
+    .cursor-blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    .terminal-empty { color: var(--text-3); text-align: center; padding: 60px 20px; }
+
+    /* ── CARDS ── */
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+    .forge-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+      display: flex; flex-direction: column; position: relative;
+      transition: border-color 0.2s;
+    }
+    .forge-card:hover { border-color: rgba(167,139,250,0.35); }
+    .card-badge {
+      position: absolute; top: 14px; right: 14px;
+      font-family: var(--fm); font-size: 9px; font-weight: 700;
+      padding: 3px 8px; border-radius: 10px; letter-spacing: 0.5px;
+    }
+    .badge-open     { background: rgba(234,179,8,0.15);   color: var(--yellow); }
+    .badge-claimed  { background: rgba(59,130,246,0.15);  color: var(--blue); }
+    .badge-resolved { background: rgba(16,185,129,0.15);  color: var(--green); }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; padding-right: 56px; line-height: 1.3; }
+    .card-meta  { font-size: 11px; color: var(--text-3); margin-bottom: 14px; font-family: var(--fm); }
+    .card-desc  { font-size: 13px; color: var(--text-2); flex: 1; line-height: 1.55; margin-bottom: 18px; }
+    .empty-state { color: var(--text-3); grid-column: 1/-1; padding: 48px; text-align: center; font-size: 15px; }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      display: none; align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
     .modal-box {
-      background: #111018;
+      background: #14121e;
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 32px;
-      width: 100%;
-      max-width: 500px;
+      width: 100%; max-width: 480px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
     }
-    .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    .modal-title { font-size: 19px; font-weight: 700; margin-bottom: 20px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 
+    /* ── TOAST ── */
+    #toast-wrap {
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast-item {
+      background: #1e1c2a; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--text-1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      .dashboard-container { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
-      .main-content { padding: 24px 16px; }
-      .nav-pill { display: inline-flex; margin-right: 8px; padding: 8px 12px; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 12px; }
+      .sidebar .profile-widget { display: none; }
+      .nav-item { display: inline-flex; width: auto; margin-right: 4px; padding: 8px 12px; font-size: 12px; }
+      .dash-body { flex-direction: column; }
+      .main-content { padding: 20px 16px; }
+      .panel-title { font-size: 22px; }
     }
   </style>
 </head>
 <body>
-  <div class="forge-bg"></div>
-  
-  <!-- Toast Container -->
-  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;"></div>
 
-  <!-- LOGIN VIEW -->
-  <div id="login-view">
-    <div class="login-card fade-up">
-      <img src="assets/logo.png" alt="Logo" class="login-logo">
-      <h1 class="login-title">Innovexa Forge</h1>
-      <p class="login-subtitle">Restricted Access — Approved Operatives Only</p>
-      
-      <form id="forge-login-form" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label class="form-label">Operative ID</label>
-          <input type="text" id="login-id" class="form-input" placeholder="INVX-001" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Registered Email</label>
-          <input type="email" id="login-email" class="form-input" placeholder="operative@example.com" required>
-        </div>
-        <button type="submit" id="login-btn" class="btn-forge">Initialize Access</button>
-        <div id="login-error" class="login-error"></div>
-      </form>
-      
-      <a href="index.html" class="back-to-hub">← Return to Hub</a>
-    </div>
-  </div>
+<div class="forge-bg"></div>
+<div id="toast-wrap"></div>
 
-  <!-- DASHBOARD VIEW -->
-  <div id="dashboard-view">
-    <nav class="forge-nav">
-      <a href="forge.html" class="forge-logo-wrap">
-        <img src="assets/logo.png" style="width:28px;height:28px;object-fit:contain;">
-        <span class="forge-logo-text">Innovexa<span>Forge</span></span>
-      </a>
-      <div class="forge-nav-right">
-        <div class="user-badge" id="nav-user-badge">INVX-XXX</div>
-        <button class="btn-logout" onclick="handleLogout()">Disconnect</button>
+<!-- ════════════════ LOGIN VIEW ════════════════ -->
+<div id="login-view">
+  <div class="login-card">
+    <img src="assets/logo.png" alt="Innovexa" class="login-logo" onerror="this.style.display='none'">
+    <h1 class="login-title">Innovexa Forge</h1>
+    <p class="login-subtitle">Restricted to approved operatives.<br>Enter your credentials to access the portal.</p>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="inp-id">Operative ID (INVX-XXX)</label>
+        <input type="text" id="inp-id" class="form-input" placeholder="INVX-001" autocomplete="off" required>
       </div>
-    </nav>
+      <div class="form-group">
+        <label class="form-label" for="inp-email">Registered Email</label>
+        <input type="email" id="inp-email" class="form-input" placeholder="you@college.edu" required>
+      </div>
+      <button type="submit" id="login-btn" class="btn-primary">Initialize Access</button>
+      <div id="login-err" class="login-error"></div>
+    </form>
 
-    <div class="dashboard-container">
-      <aside class="sidebar">
-        <div class="profile-widget">
-          <div class="profile-avatar" id="prof-avatar">A</div>
-          <div class="profile-name" id="prof-name">Loading...</div>
-          <div id="prof-role-badge"></div>
-          <div id="prof-linked" class="linked-mentor" style="display:none;"></div>
-        </div>
-        
-        <nav class="sidebar-nav">
-          <a class="nav-pill active" onclick="switchTab('overview', this)">
-            <span>🏠</span> Command Center
-          </a>
-          <a class="nav-pill" onclick="switchTab('sos', this)">
-            <span>📡</span> SOS Flares
-          </a>
-          <a class="nav-pill" onclick="switchTab('bounties', this)">
-            <span>⚔️</span> Bounty Board
-          </a>
-          <a class="nav-pill" onclick="switchTab('resources', this)">
-            <span>📚</span> Resource Vault
-          </a>
-          <a class="nav-pill" id="nav-squad" style="display:none;" onclick="switchTab('squad', this)">
-            <span>👥</span> My Squad
-          </a>
-        </nav>
-      </aside>
-
-      <main class="main-content">
-        <!-- OVERVIEW -->
-        <div id="panel-overview" class="panel active">
-          <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Command Center</h2>
-              <p class="panel-sub">Real-time intelligence feed of all hub activities.</p>
-            </div>
-          </div>
-          <div class="terminal-box" id="terminal-feed">
-            <div style="color:var(--text-3); text-align:center; padding:40px;">Establishing connection...</div>
-          </div>
-        </div>
-
-        <!-- SOS -->
-        <div id="panel-sos" class="panel">
-          <div class="panel-header">
-            <div>
-              <h2 class="panel-title">SOS Flares</h2>
-              <p class="panel-sub">Fire an SOS to get real-time help, or assist others.</p>
-            </div>
-            <button class="btn-sm btn-accent" onclick="openModal('modal-sos')">📡 Fire SOS Flare</button>
-          </div>
-          <div class="grid-cards" id="sos-grid">
-            <div style="color:var(--text-3); grid-column:1/-1;">Scanning frequencies...</div>
-          </div>
-        </div>
-
-        <!-- BOUNTIES -->
-        <div id="panel-bounties" class="panel">
-          <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Bounty Board</h2>
-              <p class="panel-sub">Claim technical bounties to level up your skills.</p>
-            </div>
-            <button class="btn-sm btn-accent" id="btn-post-bounty" style="display:none;" onclick="openModal('modal-bounty')">⚔️ Post Bounty</button>
-          </div>
-          <div class="grid-cards" id="bounty-grid">
-            <div style="color:var(--text-3); grid-column:1/-1;">Loading bounties...</div>
-          </div>
-        </div>
-
-        <!-- RESOURCES -->
-        <div id="panel-resources" class="panel">
-          <div class="panel-header">
-            <div>
-              <h2 class="panel-title">Resource Vault</h2>
-              <p class="panel-sub">Curated high-signal learning resources from Innovexa mentors.</p>
-            </div>
-          </div>
-          
-          <h3 style="font-size:16px; margin: 32px 0 16px; color:var(--accent);">Full-Stack Architecture</h3>
-          <div class="grid-cards">
-            <div class="forge-card">
-              <h4 class="card-title">The Odin Project</h4>
-              <p class="card-desc">Complete web development curriculum from zero to hero. Highly recommended for absolute beginners.</p>
-              <a href="https://www.theodinproject.com" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access Resource →</a>
-            </div>
-            <div class="forge-card">
-              <h4 class="card-title">roadmap.sh</h4>
-              <p class="card-desc">Interactive developer roadmaps, guides and other educational content to help guide your career.</p>
-              <a href="https://roadmap.sh" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access Resource →</a>
-            </div>
-            <div class="forge-card">
-              <h4 class="card-title">JavaScript.info</h4>
-              <p class="card-desc">The modern JavaScript tutorial. Detailed explanations with tests and tasks.</p>
-              <a href="https://javascript.info" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access Resource →</a>
-            </div>
-          </div>
-
-          <h3 style="font-size:16px; margin: 32px 0 16px; color:var(--accent);">Applied AI</h3>
-          <div class="grid-cards">
-            <div class="forge-card">
-              <h4 class="card-title">Fast.ai</h4>
-              <p class="card-desc">Practical deep learning for coders. Top-down approach to learning AI.</p>
-              <a href="https://www.fast.ai" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access Resource →</a>
-            </div>
-            <div class="forge-card">
-              <h4 class="card-title">NN Zero to Hero</h4>
-              <p class="card-desc">Andrej Karpathy's course on building Neural Networks from scratch, in code.</p>
-              <a href="https://github.com/karpathy/nn-zero-to-hero" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access Resource →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- SQUAD -->
-        <div id="panel-squad" class="panel">
-          <div class="panel-header">
-            <div>
-              <h2 class="panel-title">My Squad</h2>
-              <p class="panel-sub">Apprentices currently assigned to you.</p>
-            </div>
-          </div>
-          <div class="grid-cards" id="squad-grid">
-            <div style="color:var(--text-3); grid-column:1/-1;">Loading squad...</div>
-          </div>
-        </div>
-
-      </main>
-    </div>
+    <a href="index.html" class="back-link">← Return to Hub</a>
   </div>
+</div>
 
-  <!-- MODALS -->
-  <div class="modal-overlay" id="modal-sos">
-    <div class="modal-box">
-      <h2 class="modal-title">Fire SOS Flare</h2>
-      <form id="form-sos" onsubmit="submitSos(event)">
-        <div class="form-group">
-          <label class="form-label">Title / Issue Summary</label>
-          <input type="text" id="sos-title" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Description (Provide details/links)</label>
-          <textarea id="sos-desc" class="form-input" rows="4" required></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-sm" onclick="closeModal('modal-sos')">Cancel</button>
-          <button type="submit" class="btn-sm btn-accent" id="btn-submit-sos">Fire Flare</button>
-        </div>
-      </form>
+<!-- ════════════════ DASHBOARD VIEW ════════════════ -->
+<div id="dashboard-view">
+
+  <!-- Navbar -->
+  <nav class="forge-nav">
+    <a href="forge.html" class="forge-brand">
+      <img src="assets/logo.png" alt="Logo">
+      <span class="forge-brand-text">Innovexa<span>Forge</span></span>
+    </a>
+    <div class="forge-nav-right">
+      <span class="nav-badge" id="nav-badge">INVX-XXX</span>
+      <button class="btn-logout" onclick="doLogout()">Disconnect</button>
     </div>
+  </nav>
+
+  <div class="dash-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile-widget">
+        <div class="prof-avatar" id="prof-avatar">A</div>
+        <div class="prof-name" id="prof-name">Loading…</div>
+        <span class="prof-role-badge" id="prof-role-badge"></span>
+        <div class="linked-mentor-info" id="prof-linked" style="display:none;"></div>
+      </div>
+      <nav>
+        <button class="nav-item active" onclick="switchTab('overview',this)">🏠 Command Center</button>
+        <button class="nav-item" onclick="switchTab('sos',this)">📡 SOS Flares</button>
+        <button class="nav-item" onclick="switchTab('bounties',this)">⚔️ Bounty Board</button>
+        <button class="nav-item" onclick="switchTab('resources',this)">📚 Resource Vault</button>
+        <button class="nav-item" id="nav-squad" style="display:none;" onclick="switchTab('squad',this)">👥 My Squad</button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+
+      <!-- OVERVIEW -->
+      <div id="panel-overview" class="panel active">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Command Center</div>
+            <div class="panel-sub">Live intelligence feed — real-time hub activity log.</div>
+          </div>
+          <button class="btn-sm" onclick="loadFeed()">↻ Refresh</button>
+        </div>
+        <div class="terminal-box" id="terminal-feed">
+          <div class="terminal-empty">⟳ Establishing connection to feed…</div>
+        </div>
+      </div>
+
+      <!-- SOS -->
+      <div id="panel-sos" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">SOS Flares</div>
+            <div class="panel-sub">Request urgent help or assist a fellow operative.</div>
+          </div>
+          <button class="btn-sm btn-accent" onclick="openModal('modal-sos')">📡 Fire SOS</button>
+        </div>
+        <div class="grid-cards" id="sos-grid">
+          <div class="empty-state">Scanning frequencies…</div>
+        </div>
+      </div>
+
+      <!-- BOUNTIES -->
+      <div id="panel-bounties" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Bounty Board</div>
+            <div class="panel-sub">Claim technical challenges to earn XP and level up.</div>
+          </div>
+          <button class="btn-sm btn-accent" id="btn-post-bounty" style="display:none;" onclick="openModal('modal-bounty')">⚔️ Post Bounty</button>
+        </div>
+        <div class="grid-cards" id="bounty-grid">
+          <div class="empty-state">Loading bounties…</div>
+        </div>
+      </div>
+
+      <!-- RESOURCES -->
+      <div id="panel-resources" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Resource Vault</div>
+            <div class="panel-sub">Curated high-signal learning materials from Innovexa mentors.</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Full-Stack Engineering</div>
+        <div class="grid-cards" style="margin-bottom:36px;">
+          <div class="forge-card">
+            <div class="card-title">The Odin Project</div>
+            <div class="card-desc">Complete web development curriculum from zero to hero. Highly recommended for beginners to intermediate.</div>
+            <a href="https://www.theodinproject.com" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">roadmap.sh</div>
+            <div class="card-desc">Interactive developer roadmaps, guides and educational content to help guide your career path.</div>
+            <a href="https://roadmap.sh" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">JavaScript.info</div>
+            <div class="card-desc">The modern JavaScript tutorial — detailed explanations with built-in tasks and tests.</div>
+            <a href="https://javascript.info" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">CS50 by Harvard</div>
+            <div class="card-desc">Harvard's legendary introduction to computer science. Best foundation course available, completely free.</div>
+            <a href="https://cs50.harvard.edu" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Applied AI & Machine Learning</div>
+        <div class="grid-cards" style="margin-bottom:36px;">
+          <div class="forge-card">
+            <div class="card-title">Fast.ai</div>
+            <div class="card-desc">Practical deep learning for coders — top-down approach, learn with real projects from day one.</div>
+            <a href="https://www.fast.ai" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">Neural Networks: Zero to Hero</div>
+            <div class="card-desc">Andrej Karpathy's course — build neural networks from scratch in code. Industry-gold content.</div>
+            <a href="https://github.com/karpathy/nn-zero-to-hero" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">Google ML Crash Course</div>
+            <div class="card-desc">Google's free course on machine learning fundamentals with TensorFlow. Great starting point for AI.</div>
+            <a href="https://developers.google.com/machine-learning/crash-course" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Tools & DevOps</div>
+        <div class="grid-cards">
+          <div class="forge-card">
+            <div class="card-title">Git & GitHub Docs</div>
+            <div class="card-desc">Official Git documentation. Master version control — essential skill for every engineer.</div>
+            <a href="https://docs.github.com/en/get-started" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+          <div class="forge-card">
+            <div class="card-title">Linux Journey</div>
+            <div class="card-desc">Gamified Linux learning — understand the OS that powers the internet. Essential for backend and DevOps.</div>
+            <a href="https://linuxjourney.com" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SQUAD (Mentors only) -->
+      <div id="panel-squad" class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">My Squad</div>
+            <div class="panel-sub">Apprentices currently assigned to you by the admin team.</div>
+          </div>
+        </div>
+        <div class="grid-cards" id="squad-grid">
+          <div class="empty-state">Loading squad…</div>
+        </div>
+      </div>
+
+    </main>
   </div>
+</div>
 
-  <div class="modal-overlay" id="modal-bounty">
-    <div class="modal-box">
-      <h2 class="modal-title">Post Bounty</h2>
-      <form id="form-bounty" onsubmit="submitBounty(event)">
-        <div class="form-group">
-          <label class="form-label">Bounty Title</label>
-          <input type="text" id="bounty-title" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Description / Requirements</label>
-          <textarea id="bounty-desc" class="form-input" rows="4" required></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">XP Reward</label>
-          <input type="number" id="bounty-xp" class="form-input" value="50" required>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-sm" onclick="closeModal('modal-bounty')">Cancel</button>
-          <button type="submit" class="btn-sm btn-accent" id="btn-submit-bounty">Post</button>
-        </div>
-      </form>
-    </div>
+<!-- ════════ MODAL: SOS ════════ -->
+<div class="modal-overlay" id="modal-sos">
+  <div class="modal-box">
+    <div class="modal-title">📡 Fire SOS Flare</div>
+    <form id="form-sos">
+      <div class="form-group">
+        <label class="form-label">Issue Title</label>
+        <input type="text" id="sos-title" class="form-input" placeholder="e.g. Stuck on React state management" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description (provide context / error messages)</label>
+        <textarea id="sos-desc" class="form-input" rows="4" placeholder="Describe what you tried and where you're stuck…" required></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-sm" onclick="closeModal('modal-sos')">Cancel</button>
+        <button type="submit" class="btn-sm btn-accent" id="btn-sos-submit">Fire Flare</button>
+      </div>
+    </form>
   </div>
+</div>
 
-  <script src="/js/api.js"></script>
-  <script>
-    let userSession = null;
-    let pollIntervals = {};
+<!-- ════════ MODAL: BOUNTY ════════ -->
+<div class="modal-overlay" id="modal-bounty">
+  <div class="modal-box">
+    <div class="modal-title">⚔️ Post Bounty</div>
+    <form id="form-bounty">
+      <div class="form-group">
+        <label class="form-label">Bounty Title</label>
+        <input type="text" id="bounty-title" class="form-input" placeholder="e.g. Build a REST API with Node.js" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description & Requirements</label>
+        <textarea id="bounty-desc" class="form-input" rows="4" placeholder="What should the apprentice build or achieve?" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">XP Reward</label>
+        <input type="number" id="bounty-xp" class="form-input" value="50" min="10" max="500" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-sm" onclick="closeModal('modal-bounty')">Cancel</button>
+        <button type="submit" class="btn-sm btn-accent" id="btn-bounty-submit">Post Bounty</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-    // ── INITIALIZATION ──
-    document.addEventListener('DOMContentLoaded', () => {
-      const stored = localStorage.getItem('forge_user');
-      if (stored) {
-        try {
-          userSession = JSON.parse(stored);
-          document.getElementById('login-view').style.display = 'none';
-          showDashboard();
-        } catch(e) {
-          localStorage.removeItem('forge_user');
-        }
-      }
-      // login-view is visible by default via CSS, no action needed
-    });
+<script>
+  // ══════════════════════════════════════════
+  //  CONFIGURATION
+  // ══════════════════════════════════════════
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec';
 
-    // ── LOGIN ──
-    async function handleLogin(e) {
-      e.preventDefault();
-      const id = document.getElementById('login-id').value.trim();
-      const email = document.getElementById('login-email').value.trim();
-      const btn = document.getElementById('login-btn');
-      const err = document.getElementById('login-error');
-      
-      btn.disabled = true;
-      btn.textContent = 'Authenticating...';
-      err.textContent = '';
-      
-      try {
-        const url = SCRIPT_URL + '?action=forge_login&invxId=' + encodeURIComponent(id) + '&email=' + encodeURIComponent(email);
-        const res = await gasGet(url);
-        
-        if (res.success && res.data) {
-          userSession = res.data;
-          localStorage.setItem('forge_user', JSON.stringify(res.data));
-          
-          // If Member, try to fetch mentor name
-          if (userSession.forgeRole === 'Member' && userSession.linkedMentor) {
-            const pRes = await gasGet(SCRIPT_URL + '?action=forge_get_member_profile&operativeId=' + encodeURIComponent(id));
-            if (pRes.success && pRes.data && pRes.data.linkedMentorName) {
-              userSession.linkedMentorName = pRes.data.linkedMentorName;
-              localStorage.setItem('forge_user', JSON.stringify(userSession));
-            }
-          }
-          showDashboard();
-        } else {
-          err.textContent = res.message || 'Login failed.';
-        }
-      } catch (e) {
-        err.textContent = 'Network error. Please try again.';
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Initialize Access';
-      }
+  // ══════════════════════════════════════════
+  //  HELPERS
+  // ══════════════════════════════════════════
+  function escHtml(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  async function gasGet(action, extraParams = {}) {
+    const params = new URLSearchParams({ action, ...extraParams });
+    try {
+      const r = await fetch('/api/proxy?' + params.toString());
+      if (!r.ok) throw new Error('Proxy ' + r.status);
+      return await r.json();
+    } catch (e) {
+      // Fallback: direct GAS call
+      const r2 = await fetch(SCRIPT_URL + '?' + params.toString(), { method: 'GET', redirect: 'follow' });
+      return await r2.json();
     }
+  }
 
-    function handleLogout() {
-      localStorage.removeItem('forge_user');
-      userSession = null;
-      document.getElementById('dashboard-view').style.display = 'none';
-      document.getElementById('login-view').style.display = 'flex';
-      Object.values(pollIntervals).forEach(clearInterval);
-    }
-
-    // ── DASHBOARD ──
-    function showDashboard() {
-      document.getElementById('login-view').style.display = 'none';
-      document.getElementById('dashboard-view').style.display = 'block';
-      
-      // Update nav
-      document.getElementById('nav-user-badge').textContent = userSession.operativeId;
-      
-      // Update profile widget
-      document.getElementById('prof-avatar').textContent = userSession.name.charAt(0).toUpperCase();
-      document.getElementById('prof-name').textContent = userSession.name;
-      
-      const roleBadge = document.getElementById('prof-role-badge');
-      if (userSession.forgeRole === 'Mentor') {
-        roleBadge.className = 'profile-role role-mentor';
-        roleBadge.textContent = 'ARCHITECT';
-        document.getElementById('nav-squad').style.display = 'flex';
-        document.getElementById('btn-post-bounty').style.display = 'inline-block';
-      } else if (userSession.forgeRole === 'Member') {
-        roleBadge.className = 'profile-role role-member';
-        roleBadge.textContent = 'APPRENTICE';
-        if (userSession.linkedMentor) {
-          const lk = document.getElementById('prof-linked');
-          lk.style.display = 'block';
-          lk.innerHTML = `Linked Architect:<br><strong style="color:var(--text-1);font-family:var(--font-s);">${escHtml(userSession.linkedMentorName || userSession.linkedMentor)}</strong>`;
-        }
-      } else {
-        roleBadge.className = 'profile-role role-none';
-        roleBadge.textContent = 'UNASSIGNED';
-      }
-
-      // Load initial tab
-      loadFeed();
-      
-      // Setup polling
-      pollIntervals.feed = setInterval(loadFeed, 30000);
-      pollIntervals.sos = setInterval(loadSos, 20000);
-      pollIntervals.bounties = setInterval(loadBounties, 30000);
-    }
-
-    function switchTab(tabId, el) {
-      document.querySelectorAll('.nav-pill').forEach(n => n.classList.remove('active'));
-      el.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.getElementById('panel-' + tabId).classList.add('active');
-      
-      if (tabId === 'overview') loadFeed();
-      if (tabId === 'sos') loadSos();
-      if (tabId === 'bounties') loadBounties();
-      if (tabId === 'squad' && userSession.forgeRole === 'Mentor') loadSquad();
-    }
-
-    // ── DATA FETCHING & RENDERING ──
-    async function loadFeed() {
-      if (!userSession) return;
-      try {
-        const res = await gasGet(SCRIPT_URL + '?action=forge_get_feed');
-        if (res.success && res.data) {
-          const html = res.data.map(item => {
-            const time = new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            return `<div class="log-entry"><span class="log-time">[${time}]</span> <span class="log-${item.type}">${escHtml(item.message)}</span></div>`;
-          }).join('');
-          document.getElementById('terminal-feed').innerHTML = html + '<div class="log-entry cursor-blink" style="color:var(--accent);">_</div>';
-          const box = document.getElementById('terminal-feed');
-          box.scrollTop = box.scrollHeight;
-        }
-      } catch(e) {}
-    }
-
-    async function loadSos() {
-      if (!userSession) return;
-      try {
-        const res = await gasGet(SCRIPT_URL + '?action=forge_get_sos');
-        const grid = document.getElementById('sos-grid');
-        if (res.success && res.data && res.data.length) {
-          grid.innerHTML = res.data.map(s => {
-            const isMine = s.operativeId === userSession.operativeId;
-            return `
-              <div class="forge-card">
-                <span class="card-badge badge-open">OPEN</span>
-                <h4 class="card-title">${escHtml(s.title)}</h4>
-                <div class="card-meta">By ${escHtml(s.name)} (${s.operativeId})</div>
-                <p class="card-desc">${escHtml(s.description)}</p>
-                <button class="btn-sm" ${isMine ? 'disabled' : ''} onclick="resolveSos(${s.rowIndex}, '${s.operativeId}')">
-                  ${isMine ? 'Waiting for assist...' : 'Resolve / Assist'}
-                </button>
-              </div>
-            `;
-          }).join('');
-        } else {
-          grid.innerHTML = '<div style="color:var(--text-3); grid-column:1/-1;">No active SOS flares. All clear.</div>';
-        }
-      } catch(e) {}
-    }
-
-    async function loadBounties() {
-      if (!userSession) return;
-      try {
-        const res = await gasGet(SCRIPT_URL + '?action=forge_get_bounties');
-        const grid = document.getElementById('bounty-grid');
-        if (res.success && res.data && res.data.length) {
-          grid.innerHTML = res.data.map(b => {
-            const isOpen = b.status === 'open';
-            const badgeClass = isOpen ? 'badge-open' : 'badge-claimed';
-            let btnHtml = '';
-            
-            if (isOpen && userSession.forgeRole === 'Member') {
-              btnHtml = `<button class="btn-sm btn-accent" onclick="claimBounty(${b.rowIndex})">Claim Bounty</button>`;
-            } else if (b.status === 'claimed') {
-              btnHtml = `<div style="font-size:12px; color:var(--text-3); padding:8px 0;">Claimed by ${escHtml(b.claimedByName)}</div>`;
-              if (userSession.operativeId === b.postedBy) {
-                btnHtml += `<button class="btn-sm" style="background:#10b981;border:none;color:#fff;" onclick="completeBounty(${b.rowIndex})">Mark Completed</button>`;
-              }
-            } else if (isOpen && userSession.forgeRole === 'Mentor') {
-              btnHtml = `<div style="font-size:12px; color:var(--text-3); padding:8px 0;">Awaiting claim...</div>`;
-            }
-
-            return `
-              <div class="forge-card">
-                <span class="card-badge ${badgeClass}">${b.status.toUpperCase()}</span>
-                <h4 class="card-title">${escHtml(b.title)}</h4>
-                <div class="card-meta" style="color:var(--accent);">+${b.xp} XP &nbsp;&bull;&nbsp; <span style="color:var(--text-3)">By ${escHtml(b.postedByName)}</span></div>
-                <p class="card-desc">${escHtml(b.description)}</p>
-                ${btnHtml}
-              </div>
-            `;
-          }).join('');
-        } else {
-          grid.innerHTML = '<div style="color:var(--text-3); grid-column:1/-1;">No bounties currently available.</div>';
-        }
-      } catch(e) {}
-    }
-
-    async function loadSquad() {
-      try {
-        const res = await gasGet(SCRIPT_URL + '?action=forge_get_apprentices&mentorOperativeId=' + encodeURIComponent(userSession.operativeId));
-        const grid = document.getElementById('squad-grid');
-        if (res.success && res.data && res.data.length) {
-          grid.innerHTML = res.data.map(s => `
-            <div class="forge-card" style="align-items:center; text-align:center; padding:32px 24px;">
-              <div class="profile-avatar" style="margin-bottom:16px;">${s.name.charAt(0).toUpperCase()}</div>
-              <h4 style="font-size:18px; font-weight:700; margin-bottom:4px;">${escHtml(s.name)}</h4>
-              <div style="font-family:var(--font-d); font-size:12px; color:var(--accent);">${s.operativeId}</div>
-            </div>
-          `).join('');
-        } else {
-          grid.innerHTML = '<div style="color:var(--text-3); grid-column:1/-1;">No apprentices assigned yet.</div>';
-        }
-      } catch(e) {}
-    }
-
-    // ── WRITES ──
-    async function apiProxyPost(payload) {
+  async function gasPost(payload) {
+    try {
       const r = await fetch('/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payload: payload })
+        body: JSON.stringify({ payload })
       });
-      return r.json();
+      return await r.json();
+    } catch (e) {
+      throw new Error('Network error: ' + e.message);
     }
+  }
 
-    async function submitSos(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-submit-sos');
-      btn.disabled = true;
-      btn.textContent = 'Firing...';
-      try {
-        const payload = {
-          action: 'forge_post_sos',
-          operativeId: userSession.operativeId,
-          name: userSession.name,
-          title: document.getElementById('sos-title').value.trim(),
-          description: document.getElementById('sos-desc').value.trim()
-        };
-        const res = await apiProxyPost(payload);
-        if (res.success) {
-          showToast('SOS Flare launched!', 'success');
-          closeModal('modal-sos');
-          document.getElementById('form-sos').reset();
-          loadSos();
-        } else {
-          showToast('Failed to post SOS.', 'error');
-        }
-      } catch(e) {
-        showToast('Network error.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Fire Flare';
+  function toast(msg, type = 'info') {
+    const wrap = document.getElementById('toast-wrap');
+    const colors = { success: '#10b981', error: '#ef4444', info: '#a78bfa' };
+    const el = document.createElement('div');
+    el.className = 'toast-item';
+    el.innerHTML = `<span style="color:${colors[type]||colors.info};font-size:16px">${type==='success'?'✓':type==='error'?'✗':'ℹ'}</span> ${escHtml(msg)}`;
+    wrap.appendChild(el);
+    setTimeout(() => {
+      el.style.cssText += 'opacity:0;transform:translateX(20px);transition:all 0.3s';
+      setTimeout(() => el.remove(), 300);
+    }, 3500);
+  }
+
+  // ══════════════════════════════════════════
+  //  SESSION
+  // ══════════════════════════════════════════
+  let session = null;
+  let polls   = {};
+
+  function saveSession(data) {
+    session = data;
+    try { localStorage.setItem('forge_session', JSON.stringify(data)); } catch(_) {}
+  }
+
+  function clearSession() {
+    session = null;
+    try { localStorage.removeItem('forge_session'); } catch(_) {}
+  }
+
+  // ── Restore on load ──
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      const raw = localStorage.getItem('forge_session');
+      if (raw) {
+        session = JSON.parse(raw);
+        bootDashboard();
+        return;
       }
+    } catch(_) { clearSession(); }
+    // Show login (already visible by CSS)
+  });
+
+  // ══════════════════════════════════════════
+  //  LOGIN
+  // ══════════════════════════════════════════
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id    = document.getElementById('inp-id').value.trim().toUpperCase();
+    const email = document.getElementById('inp-email').value.trim().toLowerCase();
+    const btn   = document.getElementById('login-btn');
+    const err   = document.getElementById('login-err');
+
+    if (!id.startsWith('INVX-')) {
+      err.textContent = 'Operative ID must start with INVX- (e.g. INVX-001)';
+      return;
     }
 
-    async function resolveSos(rowIndex, requesterId) {
-      if (requesterId === userSession.operativeId) return;
-      if (!confirm('Take on this SOS? You should reach out to them immediately.')) return;
-      try {
-        const payload = {
-          action: 'forge_resolve_sos',
-          rowIndex: rowIndex,
-          helperOperativeId: userSession.operativeId,
-          helperName: userSession.name
-        };
-        const res = await apiProxyPost(payload);
-        if (res.success) {
-          showToast('Assigned to you! Reach out now.', 'success');
-          loadSos();
-        } else showToast('Failed.', 'error');
-      } catch(e) { showToast('Error.', 'error'); }
-    }
+    btn.disabled = true;
+    btn.textContent = 'Authenticating…';
+    err.textContent = '';
 
-    async function submitBounty(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-submit-bounty');
-      btn.disabled = true;
-      btn.textContent = 'Posting...';
-      try {
-        const payload = {
-          action: 'forge_post_bounty',
-          operativeId: userSession.operativeId,
-          name: userSession.name,
-          title: document.getElementById('bounty-title').value.trim(),
-          description: document.getElementById('bounty-desc').value.trim(),
-          xp: document.getElementById('bounty-xp').value
-        };
-        const res = await apiProxyPost(payload);
-        if (res.success) {
-          showToast('Bounty posted!', 'success');
-          closeModal('modal-bounty');
-          document.getElementById('form-bounty').reset();
-          loadBounties();
-        } else showToast('Failed.', 'error');
-      } catch(e) { showToast('Error.', 'error'); } finally {
-        btn.disabled = false;
-        btn.textContent = 'Post';
+    try {
+      const res = await gasGet('forge_login', { invxId: id, email });
+      if (res.success && res.data) {
+        saveSession({ ...res.data, loginTime: Date.now() });
+        bootDashboard();
+      } else {
+        err.textContent = res.message || 'Login failed. Check your credentials.';
       }
+    } catch (ex) {
+      err.textContent = 'Connection error. Please try again.';
+      console.error(ex);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Initialize Access';
+    }
+  });
+
+  // ══════════════════════════════════════════
+  //  BOOT DASHBOARD
+  // ══════════════════════════════════════════
+  function bootDashboard() {
+    document.getElementById('login-view').style.display      = 'none';
+    document.getElementById('dashboard-view').style.display  = 'flex';
+
+    // Nav badge
+    document.getElementById('nav-badge').textContent = session.operativeId || '';
+
+    // Profile widget
+    document.getElementById('prof-avatar').textContent = (session.name || 'O')[0].toUpperCase();
+    document.getElementById('prof-name').textContent   = session.name || 'Operative';
+
+    const roleBadge = document.getElementById('prof-role-badge');
+    const role = (session.forgeRole || '').trim();
+
+    if (role === 'Mentor') {
+      roleBadge.className   = 'prof-role-badge badge-mentor';
+      roleBadge.textContent = '⚡ ARCHITECT';
+      document.getElementById('nav-squad').style.display = 'block';
+      document.getElementById('btn-post-bounty').style.display = 'inline-block';
+    } else if (role === 'Member') {
+      roleBadge.className   = 'prof-role-badge badge-member';
+      roleBadge.textContent = '🔧 APPRENTICE';
+
+      if (session.linkedMentor) {
+        const lk = document.getElementById('prof-linked');
+        lk.style.display = 'block';
+        lk.innerHTML = `Linked Architect:<br><strong style="color:var(--text-1);">${escHtml(session.linkedMentorName || session.linkedMentor)}</strong>`;
+      }
+    } else {
+      roleBadge.className   = 'prof-role-badge badge-none';
+      roleBadge.textContent = 'UNASSIGNED';
     }
 
-    async function claimBounty(rowIndex) {
-      if (!confirm('Claim this bounty? Ensure you have the bandwidth.')) return;
-      try {
-        const payload = {
-          action: 'forge_claim_bounty',
-          rowIndex: rowIndex,
-          operativeId: userSession.operativeId,
-          name: userSession.name
-        };
-        const res = await apiProxyPost(payload);
-        if (res.success) {
-          showToast('Bounty claimed! Get to work.', 'success');
-          loadBounties();
-        } else showToast('Failed.', 'error');
-      } catch(e) { showToast('Error.', 'error'); }
-    }
+    loadFeed();
+    polls.feed     = setInterval(loadFeed,    30000);
+    polls.sos      = setInterval(loadSos,     25000);
+    polls.bounties = setInterval(loadBounties,30000);
+  }
 
-    async function completeBounty(rowIndex) {
-      if (!confirm('Mark this bounty as fully completed?')) return;
-      try {
-        const payload = {
-          action: 'forge_complete_bounty',
-          rowIndex: rowIndex
-        };
-        const res = await apiProxyPost(payload);
-        if (res.success) {
-          showToast('Bounty completed!', 'success');
-          loadBounties();
-        } else showToast('Failed.', 'error');
-      } catch(e) { showToast('Error.', 'error'); }
-    }
+  function doLogout() {
+    Object.values(polls).forEach(clearInterval);
+    polls = {};
+    clearSession();
+    document.getElementById('dashboard-view').style.display = 'none';
+    document.getElementById('login-view').style.display     = 'flex';
+    // Reset form
+    document.getElementById('login-form').reset();
+    document.getElementById('login-err').textContent = '';
+  }
 
-    // ── MODALS ──
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    document.querySelectorAll('.modal-overlay').forEach(el => {
-      el.addEventListener('click', e => { if(e.target===el) el.classList.remove('active'); });
-    });
-  </script>
+  // ══════════════════════════════════════════
+  //  TAB SWITCHING
+  // ══════════════════════════════════════════
+  function switchTab(id, el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+
+    if (id === 'overview')  loadFeed();
+    if (id === 'sos')       loadSos();
+    if (id === 'bounties')  loadBounties();
+    if (id === 'squad')     loadSquad();
+  }
+
+  // ══════════════════════════════════════════
+  //  FEED
+  // ══════════════════════════════════════════
+  async function loadFeed() {
+    if (!session) return;
+    const box = document.getElementById('terminal-feed');
+    try {
+      const res = await gasGet('forge_get_feed');
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        box.innerHTML = res.data.map(item => {
+          const t = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '--:--';
+          const cls = 'log-' + (item.type || '');
+          return `<div class="log-entry"><span class="log-time">[${t}]</span> <span class="${cls}">${escHtml(item.message)}</span></div>`;
+        }).join('') + '<div class="log-entry cursor-blink" style="color:var(--accent);">_</div>';
+        box.scrollTop = box.scrollHeight;
+      } else {
+        box.innerHTML = '<div class="terminal-empty">No activity yet. Start by firing an SOS or posting a bounty.</div>';
+      }
+    } catch(e) {
+      box.innerHTML = '<div class="terminal-empty" style="color:var(--red);">⚠ Could not connect to feed.</div>';
+    }
+  }
+
+  // ══════════════════════════════════════════
+  //  SOS
+  // ══════════════════════════════════════════
+  async function loadSos() {
+    if (!session) return;
+    const grid = document.getElementById('sos-grid');
+    try {
+      const res = await gasGet('forge_get_sos');
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        grid.innerHTML = res.data.map(s => {
+          const isMine = s.operativeId === session.operativeId;
+          return `
+            <div class="forge-card">
+              <span class="card-badge badge-open">OPEN</span>
+              <div class="card-title">${escHtml(s.title)}</div>
+              <div class="card-meta">By ${escHtml(s.name)} &bull; ${escHtml(s.operativeId)}</div>
+              <div class="card-desc">${escHtml(s.description)}</div>
+              ${isMine
+                ? `<button class="btn-sm" disabled style="opacity:0.4;">Waiting for assist…</button>`
+                : `<button class="btn-sm btn-green" onclick="resolveSos(${s.rowIndex},'${escHtml(s.operativeId)}')">✓ Assist</button>`
+              }
+            </div>`;
+        }).join('');
+      } else {
+        grid.innerHTML = '<div class="empty-state">✅ No active SOS flares. All operatives accounted for.</div>';
+      }
+    } catch(e) {
+      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load SOS data.</div>';
+    }
+  }
+
+  document.getElementById('form-sos').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-sos-submit');
+    btn.disabled = true; btn.textContent = 'Firing…';
+    try {
+      const res = await gasPost({
+        action: 'forge_post_sos',
+        operativeId: session.operativeId,
+        name: session.name,
+        title: document.getElementById('sos-title').value.trim(),
+        description: document.getElementById('sos-desc').value.trim()
+      });
+      if (res.success) {
+        toast('SOS Flare launched!', 'success');
+        closeModal('modal-sos');
+        document.getElementById('form-sos').reset();
+        loadSos(); loadFeed();
+      } else { toast(res.message || 'Failed to post SOS.', 'error'); }
+    } catch(ex) { toast('Network error.', 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Fire Flare'; }
+  });
+
+  async function resolveSos(rowIndex, requesterId) {
+    if (requesterId === session.operativeId) return;
+    if (!confirm('Take on this SOS? Reach out to them immediately after.')) return;
+    try {
+      const res = await gasPost({
+        action: 'forge_resolve_sos',
+        rowIndex,
+        helperOperativeId: session.operativeId,
+        helperName: session.name
+      });
+      if (res.success) { toast('SOS claimed! Connect with them now.', 'success'); loadSos(); loadFeed(); }
+      else toast(res.message || 'Failed.', 'error');
+    } catch(ex) { toast('Network error.', 'error'); }
+  }
+
+  // ══════════════════════════════════════════
+  //  BOUNTIES
+  // ══════════════════════════════════════════
+  async function loadBounties() {
+    if (!session) return;
+    const grid = document.getElementById('bounty-grid');
+    try {
+      const res = await gasGet('forge_get_bounties');
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        grid.innerHTML = res.data.map(b => {
+          const isOpen    = b.status === 'open';
+          const isClaimed = b.status === 'claimed';
+          const badgeCls  = isOpen ? 'badge-open' : isClaimed ? 'badge-claimed' : 'badge-resolved';
+          const isMentor  = session.forgeRole === 'Mentor';
+          const isMine    = b.postedBy === session.operativeId;
+
+          let action = '';
+          if (isOpen && !isMentor) {
+            action = `<button class="btn-sm btn-accent" onclick="claimBounty(${b.rowIndex})">Claim Bounty</button>`;
+          } else if (isClaimed && isMine) {
+            action = `
+              <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Claimed by <strong>${escHtml(b.claimedByName)}</strong></div>
+              <button class="btn-sm btn-green" onclick="completeBounty(${b.rowIndex})">Mark Completed</button>`;
+          } else if (isClaimed) {
+            action = `<div style="font-size:12px;color:var(--text-3);">Claimed by ${escHtml(b.claimedByName)}</div>`;
+          } else if (isOpen && isMentor) {
+            action = `<div style="font-size:12px;color:var(--text-3);">Awaiting claim…</div>`;
+          }
+
+          return `
+            <div class="forge-card">
+              <span class="card-badge ${badgeCls}">${b.status.toUpperCase()}</span>
+              <div class="card-title">${escHtml(b.title)}</div>
+              <div class="card-meta" style="color:var(--accent);">+${escHtml(b.xp)} XP &bull; <span style="color:var(--text-3)">by ${escHtml(b.postedByName)}</span></div>
+              <div class="card-desc">${escHtml(b.description)}</div>
+              ${action}
+            </div>`;
+        }).join('');
+      } else {
+        grid.innerHTML = '<div class="empty-state">No bounties posted yet.' + (session.forgeRole === 'Mentor' ? ' Post the first one!' : '') + '</div>';
+      }
+    } catch(e) {
+      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load bounties.</div>';
+    }
+  }
+
+  document.getElementById('form-bounty').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-bounty-submit');
+    btn.disabled = true; btn.textContent = 'Posting…';
+    try {
+      const res = await gasPost({
+        action: 'forge_post_bounty',
+        operativeId: session.operativeId,
+        name: session.name,
+        title: document.getElementById('bounty-title').value.trim(),
+        description: document.getElementById('bounty-desc').value.trim(),
+        xp: document.getElementById('bounty-xp').value
+      });
+      if (res.success) {
+        toast('Bounty posted!', 'success');
+        closeModal('modal-bounty');
+        document.getElementById('form-bounty').reset();
+        loadBounties(); loadFeed();
+      } else { toast(res.message || 'Failed.', 'error'); }
+    } catch(ex) { toast('Network error.', 'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Post Bounty'; }
+  });
+
+  async function claimBounty(rowIndex) {
+    if (!confirm('Claim this bounty? Make sure you have time to complete it.')) return;
+    try {
+      const res = await gasPost({ action: 'forge_claim_bounty', rowIndex, operativeId: session.operativeId, name: session.name });
+      if (res.success) { toast('Bounty claimed! Get to work.', 'success'); loadBounties(); loadFeed(); }
+      else toast(res.message || 'Failed.', 'error');
+    } catch(ex) { toast('Network error.', 'error'); }
+  }
+
+  async function completeBounty(rowIndex) {
+    if (!confirm('Mark this bounty as fully completed?')) return;
+    try {
+      const res = await gasPost({ action: 'forge_complete_bounty', rowIndex });
+      if (res.success) { toast('Bounty completed! 🎉', 'success'); loadBounties(); loadFeed(); }
+      else toast(res.message || 'Failed.', 'error');
+    } catch(ex) { toast('Network error.', 'error'); }
+  }
+
+  // ══════════════════════════════════════════
+  //  SQUAD
+  // ══════════════════════════════════════════
+  async function loadSquad() {
+    if (!session || session.forgeRole !== 'Mentor') return;
+    const grid = document.getElementById('squad-grid');
+    try {
+      const res = await gasGet('forge_get_apprentices', { mentorOperativeId: session.operativeId });
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        grid.innerHTML = res.data.map(s => `
+          <div class="forge-card" style="text-align:center;align-items:center;padding:32px 24px;">
+            <div class="prof-avatar" style="margin-bottom:14px;">${escHtml(s.name)[0].toUpperCase()}</div>
+            <div class="prof-name">${escHtml(s.name)}</div>
+            <div style="font-family:var(--fm);font-size:12px;color:var(--accent);margin-top:6px;">${escHtml(s.operativeId)}</div>
+          </div>`).join('');
+      } else {
+        grid.innerHTML = '<div class="empty-state">No apprentices linked to you yet. Ask admin to link members.</div>';
+      }
+    } catch(e) {
+      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load squad.</div>';
+    }
+  }
+
+  // ══════════════════════════════════════════
+  //  MODALS
+  // ══════════════════════════════════════════
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // Close on backdrop click
+  document.querySelectorAll('.modal-overlay').forEach(el =>
+    el.addEventListener('click', ev => { if (ev.target === el) el.classList.remove('open'); })
+  );
+</script>
 </body>
 </html>
