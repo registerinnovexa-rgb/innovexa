@@ -47,11 +47,6 @@
     }
 
     /* Views */
-    #login-view, #dashboard-view {
-      display: none;
-    }
-
-    /* ─── LOGIN VIEW ─── */
     #login-view {
       flex: 1;
       display: flex;
@@ -59,6 +54,11 @@
       justify-content: center;
       padding: 24px;
     }
+    #dashboard-view {
+      display: none;
+    }
+
+    /* ─── LOGIN VIEW ─── */
     .login-card {
       background: var(--bg2);
       border: 1px solid var(--border);
@@ -659,11 +659,15 @@
     document.addEventListener('DOMContentLoaded', () => {
       const stored = localStorage.getItem('forge_user');
       if (stored) {
-        userSession = JSON.parse(stored);
-        showDashboard();
-      } else {
-        document.getElementById('login-view').style.display = 'flex';
+        try {
+          userSession = JSON.parse(stored);
+          document.getElementById('login-view').style.display = 'none';
+          showDashboard();
+        } catch(e) {
+          localStorage.removeItem('forge_user');
+        }
       }
+      // login-view is visible by default via CSS, no action needed
     });
 
     // ── LOGIN ──
