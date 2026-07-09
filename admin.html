@@ -785,20 +785,6 @@ async function loadMembers() {
     const data = await apiGet('adminMembers');
     const members = data.members || [];
     
-    // Merge Forge Roles from proxy script
-    try {
-      const fRes = await fetch('/api/proxy?action=forge_get_all_roles');
-      const fData = await fRes.json();
-      if (fData.success && fData.data) {
-        members.forEach(m => {
-          if (fData.data[m.operativeId]) {
-            m.forgeRole = fData.data[m.operativeId].forgeRole;
-            m.linkedMentor = fData.data[m.operativeId].linkedMentor;
-          }
-        });
-      }
-    } catch(e) { console.error('Error fetching forge roles:', e); }
-
     cachedMembers = members;
     renderMembers(cachedMembers);
   } catch(e) { showToast('Failed to load members', 'error'); }
@@ -1069,26 +1055,6 @@ function openProfileModal(encodedData) {
         <img src="${m.paymentProof}" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--border); cursor:pointer;" onclick="window.open(this.src)"/>
       </div>
     ` : ''}
-    
-    <div style="margin-top:30px; padding:20px; background:var(--bg3); border-radius:12px; border:1px solid var(--border);">
-      <h3 style="font-size:16px; margin-bottom:16px; color:var(--text1);">⚡ Forge Management</h3>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-        <div>
-          <label style="font-size:12px; color:var(--text3); display:block; margin-bottom:6px;">Assign Role</label>
-          <select id="forgeRoleSelect" class="form-input" style="width:100%; margin-bottom:10px;">
-            <option value="" ${forgeRole===''?'selected':''}>Unassigned</option>
-            <option value="Mentor" ${forgeRole==='Mentor'?'selected':''}>Mentor (Architect)</option>
-            <option value="Member" ${forgeRole==='Member'?'selected':''}>Member (Apprentice)</option>
-          </select>
-          <button class="btn-sm" style="background:var(--accent); color:#000;" onclick="updateForgeRole('${m.operativeId}')">Update Role</button>
-        </div>
-        <div>
-          <label style="font-size:12px; color:var(--text3); display:block; margin-bottom:6px;">Link Mentor (Apprentices Only)</label>
-          <input type="text" id="forgeMentorId" class="form-input" placeholder="INVX-XXX" value="${escHtml(linkedMentor)}" style="width:100%; margin-bottom:10px;"/>
-          <button class="btn-sm" style="background:var(--green); color:#fff;" onclick="updateForgeMentor('${m.operativeId}')">Link Mentor</button>
-        </div>
-      </div>
-    </div>
   `;
   
   document.getElementById('modalTitle').textContent = 'Member Profile';
@@ -1098,47 +1064,7 @@ function openProfileModal(encodedData) {
   document.getElementById('modal').style.display = '';
 }
 
-async function updateForgeRole(operativeId) {
-  const role = document.getElementById('forgeRoleSelect').value;
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Updating...';
-  try {
-    const payload = { action: 'forge_set_role', operativeId: operativeId, forgeRole: role };
-    const r = await fetch('/api/proxy', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({payload}) });
-    const res = await r.json();
-    if(res.success) {
-      showToast('Role updated!', 'success');
-      const m = cachedMembers.find(x => x.operativeId === operativeId);
-      if (m) m.forgeRole = role;
-      renderMembers(cachedMembers);
-    }
-    else showToast('Failed to update: ' + res.message, 'error');
-  } catch(e) { showToast('Error', 'error'); }
-  btn.disabled = false;
-  btn.textContent = 'Update Role';
-}
 
-async function updateForgeMentor(operativeId) {
-  const mentorId = document.getElementById('forgeMentorId').value.trim();
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Linking...';
-  try {
-    const payload = { action: 'forge_link_mentor', memberOperativeId: operativeId, mentorOperativeId: mentorId };
-    const r = await fetch('/api/proxy', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({payload}) });
-    const res = await r.json();
-    if(res.success) {
-      showToast('Mentor linked!', 'success');
-      const m = cachedMembers.find(x => x.operativeId === operativeId);
-      if (m) m.linkedMentor = mentorId;
-      renderMembers(cachedMembers);
-    }
-    else showToast('Failed to link: ' + res.message, 'error');
-  } catch(e) { showToast('Error', 'error'); }
-  btn.disabled = false;
-  btn.textContent = 'Link Mentor';
-}
 
 async function generateIDCard(encodedData, autoSave = true) {
   const m = JSON.parse(decodeURIComponent(encodedData));

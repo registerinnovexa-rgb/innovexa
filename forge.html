@@ -1,941 +1,545 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Innovexa Forge — Operative Portal</title>
-  <meta name="description" content="Innovexa Forge — Restricted access portal for approved operatives.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Innovexa Forge — Restricted access portal for approved operatives." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="css/design.css" />
+  
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:      #0d0c12;
-      --bg2:     rgba(255,255,255,0.05);
-      --bg3:     rgba(255,255,255,0.08);
-      --text-1:  #f0eeff;
-      --text-2:  rgba(240,238,255,0.65);
-      --text-3:  rgba(240,238,255,0.38);
-      --accent:  #a78bfa;
-      --accent2: #8b5cf6;
-      --border:  rgba(167,139,250,0.18);
-      --green:   #10b981;
-      --red:     #ef4444;
-      --yellow:  #eab308;
-      --blue:    #3b82f6;
-      --fs:      'Inter', sans-serif;
-      --fm:      'JetBrains Mono', monospace;
-    }
-
+    /* ── FORGE SPECIFIC STYLES OVERRIDING DESIGN.CSS AS NEEDED ── */
     body {
-      background: var(--bg);
-      color: var(--text-1);
-      font-family: var(--fs);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      min-height: 100vh;
     }
-
-    /* ── BG ── */
-    .forge-bg {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background:
-        radial-gradient(circle at 15% 50%, rgba(167,139,250,0.1), transparent 40%),
-        radial-gradient(circle at 85% 30%, rgba(139,92,246,0.08), transparent 40%);
+    
+    /* ── BACKGROUND ORBS ── */
+    .hero-bg {
+      position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden;
+    }
+    .shape-1 {
+      position: absolute; top: -10%; left: 60%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+      border-radius: 50%; filter: blur(40px); animation: float 12s ease-in-out infinite;
+    }
+    .shape-2 {
+      position: absolute; top: 40%; left: -10%;
+      width: 400px; height: 400px;
+      background: linear-gradient(135deg, rgba(17,17,16,0.04) 0%, transparent 100%);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      filter: blur(30px); animation: float 15s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -50px) rotate(10deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
     }
 
     /* ── VIEWS ── */
     #login-view {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; margin-top: 68px;
     }
-    #dashboard-view { display: none; flex-direction: column; flex: 1; }
+    #dashboard-view { 
+      display: none; flex-direction: column; flex: 1; margin-top: 68px;
+    }
 
     /* ── LOGIN CARD ── */
     .login-card {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.7);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 24px;
+      padding: 48px 40px;
       width: 100%;
       max-width: 420px;
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       text-align: center;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.06);
     }
-    .login-logo { width: 52px; height: 52px; object-fit: contain; margin-bottom: 20px; border-radius: 10px; }
-    .login-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-    .login-subtitle { font-size: 13px; color: var(--text-2); margin-bottom: 28px; line-height: 1.5; }
+    .login-logo { width: 52px; height: 52px; object-fit: contain; margin-bottom: 24px; border-radius: 12px; }
+    .login-title { font-family: var(--font-d); font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.03em; }
+    .login-subtitle { font-size: 14px; color: var(--text-2); margin-bottom: 32px; line-height: 1.5; }
 
-    .form-group { text-align: left; margin-bottom: 14px; }
-    .form-label { display: block; font-family: var(--fm); font-size: 10px; color: var(--text-3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .form-group { text-align: left; margin-bottom: 16px; }
+    .form-label { display: block; font-family: var(--font-m); font-size: 11px; color: var(--text-3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
     .form-input {
-      width: 100%; padding: 11px 14px;
-      background: rgba(0,0,0,0.35);
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.8);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       color: var(--text-1);
-      font-family: var(--fm);
+      font-family: var(--font-m);
       font-size: 14px;
-      transition: border 0.25s, box-shadow 0.25s;
+      transition: all 0.2s;
     }
-    .form-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
-    textarea.form-input { resize: vertical; }
-    select.form-input { cursor: pointer; }
+    .form-input:focus { outline: none; border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); background: #fff; }
 
-    .btn-primary {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      border: none; border-radius: 10px;
-      font-weight: 700; font-family: var(--fm); font-size: 14px;
-      cursor: pointer; transition: all 0.3s;
-      letter-spacing: 0.4px; margin-top: 12px;
-      box-shadow: 0 4px 16px rgba(139,92,246,0.35);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.45); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .login-error { color: var(--red); font-size: 13px; margin-top: 12px; min-height: 18px; }
-    .back-link { display: inline-block; margin-top: 22px; color: var(--text-3); font-size: 13px; text-decoration: none; transition: color 0.2s; }
-    .back-link:hover { color: var(--text-2); }
-
-    /* ── FORGE NAV ── */
-    .forge-nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(13,12,18,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      height: 62px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 28px;
-      flex-shrink: 0;
-    }
-    .forge-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .forge-brand img { width: 26px; height: 26px; object-fit: contain; border-radius: 6px; }
-    .forge-brand-text { font-weight: 700; font-size: 17px; color: var(--text-1); }
-    .forge-brand-text span { color: var(--accent); }
-    .forge-nav-right { display: flex; align-items: center; gap: 12px; }
-    .nav-badge {
-      background: rgba(167,139,250,0.1);
-      border: 1px solid var(--border);
-      padding: 4px 10px; border-radius: 6px;
-      font-family: var(--fm); font-size: 11px; color: var(--accent);
-    }
-    .btn-logout {
-      background: transparent; border: 1px solid rgba(255,255,255,0.15);
-      color: var(--text-2); padding: 6px 14px; border-radius: 8px;
-      font-size: 13px; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-logout:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
+    .login-error { color: #ef4444; font-size: 13px; margin-top: 12px; min-height: 18px; font-weight: 500; }
+    .back-link { display: inline-block; margin-top: 24px; color: var(--text-3); font-size: 13px; font-weight: 500; transition: color 0.2s; }
+    .back-link:hover { color: var(--text-1); }
 
     /* ── DASHBOARD LAYOUT ── */
-    .dash-body { display: flex; flex: 1; }
+    .dash-body { display: flex; flex: 1; max-width: var(--max-w); margin: 0 auto; width: 100%; }
     .sidebar {
-      width: 260px; flex-shrink: 0;
+      width: 280px; flex-shrink: 0;
       border-right: 1px solid var(--border);
-      padding: 24px 16px;
-      background: rgba(255,255,255,0.01);
+      padding: 32px 24px;
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(10px);
     }
+    
     .profile-widget {
       text-align: center;
-      padding-bottom: 20px;
+      padding-bottom: 24px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .prof-avatar {
-      width: 60px; height: 60px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--bg-dark); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 800; color: #fff;
-      margin: 0 auto 10px;
+      font-size: 28px; font-weight: 700; margin: 0 auto 16px;
+      font-family: var(--font-d);
     }
-    .prof-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-    .prof-role-badge {
-      display: inline-block;
-      padding: 3px 10px; border-radius: 20px;
-      font-family: var(--fm); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-    }
-    .badge-mentor { background: rgba(16,185,129,0.15); color: var(--green); }
-    .badge-member { background: rgba(167,139,250,0.15); color: var(--accent); }
-    .badge-none   { background: rgba(255,255,255,0.08); color: var(--text-3); }
-    .linked-mentor-info {
-      margin-top: 10px; font-size: 12px; color: var(--text-2);
-      background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px;
-      border: 1px solid var(--border); line-height: 1.4;
+    .prof-name { font-weight: 700; font-size: 18px; font-family: var(--font-d); color: var(--text-1); margin-bottom: 4px; }
+    .prof-email { font-size: 13px; color: var(--text-3); font-family: var(--font-m); margin-bottom: 12px; word-break: break-all; }
+    .prof-badge {
+      display: inline-block; background: rgba(0,0,0,0.06); color: var(--text-2);
+      padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--font-m);
     }
 
+    .nav-menu { display: flex; flex-direction: column; gap: 8px; }
     .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border-radius: 8px; margin-bottom: 4px;
-      color: var(--text-2); font-size: 14px; font-weight: 500;
-      cursor: pointer; border: 1px solid transparent;
-      transition: all 0.2s; text-decoration: none;
-      background: transparent;
-      width: 100%; text-align: left;
+      padding: 12px 16px; border-radius: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text-2);
+      transition: all 0.2s; display: flex; align-items: center; gap: 12px;
     }
-    .nav-item:hover { background: var(--bg2); color: var(--text-1); }
-    .nav-item.active { background: rgba(167,139,250,0.1); color: var(--accent); border-color: rgba(167,139,250,0.2); }
+    .nav-item:hover { background: rgba(0,0,0,0.04); color: var(--text-1); }
+    .nav-item.active { background: #111; color: #fff; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    
+    .nav-item-icon { font-size: 18px; }
 
-    /* ── MAIN CONTENT ── */
-    .main-content { flex: 1; padding: 32px; overflow-y: auto; }
-    .panel { display: none; }
-    .panel.active { display: block; animation: fadeUp 0.35s ease; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-
-    .panel-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-    .panel-title { font-size: 26px; font-weight: 800; }
-    .panel-sub { color: var(--text-2); font-size: 13px; margin-top: 4px; }
-
-    /* ── BUTTONS ── */
-    .btn-sm {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: var(--text-1);
-      padding: 8px 16px; border-radius: 8px;
-      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    .main-content {
+      flex: 1; padding: 40px; min-width: 0;
     }
-    .btn-sm:hover { background: rgba(255,255,255,0.12); }
-    .btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-accent { background: rgba(167,139,250,0.15); color: var(--accent); border-color: rgba(167,139,250,0.3); }
-    .btn-accent:hover { background: rgba(167,139,250,0.25); }
-    .btn-green  { background: rgba(16,185,129,0.15); color: var(--green); border-color: rgba(16,185,129,0.3); }
-    .btn-green:hover  { background: rgba(16,185,129,0.25); }
-
-    /* ── TERMINAL ── */
-    .terminal-box {
-      background: rgba(0,0,0,0.55);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      height: 480px; overflow-y: auto;
-      padding: 20px;
-      font-family: var(--fm); font-size: 12.5px; line-height: 1.65;
-    }
-    .log-entry { margin-bottom: 6px; }
-    .log-time { color: var(--text-3); margin-right: 8px; }
-    .log-SOS           { color: var(--red); }
-    .log-SOS_RESOLVED  { color: var(--green); }
-    .log-BOUNTY_POSTED { color: var(--yellow); }
-    .log-BOUNTY_CLAIMED{ color: var(--green); }
-    .log-BOUNTY_COMPLETED{ color: var(--accent); }
-    .log-ROLE_ASSIGNED { color: var(--blue); }
-    .log-MENTOR_LINKED { color: var(--accent); }
-    .cursor-blink { animation: blink 1s step-end infinite; }
-    @keyframes blink { 50% { opacity:0; } }
-    .terminal-empty { color: var(--text-3); text-align: center; padding: 60px 20px; }
+    .view-section { display: none; animation: fadeIn 0.3s ease; }
+    .view-section.active { display: block; }
+    .section-title { font-family: var(--font-d); font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--text-1); letter-spacing: -0.02em; }
+    .section-desc { font-size: 15px; color: var(--text-2); margin-bottom: 32px; }
 
     /* ── CARDS ── */
-    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
-    .forge-card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 16px; padding: 22px;
-      display: flex; flex-direction: column; position: relative;
-      transition: border-color 0.2s;
-    }
-    .forge-card:hover { border-color: rgba(167,139,250,0.35); }
-    .card-badge {
-      position: absolute; top: 14px; right: 14px;
-      font-family: var(--fm); font-size: 9px; font-weight: 700;
-      padding: 3px 8px; border-radius: 10px; letter-spacing: 0.5px;
-    }
-    .badge-open     { background: rgba(234,179,8,0.15);   color: var(--yellow); }
-    .badge-claimed  { background: rgba(59,130,246,0.15);  color: var(--blue); }
-    .badge-resolved { background: rgba(16,185,129,0.15);  color: var(--green); }
-    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; padding-right: 56px; line-height: 1.3; }
-    .card-meta  { font-size: 11px; color: var(--text-3); margin-bottom: 14px; font-family: var(--fm); }
-    .card-desc  { font-size: 13px; color: var(--text-2); flex: 1; line-height: 1.55; margin-bottom: 18px; }
-    .empty-state { color: var(--text-3); grid-column: 1/-1; padding: 48px; text-align: center; font-size: 15px; }
-
-    /* ── MODALS ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(6px);
-      z-index: 2000;
-      display: none; align-items: center; justify-content: center; padding: 24px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: #14121e;
+    .glass-card {
+      background: rgba(255,255,255,0.7);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 32px;
-      width: 100%; max-width: 480px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.02);
     }
-    .modal-title { font-size: 19px; font-weight: 700; margin-bottom: 20px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
-
-    /* ── TOAST ── */
-    #toast-wrap {
-      position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-      display: flex; flex-direction: column; gap: 8px;
+    
+    /* ── RESOURCES GRID ── */
+    .resources-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
     }
-    .toast-item {
-      background: #1e1c2a; border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 18px;
-      display: flex; align-items: center; gap: 10px;
-      font-size: 13px; color: var(--text-1);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      animation: toastIn 0.3s ease;
+    .resource-card {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      display: flex; flex-direction: column;
     }
-    @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+    .resource-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,0,0,0.2);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+    .res-type {
+      font-family: var(--font-m); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-3); margin-bottom: 8px; font-weight: 600;
+    }
+    .res-title { font-size: 16px; font-weight: 600; color: var(--text-1); margin-bottom: 12px; font-family: var(--font-d); }
+    .res-desc { font-size: 13px; color: var(--text-2); margin-bottom: 20px; flex: 1; line-height: 1.5; }
+    
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: rgba(255,255,255,0.5); border: 1px dashed var(--border); border-radius: 16px;
+      color: var(--text-3); font-size: 14px; font-weight: 500;
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 12px; }
-      .sidebar .profile-widget { display: none; }
-      .nav-item { display: inline-flex; width: auto; margin-right: 4px; padding: 8px 12px; font-size: 12px; }
       .dash-body { flex-direction: column; }
-      .main-content { padding: 20px 16px; }
-      .panel-title { font-size: 22px; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
+      .nav-menu { flex-direction: row; overflow-x: auto; padding-bottom: 8px; }
+      .nav-item { white-space: nowrap; padding: 10px 16px; }
+      .main-content { padding: 24px 20px; }
     }
+    
+    /* ── TOAST ── */
+    #toast-container {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+    }
+    .toast {
+      background: var(--bg-dark); color: #fff;
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 500; font-family: var(--font-b);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: #ef4444; }
+    .toast.success { background: #10b981; color: #fff; }
   </style>
 </head>
 <body>
 
-<div class="forge-bg"></div>
-<div id="toast-wrap"></div>
-
-<!-- ════════════════ LOGIN VIEW ════════════════ -->
-<div id="login-view">
-  <div class="login-card">
-    <img src="assets/logo.png" alt="Innovexa" class="login-logo" onerror="this.style.display='none'">
-    <h1 class="login-title">Innovexa Forge</h1>
-    <p class="login-subtitle">Restricted to approved operatives.<br>Enter your credentials to access the portal.</p>
-
-    <form id="login-form">
-      <div class="form-group">
-        <label class="form-label" for="inp-id">Operative ID (INVX-XXX)</label>
-        <input type="text" id="inp-id" class="form-input" placeholder="INVX-001" autocomplete="off" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="inp-email">Registered Email</label>
-        <input type="email" id="inp-email" class="form-input" placeholder="you@college.edu" required>
-      </div>
-      <button type="submit" id="login-btn" class="btn-primary">Initialize Access</button>
-      <div id="login-err" class="login-error"></div>
-    </form>
-
-    <a href="index.html" class="back-link">← Return to Hub</a>
+  <!-- BACKGROUND -->
+  <div class="hero-bg">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+    <div class="grid-lines"></div>
   </div>
-</div>
 
-<!-- ════════════════ DASHBOARD VIEW ════════════════ -->
-<div id="dashboard-view">
-
-  <!-- Navbar -->
-  <nav class="forge-nav">
-    <a href="forge.html" class="forge-brand">
-      <img src="assets/logo.png" alt="Logo">
-      <span class="forge-brand-text">Innovexa<span>Forge</span></span>
-    </a>
-    <div class="forge-nav-right">
-      <span class="nav-badge" id="nav-badge">INVX-XXX</span>
-      <button class="btn-logout" onclick="doLogout()">Disconnect</button>
+  <!-- NAVBAR -->
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="assets/logo.png" alt="Logo" />
+        <div class="nav-logo-text">INNOVEXA <span>HUB</span></div>
+      </a>
+      <div class="nav-links" id="desktop-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="register.html" class="nav-link">Register</a>
+        <a href="status.html" class="nav-link">Status</a>
+        <a href="pathfinder.html" class="nav-link">Pathfinder</a>
+        <a href="atlas.html" class="nav-link">Atlas</a>
+      </div>
     </div>
   </nav>
 
-  <div class="dash-body">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="profile-widget">
-        <div class="prof-avatar" id="prof-avatar">A</div>
-        <div class="prof-name" id="prof-name">Loading…</div>
-        <span class="prof-role-badge" id="prof-role-badge"></span>
-        <div class="linked-mentor-info" id="prof-linked" style="display:none;"></div>
+  <!-- LOGIN VIEW -->
+  <div id="login-view">
+    <div class="login-card fade-up visible">
+      <img src="assets/logo.png" class="login-logo" style="filter:invert(1); background:#111; padding:10px;" alt="Logo" />
+      <h1 class="login-title">Operative Access</h1>
+      <p class="login-subtitle">Authenticate to enter the Forge</p>
+
+      <div class="form-group">
+        <label class="form-label">Operative ID</label>
+        <input type="text" id="loginId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
       </div>
-      <nav>
-        <button class="nav-item active" onclick="switchTab('overview',this)">🏠 Command Center</button>
-        <button class="nav-item" onclick="switchTab('sos',this)">📡 SOS Flares</button>
-        <button class="nav-item" onclick="switchTab('bounties',this)">⚔️ Bounty Board</button>
-        <button class="nav-item" onclick="switchTab('resources',this)">📚 Resource Vault</button>
-        <button class="nav-item" id="nav-squad" style="display:none;" onclick="switchTab('squad',this)">👥 My Squad</button>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="main-content">
-
-      <!-- OVERVIEW -->
-      <div id="panel-overview" class="panel active">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Command Center</div>
-            <div class="panel-sub">Live intelligence feed — real-time hub activity log.</div>
-          </div>
-          <button class="btn-sm" onclick="loadFeed()">↻ Refresh</button>
-        </div>
-        <div class="terminal-box" id="terminal-feed">
-          <div class="terminal-empty">⟳ Establishing connection to feed…</div>
-        </div>
+      <div class="form-group">
+        <label class="form-label">Registered Email</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="operative@example.com" />
       </div>
 
-      <!-- SOS -->
-      <div id="panel-sos" class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">SOS Flares</div>
-            <div class="panel-sub">Request urgent help or assist a fellow operative.</div>
-          </div>
-          <button class="btn-sm btn-accent" onclick="openModal('modal-sos')">📡 Fire SOS</button>
-        </div>
-        <div class="grid-cards" id="sos-grid">
-          <div class="empty-state">Scanning frequencies…</div>
-        </div>
-      </div>
-
-      <!-- BOUNTIES -->
-      <div id="panel-bounties" class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Bounty Board</div>
-            <div class="panel-sub">Claim technical challenges to earn XP and level up.</div>
-          </div>
-          <button class="btn-sm btn-accent" id="btn-post-bounty" style="display:none;" onclick="openModal('modal-bounty')">⚔️ Post Bounty</button>
-        </div>
-        <div class="grid-cards" id="bounty-grid">
-          <div class="empty-state">Loading bounties…</div>
-        </div>
-      </div>
-
-      <!-- RESOURCES -->
-      <div id="panel-resources" class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Resource Vault</div>
-            <div class="panel-sub">Curated high-signal learning materials from Innovexa mentors.</div>
-          </div>
-        </div>
-
-        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Full-Stack Engineering</div>
-        <div class="grid-cards" style="margin-bottom:36px;">
-          <div class="forge-card">
-            <div class="card-title">The Odin Project</div>
-            <div class="card-desc">Complete web development curriculum from zero to hero. Highly recommended for beginners to intermediate.</div>
-            <a href="https://www.theodinproject.com" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">roadmap.sh</div>
-            <div class="card-desc">Interactive developer roadmaps, guides and educational content to help guide your career path.</div>
-            <a href="https://roadmap.sh" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">JavaScript.info</div>
-            <div class="card-desc">The modern JavaScript tutorial — detailed explanations with built-in tasks and tests.</div>
-            <a href="https://javascript.info" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">CS50 by Harvard</div>
-            <div class="card-desc">Harvard's legendary introduction to computer science. Best foundation course available, completely free.</div>
-            <a href="https://cs50.harvard.edu" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-        </div>
-
-        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Applied AI & Machine Learning</div>
-        <div class="grid-cards" style="margin-bottom:36px;">
-          <div class="forge-card">
-            <div class="card-title">Fast.ai</div>
-            <div class="card-desc">Practical deep learning for coders — top-down approach, learn with real projects from day one.</div>
-            <a href="https://www.fast.ai" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">Neural Networks: Zero to Hero</div>
-            <div class="card-desc">Andrej Karpathy's course — build neural networks from scratch in code. Industry-gold content.</div>
-            <a href="https://github.com/karpathy/nn-zero-to-hero" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">Google ML Crash Course</div>
-            <div class="card-desc">Google's free course on machine learning fundamentals with TensorFlow. Great starting point for AI.</div>
-            <a href="https://developers.google.com/machine-learning/crash-course" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-        </div>
-
-        <div style="margin-bottom:12px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;">Tools & DevOps</div>
-        <div class="grid-cards">
-          <div class="forge-card">
-            <div class="card-title">Git & GitHub Docs</div>
-            <div class="card-desc">Official Git documentation. Master version control — essential skill for every engineer.</div>
-            <a href="https://docs.github.com/en/get-started" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-          <div class="forge-card">
-            <div class="card-title">Linux Journey</div>
-            <div class="card-desc">Gamified Linux learning — understand the OS that powers the internet. Essential for backend and DevOps.</div>
-            <a href="https://linuxjourney.com" target="_blank" class="btn-sm" style="text-align:center;text-decoration:none;">Access →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- SQUAD (Mentors only) -->
-      <div id="panel-squad" class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">My Squad</div>
-            <div class="panel-sub">Apprentices currently assigned to you by the admin team.</div>
-          </div>
-        </div>
-        <div class="grid-cards" id="squad-grid">
-          <div class="empty-state">Loading squad…</div>
-        </div>
-      </div>
-
-    </main>
+      <button id="loginBtn" class="btn-dark" style="width:100%; margin-top:12px; padding:14px;" onclick="handleLogin()">Initialize Link</button>
+      <div id="loginError" class="login-error"></div>
+      <a href="index.html" class="back-link">← Return to Hub</a>
+    </div>
   </div>
-</div>
 
-<!-- ════════ MODAL: SOS ════════ -->
-<div class="modal-overlay" id="modal-sos">
-  <div class="modal-box">
-    <div class="modal-title">📡 Fire SOS Flare</div>
-    <form id="form-sos">
-      <div class="form-group">
-        <label class="form-label">Issue Title</label>
-        <input type="text" id="sos-title" class="form-input" placeholder="e.g. Stuck on React state management" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description (provide context / error messages)</label>
-        <textarea id="sos-desc" class="form-input" rows="4" placeholder="Describe what you tried and where you're stuck…" required></textarea>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-sm" onclick="closeModal('modal-sos')">Cancel</button>
-        <button type="submit" class="btn-sm btn-accent" id="btn-sos-submit">Fire Flare</button>
-      </div>
-    </form>
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboard-view">
+    <div class="dash-body">
+      <!-- SIDEBAR -->
+      <aside class="sidebar fade-up delay-1">
+        <div class="profile-widget">
+          <div class="prof-avatar" id="prof-initial">?</div>
+          <div class="prof-name" id="prof-name">Loading...</div>
+          <div class="prof-email" id="prof-email">...</div>
+          <div class="prof-badge" id="prof-id">INVX-XXX</div>
+        </div>
+
+        <div class="nav-menu">
+          <div class="nav-item active" onclick="switchTab('dashboard')">
+            <span class="nav-item-icon">⚡</span> Profile
+          </div>
+          <div class="nav-item" onclick="switchTab('resources')">
+            <span class="nav-item-icon">📚</span> Resources
+          </div>
+          <div class="nav-item" onclick="logout()" style="margin-top:20px; color:#ef4444;">
+            <span class="nav-item-icon">⏻</span> Disconnect
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content fade-up delay-2">
+        
+        <!-- Profile Tab -->
+        <div id="tab-dashboard" class="view-section active">
+          <h2 class="section-title">Welcome to the Forge</h2>
+          <p class="section-desc">Your restricted operative dashboard.</p>
+
+          <div class="glass-card">
+            <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Operative Status</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:20px;">
+              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
+                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Clearance Level</div>
+                <div style="font-weight:600; color:var(--text-1);">Active Member</div>
+              </div>
+              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
+                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Batch</div>
+                <div style="font-weight:600; color:var(--text-1);">2025-26</div>
+              </div>
+            </div>
+            
+            <div style="margin-top:32px; padding:24px; background:rgba(17,17,16,0.9); border-radius:16px; color:#fff;">
+              <h4 style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Need Assistance?</h4>
+              <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.5;">Reach out to the Core Team on the official WhatsApp group for any queries or guidance.</p>
+              <button class="btn-dark" style="background:#fff; color:#111;" onclick="window.open('https://chat.whatsapp.com/E160VovtX55L94mF6VzC5K', '_blank')">Open WhatsApp</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="tab-resources" class="view-section">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+            <div>
+              <h2 class="section-title">Forge Resources</h2>
+              <p class="section-desc" style="margin-bottom:0;">Exclusive materials and knowledge banks for operatives.</p>
+            </div>
+            <button class="btn-dark" onclick="loadResources()">↻ Refresh</button>
+          </div>
+
+          <div id="resourcesLoading" class="empty-state" style="display:none;">
+            <div class="badge-dot" style="margin: 0 auto 16px;"></div>
+            Decrypting resources...
+          </div>
+          
+          <div id="resourcesGrid" class="resources-grid">
+            <!-- Resources injected here -->
+          </div>
+        </div>
+
+      </main>
+    </div>
   </div>
-</div>
 
-<!-- ════════ MODAL: BOUNTY ════════ -->
-<div class="modal-overlay" id="modal-bounty">
-  <div class="modal-box">
-    <div class="modal-title">⚔️ Post Bounty</div>
-    <form id="form-bounty">
-      <div class="form-group">
-        <label class="form-label">Bounty Title</label>
-        <input type="text" id="bounty-title" class="form-input" placeholder="e.g. Build a REST API with Node.js" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description & Requirements</label>
-        <textarea id="bounty-desc" class="form-input" rows="4" placeholder="What should the apprentice build or achieve?" required></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">XP Reward</label>
-        <input type="number" id="bounty-xp" class="form-input" value="50" min="10" max="500" required>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-sm" onclick="closeModal('modal-bounty')">Cancel</button>
-        <button type="submit" class="btn-sm btn-accent" id="btn-bounty-submit">Post Bounty</button>
-      </div>
-    </form>
-  </div>
-</div>
+  <div id="toast-container"></div>
 
-<script>
-  // ══════════════════════════════════════════
-  //  CONFIGURATION
-  // ══════════════════════════════════════════
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec';
+  <!-- SCRIPT -->
+  <script>
+    // ══════════════════════════════════════════
+    //  GLOBALS & CONSTANTS
+    // ══════════════════════════════════════════
+    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPGtP8XQ-KbMq4q8B_stDdvKTBm0SIa7WriLeEhUf3jRj0ZnkwrBt11qLTgyKsqQScTw/exec';
+    
+    let session = null;
+    let cachedResources = [];
 
-  // ══════════════════════════════════════════
-  //  HELPERS
-  // ══════════════════════════════════════════
-  function escHtml(s) {
-    if (!s) return '';
-    return String(s)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
-  }
-
-  async function gasGet(action, extraParams = {}) {
-    const params = new URLSearchParams({ action, ...extraParams, _t: Date.now() });
-    try {
-      const r = await fetch('/api/proxy?' + params.toString(), { cache: 'no-store' });
-      if (!r.ok) throw new Error('Proxy ' + r.status);
-      return await r.json();
-    } catch (e) {
-      // Fallback: direct GAS call
-      const r2 = await fetch(SCRIPT_URL + '?' + params.toString(), { method: 'GET', redirect: 'follow', cache: 'no-store' });
-      return await r2.json();
+    // Utility: HTML Escape
+    function escHtml(unsafe) {
+      return (unsafe || '').toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-  }
 
-  async function gasPost(payload) {
-    try {
-      const r = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payload })
+    // ══════════════════════════════════════════
+    //  API HELPERS
+    // ══════════════════════════════════════════
+    // Fetch from Forge Code.gs (for login)
+    async function gasGet(action, extraParams = {}) {
+      const params = new URLSearchParams({ action, ...extraParams, _t: Date.now() });
+      try {
+        const r = await fetch('/api/proxy?' + params.toString(), { cache: 'no-store' });
+        if (!r.ok) throw new Error('Proxy ' + r.status);
+        return await r.json();
+      } catch (e) {
+        throw e;
+      }
+    }
+
+    // Fetch from Main Admin Code.gs (for resources)
+    async function apiGetMain(action) {
+      const gasUrl = `${MAIN_SCRIPT_URL}?action=${action}&_t=${Date.now()}`;
+      try {
+        const proxyUrl = `/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`;
+        const r = await fetch(proxyUrl, { cache: 'no-store' });
+        if (!r.ok) throw new Error('Proxy error');
+        return await r.json();
+      } catch(e) {
+        const r = await fetch(gasUrl, { method:'GET', redirect:'follow', cache:'no-store' });
+        return await r.json();
+      }
+    }
+
+    // ══════════════════════════════════════════
+    //  TOAST SYSTEM
+    // ══════════════════════════════════════════
+    function toast(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      container.appendChild(el);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => el.classList.add('show'));
       });
-      return await r.json();
-    } catch (e) {
-      throw new Error('Network error: ' + e.message);
+      setTimeout(() => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 300);
+      }, 3000);
     }
-  }
 
-  function toast(msg, type = 'info') {
-    const wrap = document.getElementById('toast-wrap');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a78bfa' };
-    const el = document.createElement('div');
-    el.className = 'toast-item';
-    el.innerHTML = `<span style="color:${colors[type]||colors.info};font-size:16px">${type==='success'?'✓':type==='error'?'✗':'ℹ'}</span> ${escHtml(msg)}`;
-    wrap.appendChild(el);
-    setTimeout(() => {
-      el.style.cssText += 'opacity:0;transform:translateX(20px);transition:all 0.3s';
-      setTimeout(() => el.remove(), 300);
-    }, 3500);
-  }
+    // ══════════════════════════════════════════
+    //  LIFECYCLE
+    // ══════════════════════════════════════════
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const raw = localStorage.getItem('forge_session');
+        if (raw) {
+          session = JSON.parse(raw);
+          bootDashboard();
+          return;
+        }
+      } catch(_) { clearSession(); }
+      
+      // Animations for login
+      setTimeout(() => {
+        document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+      }, 100);
+    });
 
-  // ══════════════════════════════════════════
-  //  SESSION
-  // ══════════════════════════════════════════
-  let session = null;
-  let polls   = {};
+    function clearSession() {
+      session = null;
+      localStorage.removeItem('forge_session');
+      document.getElementById('login-view').style.display = 'flex';
+      document.getElementById('dashboard-view').style.display = 'none';
+      document.getElementById('loginId').value = '';
+      document.getElementById('loginEmail').value = '';
+    }
 
-  function saveSession(data) {
-    session = data;
-    try { localStorage.setItem('forge_session', JSON.stringify(data)); } catch(_) {}
-  }
+    function logout() {
+      clearSession();
+      toast('Disconnected from Forge', 'success');
+    }
 
-  function clearSession() {
-    session = null;
-    try { localStorage.removeItem('forge_session'); } catch(_) {}
-  }
+    // ══════════════════════════════════════════
+    //  LOGIN
+    // ══════════════════════════════════════════
+    async function handleLogin() {
+      const id = document.getElementById('loginId').value.trim();
+      const email = document.getElementById('loginEmail').value.trim();
+      const err = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn');
 
-  // ── Restore on load ──
-  window.addEventListener('DOMContentLoaded', () => {
-    try {
-      const raw = localStorage.getItem('forge_session');
-      if (raw) {
-        session = JSON.parse(raw);
-        bootDashboard();
+      if (!id || !email) {
+        err.textContent = 'Enter Operative ID and Email.';
         return;
       }
-    } catch(_) { clearSession(); }
-    // Show login (already visible by CSS)
-  });
+      
+      err.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Authenticating...';
 
-  // ══════════════════════════════════════════
-  //  LOGIN
-  // ══════════════════════════════════════════
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id    = document.getElementById('inp-id').value.trim().toUpperCase();
-    const email = document.getElementById('inp-email').value.trim().toLowerCase();
-    const btn   = document.getElementById('login-btn');
-    const err   = document.getElementById('login-err');
-
-    if (!id.startsWith('INVX-')) {
-      err.textContent = 'Operative ID must start with INVX- (e.g. INVX-001)';
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Authenticating…';
-    err.textContent = '';
-
-    try {
-      const res = await gasGet('forge_login', { invxId: id, email });
-      if (res.success && res.data) {
-        saveSession({ ...res.data, loginTime: Date.now() });
-        bootDashboard();
-      } else {
-        err.textContent = res.message || 'Login failed. Check your credentials.';
+      try {
+        const res = await gasGet('forge_login', { invxId: id, email });
+        if (res.success && res.data) {
+          session = res.data;
+          localStorage.setItem('forge_session', JSON.stringify(session));
+          toast('Link established.', 'success');
+          bootDashboard();
+        } else {
+          err.textContent = res.message || 'Access denied.';
+        }
+      } catch(e) {
+        err.textContent = 'Network error. Try again.';
       }
-    } catch (ex) {
-      err.textContent = 'Connection error. Please try again.';
-      console.error(ex);
-    } finally {
+
       btn.disabled = false;
-      btn.textContent = 'Initialize Access';
+      btn.textContent = 'Initialize Link';
     }
-  });
 
-  // ══════════════════════════════════════════
-  //  BOOT DASHBOARD
-  // ══════════════════════════════════════════
-  function bootDashboard() {
-    document.getElementById('login-view').style.display      = 'none';
-    document.getElementById('dashboard-view').style.display  = 'flex';
+    // ══════════════════════════════════════════
+    //  DASHBOARD INIT
+    // ══════════════════════════════════════════
+    function bootDashboard() {
+      document.getElementById('login-view').style.display = 'none';
+      const dash = document.getElementById('dashboard-view');
+      dash.style.display = 'flex';
 
-    // Nav badge
-    document.getElementById('nav-badge').textContent = session.operativeId || '';
+      // Setup Profile UI
+      document.getElementById('prof-name').textContent = session.name;
+      document.getElementById('prof-email').textContent = session.email;
+      document.getElementById('prof-id').textContent = session.operativeId;
+      document.getElementById('prof-initial').textContent = (session.name || '?')[0].toUpperCase();
 
-    // Profile widget
-    document.getElementById('prof-avatar').textContent = (session.name || 'O')[0].toUpperCase();
-    document.getElementById('prof-name').textContent   = session.name || 'Operative';
+      // Trigger animations
+      setTimeout(() => {
+        dash.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+      }, 50);
 
-    const roleBadge = document.getElementById('prof-role-badge');
-    const role = (session.forgeRole || '').trim();
+      switchTab('dashboard');
+    }
 
-    if (role === 'Mentor') {
-      roleBadge.className   = 'prof-role-badge badge-mentor';
-      roleBadge.textContent = '⚡ ARCHITECT';
-      document.getElementById('nav-squad').style.display = 'block';
-      document.getElementById('btn-post-bounty').style.display = 'inline-block';
-    } else if (role === 'Member') {
-      roleBadge.className   = 'prof-role-badge badge-member';
-      roleBadge.textContent = '🔧 APPRENTICE';
-
-      if (session.linkedMentor) {
-        const lk = document.getElementById('prof-linked');
-        lk.style.display = 'block';
-        lk.innerHTML = `Linked Architect:<br><strong style="color:var(--text-1);">${escHtml(session.linkedMentorName || session.linkedMentor)}</strong>`;
+    // ══════════════════════════════════════════
+    //  TABS
+    // ══════════════════════════════════════════
+    function switchTab(tabId) {
+      const navItem = event ? event.currentTarget : document.querySelector('.nav-item.active');
+      if (event) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        navItem.classList.add('active');
       }
-    } else {
-      roleBadge.className   = 'prof-role-badge badge-none';
-      roleBadge.textContent = 'UNASSIGNED';
-    }
 
-    loadFeed();
-    polls.feed     = setInterval(loadFeed,    30000);
-    polls.sos      = setInterval(loadSos,     25000);
-    polls.bounties = setInterval(loadBounties,30000);
-  }
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
 
-  function doLogout() {
-    Object.values(polls).forEach(clearInterval);
-    polls = {};
-    clearSession();
-    document.getElementById('dashboard-view').style.display = 'none';
-    document.getElementById('login-view').style.display     = 'flex';
-    // Reset form
-    document.getElementById('login-form').reset();
-    document.getElementById('login-err').textContent = '';
-  }
-
-  // ══════════════════════════════════════════
-  //  TAB SWITCHING
-  // ══════════════════════════════════════════
-  function switchTab(id, el) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    el.classList.add('active');
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-
-    if (id === 'overview')  loadFeed();
-    if (id === 'sos')       loadSos();
-    if (id === 'bounties')  loadBounties();
-    if (id === 'squad')     loadSquad();
-  }
-
-  // ══════════════════════════════════════════
-  //  FEED
-  // ══════════════════════════════════════════
-  async function loadFeed() {
-    if (!session) return;
-    const box = document.getElementById('terminal-feed');
-    try {
-      const res = await gasGet('forge_get_feed');
-      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        box.innerHTML = res.data.map(item => {
-          const t = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '--:--';
-          const cls = 'log-' + (item.type || '');
-          return `<div class="log-entry"><span class="log-time">[${t}]</span> <span class="${cls}">${escHtml(item.message)}</span></div>`;
-        }).join('') + '<div class="log-entry cursor-blink" style="color:var(--accent);">_</div>';
-        box.scrollTop = box.scrollHeight;
-      } else {
-        box.innerHTML = '<div class="terminal-empty">No activity yet. Start by firing an SOS or posting a bounty.</div>';
+      if (tabId === 'resources') {
+        if (cachedResources.length === 0) loadResources();
       }
-    } catch(e) {
-      box.innerHTML = '<div class="terminal-empty" style="color:var(--red);">⚠ Could not connect to feed.</div>';
     }
-  }
 
-  // ══════════════════════════════════════════
-  //  SOS
-  // ══════════════════════════════════════════
-  async function loadSos() {
-    if (!session) return;
-    const grid = document.getElementById('sos-grid');
-    try {
-      const res = await gasGet('forge_get_sos');
-      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        grid.innerHTML = res.data.map(s => {
-          const isMine = s.operativeId === session.operativeId;
-          return `
-            <div class="forge-card">
-              <span class="card-badge badge-open">OPEN</span>
-              <div class="card-title">${escHtml(s.title)}</div>
-              <div class="card-meta">By ${escHtml(s.name)} &bull; ${escHtml(s.operativeId)}</div>
-              <div class="card-desc">${escHtml(s.description)}</div>
-              ${isMine
-                ? `<button class="btn-sm" disabled style="opacity:0.4;">Waiting for assist…</button>`
-                : `<button class="btn-sm btn-green" onclick="resolveSos(${s.rowIndex},'${escHtml(s.operativeId)}')">✓ Assist</button>`
-              }
-            </div>`;
-        }).join('');
-      } else {
-        grid.innerHTML = '<div class="empty-state">✅ No active SOS flares. All operatives accounted for.</div>';
+    // ══════════════════════════════════════════
+    //  RESOURCES
+    // ══════════════════════════════════════════
+    async function loadResources() {
+      const grid = document.getElementById('resourcesGrid');
+      const loader = document.getElementById('resourcesLoading');
+      
+      grid.innerHTML = '';
+      loader.style.display = 'block';
+
+      try {
+        const res = await apiGetMain('resources');
+        loader.style.display = 'none';
+        
+        if (res.resources && res.resources.length > 0) {
+          cachedResources = res.resources;
+          grid.innerHTML = cachedResources.map(r => `
+            <div class="resource-card">
+              <div class="res-type">${escHtml(r.type || 'Document')}</div>
+              <div class="res-title">${escHtml(r.title)}</div>
+              <div class="res-desc">${escHtml(r.description || 'No description available.')}</div>
+              <button class="btn-dark" style="width:100%; padding:10px;" onclick="window.open('${r.link}', '_blank')">Access Resource ↗</button>
+            </div>
+          `).join('');
+        } else {
+          grid.innerHTML = '<div class="empty-state">No resources available at this time.</div>';
+        }
+      } catch(e) {
+        loader.style.display = 'none';
+        grid.innerHTML = '<div class="empty-state" style="color:#ef4444;">⚠ Failed to decrypt resources. Verify connection.</div>';
       }
-    } catch(e) {
-      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load SOS data.</div>';
     }
-  }
 
-  document.getElementById('form-sos').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('btn-sos-submit');
-    btn.disabled = true; btn.textContent = 'Firing…';
-    try {
-      const res = await gasPost({
-        action: 'forge_post_sos',
-        operativeId: session.operativeId,
-        name: session.name,
-        title: document.getElementById('sos-title').value.trim(),
-        description: document.getElementById('sos-desc').value.trim()
-      });
-      if (res.success) {
-        toast('SOS Flare launched!', 'success');
-        closeModal('modal-sos');
-        document.getElementById('form-sos').reset();
-        loadSos(); loadFeed();
-      } else { toast(res.message || 'Failed to post SOS.', 'error'); }
-    } catch(ex) { toast('Network error.', 'error'); }
-    finally { btn.disabled = false; btn.textContent = 'Fire Flare'; }
-  });
-
-  async function resolveSos(rowIndex, requesterId) {
-    if (requesterId === session.operativeId) return;
-    if (!confirm('Take on this SOS? Reach out to them immediately after.')) return;
-    try {
-      const res = await gasPost({
-        action: 'forge_resolve_sos',
-        rowIndex,
-        helperOperativeId: session.operativeId,
-        helperName: session.name
-      });
-      if (res.success) { toast('SOS claimed! Connect with them now.', 'success'); loadSos(); loadFeed(); }
-      else toast(res.message || 'Failed.', 'error');
-    } catch(ex) { toast('Network error.', 'error'); }
-  }
-
-  // ══════════════════════════════════════════
-  //  BOUNTIES
-  // ══════════════════════════════════════════
-  async function loadBounties() {
-    if (!session) return;
-    const grid = document.getElementById('bounty-grid');
-    try {
-      const res = await gasGet('forge_get_bounties');
-      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        grid.innerHTML = res.data.map(b => {
-          const isOpen    = b.status === 'open';
-          const isClaimed = b.status === 'claimed';
-          const badgeCls  = isOpen ? 'badge-open' : isClaimed ? 'badge-claimed' : 'badge-resolved';
-          const isMentor  = session.forgeRole === 'Mentor';
-          const isMine    = b.postedBy === session.operativeId;
-
-          let action = '';
-          if (isOpen && !isMentor) {
-            action = `<button class="btn-sm btn-accent" onclick="claimBounty(${b.rowIndex})">Claim Bounty</button>`;
-          } else if (isClaimed && isMine) {
-            action = `
-              <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Claimed by <strong>${escHtml(b.claimedByName)}</strong></div>
-              <button class="btn-sm btn-green" onclick="completeBounty(${b.rowIndex})">Mark Completed</button>`;
-          } else if (isClaimed) {
-            action = `<div style="font-size:12px;color:var(--text-3);">Claimed by ${escHtml(b.claimedByName)}</div>`;
-          } else if (isOpen && isMentor) {
-            action = `<div style="font-size:12px;color:var(--text-3);">Awaiting claim…</div>`;
-          }
-
-          return `
-            <div class="forge-card">
-              <span class="card-badge ${badgeCls}">${b.status.toUpperCase()}</span>
-              <div class="card-title">${escHtml(b.title)}</div>
-              <div class="card-meta" style="color:var(--accent);">+${escHtml(b.xp)} XP &bull; <span style="color:var(--text-3)">by ${escHtml(b.postedByName)}</span></div>
-              <div class="card-desc">${escHtml(b.description)}</div>
-              ${action}
-            </div>`;
-        }).join('');
-      } else {
-        grid.innerHTML = '<div class="empty-state">No bounties posted yet.' + (session.forgeRole === 'Mentor' ? ' Post the first one!' : '') + '</div>';
-      }
-    } catch(e) {
-      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load bounties.</div>';
-    }
-  }
-
-  document.getElementById('form-bounty').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('btn-bounty-submit');
-    btn.disabled = true; btn.textContent = 'Posting…';
-    try {
-      const res = await gasPost({
-        action: 'forge_post_bounty',
-        operativeId: session.operativeId,
-        name: session.name,
-        title: document.getElementById('bounty-title').value.trim(),
-        description: document.getElementById('bounty-desc').value.trim(),
-        xp: document.getElementById('bounty-xp').value
-      });
-      if (res.success) {
-        toast('Bounty posted!', 'success');
-        closeModal('modal-bounty');
-        document.getElementById('form-bounty').reset();
-        loadBounties(); loadFeed();
-      } else { toast(res.message || 'Failed.', 'error'); }
-    } catch(ex) { toast('Network error.', 'error'); }
-    finally { btn.disabled = false; btn.textContent = 'Post Bounty'; }
-  });
-
-  async function claimBounty(rowIndex) {
-    if (!confirm('Claim this bounty? Make sure you have time to complete it.')) return;
-    try {
-      const res = await gasPost({ action: 'forge_claim_bounty', rowIndex, operativeId: session.operativeId, name: session.name });
-      if (res.success) { toast('Bounty claimed! Get to work.', 'success'); loadBounties(); loadFeed(); }
-      else toast(res.message || 'Failed.', 'error');
-    } catch(ex) { toast('Network error.', 'error'); }
-  }
-
-  async function completeBounty(rowIndex) {
-    if (!confirm('Mark this bounty as fully completed?')) return;
-    try {
-      const res = await gasPost({ action: 'forge_complete_bounty', rowIndex });
-      if (res.success) { toast('Bounty completed! 🎉', 'success'); loadBounties(); loadFeed(); }
-      else toast(res.message || 'Failed.', 'error');
-    } catch(ex) { toast('Network error.', 'error'); }
-  }
-
-  // ══════════════════════════════════════════
-  //  SQUAD
-  // ══════════════════════════════════════════
-  async function loadSquad() {
-    if (!session || session.forgeRole !== 'Mentor') return;
-    const grid = document.getElementById('squad-grid');
-    try {
-      const res = await gasGet('forge_get_apprentices', { mentorOperativeId: session.operativeId });
-      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-        grid.innerHTML = res.data.map(s => `
-          <div class="forge-card" style="text-align:center;align-items:center;padding:32px 24px;">
-            <div class="prof-avatar" style="margin-bottom:14px;">${escHtml(s.name)[0].toUpperCase()}</div>
-            <div class="prof-name">${escHtml(s.name)}</div>
-            <div style="font-family:var(--fm);font-size:12px;color:var(--accent);margin-top:6px;">${escHtml(s.operativeId)}</div>
-          </div>`).join('');
-      } else if (res.success) {
-        grid.innerHTML = '<div class="empty-state">No apprentices linked to you yet. Ask admin to link members.</div>';
-      } else {
-        grid.innerHTML = `<div class="empty-state" style="color:var(--red);">⚠ Error: ${escHtml(res.message)}</div>`;
-      }
-    } catch(e) {
-      grid.innerHTML = '<div class="empty-state" style="color:var(--red);">⚠ Could not load squad (Network error).</div>';
-    }
-  }
-
-  // ══════════════════════════════════════════
-  //  MODALS
-  // ══════════════════════════════════════════
-  function openModal(id)  { document.getElementById(id).classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-  // Close on backdrop click
-  document.querySelectorAll('.modal-overlay').forEach(el =>
-    el.addEventListener('click', ev => { if (ev.target === el) el.classList.remove('open'); })
-  );
-</script>
+  </script>
 </body>
 </html>

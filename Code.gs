@@ -259,6 +259,23 @@ function doGet(e) {
       return respond({ success: true, data: rolesMap });
     }
 
+    // FORGE: Debug Row
+    if (action === 'forge_debug') {
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][12] || '').trim().toUpperCase() === String(p.opId || '').trim().toUpperCase()) {
+          return respond({ success: true, data: {
+            rowLength: rows[i].length,
+            index12: rows[i][12],
+            index16: rows[i][16],
+            index17: rows[i][17],
+            fullRow: rows[i]
+          }});
+        }
+      }
+      return respond({ success: false, message: 'Not found' });
+    }
+
     return respond({ success: false, message: 'Unknown action.' });
 
   } catch (err) {
