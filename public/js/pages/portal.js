@@ -23,7 +23,7 @@ export async function renderPortal(app, tab = 'portal') {
   app.innerHTML = `
   <div class="shell">
     <aside class="sidebar">
-      <a class="sidebar-brand" href="#portal"><img src="/assets/logo.png" alt=""><span>Innovexa Labs</span></a>
+      <a class="sidebar-brand" href="#portal"><img src="/assets/logo.png" alt=""><span>Innovexa Hub</span></a>
       <ul class="sidebar-nav">
         ${TABS.map(t => `<li><a href="#${t.id}" class="${tab === t.id ? 'active' : ''}"><span class="nav-icon">${t.icon}</span>${t.label}</a></li>`).join('')}
         ${isAdmin ? `<li class="sidebar-divider"></li><li><a href="#admin"><span class="nav-icon">⚙️</span>Admin Panel</a></li>` : ''}
@@ -42,7 +42,7 @@ export async function renderPortal(app, tab = 'portal') {
         <div class="topbar-right"><div class="avatar avatar-sm">${init}</div>${p.name || user?.email}</div>
       </div>
       <div class="content" id="panel"></div>
-      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Labs. All rights reserved.</div>
+      <div class="page-footer">&copy; ${new Date().getFullYear()} Innovexa Hub. All rights reserved.</div>
     </div>
   </div>`
 
@@ -177,7 +177,7 @@ function renderContact(el) {
     <div class="contact-body">
       <div class="contact-row"><span class="contact-label">📧 Email ID:</span><span class="contact-value">contact@innovexahub.com</span></div>
       <div class="contact-row"><span class="contact-label">📞 Contact Number:</span><span class="contact-value">+91 98765 43210</span></div>
-      <div class="contact-row"><span class="contact-label">📍 Address:</span><span class="contact-value">Innovexa Labs, Tech Park</span></div>
+      <div class="contact-row"><span class="contact-label">📍 Address:</span><span class="contact-value">Innovexa Hub, Tech Park</span></div>
     </div>
   </div>`
 }

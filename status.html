@@ -3,1221 +3,572 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Operative Status — Innovexa Labs</title>
-  <meta name="description" content="Check your Innovexa Labs application status. Instantly verify approval, payment, and operative ID using your email or UTR number." />
+  <title>Status — Innovexa Hub</title>
+  <meta name="description" content="Check your Innovexa Hub application status." />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="css/design.css" />
 
   <style>
-    /* ── Hero Header ─────────────────────────────────── */
-    .status-hero {
-      padding: 120px 24px 56px;
+    body { background: #f4f3ef; }
+    .container { max-width: 1300px; margin: 0 auto; padding: 0 24px; }
+    
+    /* ── HEADER ───────────────────────────────────────────────── */
+    .page-header {
+      padding: 160px 24px 80px;
       text-align: center;
+      position: relative;
     }
-    .status-hero .badge {
+    .page-title {
+      font-family: var(--font-d);
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
       margin-bottom: 20px;
     }
-    .status-hero .heading-lg {
-      margin-bottom: 14px;
-      color: var(--text-primary);
+    .page-title .italic {
+      font-family: 'Times New Roman', serif;
+      font-style: italic;
+      font-weight: 400;
+      opacity: 0.8;
     }
-    .status-hero p {
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 420px;
+    .page-sub {
+      font-size: 18px;
+      color: var(--text-2);
+      max-width: 500px;
       margin: 0 auto;
+      line-height: 1.6;
+      font-weight: 300;
     }
 
-    /* ── Status Check Card ───────────────────────────── */
+    /* ── STATUS SECTION ──────────────────────────────────────── */
+    .status-section { padding: 0 24px 160px; min-height: 50vh; }
+    
     .check-card {
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
-      padding: 36px 32px;
-    }
-    @media (max-width: 560px) {
-      .check-card { padding: 24px 20px; }
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 32px;
+      padding: 48px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.02);
     }
 
-    /* Toggle pills */
     .toggle-group {
       display: flex;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-full);
-      padding: 4px;
-      gap: 4px;
-      margin-bottom: 28px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 100px;
+      padding: 6px;
+      margin-bottom: 32px;
     }
     .toggle-pill {
       flex: 1;
-      padding: 9px 16px;
-      border-radius: var(--radius-full);
+      padding: 12px 16px;
+      border-radius: 100px;
       border: none;
       background: transparent;
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 700;
+      color: var(--text-2);
+      font-family: var(--font-b);
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      transition: var(--transition);
-      font-family: 'Inter', sans-serif;
+      transition: all 0.3s;
     }
     .toggle-pill.active {
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+      background: #111;
       color: #fff;
-      box-shadow: 0 4px 14px rgba(59,130,246,0.3);
-    }
-    .toggle-pill:not(.active):hover {
-      color: var(--text-primary);
-      background: rgba(255,255,255,0.05);
     }
 
-    /* Search group */
-    .search-group {
-      display: flex;
-      gap: 10px;
-    }
-    .search-group .form-input {
+    .search-group-row { display: flex; gap: 12px; }
+    
+    .form-control {
       flex: 1;
-      font-size: 15px;
-      padding: 13px 16px;
-      border-radius: var(--radius-md);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      border-radius: 0;
+      padding: 12px 0;
+      font-family: var(--font-b);
+      font-size: 16px;
+      color: var(--text-1);
+      transition: all 0.3s ease;
     }
-    #check-btn {
-      padding: 13px 22px;
-      font-size: 14px;
-      border-radius: var(--radius-md);
-      min-width: 130px;
-    }
-    #check-btn.btn-loading span { display: none; }
+    .form-control:focus { outline: none; border-bottom-color: var(--text-1); }
+    .form-control::placeholder { color: rgba(0,0,0,0.25); }
 
-    /* Input label above search */
-    .input-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 8px;
+    .btn-magnetic {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 28px; background: var(--text-1); color: var(--bg);
+      font-family: var(--font-b); font-size: 14px; font-weight: 500;
+      border-radius: 100px; cursor: pointer; border: none; flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
     }
+    .btn-magnetic:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    
+    #check-btn.btn-loading { opacity: 0.7; pointer-events: none; }
 
-    /* ── Result Panel ─────────────────────────────────── */
+    /* Result Panel */
     #result-panel {
-      max-width: 520px;
-      margin: 24px auto 0;
+      max-width: 560px;
+      margin: 32px auto 0;
     }
     .result-card {
-      padding: 32px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 32px;
+      padding: 40px;
     }
-    @media (max-width: 560px) {
-      .result-card { padding: 22px 18px; }
-    }
-
-    /* Status header */
+    
     .result-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
     }
     .result-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; flex-shrink: 0;
     }
-    .result-icon.pending { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); }
-    .result-icon.approved { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2); }
-    .result-icon.rejected { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); }
-    .result-icon svg { width: 24px; height: 24px; }
+    .result-icon.pending { background: #eab308; }
+    .result-icon.approved { background: #111; }
+    .result-icon.rejected { background: #ef4444; }
+    .result-icon.not-found { background: #a09d9a; }
+    .result-icon svg { width: 28px; height: 28px; }
 
     .result-info-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 3px;
+      font-family: var(--font-d);
+      font-size: 24px; font-weight: 500; color: var(--text-1);
+      margin-bottom: 4px; letter-spacing:-0.02em;
     }
     .result-info-email {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-m);
+      font-size: 13px; color: var(--text-3);
     }
 
-    /* Detail rows */
     .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--glass-border);
-      font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
     .detail-row:last-child { border-bottom: none; }
     .detail-key {
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-family: var(--font-m); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
     }
     .detail-val {
-      color: var(--text-primary);
-      font-weight: 600;
-      font-size: 13px;
-      text-align: right;
+      font-size: 15px; font-weight: 500; color: var(--text-1);
     }
 
-    /* Status message box */
     .status-msg {
-      padding: 14px 16px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      line-height: 1.6;
-      margin-top: 20px;
+      margin-top: 24px; padding: 24px; border-radius: 16px; font-size: 15px; line-height: 1.6; font-weight: 300;
     }
-    .status-msg.pending {
-      background: rgba(245,158,11,0.07);
-      border: 1px solid rgba(245,158,11,0.18);
-      color: #fbbf24;
-    }
-    .status-msg.approved {
-      background: rgba(16,185,129,0.07);
-      border: 1px solid rgba(16,185,129,0.18);
-      color: #34d399;
-    }
-    .status-msg.rejected {
-      background: rgba(239,68,68,0.07);
-      border: 1px solid rgba(239,68,68,0.18);
-      color: #f87171;
-    }
+    .status-msg.pending { background: #fef9c3; color: #a16207; }
+    .status-msg.approved { background: #111; color: #fff; }
+    .status-msg.rejected { background: #fee2e2; color: #991b1b; }
 
-    /* ── Operative ID Card Preview ───────────────────── */
+    /* Ultra-Premium ID Card */
     .id-card-preview-wrap {
-      display: flex;
-      justify-content: center;
-      margin: 24px 0 20px;
+      margin: 40px 0 32px;
+      display: flex; justify-content: center;
     }
     .id-card-preview {
-      width: 300px;
-      background: linear-gradient(145deg, #070f20 0%, #0d1f3c 40%, #122748 70%, #070f20 100%);
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(59,130,246,0.25);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(59,130,246,0.08);
+      width: 340px;
+      background: #111110;
+      border-radius: 24px;
       position: relative;
-      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      color: #edeae4;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.15);
     }
     .id-card-preview::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6);
+      content: ''; position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 150px 150px; opacity: 0.05; pointer-events: none;
     }
-    .id-card-bg-glow {
-      position: absolute;
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(59,130,246,0.15), transparent 70%);
-      top: -60px; right: -60px;
-      border-radius: 50%;
-      pointer-events: none;
+    /* Architectural mesh behind avatar */
+    .id-card-preview::after {
+      content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 16px 16px; pointer-events: none; mask-image: radial-gradient(circle, black, transparent 70%);
+      -webkit-mask-image: radial-gradient(circle, black, transparent 70%);
     }
+    
     .id-card-header {
-      padding: 18px 20px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 24px 24px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative; z-index: 1;
     }
     .id-card-logo-box {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 14px;
-      color: white;
-      flex-shrink: 0;
+      font-family: var(--font-d); font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .id-card-org { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; }
-    .id-card-org strong { display: block; font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 700; letter-spacing: -0.2px; }
-    .id-card-photo-row {
-      padding: 18px 20px 14px;
-      display: flex;
-      gap: 14px;
-      align-items: center;
+    .id-card-logo-box img { width: 20px; height: 20px; filter: invert(1); opacity: 0.8; }
+    
+    .id-card-body { padding: 40px 24px; display: flex; flex-direction: column; position: relative; z-index: 1; }
+    .id-card-op-id {
+      display: inline-block; font-family: var(--font-m); font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.6); margin-bottom: 12px;
     }
-    .id-card-avatar {
-      width: 58px; height: 58px;
-      border-radius: 12px;
-      border: 2px solid rgba(59,130,246,0.3);
-      object-fit: cover;
-      background: rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      color: var(--text-muted);
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .id-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .id-card-name-block {}
-    .id-card-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: #f1f5f9;
-      letter-spacing: -0.3px;
-      margin-bottom: 4px;
-    }
-    .id-card-operative-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: #60a5fa;
-      background: rgba(59,130,246,0.1);
-      border: 1px solid rgba(59,130,246,0.2);
-      padding: 3px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      margin-bottom: 5px;
-    }
-    .id-card-batch {
-      font-size: 10px;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
+    .id-card-name { font-family: var(--font-d); font-size: 28px; font-weight: 500; line-height: 1.1; margin-bottom: 4px; letter-spacing: -0.03em; }
+    .id-card-batch { font-family: var(--font-b); font-size: 13px; color: rgba(255,255,255,0.4); }
+    
     .id-card-footer {
-      padding: 10px 20px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 24px; border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1;
     }
-    .id-card-footer-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.25);
+    .foot-label { font-family: var(--font-m); font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .foot-val { font-size: 13px; font-weight: 500; }
+    .qr-box {
+      width: 48px; height: 48px; background: rgba(255,255,255,1); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; padding: 4px;
     }
-    .id-card-footer-val {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.55);
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .id-card-qr-placeholder {
-      width: 38px; height: 38px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      color: rgba(255,255,255,0.2);
-      text-align: center;
-      line-height: 1.2;
-    }
+    .qr-box img { width: 100%; height: 100%; }
 
-    /* Action buttons row */
-    .action-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    .action-row .btn {
-      flex: 1;
-      min-width: 130px;
-    }
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      color: white;
-    }
-    .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.3); }
-    .btn-telegram {
-      background: linear-gradient(135deg, #2aabee, #229ed9);
-      color: white;
-    }
-    .btn-telegram:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(42,171,238,0.3); }
+    .action-row { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+    .action-row .btn-magnetic, .action-row .btn-outline { flex: 1; min-width: 160px; justify-content: center; }
 
-    /* ── FAQ Section ──────────────────────────────────── */
-    .faq-section {
-      max-width: 520px;
-      margin: 32px auto 0;
-      padding-bottom: 80px;
+    .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 28px; border: 1px solid rgba(0,0,0,0.15);
+      color: var(--text-1); font-family: var(--font-b); font-size: 14px; font-weight: 500;
+      border-radius: 100px; cursor: pointer; background: transparent; transition: all 0.3s ease;
     }
-    .faq-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-    .faq-item {
-      border-radius: var(--radius-md);
-      border: 1px solid var(--glass-border);
-      background: rgba(255,255,255,0.02);
-      overflow: hidden;
-      margin-bottom: 10px;
-      transition: var(--transition);
-    }
-    .faq-item:hover { border-color: rgba(59,130,246,0.2); }
-    .faq-q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      user-select: none;
-      gap: 10px;
-    }
-    .faq-q svg {
-      width: 16px; height: 16px;
-      flex-shrink: 0;
-      color: var(--text-muted);
-      transition: transform 0.25s ease;
-    }
-    .faq-item.open .faq-q svg { transform: rotate(180deg); }
-    .faq-a {
-      display: none;
-      padding: 0 18px 14px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.65;
-    }
-    .faq-item.open .faq-a { display: block; }
+    .btn-outline:hover { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.3); }
 
-    /* ── Error / Not found state ─────────────────────── */
-    .not-found-state {
-      text-align: center;
-      padding: 10px 0 4px;
-    }
-    .not-found-state .nf-icon {
-      font-size: 42px;
-      margin-bottom: 12px;
-    }
-    .not-found-state h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-    .not-found-state p {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
+    .hidden { display: none !important; }
 
-    /* Separator */
-    .separator {
-      height: 1px;
-      background: var(--glass-border);
-      margin: 20px 0;
+    /* Navbar/Footer shared */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
     }
-
-    /* Pulse dot for live badge */
-    @keyframes pulse-ring {
-      0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
-      70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
-      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
-    }
-    .pulse-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #10b981;
-      animation: pulse-ring 2s ease-out infinite;
-      flex-shrink: 0;
-    }
-
-    /* Mobile hamburger */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      padding: 6px;
-      background: none;
-      border: none;
-    }
-    .hamburger span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--text-secondary);
-      border-radius: 2px;
-      transition: var(--transition);
-    }
+    footer { border-top: 1px solid var(--border); padding: 60px 24px; }
     @media (max-width: 768px) {
-      .hamburger { display: flex; }
-      .search-group { flex-direction: column; }
-      #check-btn { width: 100%; }
+      .check-card, .result-card { padding: 32px 24px; border-radius: 24px; }
+      .search-group-row { flex-direction: column; }
       .action-row { flex-direction: column; }
-      .action-row .btn { min-width: unset; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 32px; }
     }
   </style>
+  <script src="/js/shield.js"></script>
 </head>
 <body>
 
-  <!-- Background -->
-  <div class="bg-orbs" aria-hidden="true">
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-    <div class="bg-orb bg-orb-3"></div>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:28px; height:28px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.5;">Hub</span></span>
+    </a>
+    <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
+      <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link active" style="font-size:14px; font-weight:500;">Status</a>
+      <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:#a78bfa;">⚡ Forge</a>
+    </div>
+    <div class="nav-cta">
+      <a href="register.html" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Join the Collective</a>
+    </div>
+    <button class="hamburger" id="hamburger-btn" style="display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;">
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+    </button>
   </div>
-  <div class="bg-grid" aria-hidden="true"></div>
+</nav>
 
-  <!-- Toast -->
-  <div id="toast-container" role="status" aria-live="polite"></div>
-
-  <!-- ══════════════ NAVBAR ══════════════ -->
-  <nav class="navbar" role="navigation" aria-label="Main navigation">
-    <div class="navbar-inner">
-      <a href="index.html" class="nav-logo" aria-label="Innovexa Labs Home">
-        <img src="assets/logo.png" alt="Innovexa Labs Logo" onerror="this.style.display='none'" />
-        <span class="nav-logo-text">Innovexa<span>Labs</span></span>
-      </a>
-
-      <!-- Desktop Tabs -->
-      <div class="tab-bar" id="tab-bar" role="tablist">
-        <a href="index.html" class="tab-btn" role="tab" aria-selected="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Home
-        </a>
-        <a href="register.html" class="tab-btn" role="tab" aria-selected="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          Register
-        </a>
-        <a href="status.html" class="tab-btn active" role="tab" aria-selected="true" aria-current="page">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Status
-        </a>
-        <a href="pathfinder.html" class="tab-btn" role="tab" aria-selected="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Pathfinder
-        </a>
-        <a href="atlas.html" class="tab-btn" role="tab" aria-selected="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/></svg>
-          Atlas
-        </a>
-      </div>
-
-      <!-- Mobile hamburger -->
-      <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false" aria-controls="tab-bar">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ══════════════ PAGE CONTENT ══════════════ -->
-  <div class="page-wrap">
-    <div class="page-content">
-
-      <!-- Hero -->
-      <header class="status-hero fade-up" aria-labelledby="hero-title">
-        <div class="badge badge-blue" aria-label="Status Check">
-          <span class="dot"></span>
-          Operative Verification
-        </div>
-        <h1 class="heading-lg text-gradient" id="hero-title" style="margin-top:14px;">Operative Status</h1>
-        <p>Check your application status instantly using your registered email or UTR number.</p>
-      </header>
-
-      <!-- ── Status Check Card ── -->
-      <section class="section-sm" style="padding-top:0; padding-bottom:0;" aria-label="Status Check">
-        <div class="glass check-card fade-up delay-1" role="search" aria-label="Status lookup form">
-
-          <!-- Toggle -->
-          <div class="toggle-group" role="group" aria-label="Search by">
-            <button class="toggle-pill active" id="toggle-email" onclick="setMode('email')" aria-pressed="true">
-              ✉ &nbsp;Email Address
-            </button>
-            <button class="toggle-pill" id="toggle-utr" onclick="setMode('utr')" aria-pressed="false">
-              # &nbsp;UTR Number
-            </button>
-          </div>
-
-          <!-- Input -->
-          <div class="form-group">
-            <div class="input-label" id="input-label-text">Enter your registered email</div>
-            <div class="search-group">
-              <input
-                type="email"
-                id="query-input"
-                class="form-input"
-                placeholder="e.g. operative@example.com"
-                autocomplete="email"
-                spellcheck="false"
-                aria-label="Email address"
-                aria-required="true"
-              />
-              <button class="btn btn-primary" id="check-btn" onclick="checkStatus()" aria-label="Check status">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <span>Check Status</span>
-              </button>
-            </div>
-            <div id="input-error" class="form-error" style="display:none;" role="alert"></div>
-          </div>
-
-        </div>
-
-        <!-- ── Result Panel ── -->
-        <div id="result-panel" class="hidden" aria-live="polite" aria-atomic="true">
-
-          <!-- PENDING -->
-          <div id="state-pending" class="glass result-card scale-in hidden">
-            <div class="result-header">
-              <div class="result-icon pending" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div>
-                <div class="badge badge-yellow" style="margin-bottom:6px;">
-                  <span class="dot"></span>
-                  Pending Review
-                </div>
-                <div class="result-info-name" id="pending-name">—</div>
-                <div class="result-info-email" id="pending-email">—</div>
-              </div>
-            </div>
-            <div class="separator"></div>
-            <div id="pending-details"></div>
-            <div class="status-msg pending" role="status">
-              🕐 &nbsp;Your application is currently under review by the admin team. You will be notified once a decision is made. This typically takes 24–72 hours.
-            </div>
-          </div>
-
-          <!-- APPROVED -->
-          <div id="state-approved" class="glass result-card scale-in hidden">
-            <div class="result-header">
-              <div class="result-icon approved" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <div>
-                <div class="badge badge-green" style="margin-bottom:6px;">
-                  <span class="pulse-dot"></span>
-                  Approved — Active Operative
-                </div>
-                <div class="result-info-name" id="approved-name">—</div>
-                <div class="result-info-email" id="approved-email">—</div>
-              </div>
-            </div>
-            <div class="separator"></div>
-
-            <!-- Details -->
-            <div id="approved-details"></div>
-
-            <!-- ID Card Preview -->
-            <div class="id-card-preview-wrap" aria-label="Operative ID Card Preview">
-              <div class="id-card-preview" id="id-card-el">
-                <div class="id-card-bg-glow" aria-hidden="true"></div>
-                <div class="id-card-header">
-                  <div class="id-card-logo-box" aria-hidden="true">IX</div>
-                  <div class="id-card-org">
-                    <strong>Innovexa Labs</strong>
-                    Yenepoya (Deemed to be University)
-                  </div>
-                </div>
-                <div class="id-card-photo-row">
-                  <div class="id-card-avatar" id="id-card-avatar" aria-label="Operative photo">
-                    <span id="id-avatar-fallback">👤</span>
-                  </div>
-                  <div class="id-card-name-block">
-                    <div class="id-card-operative-id" id="id-card-op-id">INVX-00</div>
-                    <div class="id-card-name" id="id-card-name">Operative Name</div>
-                    <div class="id-card-batch">Batch 2025–26 · Active</div>
-                  </div>
-                </div>
-                <div class="id-card-footer">
-                  <div>
-                    <div class="id-card-footer-label">Branch</div>
-                    <div class="id-card-footer-val" id="id-card-branch">—</div>
-                  </div>
-                  <div>
-                    <div class="id-card-footer-label">Year</div>
-                    <div class="id-card-footer-val" id="id-card-year">—</div>
-                  </div>
-                  <div class="id-card-qr-placeholder" aria-label="QR code placeholder">QR<br/>Code</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- CTA buttons -->
-            <div class="action-row">
-              <button class="btn btn-glass" id="download-id-btn" onclick="downloadIDCard()" aria-label="Download ID Card">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download ID Card
-              </button>
-            </div>
-            <div class="action-row" style="margin-top:10px;">
-              <a href="#" class="btn btn-whatsapp" id="whatsapp-link" target="_blank" rel="noopener noreferrer" aria-label="Join WhatsApp group">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                WhatsApp Group
-              </a>
-              <a href="#" class="btn btn-telegram" id="telegram-link" target="_blank" rel="noopener noreferrer" aria-label="Join Telegram group">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                Telegram Group
-              </a>
-            </div>
-
-            <div class="status-msg approved" style="margin-top:16px;" role="status">
-              🎉 &nbsp;Welcome aboard, Operative! You are now an active member of Innovexa Labs. Join the community groups to stay connected.
-            </div>
-          </div>
-
-          <!-- REJECTED -->
-          <div id="state-rejected" class="glass result-card scale-in hidden">
-            <div class="result-header">
-              <div class="result-icon rejected" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </div>
-              <div>
-                <div class="badge badge-red" style="margin-bottom:6px;">
-                  <span class="dot"></span>
-                  Not Approved
-                </div>
-                <div class="result-info-name" id="rejected-name">—</div>
-                <div class="result-info-email" id="rejected-email">—</div>
-              </div>
-            </div>
-            <div class="separator"></div>
-            <div id="rejected-details"></div>
-            <div class="status-msg rejected" role="alert">
-              ❌ &nbsp;Your application was not approved at this time. This could be due to incomplete information or eligibility criteria. Please contact support for clarification.
-            </div>
-            <div style="margin-top:16px; text-align:center;">
-              <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">Need help? Reach out to the Innovexa team.</p>
-              <a href="mailto:innovexa@yenepoya.edu.in" class="btn btn-ghost btn-sm" aria-label="Email support">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                Contact Support
-              </a>
-            </div>
-          </div>
-
-          <!-- NOT FOUND -->
-          <div id="state-not-found" class="glass result-card scale-in hidden">
-            <div class="not-found-state">
-              <div class="nf-icon" aria-hidden="true">🔍</div>
-              <h3>No Record Found</h3>
-              <p>We couldn't find any application matching the provided details. Please check the entry and try again, or make sure you have <a href="register.html" style="color:var(--accent-blue);">registered</a> first.</p>
-            </div>
-          </div>
-
-          <!-- ERROR -->
-          <div id="state-error" class="glass result-card scale-in hidden">
-            <div class="not-found-state">
-              <div class="nf-icon" aria-hidden="true">⚠️</div>
-              <h3>Connection Error</h3>
-              <p id="error-msg-text">Something went wrong while checking your status. Please try again in a moment.</p>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ── FAQ Section ── -->
-        <aside class="faq-section fade-up delay-3" aria-label="Frequently Asked Questions">
-          <div class="faq-title">Quick Questions</div>
-
-          <div class="faq-item" id="faq-1">
-            <div class="faq-q" onclick="toggleFaq('faq-1')" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-1-a">
-              How long does approval take?
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="faq-a" id="faq-1-a" role="region">
-              Applications are typically reviewed within 24–72 hours after submission. You will be notified via email once a decision is made. If you haven't heard back after 3 days, feel free to contact support.
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-2">
-            <div class="faq-q" onclick="toggleFaq('faq-2')" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-2-a">
-              What is a UTR number?
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="faq-a" id="faq-2-a" role="region">
-              A UTR (Unique Transaction Reference) is the 12–22 digit reference number generated when you complete your payment via UPI, NEFT, or IMPS. It can be found in your payment app under transaction history or the confirmation SMS you received.
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-3">
-            <div class="faq-q" onclick="toggleFaq('faq-3')" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-3-a">
-              I'm approved — what's next?
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="faq-a" id="faq-3-a" role="region">
-              Congratulations! Download your Operative ID card, then join the WhatsApp and Telegram community groups using the buttons shown on your status result. Watch out for onboarding messages from the Innovexa core team.
-            </div>
-          </div>
-        </aside>
-
-      </section>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="/js/api.js"></script>
-  <script>
-    /* ════════════════════════════════════════════════
-       INNOVEXA LABS — Status Check Page JS
-       ════════════════════════════════════════════════ */
-
-    // ── State ─────────────────────────────────────────
-    let currentMode = 'email'; // 'email' | 'utr'
-    let isChecking  = false;
-
-    // ── Mode Toggle ───────────────────────────────────
-    function setMode(mode) {
-      currentMode = mode;
-      const input      = document.getElementById('query-input');
-      const labelEl    = document.getElementById('input-label-text');
-      const toggleEmail = document.getElementById('toggle-email');
-      const toggleUtr   = document.getElementById('toggle-utr');
-
-      if (mode === 'email') {
-        input.type        = 'email';
-        input.placeholder = 'e.g. operative@example.com';
-        input.autocomplete = 'email';
-        input.setAttribute('aria-label', 'Email address');
-        labelEl.textContent = 'Enter your registered email';
-        toggleEmail.classList.add('active');
-        toggleEmail.setAttribute('aria-pressed', 'true');
-        toggleUtr.classList.remove('active');
-        toggleUtr.setAttribute('aria-pressed', 'false');
-      } else {
-        input.type        = 'text';
-        input.placeholder = 'e.g. 432112345678';
-        input.autocomplete = 'off';
-        input.setAttribute('aria-label', 'UTR number');
-        labelEl.textContent = 'Enter your UTR / transaction reference number';
-        toggleUtr.classList.add('active');
-        toggleUtr.setAttribute('aria-pressed', 'true');
-        toggleEmail.classList.remove('active');
-        toggleEmail.setAttribute('aria-pressed', 'false');
-      }
-
-      input.value = '';
-      hideError();
-      hideResultPanel();
-    }
-
-    // ── Validate Input ────────────────────────────────
-    function validateInput(val) {
-      if (!val || val.trim().length === 0) {
-        return currentMode === 'email' ? 'Please enter your email address.' : 'Please enter your UTR number.';
-      }
-      if (currentMode === 'email') {
-        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRe.test(val.trim())) return 'Please enter a valid email address.';
-      } else {
-        if (val.trim().length < 6) return 'UTR number seems too short. Please check and try again.';
-      }
-      return null;
-    }
-
-    // ── Check Status ──────────────────────────────────
-    async function checkStatus() {
-      if (isChecking) return;
-
-      const input = document.getElementById('query-input');
-      const query = input.value.trim();
-
-      const errMsg = validateInput(query);
-      if (errMsg) { showError(errMsg); return; }
-      hideError();
-
-      // Button loading state
-      isChecking = true;
-      const btn = document.getElementById('check-btn');
-      btn.classList.add('btn-loading');
-      btn.disabled = true;
-
-      hideResultPanel();
-
-      try {
-        // Build query URL — proxy strips SCRIPT_URL, only passes params
-        const param = currentMode === 'email'
-          ? 'email=' + encodeURIComponent(query)
-          : 'utr='   + encodeURIComponent(query);
-
-        const res = await gasGet(SCRIPT_URL + '?' + param);
-
-        // Normalise response — handle BOTH GAS formats:
-        // OLD: { found:true, name, email, status, ... }
-        // NEW: { success:true, data:{ name, email, status, ... } }
-        let member;
-        if (res && res.data && typeof res.data === 'object') {
-          member = res.data;                     // new Code.gs format
-        } else if (res && res.found === true) {
-          member = res;                          // old Code.gs format
-        } else {
-          member = null;                         // not found
-        }
-        renderResult(member);
-      } catch (err) {
-        showState('error');
-        document.getElementById('error-msg-text').textContent =
-          err && err.message ? err.message : 'Failed to connect. Please check your internet connection and try again.';
-        showResultPanel();
-      } finally {
-        isChecking = false;
-        btn.classList.remove('btn-loading');
-        btn.disabled = false;
-      }
-    }
-
-    // ── Render Result ─────────────────────────────────
-    function renderResult(data) {
-      if (!data || (!data.status && !data.email && !data.name)) {
-        showState('not-found');
-        showResultPanel();
-        return;
-      }
-      const status = (data.status || data.Status || 'pending').toLowerCase().trim();
-      const name   = data.name  || '—';
-      const email  = data.email || '—';
-
-      // Build detail rows HTML
-      const detailsHtml = buildDetailRows(data);
-
-      if (status === 'pending') {
-        document.getElementById('pending-name').textContent  = name;
-        document.getElementById('pending-email').textContent = email;
-        document.getElementById('pending-details').innerHTML = detailsHtml;
-        showState('pending');
-
-      } else if (status === 'approved' || status === 'confirmed' || status === 'active') {
-        document.getElementById('approved-name').textContent  = name;
-        document.getElementById('approved-email').textContent = email;
-        document.getElementById('approved-details').innerHTML = detailsHtml;
-
-        // Populate ID card
-        const opId  = data.operative_id || data.operativeId || 'INVX-00';
-        document.getElementById('id-card-op-id').textContent   = opId;
-        document.getElementById('id-card-name').textContent    = name;
-        document.getElementById('id-card-branch').textContent  = data.branch || '—';
-        document.getElementById('id-card-year').textContent    = data.year   || '—';
-
-        // Avatar
-        const avatarEl = document.getElementById('id-card-avatar');
-        if (data.photo_url || data.photoUrl) {
-          const imgEl = document.createElement('img');
-          imgEl.src = data.photo_url || data.photoUrl;
-          imgEl.alt = name + ' photo';
-          imgEl.onerror = function() { this.style.display='none'; };
-          avatarEl.innerHTML = '';
-          avatarEl.appendChild(imgEl);
-        }
-
-        showState('approved');
-
-      } else if (status === 'rejected' || status === 'not approved') {
-        document.getElementById('rejected-name').textContent  = name;
-        document.getElementById('rejected-email').textContent = email;
-        document.getElementById('rejected-details').innerHTML = detailsHtml;
-        showState('rejected');
-
-      } else {
-        // Fallback for unknown status (treat as pending)
-        document.getElementById('pending-name').textContent  = name;
-        document.getElementById('pending-email').textContent = email;
-        document.getElementById('pending-details').innerHTML = detailsHtml;
-        showState('pending');
-      }
-
-      showResultPanel();
-    }
-
-    // ── Build Detail Rows ─────────────────────────────
-    function buildDetailRows(data) {
-      const rows = [];
-      if (data.name)  rows.push(['Name', escHtml(data.name)]);
-      if (data.email) rows.push(['Email', escHtml(data.email)]);
-      if (data.phone) rows.push(['Phone', escHtml(data.phone)]);
-      if (data.year)  rows.push(['Year', escHtml(data.year)]);
-      if (data.branch) rows.push(['Branch', escHtml(data.branch)]);
-      if (data.skill_level || data.skillLevel) rows.push(['Skill Level', escHtml(data.skill_level || data.skillLevel)]);
-      if (data.operative_id || data.operativeId) rows.push(['Operative ID', escHtml(data.operative_id || data.operativeId)]);
-      if (data.amount) rows.push(['Amount Paid', '₹' + escHtml(String(data.amount))]);
-      if (data.utr)    rows.push(['UTR', escHtml(data.utr)]);
-
-      return rows.map(([k, v]) =>
-        `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`
-      ).join('');
-    }
-
-    // ── Show/Hide Helpers ─────────────────────────────
-    const STATES = ['pending', 'approved', 'rejected', 'not-found', 'error'];
-
-    function showState(stateName) {
-      STATES.forEach(s => {
-        const el = document.getElementById('state-' + s);
-        if (el) el.classList.add('hidden');
-      });
-      const target = document.getElementById('state-' + stateName);
-      if (target) {
-        target.classList.remove('hidden');
-        // Re-trigger animation
-        target.classList.remove('scale-in');
-        void target.offsetWidth;
-        target.classList.add('scale-in');
-      }
-    }
-
-    function showResultPanel() {
-      const panel = document.getElementById('result-panel');
-      panel.classList.remove('hidden');
-      // Smooth scroll into view
-      setTimeout(() => {
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 80);
-    }
-
-    function hideResultPanel() {
-      const panel = document.getElementById('result-panel');
-      panel.classList.add('hidden');
-      STATES.forEach(s => {
-        const el = document.getElementById('state-' + s);
-        if (el) el.classList.add('hidden');
-      });
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('input-error');
-      el.textContent = msg;
-      el.style.display = 'block';
-      document.getElementById('query-input').classList.add('error');
-    }
-
-    function hideError() {
-      const el = document.getElementById('input-error');
-      el.style.display = 'none';
-      document.getElementById('query-input').classList.remove('error');
-    }
-
-    // ── Download ID Card ──────────────────────────────
-    function downloadIDCard() {
-      const opId    = document.getElementById('id-card-op-id').textContent;
-      const name    = document.getElementById('id-card-name').textContent;
-      const branch  = document.getElementById('id-card-branch').textContent;
-      const year    = document.getElementById('id-card-year').textContent;
-      const avatarEl = document.getElementById('id-card-avatar');
-      const imgEl   = avatarEl.querySelector('img');
-      const photoSrc = imgEl ? imgEl.src : '';
-
-      const avatarHtml = photoSrc
-        ? `<img src="${photoSrc}" alt="${escHtml(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />`
-        : `<span style="font-size:36px;">👤</span>`;
-
-      const printHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<title>Innovexa Labs — Operative ID Card</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"/>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{
-    background:#050b18;
-    display:flex;align-items:center;justify-content:center;
-    min-height:100vh;
-    font-family:'Inter',sans-serif;
-  }
-  .print-wrap{
-    display:flex;flex-direction:column;align-items:center;gap:24px;
-    padding:40px 24px;
-  }
-  .card{
-    width:340px;
-    background:linear-gradient(145deg,#070f20 0%,#0d1f3c 40%,#122748 70%,#070f20 100%);
-    border-radius:20px;
-    overflow:hidden;
-    border:1px solid rgba(59,130,246,0.3);
-    box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 40px rgba(59,130,246,0.12);
-    position:relative;
-  }
-  .top-bar{height:4px;background:linear-gradient(90deg,#3b82f6,#6366f1,#8b5cf6);}
-  .card-header{
-    padding:20px 24px 14px;
-    display:flex;align-items:center;gap:12px;
-    border-bottom:1px solid rgba(255,255,255,0.06);
-  }
-  .logo-box{
-    width:42px;height:42px;
-    background:linear-gradient(135deg,#3b82f6,#6366f1);
-    border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-    font-weight:900;font-size:16px;color:white;flex-shrink:0;
-  }
-  .org-name{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.04em;}
-  .org-name strong{display:block;font-size:15px;color:rgba(255,255,255,0.9);font-weight:800;letter-spacing:-0.3px;}
-  .card-body{
-    padding:22px 24px 18px;
-    display:flex;gap:18px;align-items:center;
-  }
-  .avatar{
-    width:72px;height:72px;border-radius:14px;
-    border:2px solid rgba(59,130,246,0.35);
-    display:flex;align-items:center;justify-content:center;
-    overflow:hidden;flex-shrink:0;
-    background:rgba(255,255,255,0.05);
-  }
-  .op-id{
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;font-weight:700;color:#60a5fa;
-    background:rgba(59,130,246,0.12);
-    border:1px solid rgba(59,130,246,0.25);
-    padding:4px 10px;border-radius:7px;
-    display:inline-block;margin-bottom:8px;
-  }
-  .op-name{font-size:18px;font-weight:800;color:#f1f5f9;letter-spacing:-0.4px;margin-bottom:5px;}
-  .op-batch{font-size:11px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.08em;}
-  .card-footer{
-    padding:12px 24px 18px;
-    display:flex;justify-content:space-between;align-items:center;
-    border-top:1px solid rgba(255,255,255,0.05);
-  }
-  .foot-label{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.25);}
-  .foot-val{font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);font-family:'JetBrains Mono',monospace;margin-top:3px;}
-  .qr-box{
-    width:44px;height:44px;background:rgba(255,255,255,0.06);
-    border-radius:8px;border:1px solid rgba(255,255,255,0.08);
-    display:flex;align-items:center;justify-content:center;
-    font-size:9px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.3;
-  }
-  .print-label{
-    color:rgba(255,255,255,0.25);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
-  }
-  @media print{
-    body{background:white;}
-    .card{box-shadow:none;border-color:#ccc;}
-    .print-label{display:none;}
-  }
-</style>
-</head>
-<body>
-<div class="print-wrap">
-  <div class="card">
-    <div class="top-bar"></div>
-    <div class="card-header">
-      <div class="logo-box">IX</div>
-      <div class="org-name">
-        <strong>Innovexa Labs</strong>
-        Yenepoya (Deemed to be University)
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="avatar">${avatarHtml}</div>
-      <div>
-        <div class="op-id">${escHtml(opId)}</div>
-        <div class="op-name">${escHtml(name)}</div>
-        <div class="op-batch">Batch 2025–26 &nbsp;·&nbsp; Active Operative</div>
-      </div>
-    </div>
-    <div class="card-footer">
-      <div>
-        <div class="foot-label">Branch</div>
-        <div class="foot-val">${escHtml(branch)}</div>
-      </div>
-      <div>
-        <div class="foot-label">Year</div>
-        <div class="foot-val">${escHtml(year)}</div>
-      </div>
-      <div class="qr-box">QR<br/>Code</div>
-    </div>
-  </div>
-  <div class="print-label">Innovexa Labs &nbsp;·&nbsp; innovexa.yenepoya.edu.in</div>
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#a78bfa;" onclick="closeMobileMenu()">⚡ Forge</a>
 </div>
-<script>window.onload=function(){window.print();}<\/script>
-</body>
-</html>`;
 
-      const win = window.open('', '_blank', 'width=600,height=700');
-      if (win) {
-        win.document.write(printHtml);
-        win.document.close();
+<!-- HEADER -->
+<header class="page-header">
+  <div class="container fade-up">
+    <h1 class="page-title">Intelligence <span class="italic">Log.</span></h1>
+    <p class="page-sub">Check your application status or access your secure digital operative credentials.</p>
+  </div>
+</header>
+
+<!-- STATUS CHECKER -->
+<section class="status-section">
+  <div class="check-card fade-up delay-1">
+    <div class="toggle-group" id="query-toggle">
+      <button class="toggle-pill active" data-type="email">Search by Email</button>
+      <button class="toggle-pill" data-type="utr">Search by UTR</button>
+    </div>
+
+    <div class="search-group">
+      <div class="search-group-row">
+        <input class="form-control" id="query-input" type="email" placeholder="operative@example.com" />
+        <button class="btn-magnetic" id="check-btn">Fetch Status</button>
+      </div>
+      <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:8px; display:none;"></div>
+    </div>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div id="result-panel" class="hidden fade-up">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-icon" id="res-icon">
+          <!-- Icon injected by JS -->
+        </div>
+        <div>
+          <div class="result-info-name" id="res-name">Operative Name</div>
+          <div class="result-info-email" id="res-identifier">identifier@example.com</div>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-key">Current Status</span>
+        <span class="detail-val" id="res-status-text">Pending Verification</span>
+      </div>
+
+      <div class="status-msg" id="res-msg">
+        <!-- Message injected by JS -->
+      </div>
+
+      <!-- DIGITAL ID (Only for approved) -->
+      <div id="approved-assets" class="hidden">
+        <div class="id-card-preview-wrap">
+          <div class="id-card-preview" id="print-card">
+            <div class="id-card-header">
+              <div class="id-card-logo-box">
+                <img src="assets/logo.png" alt="Logo" />
+                Innovexa<span style="opacity:0.5;">Hub</span>
+              </div>
+            </div>
+            
+            <div class="id-card-body">
+              <span class="id-card-op-id" id="card-id">INVX-XX</span>
+              <div class="id-card-name" id="card-name">Operative Name</div>
+              <div class="id-card-batch">Batch 2026-27</div>
+            </div>
+            
+            <div class="id-card-footer">
+              <div>
+                <div class="foot-label">Access Level</div>
+                <div class="foot-val">CORE OPERATIVE</div>
+              </div>
+              <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified" alt="QR" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-magnetic" id="download-id-btn">Download ID Card</button>
+          <a href="https://chat.whatsapp.com/CQIRUl4Np26BQp22Mglz8s?mode=gi_t" target="_blank" class="btn-outline">Join Comm Link</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner container" style="max-width:var(--max-w); margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:32px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:12px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:32px; height:32px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.4;">Hub</span></span>
+    </a>
+    <div class="footer-links" style="display:flex; gap:32px;">
+      <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+    </div>
+    <div class="footer-copy" style="font-family:var(--font-m); font-size:12px; color:var(--text-3);">© 2026 Innovexa Hub. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script>
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
+    }
+  }, { passive: true });
+
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
+  });
+  function closeMobileMenu() {
+    mobileMenu.style.transform = 'translateY(-100%)';
+  }
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
+
+  // Observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+    observer.observe(el);
+  });
+
+  // Toggle Input Type
+  let queryType = 'email';
+  const inputEl = document.getElementById('query-input');
+  document.querySelectorAll('.toggle-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.toggle-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      queryType = btn.dataset.type;
+      if (queryType === 'email') {
+        inputEl.type = 'email';
+        inputEl.placeholder = 'operative@example.com';
       } else {
-        showToast('Please allow pop-ups to download the ID card.', 'info');
+        inputEl.type = 'text';
+        inputEl.placeholder = 'Enter 12-digit UTR';
       }
-    }
+      inputEl.value = '';
+    });
+  });
 
-    // ── FAQ Toggle ────────────────────────────────────
-    function toggleFaq(id) {
-      const item = document.getElementById(id);
-      if (!item) return;
-      const isOpen  = item.classList.contains('open');
-      // Close all
-      document.querySelectorAll('.faq-item').forEach(el => {
-        el.classList.remove('open');
-        const q = el.querySelector('.faq-q');
-        if (q) { q.setAttribute('aria-expanded', 'false'); }
-      });
-      if (!isOpen) {
-        item.classList.add('open');
-        const q = item.querySelector('.faq-q');
-        if (q) q.setAttribute('aria-expanded', 'true');
-      }
+  // Check Status
+  let isChecking = false;
+  document.getElementById('check-btn').addEventListener('click', async () => {
+    if (isChecking) return;
+    const query = inputEl.value.trim();
+    const errEl = document.getElementById('query-error');
+    if (!query) {
+      errEl.textContent = 'Please enter a value to search';
+      errEl.style.display = 'block';
+      return;
     }
+    errEl.style.display = 'none';
 
-    // FAQ keyboard support
-    document.querySelectorAll('.faq-q').forEach(q => {
-      q.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.click();
+    const btn = document.getElementById('check-btn');
+    isChecking = true;
+    btn.classList.add('btn-loading');
+    btn.textContent = 'Fetching...';
+
+    const panel = document.getElementById('result-panel');
+    panel.classList.add('hidden');
+
+    try {
+      const url = SCRIPT_URL + '?' + queryType + '=' + encodeURIComponent(query);
+      const res = await gasGet(url);
+
+      const resIcon = document.getElementById('res-icon');
+      const resMsg = document.getElementById('res-msg');
+      const approvedAssets = document.getElementById('approved-assets');
+
+      if (res && res.success) {
+        const d = res.data || res;
+        const status = (d.status || '').trim().toLowerCase();
+        
+        document.getElementById('res-name').textContent = d.name || 'Operative';
+        document.getElementById('res-identifier').textContent = d.email || d.utr || query;
+        document.getElementById('res-status-text').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+        resIcon.className = 'result-icon ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
+        resMsg.className = 'status-msg ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
+
+        if (status === 'pending') {
+          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+          resMsg.textContent = 'Your application is currently under review by our administration. This process typically takes 24-48 hours. We will notify you once verified.';
+          approvedAssets.classList.add('hidden');
+        } else if (status === 'confirmed' || status === 'approved') {
+          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+          resMsg.innerHTML = '<strong>Access Granted.</strong> Welcome to the collective. Your operative ID is generated below.';
+          
+          document.getElementById('card-name').textContent = d.name || 'Operative';
+          document.getElementById('card-id').textContent = d.operativeId || d.operative_id || '';
+          
+          approvedAssets.classList.remove('hidden');
+        } else {
+          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+          resMsg.textContent = 'Application not approved. Please contact support for details.';
+          approvedAssets.classList.add('hidden');
         }
-      });
-    });
 
-    // ── Enter key on input ────────────────────────────
-    document.getElementById('query-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') checkStatus();
-    });
+        panel.classList.remove('hidden');
+        // Re-trigger fade
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          panel.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+          panel.style.opacity = '1';
+          panel.style.transform = 'translateY(0)';
+        }, 50);
 
-    // ── Toast ─────────────────────────────────────────
-    function showToast(msg, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast ' + type;
-      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-      toast.innerHTML = `<span>${icons[type] || ''}</span><span>${escHtml(msg)}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 4000);
-    }
-
-    // ── Util ──────────────────────────────────────────
-    function escHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    // ── Mobile Nav ────────────────────────────────────
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const tabBar       = document.getElementById('tab-bar');
-    hamburgerBtn.addEventListener('click', function() {
-      const isOpen = tabBar.classList.toggle('mobile-open');
-      hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
-    });
-    document.addEventListener('click', function(e) {
-      if (!tabBar.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-        tabBar.classList.remove('mobile-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      } else {
+        errEl.textContent = res.message || 'No record found. Please verify your details.';
+        errEl.style.display = 'block';
       }
-    });
-  </script>
+    } catch (e) {
+      console.error(e);
+      errEl.textContent = e.message || 'Connection error. Please try again.';
+      errEl.style.display = 'block';
+    } finally {
+      isChecking = false;
+      btn.classList.remove('btn-loading');
+      btn.textContent = 'Fetch Status';
+    }
+  });
+
+  // Download ID
+  document.getElementById('download-id-btn')?.addEventListener('click', () => {
+    const printCard = document.getElementById('print-card');
+    const win = window.open('', '_blank');
+    win.document.write(`
+      <html>
+        <head>
+          <title>Operative ID Card</title>
+          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+          <style>
+            body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #fff; }
+            ${document.querySelector('style').innerHTML}
+            .id-card-preview { width: 340px; box-shadow: none; border: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="id-card-preview">
+            ${printCard.innerHTML}
+          </div>
+          <script>window.onload = () => { window.print(); window.close(); }<\/script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  });
+</script>
 </body>
 </html>

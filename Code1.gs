@@ -1,5 +1,5 @@
 /**
- * INNOVEXA LABS — Universal API Backend (Code1.gs)
+ * INNOVEXA HUB — Universal API Backend (Code1.gs)
  * Handles Event WRITES (with registration fields) and Event Registration Submissions.
  */
 const MAIN_SHEET_ID = '1duYgV0rXOuN4n61HLCQIIcx2fhpL8GYiRxIBrOTbr1A';
@@ -72,12 +72,12 @@ function doGet(e) {
       // Send email on Confirmed
       if ((data.status || '').toLowerCase() === 'confirmed' && data.email) {
         try {
-          var subject = '🎉 Registration Confirmed — ' + data.eventName + ' | Innovexa Labs';
+          var subject = '🎉 Registration Confirmed — ' + data.eventName + ' | Innovexa Hub';
           var body = 'Hi ' + (data.registrantName || 'there') + ',\n\n' +
             'Great news! Your registration for "' + data.eventName + '" has been CONFIRMED! ✅\n\n' +
             'We look forward to seeing you at the event.\n\n' +
             'Best regards,\n' +
-            'Innovexa Labs Team 🚀';
+            'Innovexa Hub Team 🚀';
           MailApp.sendEmail({ to: data.email, subject: subject, body: body });
         } catch (mailErr) {
           Logger.log('Confirm email failed: ' + mailErr.message);
@@ -171,7 +171,7 @@ function doPost(e) {
       // Send confirmation email
       try {
         var fee = parseFloat(data.fee || '0');
-        var subject = '✅ Registration Received — ' + data.eventName + ' | Innovexa Labs';
+        var subject = '✅ Registration Received — ' + data.eventName + ' | Innovexa Hub';
         var body = 'Hi ' + data.name + ',\n\n' +
           'Thank you for registering for "' + data.eventName + '"!\n\n' +
           '📋 Registration Details:\n' +
@@ -187,7 +187,7 @@ function doPost(e) {
           (fee > 0 ? 'Your payment is being verified. You will receive another email once confirmed.\n\n' : 'Your registration is being reviewed. You will receive a confirmation email shortly.\n\n') +
           'If you have any questions, feel free to reach out.\n\n' +
           'Best regards,\n' +
-          'Innovexa Labs Team 🚀';
+          'Innovexa Hub Team 🚀';
         MailApp.sendEmail({ to: data.email, subject: subject, body: body });
       } catch (mailErr) {
         Logger.log('Email failed: ' + mailErr.message);

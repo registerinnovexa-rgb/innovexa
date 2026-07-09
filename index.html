@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Innovexa Labs — Build the Future</title>
-  <meta name="description" content="Innovexa Labs is the premier student tech collective at Yenepoya University. Join as an Operative. Batch 2025-26 now open." />
-  <meta name="keywords" content="Innovexa Labs, student tech, operative, pathfinder, bootcamp, atlas, Yenepoya, Kalvium" />
-  <meta property="og:title" content="Innovexa Labs — Build the Future" />
-  <meta property="og:description" content="Premier student tech collective. Join 2025-26 batch for ₹599." />
+  <title>Innovexa Hub — Engineering Excellence</title>
+  <meta name="description" content="An elite student tech collective at Yenepoya University, engineering the next generation of builders and innovators." />
+  <meta name="keywords" content="Innovexa Hub, student tech, operative, pathfinder, bootcamp, atlas, Yenepoya, Kalvium" />
+  <meta property="og:title" content="Innovexa Hub — Engineering Excellence" />
+  <meta property="og:description" content="Elite student tech collective. Forge your path. Batch 2026-27." />
   <meta property="og:type" content="website" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,606 +17,366 @@
   <link rel="stylesheet" href="css/design.css" />
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:          #edeae4;
-      --bg-2:        #e4e1db;
-      --bg-dark:     #111110;
-      --bg-dark-2:   #1a1917;
-      --border:      rgba(0,0,0,0.1);
-      --border-dark: rgba(255,255,255,0.1);
-      --accent:      #111110;
-      --accent-inv:  #edeae4;
-      --text-1:      #111110;
-      --text-2:      #4a4845;
-      --text-3:      #8a8784;
-      --text-inv:    #edeae4;
-      --text-inv-2:  #a09d9a;
-      --font-d:      'Space Grotesk', sans-serif;
-      --font-b:      'Inter', sans-serif;
-      --font-m:      'Geist Mono', monospace;
-      --radius:      12px;
-      --radius-pill: 999px;
-      --max-w:       1200px;
-    }
-
-    html { scroll-behavior: smooth; }
-
+    /* ── BASE OVERRIDES ─────────────────────────────────────── */
     body {
-      background: var(--bg);
-      color: var(--text-1);
-      font-family: var(--font-b);
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      /* Grain texture over everything */
-      position: relative;
+      background: #f4f3ef; /* Slightly warmer/lighter light theme base */
     }
-
-    /* Grain texture overlay */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9998;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-      background-size: 180px 180px;
-      opacity: 0.035;
-      mix-blend-mode: multiply;
-    }
-
-    a { text-decoration: none; color: inherit; }
-    img { max-width: 100%; display: block; }
-
     .container {
-      max-width: var(--max-w);
+      max-width: 1300px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    /* ── Animations ─────────────────────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; } to { opacity: 1; }
-    }
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    @keyframes pulse-dot {
-      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
-    }
-
-    .fade-up {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-    .delay-1 { transition-delay: 0.1s; }
-    .delay-2 { transition-delay: 0.2s; }
-    .delay-3 { transition-delay: 0.32s; }
-    .delay-4 { transition-delay: 0.45s; }
-
-    /* ── Navbar ─────────────────────────────────────────────── */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      padding: 0 24px;
-      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
-      border-bottom: 1px solid transparent;
-    }
-    .navbar.scrolled {
-      background: rgba(237,234,228,0.88);
-      backdrop-filter: blur(20px) saturate(150%);
-      border-color: var(--border);
-    }
-    .nav-inner {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      height: 68px;
-      gap: 32px;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .nav-logo img {
-      width: 32px; height: 32px;
-      object-fit: contain;
-      filter: invert(0);
-    }
-    .nav-logo-text {
-      font-family: var(--font-d);
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--text-1);
-      letter-spacing: -0.02em;
-    }
-    .nav-logo-text span { opacity: 0.45; }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: auto;
-    }
-    .nav-link {
-      font-family: var(--font-b);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-2);
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      transition: color 0.2s, background 0.2s;
-    }
-    .nav-link:hover, .nav-link.active {
-      color: var(--text-1);
-      background: rgba(0,0,0,0.06);
-    }
-
-    .nav-cta { display: flex; gap: 12px; margin-left: 8px; }
-
-    .btn-dark {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-dark);
-      color: var(--text-inv);
-      font-family: var(--font-b);
-      font-weight: 600;
-      font-size: 14px;
-      padding: 9px 20px;
-      border-radius: var(--radius-pill);
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-dark::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 100px 100px;
-      opacity: 0.06;
-      pointer-events: none;
-    }
-    .btn-dark:hover {
-      background: #222220;
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    }
-    .btn-outline-dark {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      color: var(--text-1);
-      font-family: var(--font-b);
-      font-weight: 500;
-      font-size: 14px;
-      padding: 9px 20px;
-      border-radius: var(--radius-pill);
-      border: 1px solid rgba(0,0,0,0.2);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      white-space: nowrap;
-    }
-    .btn-outline-dark:hover {
-      border-color: rgba(0,0,0,0.5);
-      background: rgba(0,0,0,0.04);
-      transform: translateY(-1px);
-    }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      margin-left: auto;
-    }
-    .hamburger span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--text-1);
-      border-radius: 2px;
-      transition: all 0.3s;
-    }
-    .mobile-menu {
-      display: none;
-      position: fixed; inset: 0;
-      z-index: 999;
-      background: var(--bg);
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu .nav-link { font-size: 24px; font-family: var(--font-d); font-weight: 600; }
-    .mobile-close {
-      position: absolute; top: 20px; right: 24px;
-      background: none; border: none;
-      color: var(--text-1); font-size: 28px; cursor: pointer;
-    }
-
-    /* ── Hero ───────────────────────────────────────────────── */
+    /* ── HERO ───────────────────────────────────────────────── */
     .hero {
       position: relative;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
+      padding: 180px 24px 100px;
       overflow: hidden;
     }
-
-    /* Textured dark circle behind hero text */
-    .hero-orb {
+    
+    .hero-bg {
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(800px, 90vw);
-      height: min(800px, 90vw);
-      border-radius: 50%;
-      background: var(--bg-dark);
-      opacity: 0.04;
+      inset: 0;
       pointer-events: none;
-      filter: blur(80px);
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    /* Geometric Shapes / Abstract Imagery */
+    .shape-1 {
+      position: absolute;
+      top: -10%; left: 60%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      animation: float 12s ease-in-out infinite;
+    }
+    .shape-2 {
+      position: absolute;
+      top: 40%; left: -10%;
+      width: 400px; height: 400px;
+      background: linear-gradient(135deg, rgba(17,17,16,0.04) 0%, transparent 100%);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      filter: blur(30px);
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 100px 100px;
+      mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 70%);
     }
 
-    /* Subtle cross-hatch / dot grid */
-    .hero-grid {
-      position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.12) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-      pointer-events: none;
+    @keyframes float {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -50px) rotate(10deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+      padding: 8px 16px;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 100px;
+      background: rgba(255,255,255,0.4);
+      backdrop-filter: blur(10px);
       font-family: var(--font-m);
       font-size: 11px;
       font-weight: 500;
-      color: var(--text-2);
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      border: 1px solid rgba(0,0,0,0.15);
-      background: rgba(0,0,0,0.05);
-      padding: 5px 14px;
-      border-radius: var(--radius-pill);
-      margin-bottom: 28px;
+      color: var(--text-2);
+      margin-bottom: 40px;
     }
     .badge-dot {
       width: 6px; height: 6px;
-      background: #22c55e;
+      background: #111;
       border-radius: 50%;
-      animation: pulse-dot 2s ease-in-out infinite;
+      animation: pulse-dot 2s infinite;
     }
 
     .hero-headline {
       font-family: var(--font-d);
-      font-size: clamp(44px, 7vw, 92px);
-      font-weight: 700;
-      line-height: 1.03;
-      letter-spacing: -0.035em;
+      font-size: clamp(48px, 8vw, 110px);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
       color: var(--text-1);
-      max-width: 900px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
     }
-    /* Black textured word */
-    .hero-headline .textured {
-      display: inline-block;
-      position: relative;
-      color: transparent;
-      -webkit-text-stroke: 1px var(--text-1);
-    }
-    /* Filled textured word via clip */
-    .hero-headline .textured-fill {
-      position: relative;
-      display: inline-block;
-      background: var(--bg-dark);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    
+    .hero-headline .italic {
+      font-family: 'Times New Roman', serif;
+      font-style: italic;
+      font-weight: 400;
+      opacity: 0.8;
+      letter-spacing: -0.02em;
     }
 
     .hero-sub {
       font-family: var(--font-b);
-      font-size: clamp(16px, 2vw, 18px);
+      font-size: clamp(16px, 2vw, 20px);
       color: var(--text-2);
-      max-width: 520px;
-      margin-bottom: 40px;
-      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto 56px;
+      line-height: 1.6;
+      font-weight: 300;
     }
 
-    .hero-btns {
+    .hero-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 64px;
-    }
-    .hero-btns .btn-dark        { font-size: 15px; padding: 13px 28px; }
-    .hero-btns .btn-outline-dark { font-size: 15px; padding: 13px 28px; }
-
-    .hero-stats {
-      display: flex;
-      align-items: center;
-      gap: 32px;
+      gap: 16px;
       flex-wrap: wrap;
-      justify-content: center;
     }
-    .hero-stat {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-m);
-      font-size: 12px;
-      color: var(--text-3);
-    }
-    .hero-stat strong {
-      font-family: var(--font-d);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-1);
-    }
-    .stat-divider { width: 1px; height: 24px; background: var(--border); }
-
-    .scroll-indicator {
-      position: absolute;
-      bottom: 32px; left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      animation: fadeIn 1s ease 1.5s both;
-    }
-    .scroll-line {
-      width: 1px; height: 36px;
-      background: linear-gradient(to bottom, var(--text-1), transparent);
-    }
-    .scroll-text {
-      font-family: var(--font-m);
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      color: var(--text-3);
-      text-transform: uppercase;
-      writing-mode: vertical-rl;
-    }
-
-    /* ── Ticker ─────────────────────────────────────────────── */
-    .ticker-wrap {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      padding: 13px 0;
-      background: var(--bg-2);
-    }
-    .ticker-track {
-      display: flex;
-      width: max-content;
-      animation: ticker 28s linear infinite;
-    }
-    .ticker-item {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      padding: 0 20px;
-      font-family: var(--font-m);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      white-space: nowrap;
-    }
-    .ticker-dot {
-      width: 3px; height: 3px;
-      background: var(--text-3);
-      border-radius: 50%;
-    }
-
-    /* ── Section ────────────────────────────────────────────── */
-    .section { padding: 100px 24px; }
-
-    .section-label {
+    
+    /* Magnetic button style */
+    .btn-magnetic {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-family: var(--font-m);
-      font-size: 11px;
+      justify-content: center;
+      padding: 16px 36px;
+      background: var(--text-1);
+      color: var(--bg);
+      font-family: var(--font-b);
+      font-size: 15px;
       font-weight: 500;
-      color: var(--text-3);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 16px;
+      border-radius: 100px;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+      cursor: pointer;
     }
-    .section-label::before {
-      content: '';
-      display: block;
-      width: 16px; height: 1px;
-      background: var(--text-3);
+    .btn-magnetic:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
-    .section-title {
-      font-family: var(--font-d);
-      font-size: clamp(32px, 4.5vw, 52px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
+    
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 36px;
+      border: 1px solid rgba(0,0,0,0.15);
       color: var(--text-1);
-      margin-bottom: 16px;
+      font-family: var(--font-b);
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 100px;
+      transition: all 0.3s ease;
+      background: transparent;
     }
-    .section-sub {
-      font-size: 17px;
+    .btn-outline:hover {
+      background: rgba(0,0,0,0.03);
+      border-color: rgba(0,0,0,0.3);
+    }
+
+    /* ── SYSTEM LOG MARQUEE ────────────────────────────────────── */
+    .marquee-section {
+      padding: 14px 0;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       color: var(--text-2);
-      max-width: 500px;
-      line-height: 1.65;
     }
-
-    /* ── Features ───────────────────────────────────────────── */
-    .features-header { max-width: var(--max-w); margin: 0 auto 56px; }
-    .features-grid {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: scrollMarquee 240s linear infinite;
     }
-    .feature-card {
-      background: rgba(0,0,0,0.04);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s, transform 0.3s;
-      cursor: default;
-      position: relative;
-      overflow: hidden;
-    }
-    .feature-card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 120px 120px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      border-radius: inherit;
-      mix-blend-mode: multiply;
-    }
-    .feature-card:hover {
-      border-color: rgba(0,0,0,0.25);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
-      background: rgba(0,0,0,0.06);
-      transform: translateY(-3px);
-    }
-    .feature-card:hover::before { opacity: 0.04; }
-    .feature-icon {
-      width: 40px; height: 40px;
-      background: rgba(0,0,0,0.07);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px;
-      color: var(--text-1);
-    }
-    .feature-icon svg { width: 20px; height: 20px; }
-    .feature-title {
-      font-family: var(--font-d);
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-1);
-      margin-bottom: 10px;
-    }
-    .feature-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; }
-
-    /* ── Stats ── BLACK TEXTURED SECTION ─────────────────────── */
-    .stats-section {
-      background: var(--bg-dark);
-      padding: 72px 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stats-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      opacity: 0.07;
-      pointer-events: none;
-    }
-    .stats-section::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
-      pointer-events: none;
-    }
-    .stats-inner {
-      position: relative;
-      z-index: 1;
-      max-width: var(--max-w);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .stat-block {
-      text-align: center;
-      padding: 24px;
-      border-right: 1px solid var(--border-dark);
-    }
-    .stat-block:last-child { border-right: none; }
-    .stat-num {
-      font-family: var(--font-d);
-      font-size: clamp(42px, 5vw, 68px);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      color: var(--text-inv);
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-    .stat-label {
+    .marquee-text {
       font-family: var(--font-m);
-      font-size: 11px;
-      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: var(--text-inv-2);
+      white-space: nowrap;
+      padding: 0 40px;
+    }
+    @keyframes scrollMarquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
 
-    /* ── Partners ───────────────────────────────────────────── */
-    .partners-section { padding: 72px 24px; background: var(--bg-2); }
-    .partners-inner { max-width: var(--max-w); margin: 0 auto; text-align: center; }
+    /* ── BENTO GRID SECTION ─────────────────────────────────── */
+    .bento-section {
+      padding: 160px 0;
+    }
+    .bento-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 80px;
+    }
+    .bento-header h2 {
+      font-family: var(--font-d);
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+    .bento-header p {
+      font-size: 18px;
+      color: var(--text-2);
+      font-weight: 300;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 320px;
+      gap: 24px;
+    }
+
+    .bento-card {
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 32px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, border-color 0.3s ease;
+      backdrop-filter: blur(20px);
+    }
+    .bento-card:hover {
+      background: rgba(255,255,255,0.8);
+      border-color: rgba(0,0,0,0.15);
+      transform: translateY(-4px);
+    }
+
+    /* Grid Spans */
+    .bento-card.span-2 { grid-column: span 2; }
+    .bento-card.span-3 { grid-column: span 3; }
+    .bento-card.row-2 { grid-row: span 2; }
+
+    .bento-icon {
+      margin-bottom: auto;
+    }
+    .bento-icon svg {
+      width: 28px; height: 28px;
+      color: var(--text-1);
+      opacity: 0.7;
+    }
+    
+    .bento-title {
+      font-family: var(--font-d);
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .bento-card.span-2 .bento-title { font-size: 32px; }
+    
+    .bento-desc {
+      font-size: 15px;
+      color: var(--text-2);
+      line-height: 1.6;
+      font-weight: 300;
+      max-width: 90%;
+    }
+
+    /* Abstract shapes inside bento cards */
+    .bento-graphic {
+      position: absolute;
+      top: -10%; right: -10%;
+      width: 250px; height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
+      pointer-events: none;
+    }
+    .bento-lines {
+      position: absolute;
+      bottom: 0; right: 0; width: 100%; height: 100%;
+      background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 10px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    /* Stats inside Bento */
+    .bento-stat-num {
+      font-family: var(--font-d);
+      font-size: clamp(60px, 8vw, 120px);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-top: auto;
+      margin-bottom: 10px;
+    }
+    .bento-stat-label {
+      font-family: var(--font-m);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+    }
+
+    /* ── PARTNERS ───────────────────────────────────────────── */
+    .partners-section {
+      padding: 0 0 160px;
+    }
+    .partners-inner {
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding-top: 80px;
+    }
     .partners-label {
       font-family: var(--font-m);
       font-size: 11px;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--text-3);
-      margin-bottom: 40px;
+      margin-bottom: 60px;
     }
     .partners-logos {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 60px; flex-wrap: wrap;
+      gap: 80px;
+      flex-wrap: wrap;
     }
     .partner-logo {
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0.35;
+      opacity: 0.4;
       filter: grayscale(1);
-      transition: opacity 0.3s, filter 0.3s;
-      max-height: 48px;
+      transition: all 0.4s ease;
     }
-    .partner-logo img { max-height: 48px; max-width: 180px; object-fit: contain; }
-    .partner-logo:hover { opacity: 0.8; filter: grayscale(0); }
+    .partner-logo:hover {
+      opacity: 1;
+      filter: grayscale(0);
+    }
+    .partner-logo img {
+      max-height: 50px;
+    }
 
-    /* ── FAQ ── BLACK TEXTURED ───────────────────────────────── */
+    /* ── FAQ ACCORDION ──────────────────────────────────────── */
     .faq-section {
-      padding: 100px 24px;
-      background: var(--bg-dark);
+      padding: 120px 0;
+      background: #111110;
+      color: #edeae4;
+      border-radius: 40px;
+      margin: 80px 24px 160px;
       position: relative;
       overflow: hidden;
     }
@@ -624,482 +384,895 @@
       content: '';
       position: absolute; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      opacity: 0.06;
+      background-size: 200px 200px;
+      opacity: 0.04;
       pointer-events: none;
     }
-    .faq-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
-    .faq-header { margin-bottom: 56px; }
-    .faq-header .section-label { color: rgba(255,255,255,0.35); }
-    .faq-header .section-label::before { background: rgba(255,255,255,0.3); }
-    .faq-header .section-title { color: var(--text-inv); }
-    .faq-header .section-sub { color: var(--text-inv-2); }
-    .faq-list { display: flex; flex-direction: column; }
-    .faq-item { border-bottom: 1px solid var(--border-dark); overflow: hidden; }
-    .faq-q {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 22px 0;
-      cursor: pointer;
+    .faq-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .faq-title {
       font-family: var(--font-d);
-      font-size: 17px;
+      font-size: clamp(36px, 5vw, 64px);
       font-weight: 500;
-      color: var(--text-inv);
-      transition: color 0.2s;
-      background: none; border: none;
-      width: 100%; text-align: left;
+      letter-spacing: -0.03em;
+      margin-bottom: 60px;
     }
-    .faq-q:hover { color: rgba(255,255,255,0.75); }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .faq-q {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 32px 0;
+      font-family: var(--font-d);
+      font-size: 20px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: color 0.3s;
+    }
+    .faq-q:hover { color: rgba(255,255,255,0.7); }
     .faq-icon {
-      width: 24px; height: 24px;
-      border: 1px solid var(--border-dark);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      color: rgba(255,255,255,0.4);
-      font-size: 16px;
-      transition: transform 0.3s, border-color 0.2s, background 0.2s, color 0.2s;
+      font-size: 24px;
+      font-weight: 300;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .faq-item.open .faq-icon {
-      transform: rotate(45deg);
-      border-color: rgba(255,255,255,0.4);
-      background: rgba(255,255,255,0.08);
-      color: var(--text-inv);
-    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
     .faq-a {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.3s ease;
+      transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+      opacity: 0;
     }
-    .faq-item.open .faq-a { max-height: 300px; padding-bottom: 20px; }
-    .faq-a p { font-size: 15px; color: var(--text-inv-2); line-height: 1.7; }
+    .faq-item.open .faq-a {
+      max-height: 400px;
+      opacity: 1;
+      padding-bottom: 32px;
+    }
+    .faq-a p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.6);
+      font-weight: 300;
+    }
 
-    /* ── CTA ── BLACK TEXTURED ───────────────────────────────── */
-    .cta-section {
+    /* ── MISSION SECTION ────────────────────────────────────── */
+    .mission-section {
       padding: 120px 24px;
       text-align: center;
-      background: var(--bg);
       position: relative;
-      overflow: hidden;
     }
-    .cta-inner { position: relative; max-width: 640px; margin: 0 auto; }
-    .cta-title {
+    .mission-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .mission-title {
       font-family: var(--font-d);
-      font-size: clamp(36px, 5vw, 60px);
-      font-weight: 700;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 500;
       letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: var(--text-1);
-      margin-bottom: 20px;
+      margin-bottom: 32px;
     }
-    .cta-sub {
-      font-size: 17px;
-      color: var(--text-2);
-      margin-bottom: 40px;
+    .mission-text {
+      font-size: clamp(20px, 3vw, 28px);
       line-height: 1.6;
+      color: var(--text-2);
+      font-weight: 300;
     }
 
-    /* ── Footer ─────────────────────────────────────────────── */
-    footer {
-      border-top: 1px solid var(--border);
-      background: var(--bg-dark);
-      padding: 40px 24px;
+    /* ── ROADMAP SECTION ────────────────────────────────────── */
+    .roadmap-section {
+      padding: 120px 24px 0;
+      position: relative;
+    }
+    .roadmap-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .roadmap-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .roadmap-header h2 {
+      font-family: var(--font-d);
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 15px;
+      width: 2px;
+      background: rgba(0,0,0,0.1);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 60px;
+    }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-dot {
+      position: absolute;
+      left: -40px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--text-1);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1;
+    }
+    .timeline-dot::after {
+      content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--text-1);
+    }
+    .timeline-date {
+      font-family: var(--font-m);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 12px;
+    }
+    .timeline-title {
+      font-family: var(--font-d);
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .timeline-content {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 24px;
+      padding: 32px;
+    }
+    .timeline-content ul {
+      list-style: none;
+      padding: 0;
+    }
+    .timeline-content li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 12px;
+      color: var(--text-2);
+      font-size: 16px;
+    }
+    .timeline-content li::before {
+      content: '→';
+      position: absolute;
+      left: 0; top: 0;
+      color: var(--text-1);
+      font-family: var(--font-m);
+    }
+    .timeline-content li:last-child { margin-bottom: 0; }
+
+    /* ── NEURAL NETWORK SECTION ──────────────────────────────── */
+    .neural-section {
+      padding: 120px 24px;
+      position: relative;
+    }
+    .neural-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .neural-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .neural-header h2 {
+      font-family: var(--font-d);
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+    }
+    
+    /* The Arsenal Grid */
+    .arsenal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .arsenal-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+    .arsenal-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.03) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .arsenal-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.5);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+    }
+    .arsenal-card:hover::before { opacity: 1; }
+    
+    .arsenal-icon {
+      font-size: 40px;
+      margin-bottom: 24px;
+      color: var(--text-1);
+    }
+    .arsenal-title {
+      font-family: var(--font-d);
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .arsenal-desc {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    /* The Comm-Link */
+    .comm-link-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+    }
+    .comm-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 32px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 100px;
+      font-family: var(--font-d);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-1);
+      text-decoration: none;
+      transition: all 0.3s;
       position: relative;
       overflow: hidden;
     }
-    footer::before {
+    .comm-btn::after {
       content: '';
-      position: absolute; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 150px 150px;
-      opacity: 0.055;
-      pointer-events: none;
+      position: absolute;
+      top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+      transform: skewX(-20deg);
+      transition: 0.5s;
+    }
+    .comm-btn:hover {
+      background: var(--text-1);
+      color: var(--bg);
+      transform: scale(1.02);
+    }
+    .comm-btn:hover::after {
+      left: 150%;
+    }
+    .comm-btn svg {
+      transition: transform 0.3s;
+    }
+    .comm-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    /* ── CTA SECTION ────────────────────────────────────────── */
+    .cta-section {
+      padding: 0 24px 160px;
+      text-align: center;
+    }
+    .cta-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .cta-title {
+      font-family: var(--font-d);
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 32px;
+    }
+    .cta-title .italic {
+      font-family: 'Times New Roman', serif;
+      font-style: italic;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 24px;
     }
     .footer-inner {
-      position: relative; z-index: 1;
       max-width: var(--max-w);
       margin: 0 auto;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      align-items: center;
       flex-wrap: wrap;
+      gap: 32px;
     }
     .footer-logo {
-      display: flex; align-items: center; gap: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       font-family: var(--font-d);
-      font-weight: 700; font-size: 16px;
-      color: var(--text-inv);
+      font-weight: 600;
+      font-size: 18px;
     }
-    .footer-logo img { width: 28px; height: 28px; object-fit: contain; filter: invert(1) brightness(2); }
-    .footer-logo span { opacity: 0.4; }
-    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-    .footer-link { font-size: 13px; color: var(--text-inv-2); transition: color 0.2s; }
-    .footer-link:hover { color: var(--text-inv); }
-    .footer-copy { font-family: var(--font-m); font-size: 12px; color: var(--text-inv-2); opacity: 0.6; }
+    .footer-logo img { width: 32px; height: 32px; object-fit: contain; }
+    .footer-links { display: flex; gap: 32px; }
+    .footer-link {
+      font-family: var(--font-b);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-2);
+      transition: color 0.3s;
+    }
+    .footer-link:hover { color: var(--text-1); }
+    .footer-copy {
+      font-family: var(--font-m);
+      font-size: 12px;
+      color: var(--text-3);
+    }
 
-    /* ── Responsive ─────────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .bento-grid { grid-template-columns: repeat(2, 1fr); }
+      .bento-card.span-3 { grid-column: span 2; }
+    }
+    @media (max-width: 768px) {
+      .hero { padding: 140px 24px 80px; }
+      .bento-grid { grid-template-columns: 1fr; grid-auto-rows: minmax(280px, auto); }
+      .bento-card.span-2 { grid-column: span 1; }
+      .bento-card.span-3 { grid-column: span 1; }
+      .bento-card.row-2 { grid-row: span 1; }
+      
       .nav-links, .nav-cta { display: none; }
       .hamburger { display: flex; }
-    }
-    @media (max-width: 640px) {
-      .features-grid { grid-template-columns: 1fr; }
-      .stats-inner { grid-template-columns: 1fr; }
-      .stat-block { border-right: none; border-bottom: 1px solid var(--border-dark); }
-      .stat-block:last-child { border-bottom: none; }
-      .footer-inner { flex-direction: column; text-align: center; }
-      .footer-links { justify-content: center; }
+      
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .faq-section { border-radius: 24px; margin: 0 16px 100px; padding: 80px 0; }
     }
   </style>
+  <script src="/js/shield.js"></script>
 </head>
 <body>
 
 <!-- ══ NAVBAR ══════════════════════════════════════════════════ -->
 <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
-  <div class="nav-inner">
-    <a href="index.html" class="nav-logo" aria-label="Innovexa Labs Home">
-      <img src="assets/logo.png" alt="Innovexa Labs Logo" />
-      <span class="nav-logo-text">Innovexa<span>Labs</span></span>
+  <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:28px; height:28px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.5;">Hub</span></span>
     </a>
-    <div class="nav-links" role="menubar">
-      <a href="index.html"      class="nav-link active" role="menuitem">Home</a>
-      <a href="register.html"   class="nav-link"        role="menuitem">Register</a>
-      <a href="status.html"     class="nav-link"        role="menuitem">Status</a>
-      <a href="pathfinder.html" class="nav-link"        role="menuitem">Pathfinder</a>
-      <a href="atlas.html"      class="nav-link"        role="menuitem">Atlas</a>
+    <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
+      <a href="index.html" class="nav-link active" style="font-size:14px; font-weight:500;">Home</a>
+      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:#a78bfa;">⚡ Forge</a>
     </div>
     <div class="nav-cta">
-      <a href="register.html" class="btn-dark" id="nav-register-btn">Become Operative</a>
+      <a href="register.html" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Join the Collective</a>
     </div>
-    <button class="hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
+    <button class="hamburger" id="hamburger-btn" style="display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;">
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
     </button>
   </div>
 </nav>
 
 <!-- Mobile Menu -->
-<div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Site menu">
-  <button class="mobile-close" id="mobile-close-btn" aria-label="Close menu">✕</button>
-  <a href="index.html"      class="nav-link" onclick="closeMobileMenu()">Home</a>
-  <a href="register.html"   class="nav-link" onclick="closeMobileMenu()">Register</a>
-  <a href="status.html"     class="nav-link" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" onclick="closeMobileMenu()">Pathfinder</a>
-  <a href="atlas.html"      class="nav-link" onclick="closeMobileMenu()">Atlas</a>
-  <a href="register.html"   class="btn-dark" style="margin-top:16px;font-size:16px;padding:14px 32px;">Become Operative</a>
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#a78bfa;" onclick="closeMobileMenu()">⚡ Forge</a>
 </div>
 
 <!-- ══ HERO ════════════════════════════════════════════════════ -->
 <section class="hero" id="home">
-  <div class="hero-orb"></div>
-  <div class="hero-grid"></div>
-
-  <div class="hero-badge fade-up">
-    <span class="badge-dot"></span>
-    // Batch 2025-26 — Applications Open
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
   </div>
 
-  <h1 class="hero-headline fade-up delay-1">
-    Build the Future<br>with Innovexa Labs.
-  </h1>
+  <div class="hero-content container">
+    <div class="hero-badge fade-up">
+      <span class="badge-dot"></span>
+      Applications Open — Batch 2026
+    </div>
 
-  <p class="hero-sub fade-up delay-2">
-    The premier student tech collective at Yenepoya University, powered by Kalvium. Forge your path from student to industry-ready operative.
-  </p>
+    <h1 class="hero-headline fade-up delay-1">
+      Engineering the <br>
+      <span class="italic">next era</span> of builders.
+    </h1>
 
-  <div class="hero-btns fade-up delay-3">
-    <a href="register.html" class="btn-dark" id="hero-register-btn">
-      Become an Operative →
-    </a>
-    <a href="status.html" class="btn-outline-dark" id="hero-status-btn">
-      Check My Status
-    </a>
-  </div>
+    <p class="hero-sub fade-up delay-2">
+      We are an exclusive student collective at Yenepoya University, architecting the bridge between academic theory and elite industry execution.
+    </p>
 
-  <div class="hero-stats fade-up delay-4">
-    <div class="hero-stat">
-      <strong><span id="hero-count">—</span></strong>
-      <span>Active Operatives</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="hero-stat">
-      <strong>₹599</strong>
-      <span>One-time fee</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="hero-stat">
-      <strong>2025-26</strong>
-      <span>Academic Batch</span>
-    </div>
-  </div>
-
-  <div class="scroll-indicator" aria-hidden="true">
-    <div class="scroll-line"></div>
-    <span class="scroll-text">Scroll</span>
-  </div>
-</section>
-
-<!-- ══ TICKER ══════════════════════════════════════════════════ -->
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker-track">
-    <div class="ticker-item"><span class="ticker-dot"></span>OPERATIVE ID CARD</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>PATHFINDER BOOTCAMP</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>ATLAS KNOWLEDGE</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>PEER NETWORK</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>BATCH 2025-26</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>YENEPOYA UNIVERSITY</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>KALVIUM POWERED</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>EVENT CERTIFICATES</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>WHATSAPP COMMUNITY</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>OPERATIVE ID CARD</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>PATHFINDER BOOTCAMP</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>ATLAS KNOWLEDGE</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>PEER NETWORK</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>BATCH 2025-26</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>YENEPOYA UNIVERSITY</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>KALVIUM POWERED</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>EVENT CERTIFICATES</div>
-    <div class="ticker-item"><span class="ticker-dot"></span>WHATSAPP COMMUNITY</div>
-  </div>
-</div>
-
-<!-- ══ FEATURES ════════════════════════════════════════════════ -->
-<section class="section" id="features" aria-label="Features">
-  <div class="features-header container fade-up">
-    <div class="section-label">What you get</div>
-    <h2 class="section-title">Everything an Operative needs.</h2>
-    <p class="section-sub">From your unique ID card to exclusive bootcamps — your membership unlocks the full Innovexa Labs ecosystem.</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card fade-up delay-1">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      </div>
-      <div class="feature-title">Operative ID Card</div>
-      <div class="feature-desc">Your exclusive INVX-XX membership card — verifiable digital identity proving your Innovexa Labs status. Downloadable and printable.</div>
-    </div>
-    <div class="feature-card fade-up delay-2">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-      </div>
-      <div class="feature-title">Pathfinder Bootcamps</div>
-      <div class="feature-desc">Structured hands-on bootcamps in Web Dev, AI/ML, Cybersecurity, and more. Learn from peers and industry mentors.</div>
-    </div>
-    <div class="feature-card fade-up delay-3">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-      </div>
-      <div class="feature-title">Atlas Knowledge</div>
-      <div class="feature-desc">A curated knowledge base of resources, guides, and learning paths across all domains of modern technology.</div>
-    </div>
-    <div class="feature-card fade-up delay-1">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-      </div>
-      <div class="feature-title">Core Network</div>
-      <div class="feature-desc">Connect with like-minded peers, seniors, and alumni. Access the exclusive Innovexa Labs WhatsApp and Telegram community.</div>
-    </div>
-    <div class="feature-card fade-up delay-2">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      </div>
-      <div class="feature-title">Event Certificates</div>
-      <div class="feature-desc">Official participation and achievement certificates for every event, hackathon, and workshop you attend as an operative.</div>
-    </div>
-    <div class="feature-card fade-up delay-3">
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      </div>
-      <div class="feature-title">Calendar Invites</div>
-      <div class="feature-desc">Never miss an event. Automatic calendar invites for all Innovexa Labs sessions, bootcamps, and community events.</div>
+    <div class="hero-actions fade-up delay-3">
+      <a href="register.html" class="btn-magnetic">Initialize Membership</a>
+      <a href="status.html" class="btn-outline">Track Application</a>
     </div>
   </div>
 </section>
 
-<!-- ══ STATS — BLACK TEXTURE ═══════════════════════════════════ -->
-<div class="stats-section" aria-label="Statistics">
-  <div class="stats-inner">
-    <div class="stat-block fade-up">
-      <div class="stat-num">₹599</div>
-      <div class="stat-label">One-time Fee</div>
-    </div>
-    <div class="stat-block fade-up delay-1">
-      <div class="stat-num"><span id="stats-count">60</span>+</div>
-      <div class="stat-label">Active Operatives</div>
-    </div>
-    <div class="stat-block fade-up delay-2">
-      <div class="stat-num">2025-26</div>
-      <div class="stat-label">Academic Batch</div>
-    </div>
+<!-- ══ MARQUEE ═════════════════════════════════════════════════ -->
+<div class="marquee-section fade-up">
+  <div class="marquee-track">
+    <div class="marquee-text" id="marquee-text-1">[SYS.LOG]: Operative Rahul_K onboarded &nbsp;•&nbsp; [SYS.LOG]: Clearance granted to Priya_S &nbsp;•&nbsp; [SYS.LOG]: Operative K. Iyer verified &nbsp;•&nbsp; [SYS.LOG]: Batch 2026 initialized &nbsp;•&nbsp; [SYS.LOG]: Operative V. Patel granted access &nbsp;•&nbsp; </div>
+    <div class="marquee-text" id="marquee-text-2">[SYS.LOG]: Operative Rahul_K onboarded &nbsp;•&nbsp; [SYS.LOG]: Clearance granted to Priya_S &nbsp;•&nbsp; [SYS.LOG]: Operative K. Iyer verified &nbsp;•&nbsp; [SYS.LOG]: Batch 2026 initialized &nbsp;•&nbsp; [SYS.LOG]: Operative V. Patel granted access &nbsp;•&nbsp; </div>
   </div>
 </div>
+
+<!-- ══ MISSION ══════════════════════════════════════════════════ -->
+<section class="mission-section container">
+  <div class="mission-inner fade-up">
+    <h2 class="mission-title">The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Directive.</span></h2>
+    <p class="mission-text">
+      Innovexa Hub was forged with a singular objective: to eradicate the gap between academic theory and elite industry execution. We are not a club. We are a collective of driven engineers, designers, and systems architects who believe in building the future by actually building it. We provide the capital, the network, and the environment. You provide the execution.
+    </p>
+  </div>
+</section>
+
+<!-- ══ BENTO GRID ══════════════════════════════════════════════ -->
+<section class="bento-section container" id="ecosystem">
+  <div class="bento-header fade-up">
+    <h2>An Ecosystem for <br><span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Excellence.</span></h2>
+    <p>We don't just host events. We engineer a comprehensive environment where raw potential transforms into exceptional capability.</p>
+  </div>
+
+  <div class="bento-grid">
+    <!-- Tall Card -->
+    <div class="bento-card row-2 fade-up">
+      <div class="bento-graphic"></div>
+      <div class="bento-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg>
+      </div>
+      <div>
+        <h3 class="bento-title">Digital Identity</h3>
+        <p class="bento-desc">Your unique INVX operative ID acts as a cryptographic proof of your involvement, skills, and access within the hub.</p>
+      </div>
+    </div>
+
+    <!-- Wide Card -->
+    <div class="bento-card span-2 fade-up delay-1">
+      <div class="bento-lines"></div>
+      <div class="bento-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <h3 class="bento-title">Pathfinder Bootcamps</h3>
+        <p class="bento-desc">Intensive, zero-to-one learning modules focusing on modern stacks, AI engineering, and systems architecture. Built by those who build.</p>
+      </div>
+    </div>
+
+    <!-- Stat Card -->
+    <div class="bento-card fade-up delay-2" style="background:var(--text-1); color:var(--bg);">
+      <div class="bento-stat-num">₹ 599</div>
+      <div class="bento-stat-label" style="color:rgba(255,255,255,0.6);">Annual Retainer</div>
+    </div>
+
+    <!-- Small Card -->
+    <div class="bento-card fade-up">
+      <div class="bento-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="22" y1="12" x2="16" y2="12"/><line x1="8" y1="12" x2="2" y2="12"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="22" x2="12" y2="16"/></svg>
+      </div>
+      <div>
+        <h3 class="bento-title">Atlas</h3>
+        <p class="bento-desc">A centralized, high-signal knowledge graph curated by seniors and industry mentors.</p>
+      </div>
+    </div>
+
+    <!-- Wide Stat Card -->
+    <div class="bento-card span-2 fade-up delay-1" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between;">
+      <div>
+        <div class="bento-stat-num"><span id="stats-count">60</span>+</div>
+        <div class="bento-stat-label">Active Operatives</div>
+      </div>
+      <div style="text-align:right; max-width:200px;">
+        <p class="bento-desc" style="margin:0 0 0 auto;">A growing network of driven individuals pushing boundaries.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ROADMAP ══════════════════════════════════════════════════ -->
+<section class="roadmap-section container">
+  <div class="roadmap-inner">
+    <div class="roadmap-header fade-up">
+      <h2>Trajectory <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">2026–2028.</span></h2>
+    </div>
+    
+    <div class="timeline">
+      <div class="timeline-item fade-up delay-1">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Q3 2026</div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Initiation</h3>
+          <ul>
+            <li>Recruitment of the foundational batch.</li>
+            <li>Pathfinder Bootcamp: Full-Stack Web Architecture.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="timeline-item fade-up delay-2">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Q4 2026</div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Execution</h3>
+          <ul>
+            <li>48-Hour Internal Hackathons.</li>
+            <li>Open-source project deployments and portfolio building.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="timeline-item fade-up delay-3">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">Q1-Q2 2026</div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Expansion</h3>
+          <ul>
+            <li>Cross-college technical summits.</li>
+            <li>Specialization tracks: Applied AI, Blockchain, and Cyber Defense.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="timeline-item fade-up delay-4">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2027</div>
+        <div class="timeline-content">
+          <h3 class="timeline-title">Apex</h3>
+          <ul>
+            <li>Direct industry collaboration.</li>
+            <li>Incubation of operative-led startups and products.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ THE NEURAL NETWORK ═══════════════════════════════════════ -->
+<section class="neural-section container">
+  <div class="neural-inner">
+    <div class="neural-header fade-up">
+      <h2>The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Arsenal.</span></h2>
+      <p style="color:var(--text-2); font-size:18px; margin-top:16px;">Technologies and systems mastered by our operatives.</p>
+    </div>
+
+    <div class="arsenal-grid">
+      <div class="arsenal-card fade-up delay-1">
+        <div class="arsenal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <h3 class="arsenal-title">Full-Stack Architecture</h3>
+        <p class="arsenal-desc">React.js, Node.js, and modern database design for scalable web applications.</p>
+      </div>
+      <div class="arsenal-card fade-up delay-2">
+        <div class="arsenal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <h3 class="arsenal-title">Applied AI</h3>
+        <p class="arsenal-desc">Integrating LLMs, computer vision, and machine learning models into production.</p>
+      </div>
+      <div class="arsenal-card fade-up delay-3">
+        <div class="arsenal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3 class="arsenal-title">Cyber Defense</h3>
+        <p class="arsenal-desc">Offensive security, cryptography, and securing modern application infrastructure.</p>
+      </div>
+    </div>
+
+    <div class="neural-header fade-up" style="margin-bottom: 40px; margin-top: 120px;">
+      <h2>Comm-<span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Link.</span></h2>
+    </div>
+    
+    <div class="comm-link-container fade-up delay-1">
+      <a href="https://wa.me/919943509981" target="_blank" class="comm-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp Lobby
+      </a>
+      <a href="https://instagram.com/innovexa_hub" target="_blank" class="comm-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        @innovexa_hub
+      </a>
+    </div>
+  </div>
+</section>
 
 <!-- ══ PARTNERS ═════════════════════════════════════════════════ -->
-<section class="partners-section" aria-label="Partners">
+<section class="partners-section container">
   <div class="partners-inner fade-up">
-    <p class="partners-label">Backed by leading institutions</p>
-    <div class="partners-logos">
-      <a href="#" class="partner-logo" aria-label="Yenepoya University">
-        <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" />
-      </a>
+    <div class="partners-label">Supported by Institutions of Excellence</div>
+    <div class="partners-logos" style="display: flex; align-items: center; justify-content: center; gap: 100px; flex-wrap: wrap;">
       <a href="#" class="partner-logo" aria-label="Kalvium">
-        <img src="assets/kalvium-logo.png" alt="Kalvium" />
+        <img src="assets/kalvium-logo.png" alt="Kalvium" style="height: 60px; width: auto; object-fit: contain;" />
+      </a>
+      <a href="#" class="partner-logo" aria-label="Yenepoya University">
+        <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" style="height: 60px; width: auto; object-fit: contain;" />
       </a>
     </div>
   </div>
 </section>
 
-<!-- ══ FAQ — BLACK TEXTURE ══════════════════════════════════════ -->
-<section class="faq-section" id="faq" aria-label="Frequently Asked Questions">
-  <div class="faq-inner">
-    <div class="faq-header fade-up">
-      <div class="section-label">FAQ</div>
-      <h2 class="section-title">Common questions.</h2>
-      <p class="section-sub">Everything you need to know about joining Innovexa Labs.</p>
+<!-- ══ TEAM ═════════════════════════════════════════════════════ -->
+<section class="neural-section container" id="team">
+  <div class="neural-inner">
+    <div class="neural-header fade-up">
+      <h2>The Core <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Team.</span></h2>
+      <p style="color:var(--text-2); font-size:18px; margin-top:16px;">The architects behind Innovexa Hub.</p>
     </div>
-    <div class="faq-list" role="list">
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">What is Innovexa Labs?<span class="faq-icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p>Innovexa Labs is the premier student tech collective at Yenepoya University, powered by Kalvium. We forge the next generation of builders through structured bootcamps, a rich knowledge atlas, peer networking, and exclusive membership perks — designed to accelerate your journey from student to industry-ready operative.</p></div>
+
+    <div class="arsenal-grid">
+      <div class="arsenal-card fade-up delay-1">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">Gowtham S</h3>
+        <p class="arsenal-desc">Director of Operations</p>
       </div>
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">How do I join Innovexa Labs?<span class="faq-icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p>Click "Become an Operative" to fill out the registration form. Complete your personal details, pay the ₹599 one-time fee via UPI, and submit your payment screenshot. Your application will be reviewed by the admin team within 24-48 hours.</p></div>
+      
+      <div class="arsenal-card fade-up delay-2">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">Jaiakash</h3>
+        <p class="arsenal-desc">Founder & President</p>
       </div>
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">What is the Operative ID?<span class="faq-icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p>Your Operative ID is a unique INVX-XX membership identifier assigned upon approval. It comes with a downloadable digital ID card that serves as verifiable proof of your Innovexa Labs membership status.</p></div>
+
+      <div class="arsenal-card fade-up delay-3">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">Puneet Ramesh</h3>
+        <p class="arsenal-desc">Director of Logistics</p>
       </div>
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">What happens after my registration is approved?<span class="faq-icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p>Once approved, you'll receive your Operative ID and gain access to the exclusive WhatsApp and Telegram community groups. You can download your ID card from the Status page using your registered email or UTR number.</p></div>
+
+      <div class="arsenal-card fade-up delay-1">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">J Pawan Bramha Gowd</h3>
+        <p class="arsenal-desc">General Secretary</p>
       </div>
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">Is the ₹599 fee refundable?<span class="faq-icon" aria-hidden="true">+</span></button>
-        <div class="faq-a"><p>The ₹599 membership fee is non-refundable. It covers your full academic year 2025-26 membership including all events, bootcamps, and community access.</p></div>
+
+      <div class="arsenal-card fade-up delay-2">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">Susidharan Vadivel</h3>
+        <p class="arsenal-desc">Executive Advisor</p>
       </div>
+
+      <div class="arsenal-card fade-up delay-3">
+        <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 class="arsenal-title" style="font-size:20px;">Visakan KC</h3>
+        <p class="arsenal-desc">Director of Media & Branding</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ACCORDION ════════════════════════════════════════════ -->
+<section class="faq-section fade-up" id="faq">
+  <div class="faq-inner">
+    <h2 class="faq-title">Intelligence <span style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.6;">Briefing.</span></h2>
+    
+    <div class="faq-item">
+      <button class="faq-q">What is the core directive of Innovexa Hub? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>We are a specialized tech collective at Yenepoya University. Our directive is to accelerate the technical and professional growth of our operatives through structured bootcamps, high-stakes hackathons, and a powerful peer network.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What is the onboarding process? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Submit your application and complete the ₹ 599 initialization fee via UPI. Once your transaction is cryptographically verified by our admins, you will be issued an Operative ID and granted access to the internal network.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">What privileges does the Operative ID grant? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Your ID serves as your access token. It validates your identity for internal bootcamps (Pathfinder), grants access to our knowledge repository (Atlas), and serves as proof of membership for external events and hackathons.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Are there any recurring fees? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Negative. The ₹ 599 fee is a one-time retainer that covers your operations for the entire 2026-27 academic year. It is strictly non-refundable.</p></div>
     </div>
   </div>
 </section>
 
 <!-- ══ CTA ══════════════════════════════════════════════════════ -->
-<section class="cta-section" aria-label="Call to action">
-  <div class="cta-inner fade-up">
-    <div class="section-label" style="justify-content:center;margin-bottom:20px;">Get started today</div>
-    <h2 class="cta-title">Ready to Initialize<br>Your Future?</h2>
-    <p class="cta-sub">Join 60+ operatives already building the future at Innovexa Labs. Batch 2025-26 is now open.</p>
-    <a href="register.html" class="btn-dark" style="font-size:16px;padding:14px 36px;" id="cta-register-btn">
-      Register Now — ₹599 →
-    </a>
+<section class="cta-section container fade-up">
+  <div class="cta-inner">
+    <h2 class="cta-title">Begin your <span class="italic">trajectory.</span></h2>
+    <p class="hero-sub" style="margin-bottom:40px;">Join an elite cohort of builders shaping the digital frontier. Batch 2026 applications are closing soon.</p>
+    <a href="register.html" class="btn-magnetic">Initialize Membership — ₹ 599</a>
   </div>
 </section>
 
-<!-- ══ FOOTER — BLACK TEXTURE ════════════════════════════════════ -->
+<!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
 <footer>
-  <div class="footer-inner">
+  <div class="footer-inner container">
     <a href="index.html" class="footer-logo">
-      <img src="assets/logo.png" alt="Innovexa Labs" />
-      Innovexa<span>Labs</span>
+      <img src="assets/logo.png" alt="Innovexa Hub" />
+      Innovexa<span style="opacity:0.4;">Hub</span>
     </a>
     <div class="footer-links">
-      <a href="index.html"      class="footer-link">Home</a>
-      <a href="register.html"   class="footer-link">Register</a>
-      <a href="status.html"     class="footer-link">Status</a>
-      <a href="pathfinder.html" class="footer-link">Pathfinder</a>
-      <a href="atlas.html"      class="footer-link">Atlas</a>
+      <a href="index.html" class="footer-link">Home</a>
+      <a href="register.html" class="footer-link">Register</a>
+      <a href="status.html" class="footer-link">Status</a>
+      <a href="atlas.html" class="footer-link">Atlas</a>
     </div>
-    <span class="footer-copy">© 2025 Innovexa Labs</span>
+    <div class="footer-copy">© 2026 Innovexa Hub. All rights reserved.</div>
   </div>
 </footer>
 
 <script src="/js/api.js"></script>
 <script>
-  // Navbar scroll
+  // Navbar scroll effect
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
+    }
   }, { passive: true });
 
-  // Mobile menu
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const mobileMenu   = document.getElementById('mobile-menu');
-  const mobileClose  = document.getElementById('mobile-close-btn');
-  hamburgerBtn.addEventListener('click', () => {
-    mobileMenu.classList.add('open');
-    hamburgerBtn.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
   });
   function closeMobileMenu() {
-    mobileMenu.classList.remove('open');
-    hamburgerBtn.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
+    mobileMenu.style.transform = 'translateY(-100%)';
   }
-  mobileClose.addEventListener('click', closeMobileMenu);
-  mobileMenu.addEventListener('click', e => { if (e.target === mobileMenu) closeMobileMenu(); });
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
 
-  // FAQ
+  // FAQ Accordion
   document.querySelectorAll('.faq-q').forEach(btn => {
     btn.addEventListener('click', () => {
-      const item = btn.closest('.faq-item');
+      const item = btn.parentElement;
       const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(i => {
-        i.classList.remove('open');
-        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
-      });
-      if (!isOpen) {
-        item.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-      }
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
     });
   });
 
-  // Scroll observer
+  // Intersection Observer for scroll animations
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  // Set initial state for fade elements
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+    if(el.classList.contains('delay-2')) el.style.transitionDelay = '0.2s';
+    if(el.classList.contains('delay-3')) el.style.transitionDelay = '0.3s';
+    observer.observe(el);
+  });
 
   // Counter animation
-  function animateCount(el, target, duration = 1800) {
+  function animateCount(el, target, duration = 2000) {
     const start = performance.now();
     function step(now) {
       const p = Math.min((now - start) / duration, 1);
-      const e = 1 - Math.pow(1 - p, 3);
+      const e = 1 - Math.pow(1 - p, 4); // easeOutQuart
       el.textContent = Math.round(target * e);
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
+  // Fetch Member Count
   async function loadMemberCount() {
     try {
-      const res = await gasGet(SCRIPT_URL + '?action=count');
+      // NOTE: gasGet expects api.js to be loaded
+      const res = await gasGet('https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec?action=count');
       let count = 0;
       if (res && res.success && res.data) count = parseInt(res.data.count) || 0;
-      else if (res && res.count)          count = parseInt(res.count) || 0;
-      const h = document.getElementById('hero-count');
+      else if (res && res.count) count = parseInt(res.count) || 0;
+      
       const s = document.getElementById('stats-count');
-      if (h) animateCount(h, count);
       if (s) animateCount(s, count);
     } catch {
-      const h = document.getElementById('hero-count');
-      if (h) h.textContent = '60+';
+      const s = document.getElementById('stats-count');
+      if (s) s.textContent = '60'; // fallback
+    }
+  }
+
+  // Fetch Confirmed Operatives
+  async function loadConfirmedOperatives() {
+    try {
+      const res = await gasGet('https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec?action=get_confirmed');
+      if (res && res.success && res.names && res.names.length > 0) {
+        // Randomize the names array
+        for (let i = res.names.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [res.names[i], res.names[j]] = [res.names[j], res.names[i]];
+        }
+        
+        let tickerString = '';
+        res.names.forEach(name => {
+          tickerString += `[SYS.LOG]: Operative ${name} verified &nbsp;&nbsp;&bull;&nbsp;&nbsp; `;
+        });
+        
+        // Loop the string a few times if there are only a few names so the marquee doesn't run out of text
+        if (res.names.length < 5) {
+            tickerString = tickerString.repeat(5);
+        }
+
+        const mq1 = document.getElementById('marquee-text-1');
+        const mq2 = document.getElementById('marquee-text-2');
+        if (mq1 && mq2) {
+          mq1.innerHTML = tickerString;
+          mq2.innerHTML = tickerString;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch operatives, falling back to default.", e);
     }
   }
 
   window.addEventListener('DOMContentLoaded', () => {
     loadMemberCount();
+    loadConfirmedOperatives();
+    // Force immediate reveal of hero elements
     setTimeout(() => {
-      document.querySelectorAll('.hero .fade-up').forEach(el => el.classList.add('visible'));
-    }, 100);
+      document.querySelectorAll('.hero .fade-up').forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+    }, 50);
   });
 </script>
 </body>

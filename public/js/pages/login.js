@@ -6,8 +6,8 @@ export function renderLogin(app) {
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-logo">
-          <img src="/assets/logo.png" alt="Innovexa Labs">
-          <h1>Innovexa Labs</h1>
+          <img src="/assets/logo.png" alt="Innovexa Hub">
+          <h1>Innovexa Hub</h1>
           <p>Sign in to your member portal</p>
         </div>
         <form id="login-form">

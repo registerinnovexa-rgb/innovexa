@@ -1,1 +1,1 @@
-# Innovexa-hub
+# Innovexa Hub

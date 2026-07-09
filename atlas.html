@@ -1,233 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Innovexa Labs — Atlas Knowledge Core</title>
-  <meta name="description" content="Atlas: Curated learning resources, roadmaps and tools for student developers."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/design.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas — Innovexa Hub</title>
+  <meta name="description" content="Atlas Knowledge Base: Curated learning resources and architectural roadmaps." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/design.css" />
+
   <style>
-    .search-wrap { position:relative; max-width:500px; margin:0 auto 32px; }
-    .search-input { width:100%; padding:13px 16px 13px 44px; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg); color:var(--text-primary); font-size:15px; outline:none; transition:var(--transition); }
-    .search-input:focus { border-color:var(--accent-blue); background:rgba(59,130,246,0.05); box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
-    .search-input::placeholder { color:var(--text-muted); }
-    .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); }
-    .resource-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:22px; transition:var(--transition); display:flex; flex-direction:column; gap:10px; }
-    .resource-card:hover { transform:translateY(-4px); border-color:rgba(59,130,246,0.3); box-shadow:0 12px 32px rgba(59,130,246,0.1); }
-    .roadmap-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:26px; }
-    .milestone { display:flex; gap:12px; padding:8px 0; border-left:2px solid var(--glass-border); padding-left:14px; position:relative; }
-    .milestone::before { content:''; width:8px; height:8px; background:var(--accent-blue); border-radius:50%; position:absolute; left:-5px; top:14px; }
-    .tool-pill { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:var(--radius-full); background:var(--glass-bg); border:1px solid var(--glass-border); font-size:13px; font-weight:600; color:var(--text-secondary); transition:var(--transition); }
-    .tool-pill:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
-    .cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:28px; }
-    .cat-tab { padding:7px 14px; border-radius:var(--radius-full); border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--text-secondary); font-size:12px; font-weight:700; cursor:pointer; transition:var(--transition); text-transform:uppercase; letter-spacing:.05em; font-family:'JetBrains Mono',monospace; }
-    .cat-tab:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
-    .cat-tab.active { background:rgba(59,130,246,0.12); border-color:var(--accent-blue); color:var(--accent-blue); }
+    body { background: #f4f3ef; }
+    .container { max-width: 1300px; margin: 0 auto; padding: 0 24px; }
+    
+    /* ── HEADER ───────────────────────────────────────────────── */
+    .page-header {
+      padding: 160px 24px 100px;
+      text-align: center;
+      position: relative;
+    }
+    .header-bg {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .shape-1 {
+      position: absolute; top: -20%; left: 10%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%); border-radius: 50%;
+      filter: blur(40px); animation: float 15s infinite;
+    }
+    .shape-2 {
+      position: absolute; top: 10%; right: 10%; width: 400px; height: 400px;
+      background: linear-gradient(135deg, rgba(0,0,0,0.03), transparent); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      filter: blur(30px); animation: float 18s infinite reverse;
+    }
+    
+    @keyframes float {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(20px, -30px) rotate(5deg); }
+      66% { transform: translate(-10px, 20px) rotate(-5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    .badge-top {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border: 1px solid rgba(0,0,0,0.1); border-radius: 100px;
+      font-family: var(--font-m); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2);
+      margin-bottom: 24px; position: relative; z-index: 1;
+    }
+
+    .page-title {
+      font-family: var(--font-d);
+      font-size: clamp(40px, 7vw, 96px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      position: relative; z-index: 1;
+    }
+    .page-title .italic {
+      font-family: 'Times New Roman', serif; font-style: italic; font-weight: 400; opacity: 0.8;
+    }
+    .page-sub {
+      font-size: 18px; color: var(--text-2); max-width: 500px; margin: 0 auto 48px;
+      line-height: 1.6; font-weight: 300; position: relative; z-index: 1;
+    }
+
+    .search-wrap {
+      position: relative; max-width: 560px; margin: 0 auto; z-index: 1;
+    }
+    .search-input {
+      width: 100%; padding: 20px 24px 20px 56px;
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.08); border-radius: 100px;
+      color: var(--text-1); font-family: var(--font-b); font-size: 16px; font-weight: 300;
+      outline: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    }
+    .search-input:focus {
+      border-color: rgba(0,0,0,0.2); box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.9);
+    }
+    .search-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
+
+    /* ── DIRECTORY (RESOURCES) ──────────────────────────────── */
+    .section { padding: 80px 0 120px; }
+    
+    .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; justify-content: center; }
+    .filter-tab {
+      padding: 12px 24px; border-radius: 100px;
+      background: transparent; border: 1px solid rgba(0,0,0,0.1);
+      font-family: var(--font-b); font-size: 14px; font-weight: 500;
+      color: var(--text-2); cursor: pointer; transition: all 0.3s;
+    }
+    .filter-tab:hover { background: rgba(0,0,0,0.03); }
+    .filter-tab.active { background: var(--text-1); color: var(--bg); border-color: var(--text-1); }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+    .resource-card {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 24px;
+      padding: 32px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column; gap: 16px;
+      position: relative; overflow: hidden;
+    }
+    .resource-card:hover {
+      background: rgba(255,255,255,0.9);
+      border-color: rgba(0,0,0,0.15);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+    }
+    .resource-title { font-family: var(--font-d); font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02em; }
+    .resource-desc { font-size: 14px; color: var(--text-2); line-height: 1.6; font-weight: 300; margin-bottom: 16px; }
+    
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-m); font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 6px 12px; border-radius: 100px;
+    }
+    .badge-primary { background: rgba(0,0,0,0.04); color: var(--text-1); }
+
+    .resource-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-m); font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-1);
+      margin-top: auto; opacity: 0.6; transition: opacity 0.3s;
+    }
+    .resource-card:hover .resource-link { opacity: 1; }
+
+    /* ── ROADMAPS ───────────────────────────────────────────── */
+    .roadmap-section {
+      padding: 120px 0;
+      background: #eceae5; /* slightly darker section for contrast */
+      border-top: 1px solid var(--border);
+    }
+    .section-title {
+      font-family: var(--font-d); font-size: clamp(32px, 5vw, 56px);
+      font-weight: 500; letter-spacing: -0.03em; margin-bottom: 60px;
+      text-align: center;
+    }
+    
+    .roadmap-card {
+      background: #f4f3ef;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 32px;
+      padding: 48px;
+    }
+    .roadmap-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .roadmap-header h3 { font-family: var(--font-d); font-size: 32px; font-weight: 500; letter-spacing:-0.03em; margin-bottom: 8px; }
+    
+    .milestone {
+      display: flex; gap: 24px; padding: 24px 0; border-left: 1px solid rgba(0,0,0,0.1); padding-left: 32px; position: relative;
+    }
+    .milestone::before {
+      content: ''; position: absolute; left: -5px; top: 32px;
+      width: 9px; height: 9px; border-radius: 50%; background: #111;
+    }
+    .milestone-title { font-family: var(--font-d); font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+    .milestone-desc { font-size: 14px; color: var(--text-2); font-weight: 300; line-height: 1.6; }
+    
+    /* ── FOOTER & UTILS ─────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+    }
+    footer { border-top: 1px solid var(--border); padding: 60px 24px; }
+
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .roadmap-card { padding: 32px 24px; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 32px; }
+    }
   </style>
+  <script src="/js/shield.js"></script>
 </head>
 <body>
-  <div class="bg-orbs"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
-  <div class="bg-grid"></div>
-  <div id="toast-container"></div>
 
-  <nav class="navbar">
-    <div class="navbar-inner">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.png" alt="Innovexa Labs"/>
-        <span class="nav-logo-text">Innovexa<span>Labs</span></span>
-      </a>
-      <div class="tab-bar" id="tab-bar">
-        <a href="index.html" class="tab-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a>
-        <a href="register.html" class="tab-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Register</a>
-        <a href="status.html" class="tab-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Status</a>
-        <a href="pathfinder.html" class="tab-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v8l9-11h-7z"/></svg>Pathfinder</a>
-        <a href="atlas.html" class="tab-btn active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Atlas</a>
-      </div>
-      <button class="btn btn-glass btn-sm" id="hamburger" style="display:none" aria-label="Menu"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:28px; height:28px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.5;">Hub</span></span>
+    </a>
+    <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
+      <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="atlas.html" class="nav-link active" style="font-size:14px; font-weight:500;">Atlas</a>
+      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:#a78bfa;">⚡ Forge</a>
     </div>
-  </nav>
-
-  <div class="page-content">
-    <section style="padding:80px 24px 48px;text-align:center;">
-      <div class="container-sm">
-        <div class="badge badge-blue fade-in" style="margin-bottom:16px;"><span class="dot"></span> Knowledge Base</div>
-        <h1 class="heading-lg fade-up delay-1" style="margin-bottom:12px;">Atlas <span class="text-gradient">Knowledge Core</span></h1>
-        <p class="fade-up delay-2" style="color:var(--text-secondary);font-size:15px;max-width:480px;margin:0 auto 28px;">Verified roadmaps, curated tools, and learning resources for every stack.</p>
-        <div class="search-wrap fade-up delay-3">
-          <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input type="text" class="search-input" id="search-input" placeholder="Search resources..."/>
-        </div>
-      </div>
-    </section>
-
-    <!-- RESOURCES -->
-    <section class="section-sm">
-      <div class="container">
-        <div class="cat-tabs" id="cat-tabs">
-          <button class="cat-tab active" data-cat="all">All</button>
-          <button class="cat-tab" data-cat="Web Dev">Web Dev</button>
-          <button class="cat-tab" data-cat="AI/ML">AI / ML</button>
-          <button class="cat-tab" data-cat="Cybersecurity">Security</button>
-          <button class="cat-tab" data-cat="Mobile">Mobile</button>
-          <button class="cat-tab" data-cat="DevOps">DevOps</button>
-          <button class="cat-tab" data-cat="UI/UX">UI / UX</button>
-        </div>
-        <div class="grid-3" id="resources-grid"></div>
-      </div>
-    </section>
-
-    <!-- ROADMAPS -->
-    <section class="section-sm" style="background:rgba(255,255,255,0.01);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);">
-      <div class="container">
-        <h2 class="heading-md" style="margin-bottom:24px;">Learning Roadmaps</h2>
-        <div class="grid-2">
-          <div class="roadmap-card">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-size:22px;">🌐</span>
-              <div><h3 style="font-weight:700;">Full Stack Developer</h3><span class="badge badge-blue" style="font-size:10px;">6 months</span></div>
-            </div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">HTML, CSS, JS Fundamentals</div><div style="font-size:12px;color:var(--text-muted);">Weeks 1–4</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">React + Node.js</div><div style="font-size:12px;color:var(--text-muted);">Weeks 5–12</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Databases + APIs</div><div style="font-size:12px;color:var(--text-muted);">Weeks 13–18</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Deploy + Portfolio Project</div><div style="font-size:12px;color:var(--text-muted);">Weeks 19–24</div></div></div>
-          </div>
-          <div class="roadmap-card">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-size:22px;">🤖</span>
-              <div><h3 style="font-weight:700;">AI/ML Engineer</h3><span class="badge badge-green" style="font-size:10px;">8 months</span></div>
-            </div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Python + Math Foundations</div><div style="font-size:12px;color:var(--text-muted);">Weeks 1–6</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">ML Algorithms + sklearn</div><div style="font-size:12px;color:var(--text-muted);">Weeks 7–16</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Deep Learning + PyTorch</div><div style="font-size:12px;color:var(--text-muted);">Weeks 17–24</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">MLOps + Kaggle Projects</div><div style="font-size:12px;color:var(--text-muted);">Weeks 25–32</div></div></div>
-          </div>
-          <div class="roadmap-card">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-size:22px;">🔐</span>
-              <div><h3 style="font-weight:700;">Cybersecurity Analyst</h3><span class="badge badge-red" style="font-size:10px;">5 months</span></div>
-            </div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Networking Fundamentals</div><div style="font-size:12px;color:var(--text-muted);">Weeks 1–4</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Linux + Bash Scripting</div><div style="font-size:12px;color:var(--text-muted);">Weeks 5–8</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">TryHackMe / HackTheBox</div><div style="font-size:12px;color:var(--text-muted);">Weeks 9–16</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">CTF Competitions</div><div style="font-size:12px;color:var(--text-muted);">Weeks 17–20</div></div></div>
-          </div>
-          <div class="roadmap-card">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-size:22px;">📱</span>
-              <div><h3 style="font-weight:700;">Mobile App Developer</h3><span class="badge badge-purple" style="font-size:10px;">4 months</span></div>
-            </div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Dart + Flutter Basics</div><div style="font-size:12px;color:var(--text-muted);">Weeks 1–4</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">State Management</div><div style="font-size:12px;color:var(--text-muted);">Weeks 5–8</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Firebase + APIs</div><div style="font-size:12px;color:var(--text-muted);">Weeks 9–12</div></div></div>
-            <div class="milestone"><div><div style="font-size:13px;font-weight:600;">Publish to Play Store</div><div style="font-size:12px;color:var(--text-muted);">Weeks 13–16</div></div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TOOLS -->
-    <section class="section-sm">
-      <div class="container">
-        <h2 class="heading-md" style="margin-bottom:24px;">Essential Dev Tools</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-          <span class="tool-pill">⚡ VS Code</span><span class="tool-pill">🐙 Git & GitHub</span>
-          <span class="tool-pill">🎨 Figma</span><span class="tool-pill">🚀 Postman</span>
-          <span class="tool-pill">🐳 Docker</span><span class="tool-pill">🐍 Python</span>
-          <span class="tool-pill">⚛️ React</span><span class="tool-pill">🔥 Firebase</span>
-          <span class="tool-pill">🌐 Vercel</span><span class="tool-pill">📦 npm</span>
-          <span class="tool-pill">🗄️ PostgreSQL</span><span class="tool-pill">☁️ AWS</span>
-        </div>
-      </div>
-    </section>
+    <div class="nav-cta">
+      <a href="register.html" class="btn-magnetic" style="padding:10px 24px; font-size:13px; background:var(--text-1); color:var(--bg); border-radius:100px; text-decoration:none;">Join the Collective</a>
+    </div>
+    <button class="hamburger" id="hamburger-btn" style="display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;">
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+    </button>
   </div>
+</nav>
 
-  <script src="/js/api.js"></script>
-  <script>
-    const STATIC_RESOURCES = [
-      { category:'Web Dev', title:'The Odin Project', description:'Full stack web dev curriculum, free and open source.', link:'https://www.theodinproject.com', level:'Beginner' },
-      { category:'Web Dev', title:'freeCodeCamp', description:'Learn to code for free with projects and certifications.', link:'https://www.freecodecamp.org', level:'Beginner' },
-      { category:'Web Dev', title:'Frontend Mentor', description:'Real-world frontend challenges with design files.', link:'https://www.frontendmentor.io', level:'Intermediate' },
-      { category:'AI/ML', title:'fast.ai', description:'Practical deep learning for coders — free course.', link:'https://www.fast.ai', level:'Intermediate' },
-      { category:'AI/ML', title:'Kaggle Learn', description:'Free micro-courses on ML, Python, SQL and more.', link:'https://www.kaggle.com/learn', level:'Beginner' },
-      { category:'AI/ML', title:'Andrew Ng ML Course', description:'The world\'s most popular ML course on Coursera.', link:'https://www.coursera.org/learn/machine-learning', level:'Intermediate' },
-      { category:'Cybersecurity', title:'TryHackMe', description:'Learn cybersecurity through hands-on labs and games.', link:'https://tryhackme.com', level:'Beginner' },
-      { category:'Cybersecurity', title:'HackTheBox', description:'Penetration testing labs for intermediate & advanced learners.', link:'https://www.hackthebox.com', level:'Advanced' },
-      { category:'Mobile', title:'Flutter Docs', description:'Official Flutter documentation with tutorials.', link:'https://flutter.dev/docs', level:'Beginner' },
-      { category:'Mobile', title:'React Native', description:'Build mobile apps with React — Meta\'s framework.', link:'https://reactnative.dev', level:'Intermediate' },
-      { category:'DevOps', title:'roadmap.sh', description:'Community-driven developer roadmaps for every track.', link:'https://roadmap.sh', level:'Beginner' },
-      { category:'DevOps', title:'Docker Docs', description:'Official Docker documentation — containerize everything.', link:'https://docs.docker.com', level:'Intermediate' },
-    ];
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#a78bfa;" onclick="closeMobileMenu()">⚡ Forge</a>
+</div>
 
-    const catColors = { 'Web Dev':'badge-blue','AI/ML':'badge-green','Cybersecurity':'badge-red','Mobile':'badge-purple','DevOps':'badge-yellow','UI/UX':'badge-blue' };
-    const lvlColors = { Beginner:'badge-green', Intermediate:'badge-yellow', Advanced:'badge-red' };
+<!-- HEADER -->
+<header class="page-header">
+  <div class="header-bg">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+  </div>
+  <div class="container fade-up">
+    <div class="badge-top">
+      <span style="width:4px;height:4px;border-radius:50%;background:#111;"></span> Knowledge Core
+    </div>
+    <h1 class="page-title">The Atlas <span class="italic">Repository.</span></h1>
+    <p class="page-sub">Verified roadmaps, curated tools, and foundational intelligence for every stack.</p>
+    
+    <div class="search-wrap fade-up delay-1">
+      <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input type="text" class="search-input" id="search-input" placeholder="Search the repository..." />
+    </div>
+  </div>
+</header>
 
-    let allResources = [...STATIC_RESOURCES];
-    let activeCat = 'all';
-    let searchQ   = '';
+<!-- RESOURCES -->
+<section class="section">
+  <div class="container">
+    <div class="filter-tabs fade-up" id="cat-tabs">
+      <button class="filter-tab active" data-cat="all">All</button>
+      <button class="filter-tab" data-cat="Web Dev">Web Dev</button>
+      <button class="filter-tab" data-cat="AI/ML">AI / ML</button>
+      <button class="filter-tab" data-cat="Cybersecurity">Security</button>
+      <button class="filter-tab" data-cat="Mobile">Mobile</button>
+      <button class="filter-tab" data-cat="DevOps">DevOps</button>
+      <button class="filter-tab" data-cat="UI/UX">UI / UX</button>
+    </div>
+    
+    <div class="grid-3 fade-up delay-1" id="resources-grid">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+</section>
 
-    function renderResources() {
-      const grid = document.getElementById('resources-grid');
-      const filtered = allResources.filter(r => {
-        const matchCat  = activeCat === 'all' || r.category === activeCat;
-        const matchSearch = !searchQ || r.title.toLowerCase().includes(searchQ) || r.description.toLowerCase().includes(searchQ);
-        return matchCat && matchSearch;
-      });
-      if (!filtered.length) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">No resources found.</div>';
-        return;
-      }
-      grid.innerHTML = filtered.map(r => `
-        <div class="resource-card">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="badge ${catColors[r.category]||'badge-blue'}">${r.category}</span>
-            <span class="badge ${lvlColors[r.level]||'badge-blue'}" style="font-size:10px;">${r.level}</span>
+<!-- ROADMAPS -->
+<section class="roadmap-section">
+  <div class="container fade-up">
+    <h2 class="section-title">Architectural <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Blueprints.</span></h2>
+    
+    <div class="grid-2">
+      <!-- Full Stack Blueprint -->
+      <div class="roadmap-card">
+        <div class="roadmap-header">
+          <div>
+            <h3>Systems Engineering</h3>
+            <span class="badge badge-primary">Full Stack • 6 Months</span>
           </div>
-          <h3 style="font-weight:700;font-size:15px;">${r.title}</h3>
-          <p style="font-size:13px;color:var(--text-secondary);flex:1;">${r.description}</p>
-          <a href="${r.link}" target="_blank" rel="noopener" class="btn btn-glass btn-sm" style="align-self:flex-start;">
-            Visit Resource →
-          </a>
-        </div>`).join('');
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">Frontend Foundations</div>
+            <div class="milestone-desc">Mastering the DOM, CSS Architecture, and Modern JS engines. (Weeks 1-4)</div>
+          </div>
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">React & State Management</div>
+            <div class="milestone-desc">Component lifecycles, Hooks, Redux/Zustand, Next.js rendering. (Weeks 5-12)</div>
+          </div>
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">Backend Architecture</div>
+            <div class="milestone-desc">Node.js, Express/Fastify, RESTful vs GraphQL APIs, Postgres design. (Weeks 13-18)</div>
+          </div>
+        </div>
+        <div class="milestone" style="border-left-color:transparent;">
+          <div>
+            <div class="milestone-title">Deployment & Scaling</div>
+            <div class="milestone-desc">Docker containers, CI/CD pipelines, AWS/Vercel deployment. (Weeks 19-24)</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- AI Engineer Blueprint -->
+      <div class="roadmap-card">
+        <div class="roadmap-header">
+          <div>
+            <h3>Artificial Intelligence</h3>
+            <span class="badge badge-primary">AI/ML • 8 Months</span>
+          </div>
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">Mathematical Foundations</div>
+            <div class="milestone-desc">Linear Algebra, Calculus, Probability, and Python data structures. (Weeks 1-6)</div>
+          </div>
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">Classical Machine Learning</div>
+            <div class="milestone-desc">Scikit-learn, Regression, Classification, SVMs, Random Forests. (Weeks 7-14)</div>
+          </div>
+        </div>
+        <div class="milestone">
+          <div>
+            <div class="milestone-title">Deep Learning Networks</div>
+            <div class="milestone-desc">PyTorch architecture, CNNs for vision, RNNs/Transformers for NLP. (Weeks 15-24)</div>
+          </div>
+        </div>
+        <div class="milestone" style="border-left-color:transparent;">
+          <div>
+            <div class="milestone-title">LLM Fine-tuning</div>
+            <div class="milestone-desc">HuggingFace, LoRA, vector databases, RAG implementations. (Weeks 25-32)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner container" style="max-width:var(--max-w); margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:32px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:12px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:32px; height:32px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.4;">Hub</span></span>
+    </a>
+    <div class="footer-links" style="display:flex; gap:32px;">
+      <a href="index.html" class="nav-link" style="font-family:var(--font-b); font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register.html" class="nav-link" style="font-family:var(--font-b); font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link" style="font-family:var(--font-b); font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="atlas.html" class="nav-link" style="font-family:var(--font-b); font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+    </div>
+    <div class="footer-copy" style="font-family:var(--font-m); font-size:12px; color:var(--text-3);">© 2026 Innovexa Hub. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
     }
+  }, { passive: true });
 
-    document.querySelectorAll('.cat-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        activeCat = tab.dataset.cat;
-        renderResources();
-      });
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
+  });
+  function closeMobileMenu() {
+    mobileMenu.style.transform = 'translateY(-100%)';
+  }
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
+
+  // Observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
     });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+    observer.observe(el);
+  });
 
-    document.getElementById('search-input').addEventListener('input', e => {
-      searchQ = e.target.value.toLowerCase();
-      renderResources();
+  // Resources Data
+  const resources = [
+    { title: 'MDN Web Docs', desc: 'The definitive source for web documentation.', cat: 'Web Dev', link: 'https://developer.mozilla.org' },
+    { title: 'React Documentation', desc: 'Official documentation for React components.', cat: 'Web Dev', link: 'https://react.dev' },
+    { title: 'Hugging Face', desc: 'The hub for machine learning models and datasets.', cat: 'AI/ML', link: 'https://huggingface.co' },
+    { title: 'PyTorch Tutorials', desc: 'Deep learning frameworks and neural networks.', cat: 'AI/ML', link: 'https://pytorch.org' },
+    { title: 'OWASP Top 10', desc: 'Standard awareness document for web app security.', cat: 'Cybersecurity', link: 'https://owasp.org' },
+    { title: 'HackTheBox', desc: 'Massive cybersecurity training platform.', cat: 'Cybersecurity', link: 'https://hackthebox.com' },
+    { title: 'Flutter Dev', desc: 'UI toolkit for building natively compiled applications.', cat: 'Mobile', link: 'https://flutter.dev' },
+    { title: 'Docker Docs', desc: 'Containerization and microservices architecture.', cat: 'DevOps', link: 'https://docs.docker.com' },
+    { title: 'Figma Community', desc: 'UI/UX design files, plugins, and widgets.', cat: 'UI/UX', link: 'https://figma.com/community' }
+  ];
+
+  const grid = document.getElementById('resources-grid');
+  
+  function renderResources(items) {
+    grid.innerHTML = items.map(r => `
+      <div class="resource-card">
+        <div class="badge badge-primary">${r.cat}</div>
+        <h3 class="resource-title">${r.title}</h3>
+        <p class="resource-desc">${r.desc}</p>
+        <a href="${r.link}" target="_blank" class="resource-link">Access Resource →</a>
+      </div>
+    `).join('');
+  }
+
+  renderResources(resources);
+
+  // Filters
+  const tabs = document.querySelectorAll('.filter-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const cat = tab.dataset.cat;
+      const filtered = cat === 'all' ? resources : resources.filter(r => r.cat === cat);
+      renderResources(filtered);
     });
+  });
 
-    async function loadResources() {
-      try {
-        const res = await gasGet(SCRIPT_URL + '?action=resources');
-        if (res && res.data && res.data.resources && res.data.resources.length) {
-          allResources = res.data.resources;
-          renderResources();
-        }
-      } catch (_) {}
-    }
-
-    const hamburger = document.getElementById('hamburger');
-    const tabBar = document.getElementById('tab-bar');
-    if (window.innerWidth <= 768) hamburger.style.display = 'flex';
-    hamburger.addEventListener('click', () => tabBar.classList.toggle('mobile-open'));
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768) { hamburger.style.display='none'; tabBar.classList.remove('mobile-open'); }
-      else hamburger.style.display='flex';
-    });
-
-    renderResources();
-    loadResources();
-  </script>
+  // Search
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = resources.filter(r => 
+      r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q)
+    );
+    renderResources(filtered);
+    // Reset tabs
+    tabs.forEach(t => t.classList.remove('active'));
+    document.querySelector('.filter-tab[data-cat="all"]').classList.add('active');
+  });
+</script>
 </body>
 </html>

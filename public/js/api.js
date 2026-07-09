@@ -1,18 +1,18 @@
 /**
- * Innovexa Labs — Shared API Helper
+ * Innovexa Hub — Shared API Helper
  * Uses /api/proxy (Vercel serverless) for GET requests to avoid CORS.
  * Uses no-cors direct POST for write operations.
  * Load as plain script: <script src="/js/api.js"></script>
  */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl5iqkdh2IyoCD2cfMfnvGpLoXuM-IvS2ggBhTjzj2udOwbrkqL8Slpw-4k0EpjU_Bbg/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec';
 
 // ── GET via server-side proxy ────────────────────────────────────
 // Passes all query params through /api/proxy so the browser
 // never directly touches GAS (avoids CORS block entirely).
 async function gasGet(gasUrl) {
   const ctrl  = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
+  const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
     // Parse params from the GAS URL and forward them to our proxy
@@ -45,7 +45,7 @@ async function gasGet(gasUrl) {
 // ── POST direct (no-cors) ────────────────────────────────────────
 async function gasPost(url, payload) {
   const ctrl  = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 25000);
+  const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
     await fetch(url, {
       method:  'POST',

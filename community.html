@@ -3,401 +3,368 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Innovexa Labs — Community</title>
+  <title>Community — Innovexa Hub</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
   <!-- Firebase compat SDKs (v10) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-
+  
   <style>
     :root {
-      --bg: #f8fafc;
-      --bg2: #f1f5f9;
-      --sidebar-bg: #ffffff;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --accent: #6366f1;
-      --accent-bg: #eef2ff;
-      --accent-light: #818cf8;
-      --text: #1e293b;
-      --text2: #475569;
-      --text3: #94a3b8;
-      --green: #22c55e;
-      --red: #ef4444;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      /* Shared values with design.css, mapped for the chat app */
+      --bg: #edeae4;
+      --bg-2: #e3dec9;
+      --bg-dark: #111110;
+      
+      --text-1: #111110;
+      --text-2: #3a3832;
+      --text-3: #757064;
+      
+      --text-inv: #edeae4;
+      --text-inv-2: #a39d89;
+      
+      --border: rgba(17,17,16,0.1);
+      --border-dark: rgba(255,255,255,0.1);
+      
+      --accent: #abd233;
+      
+      --font-d: 'Space Grotesk', sans-serif;
+      --font-b: 'Inter', sans-serif;
+      --font-m: 'Geist Mono', monospace;
+      
+      --radius: 12px;
+      --radius-pill: 9999px;
     }
+    
     * { margin:0; padding:0; box-sizing:border-box; }
-    html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); }
+    html, body { height:100%; font-family:var(--font-b); background:var(--bg); color:var(--text-1); }
     body { overflow:hidden; }
+
+    /* Noise Texture */
+    .bg-noise {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 150px 150px; opacity: 0.08;
+    }
 
     /* ── Login ── */
     #loginScreen {
-      display:flex; align-items:center; justify-content:center;
-      height:100vh; padding:20px;
-      background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 50%,#e0e7ff 100%);
+      position: relative; display:flex; align-items:center; justify-content:center;
+      height:100vh; padding:24px;
+      background: var(--bg);
     }
     .login-card {
-      width:420px; max-width:100%;
-      background:#fff; border:1px solid var(--border);
-      border-radius:20px; padding:40px 32px;
-      box-shadow:0 20px 60px rgba(99,102,241,0.1);
+      width: 480px; max-width: 100%; position: relative; z-index: 1;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 48px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.04);
     }
     .login-brand {
-      display:flex; align-items:center; gap:8px; margin-bottom:20px;
+      display:flex; align-items:center; gap:12px; margin-bottom:24px;
     }
     .login-brand-dot {
-      width:32px; height:32px; border-radius:8px;
-      background:linear-gradient(135deg,#6366f1,#818cf8);
+      width:40px; height:40px; border-radius:10px;
+      background: #111; color: #fff;
       display:flex; align-items:center; justify-content:center;
+      font-family: var(--font-d); font-weight: 700; font-size: 16px;
     }
-    .login-brand-dot svg { width:16px; height:16px; color:white; }
     .login-brand span {
-      font-weight:800; font-size:15px; color:var(--text);
+      font-family: var(--font-d); font-weight:700; font-size:18px; color:var(--text-1);
     }
-    .login-title { font-size:22px; font-weight:800; margin-bottom:4px; }
-    .login-sub { font-size:13px; color:var(--text2); margin-bottom:24px; line-height:1.6; }
-    .login-field { margin-bottom:14px; }
+    .login-title { font-family: var(--font-d); font-size:28px; font-weight:700; margin-bottom:8px; line-height:1.2; }
+    .login-sub { font-size:14px; color:var(--text-3); margin-bottom:32px; line-height:1.6; }
+    
+    .login-field { margin-bottom:16px; }
     .login-field label {
-      display:block; font-size:11px; font-weight:600; color:var(--text2);
-      margin-bottom:5px; letter-spacing:.3px;
+      display:block; font-family:var(--font-m); font-size:11px; font-weight:600; color:var(--text-2);
+      margin-bottom:6px; letter-spacing:0.05em; text-transform:uppercase;
     }
     .login-field input {
-      width:100%; padding:11px 14px; border-radius:10px;
-      border:1.5px solid var(--border); background:#fff;
-      color:var(--text); font-size:14px; outline:none;
-      transition:border-color .2s, box-shadow .2s;
+      width:100%; padding:14px 16px; border-radius:var(--radius-pill);
+      border:1px solid var(--border); background:var(--bg-2);
+      color:var(--text-1); font-family:var(--font-b); font-size:14px; outline:none;
+      transition:all .2s;
     }
-    .login-field input:focus {
-      border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(99,102,241,0.12);
-    }
-    .login-field input::placeholder { color:var(--text3); }
+    .login-field input:focus { border-color:var(--text-1); background:#fff; }
+    .login-field input::placeholder { color:var(--text-3); }
+    
     .login-btn {
-      width:100%; padding:13px; border-radius:12px; margin-top:8px;
-      background:linear-gradient(135deg,#6366f1,#4f46e5);
-      color:white; border:none; font-size:14px; font-weight:700;
+      width:100%; padding:14px; border-radius:var(--radius-pill); margin-top:16px;
+      background:var(--bg-dark); color:var(--text-inv); border:none; 
+      font-family:var(--font-b); font-size:15px; font-weight:600;
       cursor:pointer; transition:all .2s;
     }
-    .login-btn:hover { box-shadow:0 8px 24px rgba(99,102,241,0.35); transform:translateY(-1px); }
-    .login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+    .login-btn:hover { background: #000; }
+    .login-btn:disabled { opacity:0.6; cursor:not-allowed; }
+    
     .login-error {
-      color:var(--red); font-size:12px; margin-top:10px;
-      display:none; padding:10px 14px;
-      background:#fef2f2; border-radius:8px; border:1px solid #fecaca;
-      line-height:1.5;
+      color:#ef4444; font-size:13px; margin-top:12px;
+      display:none; padding:12px 16px;
+      background:#fef2f2; border-radius:8px; border:1px solid #fee2e2;
     }
     .login-back {
-      display:block; text-align:center; margin-top:18px;
-      color:var(--text3); font-size:12px; text-decoration:none;
+      display:inline-block; margin-top:24px; text-align:center; width: 100%;
+      color:var(--text-3); font-size:13px; font-weight: 500; text-decoration:none;
     }
-    .login-back:hover { color:var(--accent); }
+    .login-back:hover { color:var(--text-1); }
 
     /* ── Chat App ── */
-    #chatApp { display:none; height:100vh; flex-direction:column; }
+    #chatApp { display:none; height:100vh; flex-direction:column; position: relative; z-index: 1; }
     #chatApp.active { display:flex; }
 
     /* Topbar */
     .topbar {
-      height:56px; padding:0 20px; flex-shrink:0;
-      display:flex; align-items:center; justify-content:space-between;
-      background:white; border-bottom:1px solid var(--border);
-      box-shadow:var(--shadow);
+      height: 64px; padding: 0 24px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff; border-bottom: 1px solid var(--border);
     }
-    .topbar-left { display:flex; align-items:center; gap:12px; }
+    .topbar-left { display:flex; align-items:center; gap:16px; }
     .topbar-logo {
-      width:30px; height:30px; border-radius:8px;
-      background:linear-gradient(135deg,#6366f1,#818cf8);
+      width:36px; height:36px; border-radius:10px;
+      background: #111; color: #fff;
       display:flex; align-items:center; justify-content:center;
+      font-family: var(--font-d); font-weight: 700; font-size: 14px;
     }
-    .topbar-logo svg { width:14px; height:14px; color:white; }
-    .topbar-title { font-size:14px; font-weight:700; color:var(--text); }
+    .topbar-title { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: var(--text-1); }
     .topbar-badge {
-      font-size:10px; font-weight:600; color:var(--accent);
-      background:var(--accent-bg); padding:2px 8px; border-radius:20px;
+      font-family: var(--font-m); font-size: 10px; font-weight: 600; color: #166534;
+      background: #dcfce7; padding: 4px 10px; border-radius: var(--radius-pill);
     }
-    .topbar-right { display:flex; align-items:center; gap:12px; }
-    .topbar-user {
-      display:flex; align-items:center; gap:8px;
-      font-size:12px; color:var(--text2); font-weight:500;
-    }
+    
+    .topbar-right { display:flex; align-items:center; gap:16px; }
+    .topbar-user { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-2); font-weight:500; }
     .topbar-avatar {
-      width:30px; height:30px; border-radius:8px;
-      background:linear-gradient(135deg,#6366f1,#3b82f6);
-      display:flex; align-items:center; justify-content:center;
-      font-size:11px; font-weight:800; color:white;
+      width:32px; height:32px; border-radius:10px;
+      background:var(--accent); display:flex; align-items:center; justify-content:center;
+      font-family: var(--font-m); font-size:12px; font-weight:700; color:#111;
     }
     .topbar-portal {
-      font-size:12px; color:var(--text2); text-decoration:none;
-      font-weight:500; padding:6px 12px; border-radius:8px;
-      border:1px solid var(--border);
+      font-size:13px; color:var(--text-2); text-decoration:none; font-weight:500; 
+      padding:8px 16px; border-radius:var(--radius-pill); border:1px solid var(--border);
       transition:all .2s;
     }
-    .topbar-portal:hover { background:var(--bg2); color:var(--text); }
+    .topbar-portal:hover { background:var(--bg-2); color:var(--text-1); }
     .topbar-logout {
-      font-size:12px; font-weight:600; color:var(--red);
-      background:none; border:1px solid #fee2e2; border-radius:8px;
-      padding:6px 12px; cursor:pointer; transition:all .2s;
+      font-size:13px; font-weight:500; color:#ef4444; background:none; 
+      border:1px solid #fee2e2; border-radius:var(--radius-pill); padding:8px 16px; cursor:pointer; transition:all .2s;
     }
     .topbar-logout:hover { background:#fef2f2; }
-    .sidebar-toggle {
-      display:none; background:none; border:none;
-      color:var(--text2); cursor:pointer; padding:4px;
-    }
+    .sidebar-toggle { display:none; background:none; border:none; color:var(--text-2); cursor:pointer; padding:4px; }
 
     /* Main layout */
     .chat-main { display:flex; flex:1; overflow:hidden; }
 
     /* Sidebar */
     .sidebar {
-      width:220px; background:var(--sidebar-bg);
-      border-right:1px solid var(--border);
-      display:flex; flex-direction:column; flex-shrink:0;
+      width: 260px; background: var(--bg); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
     }
-    .sidebar-section { padding:16px 12px; }
+    .sidebar-section { padding: 24px 16px; }
     .sidebar-label {
-      font-size:10px; font-weight:700; color:var(--text3);
-      text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px;
-      padding:0 8px;
+      font-family: var(--font-m); font-size: 10px; font-weight: 600; color: var(--text-3);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; padding: 0 8px;
     }
     .channel-list { list-style:none; }
     .channel-item {
-      display:flex; align-items:center; gap:6px;
-      padding:8px 10px; border-radius:8px;
-      color:var(--text2); font-size:13px; font-weight:500;
-      cursor:pointer; transition:all .15s; margin-bottom:1px;
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:8px;
+      color:var(--text-2); font-size:14px; font-weight:500;
+      cursor:pointer; transition:all .2s; margin-bottom:2px;
     }
-    .channel-item:hover { background:var(--bg2); color:var(--text); }
-    .channel-item.active { background:var(--accent-bg); color:var(--accent); font-weight:600; }
-    .channel-hash { font-size:14px; color:var(--text3); font-family:'JetBrains Mono',monospace; font-weight:600; }
-    .channel-item.active .channel-hash { color:var(--accent); }
+    .channel-item:hover { background: rgba(0,0,0,0.04); color:var(--text-1); }
+    .channel-item.active { background: #fff; color:var(--text-1); font-weight:600; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .channel-hash { font-family: var(--font-m); font-size:14px; color:var(--text-3); font-weight:600; }
+    .channel-item.active .channel-hash { color:var(--text-1); }
 
-    .sidebar-divider { height:1px; background:var(--border); margin:8px 12px; }
+    .sidebar-divider { height:1px; background:var(--border); margin:0 16px; }
 
     .online-list { list-style:none; }
     .online-item {
       display:flex; align-items:center; gap:8px;
-      padding:5px 8px; font-size:12px; color:var(--text2);
-      border-radius:6px;
+      padding:6px 12px; font-size:13px; color:var(--text-2);
     }
-    .online-dot { width:7px; height:7px; border-radius:50%; background:var(--green); flex-shrink:0; }
+    .online-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; flex-shrink:0; }
 
     /* Chat area */
-    .chat-area { flex:1; display:flex; flex-direction:column; background:var(--bg); overflow:hidden; }
+    .chat-area { flex:1; display:flex; flex-direction:column; background:#fff; overflow:hidden; }
 
     .chat-header {
-      padding:12px 20px; background:white;
-      border-bottom:1px solid var(--border);
-      display:flex; align-items:center; gap:8px;
-      flex-shrink:0;
+      padding:20px 32px; background:#fff; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
     }
-    .chat-header-hash { font-size:18px; color:var(--text3); font-family:'JetBrains Mono',monospace; font-weight:700; }
-    .chat-header-name { font-size:15px; font-weight:700; }
-    .chat-header-desc { font-size:12px; color:var(--text3); margin-left:8px; }
+    .chat-header-hash { font-family: var(--font-m); font-size:20px; color:var(--text-3); font-weight:700; }
+    .chat-header-name { font-family: var(--font-d); font-size:18px; font-weight:700; }
+    .chat-header-desc { font-size:13px; color:var(--text-3); margin-left:8px; }
 
     /* Messages */
     .messages {
-      flex:1; overflow-y:auto; padding:20px;
+      flex:1; overflow-y:auto; padding:24px 32px;
       display:flex; flex-direction:column;
     }
-    .messages::-webkit-scrollbar { width:5px; }
+    .messages::-webkit-scrollbar { width:6px; }
     .messages::-webkit-scrollbar-track { background:transparent; }
-    .messages::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+    .messages::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.1); border-radius:3px; }
 
-    .msg-welcome { text-align:center; padding:60px 20px; color:var(--text3); }
-    .msg-welcome-icon { font-size:48px; margin-bottom:12px; }
-    .msg-welcome h3 { font-size:18px; font-weight:700; color:var(--text2); margin-bottom:4px; }
-    .msg-welcome p { font-size:13px; }
+    .msg-welcome { text-align:center; padding:80px 20px; color:var(--text-3); }
+    .msg-welcome-icon { font-size:48px; margin-bottom:16px; }
+    .msg-welcome h3 { font-family: var(--font-d); font-size:24px; font-weight:700; color:var(--text-1); margin-bottom:8px; }
+    .msg-welcome p { font-size:15px; }
 
     .msg-group {
-      display:flex; gap:12px; margin-bottom:4px;
-      padding:6px 8px; border-radius:10px; transition:background .1s;
+      display:flex; gap:16px; margin-bottom:8px;
+      padding:8px 12px; border-radius:12px; transition:background .2s;
     }
-    .msg-group:hover { background:var(--bg2); }
+    .msg-group:hover { background:var(--bg); }
     .msg-avatar {
-      width:36px; height:36px; border-radius:10px; flex-shrink:0;
+      width:40px; height:40px; border-radius:10px; flex-shrink:0;
       display:flex; align-items:center; justify-content:center;
-      font-size:12px; font-weight:800; color:white;
-      font-family:'JetBrains Mono',monospace;
+      font-family: var(--font-m); font-size:14px; font-weight:700; color:#111;
       margin-top:2px;
     }
     .msg-body { flex:1; min-width:0; }
-    .msg-meta { display:flex; align-items:baseline; gap:8px; margin-bottom:3px; }
-    .msg-name { font-size:13px; font-weight:700; color:var(--text); }
-    .msg-id { font-size:10px; color:var(--accent); font-family:'JetBrains Mono',monospace; }
-    .msg-time { font-size:10px; color:var(--text3); margin-left:4px; }
-    .msg-text { font-size:14px; color:var(--text2); line-height:1.65; word-break:break-word; }
+    .msg-meta { display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
+    .msg-name { font-size:14px; font-weight:600; color:var(--text-1); }
+    .msg-id { font-family: var(--font-m); font-size:11px; color:var(--text-3); }
+    .msg-time { font-size:11px; color:var(--text-3); margin-left:4px; }
+    .msg-text { font-size:15px; color:var(--text-2); line-height:1.6; word-break:break-word; }
 
     /* Role badge */
     .role-badge {
       display:inline-flex; align-items:center;
-      font-size:9px; font-weight:700; letter-spacing:.4px;
-      text-transform:uppercase; padding:1px 6px 1px 5px;
-      border-radius:20px; vertical-align:middle;
-      margin-left:2px;
+      font-family: var(--font-m); font-size:9px; font-weight:700; letter-spacing:0.1em;
+      text-transform:uppercase; padding:2px 8px;
+      border-radius:var(--radius-pill); vertical-align:middle;
+      margin-left:4px;
     }
 
     /* Delete button */
-    .msg-actions {
-      margin-left:auto; opacity:0; transition:opacity .15s;
-      display:flex; align-items:center; gap:4px;
-    }
+    .msg-actions { margin-left:auto; opacity:0; transition:opacity .2s; display:flex; align-items:center; }
     .msg-group:hover .msg-actions { opacity:1; }
     .msg-del {
       background:none; border:none; cursor:pointer;
-      color:var(--text3); padding:3px 6px; border-radius:6px;
-      font-size:11px; font-weight:600;
-      transition:all .15s; display:flex; align-items:center; gap:3px;
+      color:var(--text-3); padding:4px 8px; border-radius:6px;
+      font-family: var(--font-m); font-size:11px; font-weight:600;
+      transition:all .2s; display:flex; align-items:center; gap:4px;
     }
-    .msg-del:hover { background:#fef2f2; color:var(--red); }
-    .msg-del svg { width:12px; height:12px; }
+    .msg-del:hover { background:#fef2f2; color:#ef4444; }
 
-    /* Delete confirmation toast */
+    /* Delete confirmation */
     .del-confirm {
-      position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-      background:#1e293b; color:white; border-radius:12px;
-      padding:12px 20px; display:flex; align-items:center; gap:12px;
-      font-size:13px; font-weight:500; z-index:100;
-      box-shadow:0 8px 32px rgba(0,0,0,0.2);
+      position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+      background:var(--bg-dark); color:var(--text-inv); border-radius:var(--radius);
+      padding:16px 24px; display:flex; align-items:center; gap:16px;
+      font-size:14px; font-weight:500; z-index:100;
+      box-shadow:0 10px 40px rgba(0,0,0,0.15);
       animation:slideUp .2s ease;
     }
     @keyframes slideUp { from{transform:translateX(-50%) translateY(10px);opacity:0} to{transform:translateX(-50%);opacity:1} }
     .del-confirm-yes {
-      background:var(--red); color:white; border:none;
-      padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700;
-      cursor:pointer;
+      background:#ef4444; color:#fff; border:none;
+      padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;
     }
     .del-confirm-no {
-      background:none; color:#94a3b8; border:none;
-      padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer;
+      background:none; color:var(--text-inv-2); border:none;
+      padding:8px 16px; font-weight:600; cursor:pointer;
     }
 
     .msg-system {
-      text-align:center; font-size:11px; color:var(--text3);
-      padding:4px 0; font-family:'JetBrains Mono',monospace;
+      text-align:center; font-family:var(--font-m); font-size:11px; color:var(--text-3);
+      padding:8px 0; margin: 16px 0;
     }
-
-    /* Date divider */
     .msg-date {
-      display:flex; align-items:center; gap:12px;
-      margin:16px 0 8px; color:var(--text3); font-size:11px; font-weight:600;
+      display:flex; align-items:center; gap:16px;
+      margin:24px 0 16px; color:var(--text-3); font-family:var(--font-m); font-size:11px; font-weight:600; text-transform:uppercase;
     }
     .msg-date::before,.msg-date::after { content:''; flex:1; height:1px; background:var(--border); }
 
     /* Input */
     .chat-input-wrap {
-      padding:12px 20px 16px;
-      background:white; border-top:1px solid var(--border);
-      flex-shrink:0;
+      padding:20px 32px; background:#fff; border-top:1px solid var(--border); flex-shrink:0;
     }
     .chat-input-box {
-      display:flex; align-items:center; gap:8px;
-      background:var(--bg2); border:1.5px solid var(--border);
-      border-radius:12px; padding:6px 6px 6px 16px;
-      transition:border-color .2s, box-shadow .2s;
+      display:flex; align-items:center; gap:12px;
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--radius-pill); padding:8px 8px 8px 20px;
+      transition:all .2s;
     }
-    .chat-input-box:focus-within {
-      border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(99,102,241,0.1);
-      background:white;
-    }
+    .chat-input-box:focus-within { border-color:var(--text-1); background:#fff; }
     .chat-input {
       flex:1; background:none; border:none; outline:none;
-      color:var(--text); font-size:14px; font-family:'Inter',sans-serif;
-      padding:6px 0;
+      color:var(--text-1); font-family:var(--font-b); font-size:15px; padding:8px 0;
     }
-    .chat-input::placeholder { color:var(--text3); }
+    .chat-input::placeholder { color:var(--text-3); }
     .chat-send {
-      padding:9px 18px; border-radius:9px;
-      background:var(--accent); color:white;
-      border:none; font-size:13px; font-weight:700;
-      cursor:pointer; transition:all .15s;
+      padding:12px 24px; border-radius:var(--radius-pill);
+      background:var(--bg-dark); color:var(--text-inv);
+      border:none; font-family:var(--font-b); font-size:14px; font-weight:600;
+      cursor:pointer; transition:all .2s;
     }
-    .chat-send:hover { background:#4f46e5; }
+    .chat-send:hover { background:#000; }
     .chat-send:disabled { opacity:0.4; cursor:not-allowed; }
 
-    .typing-bar {
-      padding:2px 20px 0; font-size:11px; color:var(--text3);
-      min-height:18px; font-style:italic;
-    }
+    .typing-bar { padding:4px 32px; font-family:var(--font-m); font-size:11px; color:var(--text-3); min-height:24px; }
 
-    /* Error banner */
     .error-banner {
-      display:none; padding:12px 20px;
-      background:#fef2f2; border-bottom:1px solid #fecaca;
-      font-size:13px; color:#b91c1c; font-weight:500;
+      display:none; padding:16px 24px; background:#fef2f2; border-bottom:1px solid #fee2e2;
+      font-size:14px; color:#b91c1c; font-weight:500;
     }
 
     @media(max-width:768px) {
-      .sidebar { position:fixed; left:-240px; top:56px; bottom:0; z-index:50; transition:left .25s; box-shadow:none; }
-      .sidebar.open { left:0; box-shadow:var(--shadow-md); }
+      .sidebar { position:fixed; left:-280px; top:64px; bottom:0; z-index:50; transition:left .3s; }
+      .sidebar.open { left:0; box-shadow: 10px 0 30px rgba(0,0,0,0.05); }
       .sidebar-toggle { display:block; }
-      .overlay { display:none; position:fixed; inset:0; top:56px; background:rgba(0,0,0,0.3); z-index:40; }
+      .overlay { display:none; position:fixed; inset:0; top:64px; background:rgba(0,0,0,0.2); z-index:40; backdrop-filter:blur(4px); }
       .overlay.active { display:block; }
       .chat-header-desc { display:none; }
       .topbar-portal { display:none; }
-
-      /* Topbar compact */
-      .topbar { padding:0 12px; }
+      
+      .topbar { padding:0 16px; }
       .topbar-user { display:none; }
-      .topbar-title { font-size:13px; }
-
-      /* Login card */
-      .login-card { padding:28px 20px; }
-
-      /* Chat area full width */
+      
+      .login-card { padding:32px 24px; }
       .chat-area { min-width:0; }
-
-      /* Messages */
-      .messages { padding:12px 8px; }
-      .msg-avatar { width:30px; height:30px; font-size:10px; }
-      .msg-group { gap:8px; padding:4px 4px; }
-      .msg-text { font-size:13px; }
-
-      /* Input bar */
-      .chat-input { padding:8px 10px; }
-      .chat-input input { font-size:14px; padding:10px 12px; }
-      .chat-input button { padding:10px 14px; font-size:12px; }
+      .messages { padding:16px; }
+      .chat-input-wrap { padding:16px; }
     }
-
     @media(max-width:480px) {
       .topbar-badge { display:none; }
-      .topbar-logout { font-size:11px; padding:4px 8px; }
-      .login-title { font-size:18px; }
-      .login-sub { font-size:12px; }
+      .topbar-logout { font-size:12px; padding:6px 12px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- BACKGROUND NOISE -->
+  <div class="bg-noise"></div>
+
   <!-- LOGIN -->
   <div id="loginScreen">
     <div class="login-card">
       <div class="login-brand">
-        <div class="login-brand-dot">
-          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        </div>
-        <span>Innovexa Labs</span>
+        <div class="login-brand-dot">IX</div>
+        <span>Innovexa Hub</span>
       </div>
-      <h1 class="login-title">Join the Community</h1>
-      <p class="login-sub">Verify your identity using your registration credentials to access the community chat.</p>
+      <h1 class="login-title">Join the Community.</h1>
+      <p class="login-sub">Verify your identity using your registration credentials to access the operative network.</p>
 
       <div class="login-field">
         <label>Operative ID</label>
-        <input type="text" id="loginId" placeholder="INVX-01" autocomplete="off" />
+        <input type="text" id="loginId" placeholder="INVX-000" autocomplete="off" />
       </div>
       <div class="login-field">
         <label>Registered Email</label>
-        <input type="email" id="loginEmail" placeholder="you@email.com" />
+        <input type="email" id="loginEmail" placeholder="you@college.edu" />
       </div>
       <div class="login-field">
         <label>Last 5 Digits of Phone</label>
         <input type="text" id="loginPhone" placeholder="e.g. 45678" maxlength="5" inputmode="numeric" />
       </div>
 
-      <button class="login-btn" id="loginBtn" onclick="verifyAndLogin()">Verify &amp; Enter Community</button>
+      <button class="login-btn" id="loginBtn" onclick="verifyAndLogin()">Initialize Access</button>
       <div class="login-error" id="loginError"></div>
       <a href="index.html" class="login-back">← Back to Portal</a>
     </div>
@@ -411,11 +378,9 @@
     <div class="topbar">
       <div class="topbar-left">
         <button class="sidebar-toggle" onclick="toggleSidebar()">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <div class="topbar-logo">
-          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        </div>
+        <div class="topbar-logo">IX</div>
         <span class="topbar-title">Community</span>
         <span class="topbar-badge" id="onlineBadge">0 online</span>
       </div>
@@ -476,10 +441,7 @@
               placeholder="Message #general…"
               autocomplete="off"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendMsg();event.preventDefault()}" />
-            <button class="chat-send" onclick="sendMsg()">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-              Send
-            </button>
+            <button class="chat-send" onclick="sendMsg()">Send</button>
           </div>
         </div>
       </div>
@@ -495,7 +457,6 @@
   const FB_CONFIG = {
     apiKey:            "AIzaSyAufdQ8b5wktFuRFvtDERnjanJ-9b-sv3U",
     authDomain:        "innovexa-hub-77b97.firebaseapp.com",
-    // Try both common regional URLs — the app will use whichever works
     databaseURL:       "https://innovexa-hub-77b97-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId:         "innovexa-hub-77b97",
     storageBucket:     "innovexa-hub-77b97.firebasestorage.app",
@@ -515,9 +476,9 @@
 
   // Core Team Roles
   const ROLES = {
-    'INVX-01': { label:'President',         color:'#7c3aed', bg:'#ede9fe' },
-    'INVX-02': { label:'CTO',               color:'#0369a1', bg:'#e0f2fe' },
-    'INVX-03': { label:'General Secretary', color:'#065f46', bg:'#d1fae5' },
+    'INVX-01': { label:'President',         color:'#111', bg:'#abd233' },
+    'INVX-02': { label:'CTO',               color:'#111', bg:'#e3dec9' },
+    'INVX-03': { label:'General Secretary', color:'#111', bg:'#e3dec9' },
   };
   function getRoleBadge(id) {
     const r = ROLES[(id||'').toUpperCase()];
@@ -531,7 +492,6 @@
 
   // ── Init ──
   (function init() {
-    // Clear ALL old session keys from previous versions
     ['innovexa_chat_user','invx_chat_user','invx_v2_user'].forEach(k => localStorage.removeItem(k));
 
     try {
@@ -543,17 +503,11 @@
     } catch(e) { console.error('Firebase init error:', e); }
 
     const saved = localStorage.getItem(STORE_KEY);
-    console.log('[INVX] Saved session:', saved);
     if (saved) {
       try {
         me = JSON.parse(saved);
-        console.log('[INVX] Loaded me:', me);
-        if (me && me.id && me.name) {
-          showChat();
-        } else {
-          console.warn('[INVX] Invalid session, clearing');
-          localStorage.removeItem(STORE_KEY);
-        }
+        if (me && me.id && me.name) { showChat(); } 
+        else { localStorage.removeItem(STORE_KEY); }
       } catch(e) { localStorage.removeItem(STORE_KEY); }
     }
   })();
@@ -568,64 +522,50 @@
 
     err.style.display = 'none';
 
-    if (!opId || !email || !phone) {
-      return showErr('Please fill in all 3 fields.');
-    }
-    if (!/^INVX-\d{2,}$/.test(opId)) {
-      return showErr('Operative ID should be in format INVX-01');
-    }
-    if (phone.length !== 5) {
-      return showErr('Enter exactly 5 digits of your phone number.');
-    }
+    if (!opId || !email || !phone) return showErr('Please fill in all 3 fields.');
+    if (!/^INVX-\d{2,}$/.test(opId)) return showErr('Operative ID format: INVX-000');
+    if (phone.length !== 5) return showErr('Enter exactly 5 digits of your phone number.');
 
     btn.textContent = 'Verifying…'; btn.disabled = true;
 
     try {
-      // Use existing email-lookup endpoint (no redeploy needed)
       const url = `${SCRIPT_URL}?email=${encodeURIComponent(email)}`;
       const res  = await fetch(url, { method:'GET', redirect:'follow' });
       const data = await res.json();
 
-      console.log('[INVX] API response:', JSON.stringify(data));
-
       if (!data.success || !data.id) {
         showErr('Email not found in our records.');
-        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        btn.textContent = 'Initialize Access'; btn.disabled = false;
         return;
       }
 
-      // Verify Operative ID matches
       if (data.id.toUpperCase() !== opId) {
         showErr('Operative ID does not match this email.');
-        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        btn.textContent = 'Initialize Access'; btn.disabled = false;
         return;
       }
 
-      // Verify phone last 5 digits
       const regPhone = (data.phone || '').toString().replace(/\D/g, '');
       const regLast5 = regPhone.slice(-5);
       if (regLast5 !== phone) {
         showErr('Phone number does not match our records.');
-        btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+        btn.textContent = 'Initialize Access'; btn.disabled = false;
         return;
       }
 
       me = {
         name: data.name,
-        id:   data.id,       // data.id is the operative ID from this endpoint
+        id:   data.id,
         init: data.name ? data.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : '??'
       };
-      console.log('[INVX] me object set to:', JSON.stringify(me));
       localStorage.setItem(STORE_KEY, JSON.stringify(me));
       showChat();
 
     } catch(e) {
       showErr('Network error — please check your connection and try again.');
-      btn.textContent = 'Verify & Enter Community'; btn.disabled = false;
+      btn.textContent = 'Initialize Access'; btn.disabled = false;
     }
-    function showErr(msg) {
-      err.textContent = msg; err.style.display = 'block';
-    }
+    function showErr(msg) { err.textContent = msg; err.style.display = 'block'; }
   }
 
   function logout() {
@@ -641,13 +581,11 @@
     app.style.display = 'flex'; app.style.flexDirection = 'column'; app.style.height = '100vh';
 
     document.getElementById('userAvatar').textContent = me.init;
-    document.getElementById('userName').textContent   = me.id + (me.id ? '' : ' (ID missing!)');
-    // Add role badge next to name in topbar if applicable
+    document.getElementById('userName').textContent   = me.id;
     const roleEl = document.getElementById('userName');
     const badge  = getRoleBadge(me.id);
     if (badge) roleEl.innerHTML = (me.id||'') + ' ' + badge;
 
-    // Presence
     if (db) {
       const pRef = db.ref('presence/'+me.id);
       pRef.set({ name:me.name, ts: firebase.database.ServerValue.TIMESTAMP });
@@ -660,7 +598,7 @@
         document.getElementById('onlineBadge').textContent = keys.length + ' online';
         document.getElementById('onlineList').innerHTML = keys.map(id => {
           const n = users[id].name || id;
-          return `<li class="online-item"><span class="online-dot"></span><span style="font-weight:600">${escHtml(n)}</span><span style="color:var(--text-muted);font-size:10px;margin-left:4px">${escHtml(id)}</span>${getRoleBadge(id)}</li>`;
+          return `<li class="online-item"><span class="online-dot"></span><span style="font-weight:600">${escHtml(n)}</span><span style="color:var(--text-3);font-family:var(--font-m);font-size:10px;margin-left:4px">${escHtml(id)}</span>${getRoleBadge(id)}</li>`;
         }).join('');
       });
 
@@ -670,22 +608,18 @@
 
   // ── Switch Channel ──
   function switchCh(channel) {
-    const oldCh = ch;  // save BEFORE updating ch
+    const oldCh = ch;
     ch = channel;
     if (db && prevListener) {
       db.ref('channels/'+oldCh+'/messages').off('child_added', prevListener);
       db.ref('channels/'+oldCh+'/typing').off();
     }
 
-    // Update sidebar
-    document.querySelectorAll('.channel-item').forEach(el =>
-      el.classList.toggle('active', el.dataset.ch === channel)
-    );
+    document.querySelectorAll('.channel-item').forEach(el => el.classList.toggle('active', el.dataset.ch === channel));
     document.getElementById('chName').textContent = channel;
     document.getElementById('chDesc').textContent = CH_INFO[channel] || '';
     document.getElementById('msgInput').placeholder = `Message #${channel}…`;
 
-    // Clear messages
     const box = document.getElementById('messages');
     box.innerHTML = `<div class="msg-welcome">
       <div class="msg-welcome-icon">${CH_EMOJI[channel]||'💬'}</div>
@@ -695,14 +629,12 @@
 
     if (!db) return;
 
-    // Load last 80 messages (no orderByChild — avoids needing a Firebase index)
     const ref = db.ref('channels/'+channel+'/messages').limitToLast(80);
     prevListener = ref.on('child_added', snap => {
-      appendMsg(snap.val(), snap.key);  // pass Firebase key for delete
+      appendMsg(snap.val(), snap.key);
       box.scrollTop = box.scrollHeight;
     });
 
-    // Listen for removals (so UI updates when message deleted)
     db.ref('channels/'+channel+'/messages').on('child_removed', snap => {
       const el = document.querySelector(`[data-key="${snap.key}"]`);
       if (el) {
@@ -712,16 +644,13 @@
       }
     });
 
-    // Typing
     db.ref('channels/'+channel+'/typing').on('value', snap => {
       const typists = snap.val() || {};
       const others  = Object.keys(typists).filter(id => id !== me.id);
       const bar     = document.getElementById('typingBar');
-      bar.textContent = others.length === 1 ? `${others[0]} is typing…`
-                      : others.length  > 1 ? `${others.length} people typing…` : '';
+      bar.textContent = others.length === 1 ? `${others[0]} is typing…` : others.length > 1 ? `${others.length} people typing…` : '';
     });
 
-    // Mobile
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('overlay').classList.remove('active');
   }
@@ -733,25 +662,20 @@
     if (wc) wc.remove();
 
     if (msg.type === 'system') {
-      const d = document.createElement('div');
-      d.className = 'msg-system';
-      d.textContent = '⚡ ' + (msg.text || '');
-      box.appendChild(d);
-      return;
+      const d = document.createElement('div'); d.className = 'msg-system'; d.textContent = '⚡ ' + (msg.text || ''); box.appendChild(d); return;
     }
 
     const ts   = msg.timestamp ? new Date(msg.timestamp) : new Date();
     const time = ts.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
     const init = (msg.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const hue  = hashStr(msg.uid||'') % 360;
-    const c1   = `hsl(${hue},65%,55%)`, c2 = `hsl(${(hue+40)%360},65%,45%)`;
     const isOwn = me && msg.uid === me.id;
 
     const d = document.createElement('div');
     d.className = 'msg-group';
     if (key) d.dataset.key = key;
     d.innerHTML = `
-      <div class="msg-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${escHtml(init)}</div>
+      <div class="msg-avatar" style="background:hsl(${hue}, 40%, 85%); color:hsl(${hue}, 60%, 20%);">${escHtml(init)}</div>
       <div class="msg-body">
         <div class="msg-meta">
           <span class="msg-name">${escHtml(msg.name||'Unknown')}</span>
@@ -760,10 +684,7 @@
           <span class="msg-time">${time}</span>
           ${isOwn && key ? `
           <div class="msg-actions">
-            <button class="msg-del" onclick="deleteMsg('${escHtml(key)}', this)" title="Delete message">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              Delete
-            </button>
+            <button class="msg-del" onclick="deleteMsg('${escHtml(key)}', this)">Delete</button>
           </div>` : ''}
         </div>
         <div class="msg-text">${escHtml(msg.text||'')}</div>
@@ -773,7 +694,6 @@
 
   // ── Delete Message ──
   function deleteMsg(key, btnEl) {
-    // Remove any existing confirmation
     const existing = document.querySelector('.del-confirm');
     if (existing) existing.remove();
 
@@ -788,12 +708,8 @@
     document.getElementById('delNo').onclick  = () => toast.remove();
     document.getElementById('delYes').onclick = () => {
       toast.remove();
-      db.ref('channels/'+ch+'/messages/'+key).remove(err => {
-        if (err) showBanner('Delete failed: ' + err.message);
-      });
+      db.ref('channels/'+ch+'/messages/'+key).remove(err => { if (err) showBanner('Delete failed: ' + err.message); });
     };
-
-    // Auto-dismiss after 5s
     setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
   }
 
@@ -802,29 +718,22 @@
     const input = document.getElementById('msgInput');
     const text  = input.value.trim();
     if (!text) return;
-    if (!me)   { showBanner('You are not logged in. Please refresh.'); return; }
-    if (!db)   { showBanner('Firebase not connected. Please refresh.'); return; }
+    if (!me) { showBanner('You are not logged in. Please refresh.'); return; }
+    if (!db) { showBanner('Firebase not connected. Please refresh.'); return; }
 
     const btn = document.querySelector('.chat-send');
     btn.disabled = true;
 
     db.ref('channels/'+ch+'/messages').push({
-      type:'user', uid:me.id, name:me.name,
-      text: text,
+      type:'user', uid:me.id, name:me.name, text: text,
       timestamp: firebase.database.ServerValue.TIMESTAMP
     }, function(err) {
       btn.disabled = false;
       if (err) {
-        showBanner('Send failed: ' + err.message + ' — Check Firebase rules allow read/write.');
+        showBanner('Send failed: ' + err.message);
       } else {
-        hideBanner();
-        input.value = '';
-        input.focus();
+        hideBanner(); input.value = ''; input.focus();
         db.ref('channels/'+ch+'/typing/'+me.id).remove();
-        // Flash send button green briefly
-        btn.style.background = '#16a34a';
-        btn.textContent = '✓ Sent';
-        setTimeout(() => { btn.style.background = ''; btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg> Send'; }, 1000);
       }
     });
   }
@@ -839,30 +748,16 @@
         db.ref('channels/'+ch+'/typing/'+me.id).set({ ts: firebase.database.ServerValue.TIMESTAMP });
       }
       clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => {
-        if (db) db.ref('channels/'+ch+'/typing/'+me.id).remove();
-      }, 3000);
+      typingTimer = setTimeout(() => { if (db) db.ref('channels/'+ch+'/typing/'+me.id).remove(); }, 3000);
     });
   });
 
   // ── Helpers ──
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('active');
-  }
-  function showBanner(msg) {
-    const b = document.getElementById('errorBanner');
-    b.textContent = msg; b.style.display = 'block';
-  }
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('active'); }
+  function showBanner(msg) { const b = document.getElementById('errorBanner'); b.textContent = msg; b.style.display = 'block'; }
   function hideBanner() { document.getElementById('errorBanner').style.display = 'none'; }
-  function escHtml(s) {
-    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
-  }
-  function hashStr(s) {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) { h = ((h<<5)-h)+s.charCodeAt(i); h|=0; }
-    return Math.abs(h);
-  }
+  function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = ((h<<5)-h)+s.charCodeAt(i); h|=0; } return Math.abs(h); }
   </script>
 </body>
 </html>
