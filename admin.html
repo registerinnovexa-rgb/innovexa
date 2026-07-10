@@ -653,7 +653,7 @@ async function handleLogin() {
   btn.disabled = true; btn.textContent = 'Verifying...'; err.textContent = '';
 
   try {
-    const data = await apiGet(`forge_login&invxId=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}`);
+    const data = await apiGet(`admin_login&invxId=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}`);
     if (!data.success) { err.textContent = data.message || 'Verification failed.'; btn.disabled = false; btn.textContent = 'Verify & Access Dashboard'; return; }
 
     adminSession = { id, email, phone, name: (data.data && data.data.name) || id };
