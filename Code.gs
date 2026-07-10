@@ -277,6 +277,8 @@ function doGet(e) {
           name: rows[i][1],
           email: rows[i][2],
           phone: rows[i][3],
+          year: rows[i][4],
+          branch: rows[i][5],
           status: rows[i][10],
           operativeId: rows[i][12],
           photoUrl: rows[i][13],

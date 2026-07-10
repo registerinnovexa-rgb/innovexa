@@ -15,30 +15,19 @@ async function gasGet(gasUrl) {
   const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
-    // Parse params from the GAS URL and forward them to our proxy
-    const parsed  = new URL(gasUrl);
-    const params  = new URLSearchParams(parsed.search);
-
-    // Build proxy URL: /api/proxy?email=...  or  /api/proxy?action=count
-    const proxyUrl = '/api/proxy?' + params.toString();
-
-    const res  = await fetch(proxyUrl, { signal: ctrl.signal });
+    // Direct fetch to GAS (bypassing SSO-blocked proxy)
+    const r2   = await fetch(gasUrl, { method: 'GET', redirect: 'follow', signal: ctrl.signal });
     clearTimeout(timer);
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch (_) { throw new Error('Invalid response from server'); }
-
+    const text = await r2.text();
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      throw new Error('Invalid JSON from server');
+    }
   } catch (err) {
     clearTimeout(timer);
     if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
-    // Fallback: direct fetch (works in development)
-    try {
-      const r2   = await fetch(gasUrl, { method: 'GET', redirect: 'follow' });
-      const text = await r2.text();
-      return JSON.parse(text);
-    } catch (_) {
-      throw err;
-    }
+    throw err;
   }
 }
 

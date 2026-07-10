@@ -673,19 +673,20 @@
       if (!submitLink) return toast('Please provide a submission link', 'error');
       
       try {
-        const res = await fetch('/api/proxy', {
+        await fetch(MAIN_SCRIPT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId })
         });
-        const data = await res.json();
-        if (data.success) {
-          toast('Mission submitted for review!');
-          loadMissions();
-        } else {
-          toast(data.message, 'error');
-        }
-      } catch(e) { toast('Error submitting mission', 'error'); }
+        
+        toast('Mission submitted for review!');
+        // wait for GAS to process then reload
+        await new Promise(r => setTimeout(r, 1500));
+        loadMissions();
+      } catch(e) { 
+        toast('Network error. Try again.', 'error'); 
+      }
     }
 
     // ══════════════════════════════════════════
