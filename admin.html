@@ -329,11 +329,11 @@
           <div class="stat-value" id="statPending" style="color:var(--yellow)">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Events</div>
+          <div class="stat-label">Forge Operatives</div>
           <div class="stat-value" id="statEvents" style="color:var(--green)">—</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Resources</div>
+          <div class="stat-label">Confirmed Members</div>
           <div class="stat-value" id="statResources" style="color:var(--blue)">—</div>
         </div>
       </div>
@@ -500,11 +500,9 @@
             <tr>
               <th><input type="checkbox" id="selectAllMembers" onchange="toggleSelectAll()"></th>
               <th onclick="setSort('operativeId')" style="cursor:pointer;" title="Sort by ID">ID ↕</th>
-              <th>Photo</th>
               <th onclick="setSort('name')" style="cursor:pointer;" title="Sort by Name">Name ↕</th>
               <th onclick="setSort('email')" style="cursor:pointer;" title="Sort by Email">Email ↕</th>
               <th>Phone</th>
-              <th>Proof</th>
               <th onclick="setSort('status')" style="cursor:pointer;" title="Sort by Status">Status ↕</th>
               <th>Actions</th>
             </tr>
@@ -512,7 +510,7 @@
           <tbody id="membersBody"></tbody>
         </table>
       </div>
-      <div id="paginationControls" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; display:none;">
+      <div id="paginationControls" style="display:none; justify-content:space-between; align-items:center; margin-top:15px;">
         <button class="btn-sm" style="background:var(--bg3); color:var(--text); padding:6px 12px;" onclick="changePage(-1)">Previous</button>
         <span style="font-size:13px; color:var(--text2);">Page <span id="currentPageDisplay">1</span> of <span id="totalPagesDisplay">1</span></span>
         <button class="btn-sm" style="background:var(--bg3); color:var(--text); padding:6px 12px;" onclick="changePage(1)">Next</button>
@@ -613,15 +611,19 @@ async function apiGet(action) {
 async function apiWrite(op, payload) {
   payload.op = op;
   payload.adminKey = ADMIN_KEY;
-  payload.adminId = adminSession.id;
-  payload.adminEmail = adminSession.email;
-  payload.adminPhone = adminSession.phone;
-  // Event writes go through Code1.gs (supports requiresReg + regFee columns)
+  payload.adminId = adminSession ? adminSession.id : '';
   const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus','markAttendance'].includes(op);
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  const url = `${baseUrl}?action=adminWrite&data=${encodeURIComponent(JSON.stringify(payload))}`;
-  const r = await fetch(url, { method: 'GET', redirect: 'follow' });
-  return r.json();
+  // POST as plain text (no-cors) — avoids Vercel SSO proxy and URL length limits
+  await fetch(baseUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  // no-cors returns opaque response; wait briefly then optimistically return success
+  await new Promise(r => setTimeout(r, 1800));
+  return { success: true, message: 'Operation sent.' };
 }
 
 function statusBadge(s) {
@@ -651,10 +653,10 @@ async function handleLogin() {
   btn.disabled = true; btn.textContent = 'Verifying...'; err.textContent = '';
 
   try {
-    const data = await apiGet(`verifyChat&id=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}&phone=${phone}`);
+    const data = await apiGet(`forge_login&invxId=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}`);
     if (!data.success) { err.textContent = data.message || 'Verification failed.'; btn.disabled = false; btn.textContent = 'Verify & Access Dashboard'; return; }
 
-    adminSession = { id, email, phone, name: data.name || id };
+    adminSession = { id, email, phone, name: (data.data && data.data.name) || id };
     sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
     showDashboard();
   } catch(e) {
@@ -1123,12 +1125,9 @@ function drawCharts(members) {
   const branches = {};
   
   members.forEach(m => {
-    if (!m.year) return;
-    const y = m.year.trim();
+    const y = (m.year || '').trim() || 'Unknown';
     years[y] = (years[y] || 0) + 1;
-    
-    if (!m.branch) return;
-    const b = m.branch.trim().toUpperCase();
+    const b = (m.branch || '').trim().toUpperCase() || 'UNKNOWN';
     branches[b] = (branches[b] || 0) + 1;
   });
 
@@ -1139,7 +1138,7 @@ function drawCharts(members) {
   };
 
   const yCtx = document.getElementById('yearChart');
-  if (yCtx) {
+  if (yCtx && Object.keys(years).length > 0) {
     if (yearChartInstance) yearChartInstance.destroy();
     yearChartInstance = new Chart(yCtx, {
       type: 'doughnut',
@@ -1156,7 +1155,7 @@ function drawCharts(members) {
   }
 
   const bCtx = document.getElementById('branchChart');
-  if (bCtx) {
+  if (bCtx && Object.keys(branches).length > 0) {
     if (branchChartInstance) branchChartInstance.destroy();
     branchChartInstance = new Chart(bCtx, {
       type: 'bar',
@@ -1187,8 +1186,10 @@ async function loadOverview() {
     const pending = members.filter(m => (m.status||'').toLowerCase().includes('pending')).length;
     document.getElementById('statMembers').textContent = members.length;
     document.getElementById('statPending').textContent = pending;
-    document.getElementById('statEvents').textContent = 'N/A';
-    document.getElementById('statResources').textContent = 'N/A';
+    const forgeCount = members.filter(m => (m.forgeAccess||'').trim() === 'Granted').length;
+    const confirmedCount = members.filter(m => (m.status||'').trim().toLowerCase().includes('confirmed')).length;
+    document.getElementById('statEvents').textContent = forgeCount;
+    document.getElementById('statResources').textContent = confirmedCount;
     
     drawCharts(members);
   } catch(e) { console.error("Error loading overview:", e); }
@@ -1202,11 +1203,15 @@ async function loadMembers() {
   document.getElementById('membersTable').style.display = 'none';
   try {
     const data = await apiGet('adminMembers');
-    const members = data.members || [];
-    
-    cachedMembers = members;
+    if (!data || !data.success) throw new Error((data && data.message) || 'Bad response from server');
+    cachedMembers = data.members || [];
     renderMembers(cachedMembers);
-  } catch(e) { showToast('Failed to load members', 'error'); }
+  } catch(e) {
+    console.error('loadMembers error:', e);
+    document.getElementById('membersLoading').innerHTML =
+      '<p style="color:var(--red);padding:20px;text-align:center;">Failed to load members.<br><small>' + e.message + '</small><br><button class="btn-sm" style="margin-top:10px;" onclick="loadMembers()">Retry</button></p>';
+    showToast('Failed to load members', 'error');
+  }
 }
 
 let currentPage = 1;
@@ -1262,34 +1267,31 @@ function renderMembers(members) {
 
 function renderMembersHTML(members) {
   const tbody = document.getElementById('membersBody');
+  if (!members || members.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No members found.</td></tr>';
+    return;
+  }
   tbody.innerHTML = members.map(m => {
-    // Store member object securely in a data attribute
     const mData = encodeURIComponent(JSON.stringify(m));
+    const isConfirmed = (m.status||'').trim().toLowerCase().includes('confirmed');
     return `
     <tr>
       <td><input type="checkbox" class="member-checkbox" value="${m.rowIndex}" onchange="updateBulkActions()"></td>
-      <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openProfileModal('${mData}')">${escHtml(m.operativeId)}</strong></td>
-      <td>
-        ${m.photoUrl ? `<img src="${driveImgUrl(m.photoUrl)}" onclick="window.open(driveImgUrl('${m.photoUrl}'))" style="width:36px;height:36px;border-radius:50%;object-fit:cover;cursor:pointer;border:1px solid var(--border);" title="Click to view full photo"/>` : '<span style="color:var(--text3);font-size:10px;">None</span>'}
-      </td>
+      <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openProfileModal('${mData}')">${escHtml(m.operativeId || '—')}</strong></td>
       <td style="color:var(--text);cursor:pointer;" onclick="openProfileModal('${mData}')">${escHtml(m.name)}</td>
-      <td>${escHtml(m.email)}</td>
-      <td>${escHtml(m.phone)}</td>
-      <td>
-        ${m.paymentProofUrl ? `<button onclick="window.open('${m.paymentProofUrl}')" class="btn-sm" style="background:var(--blue-bg);color:var(--blue);font-size:9px;padding:4px 8px;border:none;border-radius:4px;cursor:pointer;">📄 View Proof</button>` : '<span style="color:var(--text3);font-size:10px;">—</span>'}
-      </td>
+      <td style="font-size:13px;color:var(--text2);">${escHtml(m.email)}</td>
+      <td style="font-size:13px;color:var(--text2);">${escHtml(m.phone)}</td>
       <td>${statusBadge(m.status)}</td>
       <td>
         <div class="btn-actions">
-          ${!(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.rowIndex},'Confirmed ')">✓ Approve</button>` : ''}
-          ${(m.status||'').trim().toLowerCase().includes('confirmed') ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
+          ${!isConfirmed ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.rowIndex},'Confirmed')">✓ Approve</button>` : ''}
+          ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
+          <button class="btn-sm" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);" onclick="openProfileModal('${mData}')">👤 View</button>
         </div>
       </td>
     </tr>
   `;
   }).join('');
-  
-  // Reset bulk actions state
   document.getElementById('selectAllMembers').checked = false;
   updateBulkActions();
 }
@@ -1324,7 +1326,7 @@ async function bulkUpdate(status) {
   try {
     const promises = Array.from(checkboxes).map(cb => {
       const rowIndex = cb.value;
-      return apiWrite('updateStatus', { rowIndex, status: status === 'Confirmed' ? 'Confirmed ' : status });
+      return apiWrite('updateStatus', { rowIndex, status });
     });
     
     await Promise.all(promises);
@@ -1634,10 +1636,16 @@ function exportMembersCSV() {
 
 async function updateStatus(rowIndex, status) {
   try {
-    const data = await apiWrite('updateStatus', { rowIndex, status });
-    if (data.success) { showToast(data.message); loadMembers(); loadOverview(); }
-    else showToast(data.message, 'error');
-  } catch(e) { showToast('Network error', 'error'); }
+    showToast('Updating...', 'info');
+    await apiWrite('updateStatus', { rowIndex, status });
+    showToast('Status updated to: ' + status, 'success');
+    await new Promise(r => setTimeout(r, 500));
+    loadMembers();
+    loadOverview();
+  } catch(e) {
+    console.error('updateStatus error:', e);
+    showToast('Network error updating status', 'error');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════

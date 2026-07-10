@@ -269,25 +269,30 @@ function doGet(e) {
     // FORGE: Debug Row
     if (action === 'adminMembers') {
       var rows = sheet.getDataRange().getValues();
-      var headers = rows[0];
       var members = [];
       for (var i = 1; i < rows.length; i++) {
+        if (!rows[i][1] && !rows[i][2]) continue; // skip empty rows
         members.push({
           rowIndex: i + 1,
-          name: rows[i][1],
-          email: rows[i][2],
-          phone: rows[i][3],
-          year: rows[i][4],
-          branch: rows[i][5],
-          status: rows[i][10],
-          operativeId: rows[i][12],
-          photoUrl: rows[i][13],
-          paymentProofUrl: rows[i][14],
-          utr: rows[i][9],
-          forgeAccess: String(rows[i][18] || '').trim(), // Col S
-          xp: String(rows[i][19] || '0'),               // Col T
-          rank: String(rows[i][20] || 'Apprentice'),    // Col U
-          squad: String(rows[i][21] || 'Unassigned')    // Col V
+          name: String(rows[i][1] || ''),
+          email: String(rows[i][2] || ''),
+          phone: String(rows[i][3] || ''),
+          year: String(rows[i][4] || ''),
+          branch: String(rows[i][5] || ''),
+          skillLevel: String(rows[i][6] || ''),
+          dob: String(rows[i][7] || ''),
+          interests: String(rows[i][8] || ''),
+          utr: String(rows[i][9] || ''),
+          status: String(rows[i][10] || 'Pending'),
+          amount: String(rows[i][11] || '599'),
+          operativeId: String(rows[i][12] || ''),
+          gender: String(rows[i][15] || ''),
+          forgeRole: String(rows[i][16] || ''),
+          linkedMentor: String(rows[i][17] || ''),
+          forgeAccess: String(rows[i][18] || '').trim(),
+          xp: String(rows[i][19] || '0'),
+          rank: String(rows[i][20] || 'Apprentice'),
+          squad: String(rows[i][21] || 'Unassigned')
         });
       }
       return respond({ success: true, members: members });
@@ -491,12 +496,35 @@ function doPost(e) {
     if (op === 'admin_grant_forge_access') {
       sheet.getRange(payload.rowIndex, 19).setValue(payload.accessStatus); // Col S (19) = ForgeAccess
       if (!sheet.getRange(payload.rowIndex, 20).getValue()) {
-        sheet.getRange(payload.rowIndex, 20).setValue('0'); // Set XP to 0 if empty
+        sheet.getRange(payload.rowIndex, 20).setValue('0');
       }
       if (!sheet.getRange(payload.rowIndex, 21).getValue()) {
-        sheet.getRange(payload.rowIndex, 21).setValue('Apprentice'); // Set Rank to Apprentice if empty
+        sheet.getRange(payload.rowIndex, 21).setValue('Apprentice');
       }
       return respond({ success: true, message: 'Forge access updated to: ' + payload.accessStatus });
+    }
+
+    // ADMIN: Update member status (Approve / Reject)
+    if (op === 'updateStatus') {
+      var rowIdx = parseInt(payload.rowIndex);
+      if (!rowIdx || rowIdx < 2) return respond({ success: false, message: 'Invalid row index.' });
+      var newStatus = String(payload.status || '').trim();
+      sheet.getRange(rowIdx, 11).setValue(newStatus); // Col K = Status
+      // Send approval email when confirming
+      try {
+        var memberRow = sheet.getRange(rowIdx, 1, 1, 22).getValues()[0];
+        var memberEmail = String(memberRow[2] || '');
+        var memberName = String(memberRow[1] || '');
+        var memberId = String(memberRow[12] || '');
+        if (newStatus.toLowerCase().includes('confirm') && memberEmail) {
+          MailApp.sendEmail({
+            to: memberEmail,
+            subject: 'Innovexa Hub — You are Approved! ID: ' + memberId,
+            body: 'Hi ' + memberName + ',\n\nCongratulations! Your Innovexa Hub membership has been approved.\n\nOperative ID: ' + memberId + '\n\nCheck your full status: https://innovexareg.vercel.app/status.html\n\n— Innovexa Hub Core Team'
+          });
+        }
+      } catch(_) {}
+      return respond({ success: true, message: 'Status updated to ' + newStatus });
     }
 
     // ADMIN: Create Task
