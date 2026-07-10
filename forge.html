@@ -454,17 +454,34 @@
     // ══════════════════════════════════════════
     //  LIFECYCLE
     // ══════════════════════════════════════════
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       try {
         const raw = localStorage.getItem('forge_session');
         if (raw) {
-          session = JSON.parse(raw);
-          bootDashboard();
-          return;
+          const stored = JSON.parse(raw);
+          // Always re-verify with server — never trust localStorage blindly
+          const res = await gasGet('forge_login', { invxId: stored.operativeId, email: stored.email });
+          if (res.success && res.data) {
+            session = {
+              operativeId: res.data.operativeId,
+              email: stored.email,
+              name: res.data.name,
+              xp: res.data.xp,
+              rank: res.data.rank,
+              squad: res.data.squad
+            };
+            localStorage.setItem('forge_session', JSON.stringify(session));
+            bootDashboard();
+            return;
+          } else {
+            // Access revoked or denied — clear session and show login
+            localStorage.removeItem('forge_session');
+          }
         }
-      } catch(_) { clearSession(); }
+      } catch(_) { localStorage.removeItem('forge_session'); }
       
-      // Animations for login
+      // Show login screen
+      document.getElementById('login-view').style.display = 'flex';
       setTimeout(() => {
         document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
       }, 100);

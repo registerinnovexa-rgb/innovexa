@@ -1,5 +1,5 @@
 // Innovexa Hub — Google Apps Script Backend
-// Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id N:PhotoURL O:PaymentProofURL P:Gender Q:ForgeRole R:LinkedMentor
+// Sheet columns: A:Timestamp B:Name C:Email D:Phone E:Year F:Branch G:SkillLevel H:DOB I:Interests J:UTR K:Status L:Amount M:Operative_id N:PhotoURL O:PaymentProofURL P:Gender Q:ForgeRole R:LinkedMentor S:ForgeAccess T:XP U:Rank V:Squad
 
 function getOrCreateSheet(ss, name, headers) {
   var sheet = ss.getSheetByName(name);
@@ -96,8 +96,9 @@ function doGet(e) {
 
         if (rowOpId === reqOpId && rowEmail === reqEmail) {
           if (status !== 'Approved' && status !== 'Confirmed') {
-            return respond({ success: false, message: 'Access Denied. Your application is not approved.' });
+            return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
           }
+          var forgeAccess = String(row[18] || '').trim(); // Column S = ForgeAccess
           if (forgeAccess !== 'Granted') {
             return respond({ success: false, message: 'Access Denied. Forge access has not been granted by Admin.' });
           }
@@ -107,9 +108,9 @@ function doGet(e) {
               name: String(row[1] || ''),
               operativeId: rowOpId,
               forgeAccess: forgeAccess,
-              xp: String(row[17] || '0'),        // Column R
-              rank: String(row[18] || 'Apprentice'), // Column S
-              squad: String(row[19] || 'Unassigned')  // Column T
+              xp: String(row[19] || '0'),          // Column T = XP
+              rank: String(row[20] || 'Apprentice'), // Column U = Rank
+              squad: String(row[21] || 'Unassigned') // Column V = Squad
             }
           });
         }
@@ -281,10 +282,10 @@ function doGet(e) {
           photoUrl: rows[i][13],
           paymentProofUrl: rows[i][14],
           utr: rows[i][9],
-          forgeAccess: rows[i][16],
-          xp: rows[i][17],
-          rank: rows[i][18],
-          squad: rows[i][19]
+          forgeAccess: String(rows[i][18] || '').trim(), // Col S
+          xp: String(rows[i][19] || '0'),               // Col T
+          rank: String(rows[i][20] || 'Apprentice'),    // Col U
+          squad: String(rows[i][21] || 'Unassigned')    // Col V
         });
       }
       return respond({ success: true, members: members });
@@ -322,17 +323,16 @@ function doGet(e) {
       var rows = sheet.getDataRange().getValues();
       var leaderboard = [];
       for (var i = 1; i < rows.length; i++) {
-        var forgeAccess = String(rows[i][16] || '').trim();
+        var forgeAccess = String(rows[i][18] || '').trim(); // Col S
         if (forgeAccess === 'Granted') {
           leaderboard.push({
             name: rows[i][1],
             operativeId: rows[i][12],
-            xp: parseInt(rows[i][17]) || 0,
-            rank: rows[i][18] || 'Apprentice'
+            xp: parseInt(rows[i][19]) || 0, // Col T
+            rank: rows[i][20] || 'Apprentice' // Col U
           });
         }
       }
-      // Sort descending by XP
       leaderboard.sort(function(a, b) { return b.xp - a.xp; });
       return respond({ success: true, leaderboard: leaderboard });
     }
@@ -487,12 +487,12 @@ function doPost(e) {
 
     // ADMIN: Grant/Revoke Forge Access
     if (op === 'admin_grant_forge_access') {
-      sheet.getRange(payload.rowIndex, 17).setValue(payload.accessStatus); // Col Q (17) = ForgeAccess
-      if (!sheet.getRange(payload.rowIndex, 18).getValue()) {
-        sheet.getRange(payload.rowIndex, 18).setValue('0'); // Set XP to 0 if empty
+      sheet.getRange(payload.rowIndex, 19).setValue(payload.accessStatus); // Col S (19) = ForgeAccess
+      if (!sheet.getRange(payload.rowIndex, 20).getValue()) {
+        sheet.getRange(payload.rowIndex, 20).setValue('0'); // Set XP to 0 if empty
       }
-      if (!sheet.getRange(payload.rowIndex, 19).getValue()) {
-        sheet.getRange(payload.rowIndex, 19).setValue('Apprentice'); // Set Rank to Apprentice if empty
+      if (!sheet.getRange(payload.rowIndex, 21).getValue()) {
+        sheet.getRange(payload.rowIndex, 21).setValue('Apprentice'); // Set Rank to Apprentice if empty
       }
       return respond({ success: true, message: 'Forge access updated to: ' + payload.accessStatus });
     }
@@ -515,22 +515,19 @@ function doPost(e) {
           tasksSheet.getRange(i + 1, 10).setValue(payload.feedback || ''); // Feedback
 
           // If approved, grant XP
-          if (payload.status === 'Completed' && rows[i][7] /* AssignedTo */ !== 'Open') {
+          if (payload.status === 'Completed' && rows[i][7] !== 'Open') {
             var assignee = rows[i][7];
             var xpReward = parseInt(rows[i][4]) || 0;
-            // Find member and update XP
             var memRows = sheet.getDataRange().getValues();
             for (var m = 1; m < memRows.length; m++) {
-              if (memRows[m][12] === assignee) { // col 12 is operativeId
-                var currentXp = parseInt(memRows[m][17]) || 0; // col 17 is XP
-                sheet.getRange(m + 1, 18).setValue(currentXp + xpReward); // Update XP in Col R (18)
-                
-                // Simple rank logic
+              if (String(memRows[m][12]).trim() === String(assignee).trim()) {
+                var currentXp = parseInt(memRows[m][19]) || 0; // Col T = XP
                 var newXp = currentXp + xpReward;
+                sheet.getRange(m + 1, 20).setValue(newXp); // Col T (20)
                 var rank = 'Apprentice';
                 if (newXp >= 1000) rank = 'Elite';
                 else if (newXp >= 300) rank = 'Specialist';
-                sheet.getRange(m + 1, 19).setValue(rank); // Update Rank in Col S (19)
+                sheet.getRange(m + 1, 21).setValue(rank); // Col U (21)
                 break;
               }
             }
