@@ -677,9 +677,17 @@ function logout() {
 //  TAB SWITCHING
 // ══════════════════════════════════════════════════════════════
 // ── FORGE OPS LOGIC ──
-function switchForgeSubTab(subTab) {
+async function switchForgeSubTab(subTab) {
   document.querySelectorAll('.forge-subtab').forEach(el => el.style.display = 'none');
   document.querySelectorAll('#tabForgeOps .tab-filters button').forEach(btn => btn.classList.remove('active'));
+
+  // Ensure members are loaded before rendering the access table
+  if (!cachedMembers || cachedMembers.length === 0) {
+    try {
+      const data = await apiGet('adminMembers');
+      cachedMembers = data.members || [];
+    } catch(e) { console.error('Failed to load members for Forge Ops', e); }
+  }
   
   if (subTab === 'access') {
     document.getElementById('fTabAccess').style.display = 'block';
@@ -699,15 +707,16 @@ function switchForgeSubTab(subTab) {
 function renderForgeAccess() {
   const tbody = document.getElementById('forgeAccessBody');
   tbody.innerHTML = '';
-  const approvedMembers = membersData.filter(m => m.status === 'Approved' || m.status === 'Confirmed');
+
+  const approvedMembers = (cachedMembers || []).filter(m => m.status === 'Approved' || m.status === 'Confirmed');
   
   if (approvedMembers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);">No approved members found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No approved members found. Load the Members tab first.</td></tr>';
     return;
   }
 
   approvedMembers.forEach(m => {
-    const isGranted = (m.forgeAccess === 'Granted');
+    const isGranted = (String(m.forgeAccess || '').trim() === 'Granted');
     const actionBtn = isGranted 
       ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Revoked')">Revoke</button>`
       : `<button class="btn-sm" style="background:var(--green); color:#111;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
@@ -716,7 +725,7 @@ function renderForgeAccess() {
       <tr>
         <td><strong>${m.operativeId || 'N/A'}</strong></td>
         <td>${m.name}</td>
-        <td><span class="status-badge ${isGranted ? 'status-approved' : 'status-rejected'}">${isGranted ? 'Granted' : 'Revoked/None'}</span></td>
+        <td><span class="status-badge ${isGranted ? 'status-approved' : 'status-rejected'}">${isGranted ? '✅ Granted' : '🔒 Revoked/None'}</span></td>
         <td>${m.xp || 0}</td>
         <td>${m.rank || 'Apprentice'}</td>
         <td>${actionBtn}</td>
@@ -735,13 +744,15 @@ async function toggleForgeAccess(rowIndex, newStatus) {
     });
     const data = await res.json();
     if (data.success) {
-      alert(data.message);
-      await fetchMembers(); // Refresh global members list
-      renderForgeAccess(); // Re-render table
+      showToast(data.message, 'success');
+      // Refresh members cache and re-render
+      const refreshed = await apiGet('adminMembers');
+      cachedMembers = refreshed.members || [];
+      renderForgeAccess();
     } else {
-      alert(data.message);
+      showToast(data.message || 'Error updating access', 'error');
     }
-  } catch(e) { alert('Error updating access'); }
+  } catch(e) { showToast('Error updating access', 'error'); }
 }
 
 async function adminCreateTask() {
