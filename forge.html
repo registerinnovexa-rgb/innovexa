@@ -409,7 +409,8 @@
     // ══════════════════════════════════════════
     // Fetch from Forge Code.gs (for login)
     async function gasGet(action, extraParams = {}) {
-      const params = new URLSearchParams({ action, ...extraParams, _t: Date.now() });
+      const gasUrl = `${MAIN_SCRIPT_URL}?action=${action}&_t=${Date.now()}`;
+      const params = new URLSearchParams({ ...extraParams, _gasUrl: gasUrl });
       try {
         const r = await fetch('/api/proxy?' + params.toString(), { cache: 'no-store' });
         if (!r.ok) throw new Error('Proxy ' + r.status);
