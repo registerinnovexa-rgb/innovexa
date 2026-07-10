@@ -815,8 +815,9 @@ let adminTasks = [];
 async function loadForgeTasks() {
   try {
     const gasUrl = `${SCRIPT_URL}?action=admin_get_tasks&_t=${Date.now()}`;
-    const res = await fetch('/api/proxy?_gasUrl=' + encodeURIComponent(gasUrl), { cache: 'no-store' });
-    const data = await res.json();
+    const res = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+    const text = await res.text();
+    const data = JSON.parse(text);
     if (data.success) {
       adminTasks = data.tasks || [];
       renderForgeTasks();
@@ -1440,7 +1441,6 @@ function openProfileModal(encodedData) {
 
   const html = `
     <div style="display:flex; gap:20px; align-items:flex-start; margin-bottom:20px;">
-      ${m.photoUrl ? `<img src="${driveImgUrl(m.photoUrl)}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); cursor:pointer;" onclick="window.open(driveImgUrl('${m.photoUrl}'))"/>` : `<div style="width:100px;height:100px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text3);">No Photo</div>`}
       <div>
         <h3 style="font-size:20px; margin-bottom:4px; color:var(--accent2);">${escHtml(m.operativeId)}</h3>
         <h2 style="font-size:24px; margin-bottom:8px;">${escHtml(m.name)}</h2>
@@ -1467,12 +1467,7 @@ function openProfileModal(encodedData) {
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">UTR Number</span><br><strong style="font-family:monospace; color:var(--green);">${escHtml(m.utr)}</strong></div>
     </div>
     
-    ${m.paymentProofUrl ? `
-      <div class="admin-card" style="margin:0; text-align:center;">
-        <span style="font-size:11px;color:var(--text3);display:block;margin-bottom:10px;">Payment Proof</span>
-        <img src="${driveImgUrl(m.paymentProofUrl)}" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--border); cursor:pointer;" onclick="window.open(driveImgUrl('${m.paymentProofUrl}'))"/>>
-      </div>
-    ` : ''}
+
   `;
   
   document.getElementById('modalTitle').textContent = 'Member Profile';
