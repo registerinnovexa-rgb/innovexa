@@ -740,19 +740,18 @@ async function toggleForgeAccess(rowIndex, newStatus) {
     const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_grant_forge_access', rowIndex, accessStatus: newStatus })
+      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_grant_forge_access', rowIndex, accessStatus: newStatus })
     });
     const data = await res.json();
     if (data.success) {
-      showToast(data.message, 'success');
-      // Refresh members cache and re-render
+      showToast('Access updated: ' + newStatus, 'success');
       const refreshed = await apiGet('adminMembers');
       cachedMembers = refreshed.members || [];
       renderForgeAccess();
     } else {
       showToast(data.message || 'Error updating access', 'error');
     }
-  } catch(e) { showToast('Error updating access', 'error'); }
+  } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
 async function adminCreateTask() {
@@ -762,34 +761,41 @@ async function adminCreateTask() {
   const difficulty = document.getElementById('tkDiff').value;
   const assignedTo = document.getElementById('tkAssign').value.trim();
 
-  if (!title || !desc) return alert('Title and Description are required.');
+  if (!title || !desc) return showToast('Title and Description are required.', 'error');
   
   try {
     const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
+      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
     });
     const data = await res.json();
     if (data.success) {
-      alert(data.message);
+      showToast('Bounty deployed!', 'success');
       document.getElementById('taskFormCard').style.display = 'none';
+      document.getElementById('tkTitle').value = '';
+      document.getElementById('tkDesc').value = '';
+      document.getElementById('tkXP').value = '100';
+      document.getElementById('tkAssign').value = 'Open';
       loadForgeTasks();
     } else {
-      alert(data.message);
+      showToast(data.message || 'Failed to create task', 'error');
     }
-  } catch (e) { alert('Failed to create task'); }
+  } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
 
 let adminTasks = [];
 async function loadForgeTasks() {
   try {
-    const res = await fetch('/api/proxy?action=admin_get_tasks&_t=' + Date.now(), { cache: 'no-store' });
+    const gasUrl = `${SCRIPT_URL}?action=admin_get_tasks&_t=${Date.now()}`;
+    const res = await fetch('/api/proxy?_gasUrl=' + encodeURIComponent(gasUrl), { cache: 'no-store' });
     const data = await res.json();
     if (data.success) {
       adminTasks = data.tasks || [];
       renderForgeTasks();
       renderForgeReviews();
+    } else {
+      console.error('loadForgeTasks:', data.message);
     }
   } catch (e) { console.error('Failed to load tasks', e); }
 }
@@ -861,22 +867,22 @@ async function adminReviewTask(taskId, status) {
   const feedbackInput = document.getElementById('feedback_' + taskId);
   const feedback = feedbackInput ? feedbackInput.value : '';
   
-  if (!confirm(`Are you sure you want to mark this task as ${status}?`)) return;
+  if (!confirm(`Are you sure you want to ${status === 'Completed' ? 'Approve' : 'Reject'} this submission?`)) return;
 
   try {
     const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
+      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
     });
     const data = await res.json();
     if (data.success) {
-      alert(data.message);
+      showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
       loadForgeTasks();
     } else {
-      alert(data.message);
+      showToast(data.message || 'Error reviewing task', 'error');
     }
-  } catch(e) { alert('Error reviewing task'); }
+  } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
 function switchAdminTab(tab) {
