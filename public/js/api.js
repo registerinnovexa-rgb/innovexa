@@ -5,7 +5,7 @@
  * Load as plain script: <script src="/js/api.js"></script>
  */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6IxwfOmVuJ-ktxCQOkn4wZ3i9oIVwDIuBTdwzyNo_qE5SOK6EROh7y1ZuhIb9dyuGQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl5iqkdh2IyoCD2cfMfnvGpLoXuM-IvS2ggBhTjzj2udOwbrkqL8Slpw-4k0EpjU_Bbg/exec';
 
 // ── GET via server-side proxy ────────────────────────────────────
 // Passes all query params through /api/proxy so the browser
