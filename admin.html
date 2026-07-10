@@ -307,6 +307,10 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       Members
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('forgeops')" id="navForgeOps">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Forge Ops
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -354,6 +358,95 @@
         </div>
       </div>
     </div>
+
+  <!-- ── FORGE OPS TAB ── -->
+  <div class="tab-content" id="tabForgeOps">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:24px;font-weight:800;">Forge Operations</h2>
+        <p style="color:var(--text3);font-size:14px;margin-top:4px;">Manage access, missions, and operative progression.</p>
+      </div>
+      <div class="tab-filters">
+        <button class="btn-sm active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Ranks</button>
+        <button class="btn-sm" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
+        <button class="btn-sm" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions Queue</button>
+      </div>
+    </div>
+
+    <!-- Sub-tab: Access Management -->
+    <div id="fTabAccess" class="forge-subtab active">
+      <div class="admin-card">
+        <h3>Operative Access</h3>
+        <p style="margin-bottom:12px;">Only members explicitly granted "Forge Access" can log in to the Forge portal.</p>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Operative ID</th>
+                <th>Name</th>
+                <th>Forge Access</th>
+                <th>XP</th>
+                <th>Rank</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="forgeAccessBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-tab: Bounty Board -->
+    <div id="fTabBounties" class="forge-subtab" style="display:none;">
+      <button class="btn-add" style="margin-bottom:16px;" onclick="document.getElementById('taskFormCard').style.display='block'">+ Create New Bounty</button>
+      
+      <div class="admin-card" id="taskFormCard" style="display:none; background:var(--bg3); border:1px solid var(--border);">
+        <h3 style="margin-bottom:12px;">Create Bounty (Task)</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="tkTitle"></div>
+        <div class="form-group"><label>Description</label><textarea id="tkDesc"></textarea></div>
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+          <div class="form-group" style="flex:1;"><label>XP Reward</label><input type="number" id="tkXP" value="100"></div>
+          <div class="form-group" style="flex:1;"><label>Difficulty</label><select id="tkDiff"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+        </div>
+        <div class="form-group"><label>Assign To (Leave 'Open' for anyone to claim)</label><input type="text" id="tkAssign" value="Open" placeholder="e.g., INVX-09 or Open"></div>
+        <button class="btn-primary" onclick="adminCreateTask()">Deploy Task</button>
+        <button class="btn-sm" style="background:var(--bg2); color:var(--text);" onclick="document.getElementById('taskFormCard').style.display='none'">Cancel</button>
+      </div>
+
+      <div class="admin-card">
+        <h3>Active Bounties</h3>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Task ID</th>
+                <th>Title</th>
+                <th>XP</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="forgeTasksBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-tab: Submissions Queue -->
+    <div id="fTabReviews" class="forge-subtab" style="display:none;">
+      <div class="admin-card">
+        <h3>Pending Reviews</h3>
+        <p style="margin-bottom:12px;">Tasks submitted by operatives that require your approval.</p>
+        <div id="forgeReviewsContainer">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
 
     <!-- ── MEMBERS TAB ── -->
     <div class="tab-content" id="tabMembers">
@@ -583,6 +676,198 @@ function logout() {
 // ══════════════════════════════════════════════════════════════
 //  TAB SWITCHING
 // ══════════════════════════════════════════════════════════════
+// ── FORGE OPS LOGIC ──
+function switchForgeSubTab(subTab) {
+  document.querySelectorAll('.forge-subtab').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('#tabForgeOps .tab-filters button').forEach(btn => btn.classList.remove('active'));
+  
+  if (subTab === 'access') {
+    document.getElementById('fTabAccess').style.display = 'block';
+    document.getElementById('fNavAccess').classList.add('active');
+    renderForgeAccess();
+  } else if (subTab === 'bounties') {
+    document.getElementById('fTabBounties').style.display = 'block';
+    document.getElementById('fNavBounties').classList.add('active');
+    loadForgeTasks();
+  } else if (subTab === 'reviews') {
+    document.getElementById('fTabReviews').style.display = 'block';
+    document.getElementById('fNavReviews').classList.add('active');
+    loadForgeTasks();
+  }
+}
+
+function renderForgeAccess() {
+  const tbody = document.getElementById('forgeAccessBody');
+  tbody.innerHTML = '';
+  const approvedMembers = membersData.filter(m => m.status === 'Approved' || m.status === 'Confirmed');
+  
+  if (approvedMembers.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);">No approved members found.</td></tr>';
+    return;
+  }
+
+  approvedMembers.forEach(m => {
+    const isGranted = (m.forgeAccess === 'Granted');
+    const actionBtn = isGranted 
+      ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Revoked')">Revoke</button>`
+      : `<button class="btn-sm" style="background:var(--green); color:#111;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
+    
+    tbody.innerHTML += `
+      <tr>
+        <td><strong>${m.operativeId || 'N/A'}</strong></td>
+        <td>${m.name}</td>
+        <td><span class="status-badge ${isGranted ? 'status-approved' : 'status-rejected'}">${isGranted ? 'Granted' : 'Revoked/None'}</span></td>
+        <td>${m.xp || 0}</td>
+        <td>${m.rank || 'Apprentice'}</td>
+        <td>${actionBtn}</td>
+      </tr>
+    `;
+  });
+}
+
+async function toggleForgeAccess(rowIndex, newStatus) {
+  if (!confirm(`Are you sure you want to ${newStatus === 'Granted' ? 'Grant' : 'Revoke'} Forge access for this operative?`)) return;
+  try {
+    const res = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_grant_forge_access', rowIndex, accessStatus: newStatus })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message);
+      await fetchMembers(); // Refresh global members list
+      renderForgeAccess(); // Re-render table
+    } else {
+      alert(data.message);
+    }
+  } catch(e) { alert('Error updating access'); }
+}
+
+async function adminCreateTask() {
+  const title = document.getElementById('tkTitle').value.trim();
+  const desc = document.getElementById('tkDesc').value.trim();
+  const xp = document.getElementById('tkXP').value;
+  const difficulty = document.getElementById('tkDiff').value;
+  const assignedTo = document.getElementById('tkAssign').value.trim();
+
+  if (!title || !desc) return alert('Title and Description are required.');
+  
+  try {
+    const res = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message);
+      document.getElementById('taskFormCard').style.display = 'none';
+      loadForgeTasks();
+    } else {
+      alert(data.message);
+    }
+  } catch (e) { alert('Failed to create task'); }
+}
+
+let adminTasks = [];
+async function loadForgeTasks() {
+  try {
+    const res = await fetch('/api/proxy?action=admin_get_tasks&_t=' + Date.now(), { cache: 'no-store' });
+    const data = await res.json();
+    if (data.success) {
+      adminTasks = data.tasks || [];
+      renderForgeTasks();
+      renderForgeReviews();
+    }
+  } catch (e) { console.error('Failed to load tasks', e); }
+}
+
+function renderForgeTasks() {
+  const tbody = document.getElementById('forgeTasksBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  const activeTasks = adminTasks.filter(t => t.status !== 'Completed');
+  if (activeTasks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);">No active bounties.</td></tr>';
+    return;
+  }
+
+  activeTasks.forEach(t => {
+    let statColor = 'var(--text3)';
+    if (t.status === 'Under Review') statColor = 'var(--yellow)';
+    
+    tbody.innerHTML += `
+      <tr>
+        <td style="color:var(--text3); font-size:12px;">${t.taskId}</td>
+        <td><strong>${t.title}</strong></td>
+        <td>${t.xp} XP</td>
+        <td><span class="status-badge" style="background:var(--bg3);color:var(--text);">${t.assignedTo}</span></td>
+        <td style="color:${statColor}">${t.status}</td>
+      </tr>
+    `;
+  });
+}
+
+function renderForgeReviews() {
+  const container = document.getElementById('forgeReviewsContainer');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const reviews = adminTasks.filter(t => t.status === 'Under Review');
+  if (reviews.length === 0) {
+    container.innerHTML = '<p style="color:var(--text3);">No tasks pending review right now.</p>';
+    return;
+  }
+
+  reviews.forEach(t => {
+    container.innerHTML += `
+      <div style="background:var(--bg2); padding:16px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <h4 style="margin:0;">${t.title}</h4>
+          <span class="status-badge" style="background:rgba(255,184,0,0.1);color:var(--yellow);">Pending Review</span>
+        </div>
+        <p style="color:var(--text3); font-size:14px; margin-bottom:12px;">Assigned To: <strong>${t.assignedTo}</strong> | Reward: <strong>${t.xp} XP</strong></p>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; color:var(--text3);">Operative Submission Link:</label><br>
+          <a href="${t.submitLink}" target="_blank" style="color:var(--accent2); text-decoration:underline;">${t.submitLink || 'No link provided'}</a>
+        </div>
+        <div class="form-group">
+          <label>Admin Feedback (Optional)</label>
+          <input type="text" id="feedback_${t.taskId}" placeholder="e.g., Great job!">
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-sm" style="background:var(--green); color:#111;" onclick="adminReviewTask('${t.taskId}', 'Completed')">Approve & Grant XP</button>
+          <button class="btn-sm" style="background:var(--red); color:#fff;" onclick="adminReviewTask('${t.taskId}', 'In Progress')">Reject (Send Back)</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function adminReviewTask(taskId, status) {
+  const feedbackInput = document.getElementById('feedback_' + taskId);
+  const feedback = feedbackInput ? feedbackInput.value : '';
+  
+  if (!confirm(`Are you sure you want to mark this task as ${status}?`)) return;
+
+  try {
+    const res = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message);
+      loadForgeTasks();
+    } else {
+      alert(data.message);
+    }
+  } catch(e) { alert('Error reviewing task'); }
+}
+
 function switchAdminTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.sidebar-btn').forEach(el => el.classList.remove('active'));

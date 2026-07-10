@@ -265,7 +265,13 @@
 
         <div class="nav-menu">
           <div class="nav-item active" onclick="switchTab('dashboard')">
-            <span class="nav-item-icon">⚡</span> Profile
+            <span class="nav-item-icon">⎔</span> Overview
+          </div>
+          <div class="nav-item" onclick="switchTab('missions')">
+            <span class="nav-item-icon">🎯</span> Missions
+          </div>
+          <div class="nav-item" onclick="switchTab('leaderboard')">
+            <span class="nav-item-icon">🏆</span> Leaderboard
           </div>
           <div class="nav-item" onclick="switchTab('resources')">
             <span class="nav-item-icon">📚</span> Resources
@@ -288,12 +294,16 @@
             <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Operative Status</h3>
             <div style="display:flex; flex-wrap:wrap; gap:20px;">
               <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Clearance Level</div>
-                <div style="font-weight:600; color:var(--text-1);">Active Member</div>
+                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Operative Rank</div>
+                <div style="font-weight:600; color:var(--text-1);" id="prof-rank">Apprentice</div>
               </div>
               <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Batch</div>
-                <div style="font-weight:600; color:var(--text-1);">2025-26</div>
+                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Experience Points (XP)</div>
+                <div style="font-weight:600; color:var(--accent2);"><span id="prof-xp">0</span> XP</div>
+              </div>
+              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
+                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Squad</div>
+                <div style="font-weight:600; color:var(--text-1);" id="prof-squad">Unassigned</div>
               </div>
             </div>
             
@@ -301,6 +311,49 @@
               <h4 style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Need Assistance?</h4>
               <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.5;">Reach out to the Core Team on the official WhatsApp group for any queries or guidance.</p>
               <button class="btn-dark" style="background:#fff; color:#111;" onclick="window.open('https://chat.whatsapp.com/E160VovtX55L94mF6VzC5K', '_blank')">Open WhatsApp</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missions Tab -->
+        <div id="tab-missions" class="view-section">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+            <div>
+              <h2 class="section-title">Active Missions</h2>
+              <p class="section-desc" style="margin-bottom:0;">Claim open bounties or complete tasks assigned to you.</p>
+            </div>
+            <button class="btn-dark" onclick="loadMissions()">↻ Refresh</button>
+          </div>
+          <div id="missionsLoading" class="empty-state" style="display:none;">Loading missions...</div>
+          <div id="missionsContainer">
+            <!-- Missions injected here -->
+          </div>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div id="tab-leaderboard" class="view-section">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+            <div>
+              <h2 class="section-title">Global Leaderboard</h2>
+              <p class="section-desc" style="margin-bottom:0;">Top operatives ranked by XP.</p>
+            </div>
+            <button class="btn-dark" onclick="loadLeaderboard()">↻ Refresh</button>
+          </div>
+          <div id="leaderboardLoading" class="empty-state" style="display:none;">Loading rankings...</div>
+          <div class="glass-card">
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; text-align:left;">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Rank #</th>
+                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Operative</th>
+                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Class Rank</th>
+                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">XP</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -452,7 +505,14 @@
       try {
         const res = await gasGet('forge_login', { invxId: id, email });
         if (res.success && res.data) {
-          session = res.data;
+          session = {
+            operativeId: res.data.operativeId,
+            email: email,
+            name: res.data.name,
+            xp: res.data.xp,
+            rank: res.data.rank,
+            squad: res.data.squad
+          };
           localStorage.setItem('forge_session', JSON.stringify(session));
           toast('Link established.', 'success');
           bootDashboard();
@@ -480,6 +540,9 @@
       document.getElementById('prof-email').textContent = session.email;
       document.getElementById('prof-id').textContent = session.operativeId;
       document.getElementById('prof-initial').textContent = (session.name || '?')[0].toUpperCase();
+      document.getElementById('prof-xp').textContent = session.xp || '0';
+      document.getElementById('prof-rank').textContent = session.rank || 'Apprentice';
+      document.getElementById('prof-squad').textContent = session.squad || 'Unassigned';
 
       // Trigger animations
       setTimeout(() => {
@@ -504,6 +567,10 @@
 
       if (tabId === 'resources') {
         if (cachedResources.length === 0) loadResources();
+      } else if (tabId === 'missions') {
+        loadMissions();
+      } else if (tabId === 'leaderboard') {
+        loadLeaderboard();
       }
     }
 
@@ -540,6 +607,122 @@
       }
     }
 
+    // ══════════════════════════════════════════
+    //  MISSIONS
+    // ══════════════════════════════════════════
+    async function loadMissions() {
+      const container = document.getElementById('missionsContainer');
+      const loader = document.getElementById('missionsLoading');
+      container.innerHTML = '';
+      loader.style.display = 'block';
+
+      try {
+        const data = await gasGet('forge_get_my_tasks', { invxId: session.operativeId });
+        loader.style.display = 'none';
+        
+        if (!data.success || !data.tasks || data.tasks.length === 0) {
+          container.innerHTML = '<div class="empty-state">No active missions available.</div>';
+          return;
+        }
+
+        data.tasks.forEach(t => {
+          let actionHtml = '';
+          if (t.status === 'Open' || t.status === 'In Progress') {
+            actionHtml = `
+              <div style="margin-top:16px;">
+                <input type="text" id="submitLink_${t.taskId}" class="form-input" placeholder="Paste proof link (GitHub, Drive, etc.)" style="margin-bottom:8px;">
+                <button class="btn-dark" onclick="submitMission('${t.taskId}')">Submit for Review</button>
+              </div>
+            `;
+          } else {
+            actionHtml = `<div style="margin-top:16px; font-weight:600; color:var(--accent2);">${t.status}</div>`;
+            if (t.feedback) actionHtml += `<div style="margin-top:8px; font-size:13px; color:var(--text-3);">Admin Feedback: ${escHtml(t.feedback)}</div>`;
+          }
+
+          container.innerHTML += `
+            <div class="glass-card" style="margin-bottom:16px; border-left:4px solid var(--accent2);">
+              <div style="display:flex; justify-content:space-between;">
+                <h3 style="font-family:var(--font-d); font-size:18px;">${escHtml(t.title)}</h3>
+                <span class="prof-badge">${escHtml(t.difficulty)} | ${t.xp} XP</span>
+              </div>
+              <p style="color:var(--text-2); font-size:14px; margin-top:8px;">${escHtml(t.description)}</p>
+              ${actionHtml}
+            </div>
+          `;
+        });
+      } catch (e) {
+        loader.style.display = 'none';
+        container.innerHTML = '<div class="empty-state">Failed to load missions.</div>';
+      }
+    }
+
+    async function submitMission(taskId) {
+      const linkInput = document.getElementById('submitLink_' + taskId);
+      const submitLink = linkInput.value.trim();
+      if (!submitLink) return toast('Please provide a submission link', 'error');
+      
+      try {
+        const res = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast('Mission submitted for review!');
+          loadMissions();
+        } else {
+          toast(data.message, 'error');
+        }
+      } catch(e) { toast('Error submitting mission', 'error'); }
+    }
+
+    // ══════════════════════════════════════════
+    //  LEADERBOARD
+    // ══════════════════════════════════════════
+    async function loadLeaderboard() {
+      const tbody = document.getElementById('leaderboardBody');
+      const loader = document.getElementById('leaderboardLoading');
+      tbody.innerHTML = '';
+      loader.style.display = 'block';
+
+      try {
+        const data = await gasGet('forge_get_leaderboard');
+        loader.style.display = 'none';
+
+        if (!data.success || !data.leaderboard || data.leaderboard.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:16px;">No data available.</td></tr>';
+          return;
+        }
+
+        data.leaderboard.forEach((user, index) => {
+          let rankIcon = `#${index + 1}`;
+          if (index === 0) rankIcon = '🥇 1st';
+          if (index === 1) rankIcon = '🥈 2nd';
+          if (index === 2) rankIcon = '🥉 3rd';
+          
+          let rowStyle = '';
+          if (user.operativeId === session.operativeId) {
+            rowStyle = 'background:rgba(0,0,0,0.03); font-weight:600;';
+          }
+
+          tbody.innerHTML += `
+            <tr style="${rowStyle} border-bottom:1px solid var(--border);">
+              <td style="padding:16px;">${rankIcon}</td>
+              <td style="padding:16px;">
+                <div style="color:var(--text-1);">${escHtml(user.name)}</div>
+                <div style="font-size:11px; color:var(--text-3); font-family:var(--font-m);">${user.operativeId}</div>
+              </td>
+              <td style="padding:16px;"><span class="prof-badge">${user.rank}</span></td>
+              <td style="padding:16px; color:var(--accent2); font-weight:600;">${user.xp} XP</td>
+            </tr>
+          `;
+        });
+      } catch(e) {
+        loader.style.display = 'none';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:16px;">Failed to load leaderboard.</td></tr>';
+      }
+    }
   </script>
 </body>
 </html>
