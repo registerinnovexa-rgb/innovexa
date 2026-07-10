@@ -539,7 +539,7 @@ function doPost(e) {
     }
 
     // ORIGINAL: Registration logic
-    if (!action) {
+    if (!action && !op) {
       // Duplicate email / UTR check
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
