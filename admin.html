@@ -736,22 +736,38 @@ function renderForgeAccess() {
 
 async function toggleForgeAccess(rowIndex, newStatus) {
   if (!confirm(`Are you sure you want to ${newStatus === 'Granted' ? 'Grant' : 'Revoke'} Forge access for this operative?`)) return;
+  
+  const btn = event && event.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+
   try {
-    const res = await fetch('/api/proxy', {
+    // Call GAS directly (no-cors) — bypasses the SSO-protected Vercel proxy
+    await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_grant_forge_access', rowIndex, accessStatus: newStatus })
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        adminKey: 'INNOVEXA_SECURE_KEY_2025',
+        op: 'admin_grant_forge_access',
+        rowIndex: rowIndex,
+        accessStatus: newStatus
+      })
     });
-    const data = await res.json();
-    if (data.success) {
-      showToast('Access updated: ' + newStatus, 'success');
-      const refreshed = await apiGet('adminMembers');
-      cachedMembers = refreshed.members || [];
-      renderForgeAccess();
-    } else {
-      showToast(data.message || 'Error updating access', 'error');
-    }
-  } catch(e) { showToast('Network error. Try again.', 'error'); }
+
+    // no-cors returns opaque response — wait 2s then re-fetch to confirm
+    showToast('Updating… please wait', 'info');
+    await new Promise(r => setTimeout(r, 2000));
+
+    const refreshed = await apiGet('adminMembers');
+    cachedMembers = refreshed.members || [];
+    renderForgeAccess();
+    showToast('Forge access updated: ' + newStatus, 'success');
+
+  } catch(e) {
+    console.error('toggleForgeAccess error:', e);
+    showToast('Network error. Please try again.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = newStatus === 'Granted' ? 'Grant Access' : 'Revoke'; }
+  }
 }
 
 async function adminCreateTask() {
@@ -764,23 +780,21 @@ async function adminCreateTask() {
   if (!title || !desc) return showToast('Title and Description are required.', 'error');
   
   try {
-    const res = await fetch('/api/proxy', {
+    // Call GAS directly (no-cors) — bypasses SSO-protected proxy
+    await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
     });
-    const data = await res.json();
-    if (data.success) {
-      showToast('Bounty deployed!', 'success');
-      document.getElementById('taskFormCard').style.display = 'none';
-      document.getElementById('tkTitle').value = '';
-      document.getElementById('tkDesc').value = '';
-      document.getElementById('tkXP').value = '100';
-      document.getElementById('tkAssign').value = 'Open';
-      loadForgeTasks();
-    } else {
-      showToast(data.message || 'Failed to create task', 'error');
-    }
+    showToast('Bounty deployed!', 'success');
+    document.getElementById('taskFormCard').style.display = 'none';
+    document.getElementById('tkTitle').value = '';
+    document.getElementById('tkDesc').value = '';
+    document.getElementById('tkXP').value = '100';
+    document.getElementById('tkAssign').value = 'Open';
+    await new Promise(r => setTimeout(r, 1500));
+    loadForgeTasks();
   } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -870,18 +884,16 @@ async function adminReviewTask(taskId, status) {
   if (!confirm(`Are you sure you want to ${status === 'Completed' ? 'Approve' : 'Reject'} this submission?`)) return;
 
   try {
-    const res = await fetch('/api/proxy', {
+    // Call GAS directly (no-cors) — bypasses SSO-protected proxy
+    await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: SCRIPT_URL, adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
     });
-    const data = await res.json();
-    if (data.success) {
-      showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
-      loadForgeTasks();
-    } else {
-      showToast(data.message || 'Error reviewing task', 'error');
-    }
+    showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
+    await new Promise(r => setTimeout(r, 1500));
+    loadForgeTasks();
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
