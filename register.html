@@ -421,6 +421,16 @@
         <input class="form-control" id="utr" type="text" placeholder="Enter 12-digit UTR number" />
       </div>
 
+      <div class="form-group">
+        <label class="form-label">Payment Proof Screenshot</label>
+        <div class="file-drop" id="payment-drop">
+          <input type="file" id="payment-proof" accept="image/*" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;margin:0 auto 12px;opacity:0.5;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          <div id="payment-text">Drag & drop or click to upload screenshot</div>
+          <div class="form-hint">Format: JPG, PNG. Max size: 2MB.</div>
+        </div>
+      </div>
+
       <!-- CAPTCHA -->
       <div class="captcha-box" style="margin-top:30px; padding:20px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
         <label style="display:block; font-family:var(--font-d); font-size:14px; font-weight:500; margin-bottom:12px;">CAPTCHA Verification <span style="color:red;">*</span></label>
@@ -541,6 +551,7 @@
   let paymentData = null;
   
   function handleFile(input, dropArea, textEl, callback) {
+    if(!input || !dropArea) return;
     dropArea.addEventListener('click', () => input.click());
     dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('drag-over'); });
     dropArea.addEventListener('dragleave', () => dropArea.classList.remove('drag-over'));
@@ -554,15 +565,36 @@
     input.addEventListener('change', () => { if (input.files.length) processFile(input.files[0]); });
 
     function processFile(file) {
-      if (file.size > 2 * 1024 * 1024) { alert('File too large (max 2MB)'); return; }
-      textEl.textContent = file.name;
+      if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
+      textEl.textContent = 'Compressing...';
+      
       const reader = new FileReader();
-      reader.onload = e => callback(e.target.result);
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 400; // Aggressive compression to fit Google Sheets cell limit
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Compress to extremely low quality JPEG to stay under 50k chars
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
+          textEl.textContent = file.name + ' (Ready)';
+          callback(compressedBase64);
+        };
+        img.src = e.target.result;
+      };
       reader.readAsDataURL(file);
     }
   }
 
   handleFile(document.getElementById('photo'), document.getElementById('photo-drop'), document.getElementById('photo-text'), res => photoData = res);
+  // FIX: Missing payment file handler!
+  handleFile(document.getElementById('payment-proof'), document.getElementById('payment-drop'), document.getElementById('payment-text'), res => paymentData = res);
   
   // Copy to clipboard helper
   function copyToClipboard(text, btn) {
