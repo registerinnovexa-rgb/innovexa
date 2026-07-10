@@ -226,8 +226,23 @@
         <a href="pathfinder.html" class="nav-link">Pathfinder</a>
         <a href="atlas.html" class="nav-link">Atlas</a>
       </div>
+      <button class="hamburger" id="hamburger-btn">
+        <span style="width:24px; height:2px; background:var(--text-1);"></span>
+        <span style="width:24px; height:2px; background:var(--text-1);"></span>
+        <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      </button>
     </div>
   </nav>
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg, #111); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer; color:#fff;">✕</button>
+  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Home</a>
+  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Register</a>
+  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Status</a>
+  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Atlas</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#a78bfa;" onclick="closeMobileMenu()">⚡ Forge</a>
+</div>
+
 
   <!-- LOGIN VIEW -->
   <div id="login-view">
@@ -736,5 +751,20 @@
       }
     }
   </script>
+<script>
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', () => {
+      mobileMenu.style.transform = 'translateY(0)';
+    });
+  }
+  function closeMobileMenu() {
+    if (mobileMenu) mobileMenu.style.transform = 'translateY(-100%)';
+  }
+  const closeBtn = document.getElementById('mobile-close-btn');
+  if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
+</script>
 </body>
 </html>
