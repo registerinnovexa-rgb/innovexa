@@ -407,31 +407,24 @@
     // ══════════════════════════════════════════
     //  API HELPERS
     // ══════════════════════════════════════════
-    // Fetch from Forge Code.gs (for login)
+    // Fetch from GAS directly — bypasses SSO-blocked Vercel proxy
     async function gasGet(action, extraParams = {}) {
-      const gasUrl = `${MAIN_SCRIPT_URL}?action=${action}&_t=${Date.now()}`;
-      const params = new URLSearchParams({ ...extraParams, _gasUrl: gasUrl });
+      const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
+      const gasUrl = MAIN_SCRIPT_URL + '?' + params.toString();
       try {
-        const r = await fetch('/api/proxy?' + params.toString(), { cache: 'no-store' });
-        if (!r.ok) throw new Error('Proxy ' + r.status);
-        return await r.json();
+        const r = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+        const text = await r.text();
+        try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
       } catch (e) {
         throw e;
       }
     }
 
-    // Fetch from Main Admin Code.gs (for resources)
+    // Fetch from Main Admin Code.gs — direct GAS call (no proxy)
     async function apiGetMain(action) {
-      const gasUrl = `${MAIN_SCRIPT_URL}?action=${action}&_t=${Date.now()}`;
-      try {
-        const proxyUrl = `/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`;
-        const r = await fetch(proxyUrl, { cache: 'no-store' });
-        if (!r.ok) throw new Error('Proxy error');
-        return await r.json();
-      } catch(e) {
-        const r = await fetch(gasUrl, { method:'GET', redirect:'follow', cache:'no-store' });
-        return await r.json();
-      }
+      const gasUrl = MAIN_SCRIPT_URL + '?action=' + action + '&_t=' + Date.now();
+      const r = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+      return await r.json();
     }
 
     // ══════════════════════════════════════════
