@@ -426,12 +426,34 @@
                 <th>XP</th>
                 <th>Assigned To</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="forgeTasksBody">
               <!-- Rendered via JS -->
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Bounty Modal -->
+    <div id="editBountyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:28px; width:100%; max-width:480px; margin:16px;">
+        <h3 style="margin-bottom:16px;">✏️ Edit Bounty</h3>
+        <input type="hidden" id="editTaskId">
+        <div class="form-group"><label>Title</label><input type="text" id="editTkTitle"></div>
+        <div class="form-group"><label>Description</label><textarea id="editTkDesc" rows="3"></textarea></div>
+        <div style="display:flex; gap:12px; margin-bottom:12px;">
+          <div class="form-group" style="flex:1;"><label>XP Reward</label><input type="number" id="editTkXP"></div>
+          <div class="form-group" style="flex:1;"><label>Difficulty</label>
+            <select id="editTkDiff"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Assign To</label><input type="text" id="editTkAssign"></div>
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button class="btn-primary" onclick="adminSaveEdit()">Save Changes</button>
+          <button class="btn-sm" style="background:var(--bg3); color:var(--text);" onclick="closeEditModal()">Cancel</button>
         </div>
       </div>
     </div>
@@ -828,14 +850,25 @@ function renderForgeTasks() {
   activeTasks.forEach(t => {
     let statColor = 'var(--text3)';
     if (t.status === 'Under Review') statColor = 'var(--yellow)';
+    if (t.status === 'Open') statColor = 'var(--green)';
     
     tbody.innerHTML += `
       <tr>
         <td style="color:var(--text3); font-size:12px;">${t.taskId}</td>
-        <td><strong>${t.title}</strong></td>
-        <td>${t.xp} XP</td>
+        <td><strong>${t.title}</strong><br><span style="color:var(--text3);font-size:12px;">${(t.description||'').substring(0,60)}${t.description && t.description.length > 60 ? '…' : ''}</span></td>
+        <td><span style="color:var(--accent2); font-weight:600;">${t.xp} XP</span></td>
         <td><span class="status-badge" style="background:var(--bg3);color:var(--text);">${t.assignedTo}</span></td>
-        <td style="color:${statColor}">${t.status}</td>
+        <td style="color:${statColor}; font-weight:600;">${t.status}</td>
+        <td>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-sm" style="background:var(--bg3); color:var(--text); border:1px solid var(--border);" 
+              onclick="openEditModal('${t.taskId}', '${(t.title||'').replace(/'/g,"\\'")}',' ${(t.description||'').replace(/'/g,"\\'").replace(/\n/g,' ')}', '${t.xp}', '${t.difficulty}', '${t.assignedTo}')">
+              ✏️ Edit
+            </button>
+            <button class="btn-sm" style="background:rgba(255,59,59,0.15); color:var(--red); border:1px solid var(--red);" 
+              onclick="adminDeleteTask('${t.taskId}', '${(t.title||'').replace(/'/g,"\\'")}')">🗑️ Delete</button>
+          </div>
+        </td>
       </tr>
     `;
   });
@@ -892,6 +925,62 @@ async function adminReviewTask(taskId, status) {
       body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
     });
     showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
+    await new Promise(r => setTimeout(r, 1500));
+    loadForgeTasks();
+  } catch(e) { showToast('Network error. Try again.', 'error'); }
+}
+
+
+// ── Bounty Edit Modal ────────────────────────────────────────────
+function openEditModal(taskId, title, description, xp, difficulty, assignedTo) {
+  document.getElementById('editTaskId').value   = taskId;
+  document.getElementById('editTkTitle').value  = title.trim();
+  document.getElementById('editTkDesc').value   = description.trim();
+  document.getElementById('editTkXP').value     = xp;
+  document.getElementById('editTkAssign').value = assignedTo;
+  const diffSel = document.getElementById('editTkDiff');
+  for (let o of diffSel.options) o.selected = (o.value === difficulty);
+  const modal = document.getElementById('editBountyModal');
+  modal.style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('editBountyModal').style.display = 'none';
+}
+
+async function adminSaveEdit() {
+  const taskId      = document.getElementById('editTaskId').value;
+  const title       = document.getElementById('editTkTitle').value.trim();
+  const description = document.getElementById('editTkDesc').value.trim();
+  const xp          = document.getElementById('editTkXP').value;
+  const difficulty  = document.getElementById('editTkDiff').value;
+  const assignedTo  = document.getElementById('editTkAssign').value.trim();
+  if (!title) return showToast('Title is required.', 'error');
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_edit_task', taskId, title, description, xp, difficulty, assignedTo })
+    });
+    closeEditModal();
+    showToast('Bounty updated!', 'success');
+    await new Promise(r => setTimeout(r, 1500));
+    loadForgeTasks();
+  } catch(e) { showToast('Network error. Try again.', 'error'); }
+}
+
+async function adminDeleteTask(taskId, title) {
+  if (!confirm('Delete bounty "' + title + '"? This cannot be undone.')) return;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_delete_task', taskId })
+    });
+    showToast('Bounty deleted.', 'success');
     await new Promise(r => setTimeout(r, 1500));
     loadForgeTasks();
   } catch(e) { showToast('Network error. Try again.', 'error'); }

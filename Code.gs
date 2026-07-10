@@ -505,6 +505,36 @@ function doPost(e) {
       return respond({ success: true, message: 'Task created.' });
     }
 
+    // ADMIN: Edit Task
+    if (op === 'admin_edit_task') {
+      var eSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+      var eRows = eSheet.getDataRange().getValues();
+      for (var ei = 1; ei < eRows.length; ei++) {
+        if (eRows[ei][0] === payload.taskId) {
+          if (payload.title)       eSheet.getRange(ei + 1, 3).setValue(payload.title);
+          if (payload.description) eSheet.getRange(ei + 1, 4).setValue(payload.description);
+          if (payload.xp)          eSheet.getRange(ei + 1, 5).setValue(payload.xp);
+          if (payload.difficulty)  eSheet.getRange(ei + 1, 6).setValue(payload.difficulty);
+          if (payload.assignedTo)  eSheet.getRange(ei + 1, 8).setValue(payload.assignedTo);
+          return respond({ success: true, message: 'Task updated.' });
+        }
+      }
+      return respond({ success: false, message: 'Task not found for edit.' });
+    }
+
+    // ADMIN: Delete Task
+    if (op === 'admin_delete_task') {
+      var dSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+      var dRows = dSheet.getDataRange().getValues();
+      for (var di = 1; di < dRows.length; di++) {
+        if (dRows[di][0] === payload.taskId) {
+          dSheet.deleteRow(di + 1);
+          return respond({ success: true, message: 'Task deleted.' });
+        }
+      }
+      return respond({ success: false, message: 'Task not found for delete.' });
+    }
+
     // ADMIN: Review Task
     if (op === 'admin_review_task') {
       var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
