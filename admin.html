@@ -932,14 +932,16 @@ async function adminReviewTask(taskId, status) {
 
 
 // ── Bounty Edit Modal ────────────────────────────────────────────
-function openEditModal(taskId, title, description, xp, difficulty, assignedTo) {
-  document.getElementById('editTaskId').value   = taskId;
-  document.getElementById('editTkTitle').value  = title.trim();
-  document.getElementById('editTkDesc').value   = description.trim();
-  document.getElementById('editTkXP').value     = xp;
-  document.getElementById('editTkAssign').value = assignedTo;
+function openEditModal(taskId) {
+  const t = adminTasks.find(x => x.taskId === taskId);
+  if (!t) return;
+  document.getElementById('editTaskId').value   = t.taskId;
+  document.getElementById('editTkTitle').value  = (t.title||'').trim();
+  document.getElementById('editTkDesc').value   = (t.description||'').trim();
+  document.getElementById('editTkXP').value     = t.xp;
+  document.getElementById('editTkAssign').value = t.assignedTo;
   const diffSel = document.getElementById('editTkDiff');
-  for (let o of diffSel.options) o.selected = (o.value === difficulty);
+  for (let o of diffSel.options) o.selected = (o.value === t.difficulty);
   const modal = document.getElementById('editBountyModal');
   modal.style.display = 'flex';
 }
@@ -971,8 +973,9 @@ async function adminSaveEdit() {
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
-async function adminDeleteTask(taskId, title) {
-  if (!confirm('Delete bounty "' + title + '"? This cannot be undone.')) return;
+async function adminDeleteTask(taskId) {
+  const t = adminTasks.find(x => x.taskId === taskId);
+  if (!confirm('Delete bounty "' + (t ? t.title : taskId) + '"? This cannot be undone.')) return;
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
