@@ -454,11 +454,12 @@
         <button class="btn-sm active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Ranks</button>
         <button class="btn-sm" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
         <button class="btn-sm" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions Queue</button>
+        <button class="btn-sm" id="fNavResources" onclick="switchForgeSubTab('resources')">Resources</button>
       </div>
     </div>
 
     <!-- Sub-tab: Access Management -->
-    <div id="fTabAccess" class="forge-subtab active">
+    <div id="fTabAccess" class="forge-subtab" style="display:block;">
       <div class="admin-card">
         <h3>Operative Access</h3>
         <p style="margin-bottom:12px;">Only members explicitly granted "Forge Access" can log in to the Forge portal.</p>
@@ -569,10 +570,10 @@
     <!-- Sub-tab: Submissions Queue -->
     <div id="fTabReviews" class="forge-subtab" style="display:none;">
       <div class="admin-card">
-        <h3>Pending Reviews</h3>
+        <h3>Submissions Queue</h3>
         <p style="margin-bottom:12px;">Tasks submitted by operatives that require your approval.</p>
         <div id="forgeReviewsContainer">
-          <!-- Rendered via JS -->
+          <p style="color:var(--text3);padding:20px 0;">Click this tab to load submissions...</p>
         </div>
       </div>
     </div>
