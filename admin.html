@@ -1262,6 +1262,24 @@ function renderPaginatedMembers() {
   }
 }
 
+function populateOperativeDatalist() {
+  const datalist = document.getElementById('operativeList');
+  if (!datalist) return;
+  datalist.innerHTML = '<option value="Open">Open (Anyone)</option>';
+  
+  if (cachedMembers && cachedMembers.length > 0) {
+    const approved = cachedMembers.filter(m => m.status === 'Approved' || m.status === 'Confirmed');
+    approved.forEach(m => {
+      if (m.operativeId) {
+        const option = document.createElement('option');
+        option.value = m.operativeId;
+        option.textContent = `${m.name} (${m.operativeId})`;
+        datalist.appendChild(option);
+      }
+    });
+  }
+}
+
 function renderMembers(members) {
   document.getElementById('membersLoading').style.display = 'none';
   document.getElementById('membersTable').style.display = 'block';
