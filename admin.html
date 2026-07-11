@@ -900,20 +900,15 @@ async function adminCreateTask() {
   if (!title || !desc) return showToast('Title and Description are required.', 'error');
   
   try {
-    // Call GAS directly (no-cors) — bypasses SSO-protected proxy
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_create_task', title, description: desc, xp, difficulty, assignedTo })
-    });
+    showToast('Deploying bounty...', 'info');
+    await apiWrite('admin_create_task', { title, description: desc, xp, difficulty, assignedTo });
     showToast('Bounty deployed!', 'success');
     document.getElementById('taskFormCard').style.display = 'none';
     document.getElementById('tkTitle').value = '';
     document.getElementById('tkDesc').value = '';
     document.getElementById('tkXP').value = '100';
     document.getElementById('tkAssign').value = 'Open';
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 500));
     loadForgeTasks();
   } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -1017,15 +1012,10 @@ async function adminReviewTask(taskId, status) {
   if (!confirm(`Are you sure you want to ${status === 'Completed' ? 'Approve' : 'Reject'} this submission?`)) return;
 
   try {
-    // Call GAS directly (no-cors) — bypasses SSO-protected proxy
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_review_task', taskId, status, feedback })
-    });
+    showToast('Updating...', 'info');
+    await apiWrite('admin_review_task', { taskId, status, feedback });
     showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 500));
     loadForgeTasks();
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }

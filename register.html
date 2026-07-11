@@ -743,11 +743,10 @@
     };
 
     try {
-      await fetch(SCRIPT_URL, {
+      await fetch('/api/proxy', {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUrl: SCRIPT_URL, payload: payload })
       });
       
       // Fetch current member count to assign next sequential ID

@@ -688,11 +688,10 @@
       if (!submitLink) return toast('Please provide a submission link', 'error');
       
       try {
-        await fetch(MAIN_SCRIPT_URL, {
+        await fetch('/api/proxy', {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })
         });
         
         toast('Mission submitted for review!');
