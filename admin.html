@@ -710,11 +710,11 @@ function driveImgUrl(url) {
 async function apiGet(action) {
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  const gasUrl = `${baseUrl}?action=${action}&_t=${Date.now()}`;
+  const gasUrl = encodeURIComponent(`${baseUrl}?action=${action}&_t=${Date.now()}`);
   
-  const r = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+  const r = await fetch(`/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
   const text = await r.text();
-  try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
+  try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
 }
 
 async function apiWrite(op, payload) {
@@ -971,38 +971,39 @@ function renderForgeTasks() {
 function renderForgeReviews() {
   const container = document.getElementById('forgeReviewsContainer');
   if (!container) return;
-  container.innerHTML = '';
 
   const reviews = adminTasks.filter(t => t.status === 'Under Review');
   if (reviews.length === 0) {
-    container.innerHTML = '<p style="color:var(--text3);">No tasks pending review right now.</p>';
+    container.innerHTML = '<p style="color:var(--text3);padding:20px 0;">No tasks pending review right now.</p>';
     return;
   }
 
-  let reviewsHtml = '';
+  let html = '';
   reviews.forEach(t => {
-    reviewsHtml += `
-      <div style="background:var(--bg2); padding:16px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border);">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <h4 style="margin:0;">${t.title}</h4>
-          <span class="status-badge" style="background:rgba(255,184,0,0.1);color:var(--yellow);">Pending Review</span>
+    html += `
+      <div style="background:var(--bg2);padding:16px;border-radius:8px;margin-bottom:12px;border:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <h4 style="margin:0;">${escHtml(t.title)}</h4>
+          <span style="background:rgba(255,184,0,0.15);color:#d97706;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">⏳ Pending Review</span>
         </div>
-        <p style="color:var(--text3); font-size:14px; margin-bottom:12px;">Assigned To: <strong>${t.assignedTo}</strong> | Reward: <strong>${t.xp} XP</strong></p>
-        <div style="margin-bottom:12px;">
-          <label style="font-size:12px; color:var(--text3);">Operative Submission Link:</label><br>
-          <a href="${t.submitLink}" target="_blank" style="color:var(--accent2); text-decoration:underline;">${t.submitLink || 'No link provided'}</a>
+        <p style="color:var(--text3);font-size:13px;margin-bottom:10px;">
+          Assigned: <strong>${escHtml(t.assignedTo)}</strong> &nbsp;|&nbsp; XP: <strong>${t.xp}</strong>
+        </p>
+        <div style="background:var(--bg3);padding:10px;border-radius:6px;margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Submission Link:</div>
+          <a href="${escHtml(t.submitLink || '#')}" target="_blank" style="color:var(--blue);text-decoration:underline;font-size:13px;word-break:break-all;">${escHtml(t.submitLink) || 'No link submitted'}</a>
         </div>
-        <div class="form-group">
-          <label>Admin Feedback (Optional)</label>
-          <input type="text" id="feedback_${t.taskId}" placeholder="e.g., Great job!">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="font-size:12px;">Admin Feedback (optional)</label>
+          <input type="text" id="feedback_${t.taskId}" placeholder="e.g., Great work!">
         </div>
-        <div style="display:flex; gap:10px;">
-          <button class="btn-sm" style="background:var(--green); color:#111;" onclick="adminReviewTask('${t.taskId}', 'Completed')">Approve & Grant XP</button>
-          <button class="btn-sm" style="background:var(--red); color:#fff;" onclick="adminReviewTask('${t.taskId}', 'In Progress')">Reject (Send Back)</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm" style="background:var(--green);color:#111;flex:1;" onclick="adminReviewTask('${t.taskId}','Completed')">✅ Approve & Grant XP</button>
+          <button class="btn-sm" style="background:var(--red);color:#fff;flex:1;" onclick="adminReviewTask('${t.taskId}','In Progress')">❌ Reject</button>
         </div>
-      </div>
-    `;
+      </div>`;
   });
+  container.innerHTML = html;
 }
 
 async function adminReviewTask(taskId, status) {
