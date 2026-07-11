@@ -713,7 +713,7 @@ async function apiGet(action) {
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
   const gasUrl = encodeURIComponent(`${baseUrl}?action=${action}&_t=${Date.now()}`);
   
-  const r = await fetch(`/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
+  const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
   const text = await r.text();
   try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
 }
@@ -726,7 +726,7 @@ async function apiWrite(op, payload) {
   const targetScript = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
   
   try {
-    const res = await fetch('/api/proxy', {
+    const res = await fetch('https://innovexareg.vercel.app/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUrl: targetScript, payload: payload })

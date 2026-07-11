@@ -688,7 +688,7 @@
       if (!submitLink) return toast('Please provide a submission link', 'error');
       
       try {
-        await fetch('/api/proxy', {
+        await fetch('https://innovexareg.vercel.app/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })
