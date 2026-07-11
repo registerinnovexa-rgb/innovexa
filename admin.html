@@ -832,6 +832,10 @@ async function switchForgeSubTab(subTab) {
     document.getElementById('fTabReviews').style.display = 'block';
     document.getElementById('fNavReviews').classList.add('active');
     loadForgeTasks();
+  } else if (subTab === 'resources') {
+    document.getElementById('fTabResources').style.display = 'block';
+    document.getElementById('fNavResources').classList.add('active');
+    loadForgeResources();
   }
 }
 
@@ -864,6 +868,7 @@ function renderForgeAccess() {
       </tr>
     `;
   });
+  tbody.innerHTML = html;
 }
 
 async function toggleForgeAccess(rowIndex, newStatus) {
@@ -916,12 +921,10 @@ async function adminCreateTask() {
 let adminTasks = [];
 async function loadForgeTasks() {
   try {
-    const gasUrl = `${SCRIPT_URL}?action=admin_get_tasks&_t=${Date.now()}`;
-    const res = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await apiGet('admin_get_tasks');
     if (data.success) {
       adminTasks = data.tasks || [];
+      cachedTasks = adminTasks;
       renderForgeTasks();
       renderForgeReviews();
     } else {
@@ -1050,15 +1053,10 @@ async function adminSaveEdit() {
   if (!title) return showToast('Title is required.', 'error');
 
   try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_edit_task', taskId, title, description, xp, difficulty, assignedTo })
-    });
+    await apiWrite('admin_edit_task', { taskId, title, description, xp, difficulty, assignedTo });
     closeEditModal();
     showToast('Bounty updated!', 'success');
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 500));
     loadForgeTasks();
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -1067,14 +1065,9 @@ async function adminDeleteTask(taskId) {
   const t = adminTasks.find(x => x.taskId === taskId);
   if (!confirm('Delete bounty "' + (t ? t.title : taskId) + '"? This cannot be undone.')) return;
   try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ adminKey: 'INNOVEXA_SECURE_KEY_2025', op: 'admin_delete_task', taskId })
-    });
+    await apiWrite('admin_delete_task', { taskId });
     showToast('Bounty deleted.', 'success');
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 500));
     loadForgeTasks();
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -2524,8 +2517,7 @@ async function fetchDocRequests() {
   const wrap = document.getElementById('doc-requests-list');
   wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">Loading...</div>';
   try {
-    const res = await fetch(SCRIPT_URL + '?action=docrequests', { method: 'GET', redirect: 'follow' });
-    const data = await res.json();
+    const data = await apiGet('docrequests');
     if (!data.success || !data.requests || data.requests.length === 0) {
       wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">No requests found.</div>';
       return;
@@ -2561,11 +2553,7 @@ async function fetchDocRequests() {
 
 async function approveDocReq(reqId, status) {
   try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST', redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'docApprove', requestId: reqId, status: status })
-    });
+    await apiWrite('docApprove', { requestId: reqId, status: status });
     showToast(reqId + ' → ' + status, status === 'Approved' ? 'success' : 'error');
     setTimeout(() => fetchDocRequests(), 1500);
   } catch (e) {
@@ -2666,8 +2654,7 @@ async function loadCertRequests() {
   const body = document.getElementById('certReqsBody');
   loading.style.display = 'flex'; table.style.display = 'none'; empty.style.display = 'none';
   try {
-    const res = await fetch(SCRIPT_URL + '?action=certreqs', { method: 'GET', redirect: 'follow' });
-    const data = await res.json();
+    const data = await apiGet('certreqs');
     loading.style.display = 'none';
     const reqs = data.requests || [];
     if (reqs.length === 0) { empty.style.display = 'block'; return; }
@@ -2696,10 +2683,7 @@ async function loadCertRequests() {
 async function certReqAction(rowIndex, status) {
   if (!confirm(status === 'Approved' ? 'Approve this certificate request?' : 'Reject this certificate request?')) return;
   try {
-    const res = await fetch(SCRIPT_URL, { method: 'POST', redirect: 'follow', headers: {'Content-Type': 'text/plain'},
-      body: JSON.stringify({ action: 'certApprove', rowIndex: rowIndex, status: status })
-    });
-    const data = await res.json();
+    const data = await apiWrite('certApprove', { rowIndex: rowIndex, status: status });
     showToast(data.message, data.success ? 'success' : 'error');
     loadCertRequests();
   } catch(e) { showToast('Error updating request', 'error'); }
