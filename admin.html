@@ -540,7 +540,7 @@
 // ══════════════════════════════════════════════════════════════
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI_So03xHLAyvrcjbGao6J9wfIt43aHO4wpHF_dXz96ccML2vbAquhVfGm2s-lFnhYcw/exec';
 const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
-const ADMIN_KEY = 'innovexa2025admin';
+const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 
 let adminSession = null;
 let cachedMembers = [];
@@ -614,12 +614,20 @@ async function apiWrite(op, payload) {
   payload.adminKey = ADMIN_KEY;
   payload.adminId = adminSession ? adminSession.id : '';
   const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus','markAttendance'].includes(op);
-  const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  // POST as plain text (no-cors) — avoids Vercel SSO proxy and URL length limits
-  await fetch(baseUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+  const targetScript = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
+  
+  try {
+    const res = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetUrl: targetScript, payload: payload })
+    });
+    return await res.json();
+  } catch (e) {
+    console.error('API Write Error:', e);
+    throw e;
+  }
+},
     body: JSON.stringify(payload)
   });
   // no-cors returns opaque response; wait briefly then optimistically return success
@@ -757,6 +765,22 @@ async function toggleForgeAccess(rowIndex, newStatus) {
   
   const btn = event && event.target;
   if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+
+  try {
+    showToast('Updating… please wait', 'info');
+    await apiWrite('admin_grant_forge_access', { rowIndex: rowIndex, accessStatus: newStatus });
+    
+    const refreshed = await apiGet('adminMembers');
+    cachedMembers = refreshed.members || [];
+    renderForgeAccess();
+    showToast('Forge access updated: ' + newStatus, 'success');
+
+  } catch(e) {
+    console.error('toggleForgeAccess error:', e);
+    showToast('Network error. Please try again.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = newStatus === 'Granted' ? 'Grant Access' : 'Revoke'; }
+  }
+}
 
   try {
     // Call GAS directly (no-cors) — bypasses the SSO-protected Vercel proxy
