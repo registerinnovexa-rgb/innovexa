@@ -732,13 +732,14 @@ function renderForgeAccess() {
     return;
   }
 
+  let html = "";
   approvedMembers.forEach(m => {
     const isGranted = (String(m.forgeAccess || '').trim() === 'Granted');
     const actionBtn = isGranted 
       ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Revoked')">Revoke</button>`
       : `<button class="btn-sm" style="background:var(--green); color:#111;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
     
-    tbody.innerHTML += `
+    html += `
       <tr>
         <td><strong>${m.operativeId || 'N/A'}</strong></td>
         <td>${m.name}</td>
@@ -848,7 +849,7 @@ function renderForgeTasks() {
     if (t.status === 'Under Review') statColor = 'var(--yellow)';
     if (t.status === 'Open') statColor = 'var(--green)';
     
-    tbody.innerHTML += `
+    html += `
       <tr>
         <td style="color:var(--text3); font-size:12px;">${t.taskId}</td>
         <td><strong>${t.title}</strong><br><span style="color:var(--text3);font-size:12px;">${(t.description||'').substring(0,60)}${t.description && t.description.length > 60 ? '…' : ''}</span></td>
@@ -882,7 +883,7 @@ function renderForgeReviews() {
   }
 
   reviews.forEach(t => {
-    container.innerHTML += `
+    reviewsHtml += `
       <div style="background:var(--bg2); padding:16px; border-radius:8px; margin-bottom:12px; border:1px solid var(--border);">
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
           <h4 style="margin:0;">${t.title}</h4>
@@ -2025,7 +2026,7 @@ function renderAssets() {
     const statusBadge = isBorrowed
       ? `<span style="color:var(--yellow);font-weight:600;">⚠ Borrowed</span>`
       : `<span style="color:var(--green);font-weight:600;">✓ Available</span>`;
-    tbody.innerHTML += `<tr>
+    html += `<tr>
       <td style="font-family:monospace;font-weight:700;">AST-${String(i+1).padStart(2,'0')}</td>
       <td>${a.name}</td><td>${a.type}</td><td style="font-family:monospace;">${a.serial}</td>
       <td>${statusBadge}</td><td>${a.borrowedBy || '—'}</td><td>${a.borrowDate || '—'}</td>
