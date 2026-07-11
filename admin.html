@@ -776,35 +776,7 @@ async function toggleForgeAccess(rowIndex, newStatus) {
   }
 }
 
-  try {
-    // Call GAS directly (no-cors) — bypasses the SSO-protected Vercel proxy
-    await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        adminKey: 'INNOVEXA_SECURE_KEY_2025',
-        op: 'admin_grant_forge_access',
-        rowIndex: rowIndex,
-        accessStatus: newStatus
-      })
-    });
 
-    // no-cors returns opaque response — wait 2s then re-fetch to confirm
-    showToast('Updating… please wait', 'info');
-    await new Promise(r => setTimeout(r, 2000));
-
-    const refreshed = await apiGet('adminMembers');
-    cachedMembers = refreshed.members || [];
-    renderForgeAccess();
-    showToast('Forge access updated: ' + newStatus, 'success');
-
-  } catch(e) {
-    console.error('toggleForgeAccess error:', e);
-    showToast('Network error. Please try again.', 'error');
-    if (btn) { btn.disabled = false; btn.textContent = newStatus === 'Granted' ? 'Grant Access' : 'Revoke'; }
-  }
-}
 
 async function adminCreateTask() {
   const title = document.getElementById('tkTitle').value.trim();
