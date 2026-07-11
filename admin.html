@@ -239,6 +239,91 @@
     .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--text3); font-size:13px; gap:8px; }
     @keyframes spin { to { transform:rotate(360deg); } }
     .spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .6s linear infinite; }
+  
+    /* --- NEW UI OVERHAUL CSS --- */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+    }
+    
+    .bounty-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .diff-badge {
+      display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    }
+    .diff-easy { background: rgba(0,200,83,0.15); color: #00c853; }
+    .diff-medium { background: rgba(255,145,0,0.15); color: #ff9100; }
+    .diff-hard { background: rgba(213,0,0,0.15); color: #d50000; }
+    .xp-orb {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--accent), #000);
+      color: #fff; border-radius: 50px; padding: 4px 10px; font-size: 12px; font-weight: bold;
+    }
+
+    .fab-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--text);
+      color: var(--bg2);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      border: none;
+      z-index: 1000;
+      transition: transform 0.2s;
+    }
+    .fab-btn:hover { transform: scale(1.1); }
+
+    /* iOS Toggle Switch */
+    .switch {
+      position: relative; display: inline-block; width: 40px; height: 22px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc; transition: .4s; border-radius: 22px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #2196F3; }
+    input:checked + .slider:before { transform: translateX(18px); }
+
+    .drawer-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+      z-index: 2000; display: none;
+    }
+    .side-drawer {
+      position: fixed; top: 0; right: -400px; width: 400px; height: 100%;
+      background: var(--bg2); box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+      z-index: 2001; transition: right 0.3s ease; padding: 24px;
+      overflow-y: auto;
+    }
+    .side-drawer.open { right: 0; }
   </style>
 </head>
 <body>
@@ -397,17 +482,44 @@
       </div>
     </div>
 
+    
+    <!-- Sub-tab: Resources Manager -->
+    <div id="fTabResources" class="forge-subtab" style="display:none;">
+      <div class="admin-card">
+        <h3>Resources Manager</h3>
+        <p style="margin-bottom:12px; color:var(--text3);">Add learning materials and links for operatives.</p>
+        
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+          <input type="text" id="resTitle" placeholder="Title (e.g. Intro to React)" style="flex:2;">
+          <input type="text" id="resCategory" placeholder="Category" style="flex:1;">
+          <input type="text" id="resLink" placeholder="URL" style="flex:2;">
+          <button class="btn-sm btn-primary" onclick="adminAddResource()">Add Resource</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Link</th><th>Action</th></tr></thead>
+            <tbody id="resourcesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Sub-tab: Bounty Board -->
     <div id="fTabBounties" class="forge-subtab" style="display:none;">
-      <button class="btn-add" style="margin-bottom:16px;" onclick="document.getElementById('taskFormCard').style.display='block'">+ Create New Bounty</button>
+      <button class="fab-btn" onclick="openBountyDrawer()">+</button>
       
-      <div class="admin-card" id="taskFormCard" style="display:none; background:var(--bg3); border:1px solid var(--border);">
+      <!-- Side Drawer for Creating/Editing Bounties -->
+      <div class="drawer-overlay" id="bountyOverlay" onclick="closeBountyDrawer()"></div>
+      <div class="side-drawer" id="bountyDrawer">
+        <h3 style="margin-bottom:16px;" id="drawerTitle">Create Bounty</h3>
+        <input type="hidden" id="tkId">
         <h3 style="margin-bottom:12px;">Create Bounty (Task)</h3>
         <div class="form-group"><label>Title</label><input type="text" id="tkTitle"></div>
         <div class="form-group"><label>Description</label><textarea id="tkDesc"></textarea></div>
         <div style="display:flex; gap:12px; margin-bottom:12px;">
           <div class="form-group" style="flex:1;"><label>XP Reward</label><input type="number" id="tkXP" value="100"></div>
-          <div class="form-group" style="flex:1;"><label>Difficulty</label><select id="tkDiff"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+          <div class="form-group" style="flex:1;"><label>Difficulty</label><select id="tkDiff" onchange="autoCalcXP()"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
         </div>
         <div class="form-group"><label>Assign To (Leave 'Open' for anyone to claim)</label><input type="text" id="tkAssign" value="Open" placeholder="e.g., INVX-09 or Open" list="operativeList"></div>
         <button class="btn-primary" onclick="adminCreateTask()">Deploy Task</button>
@@ -545,7 +657,7 @@ const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 let adminSession = null;
 let cachedMembers = [];
 let cachedEvents = [];
-let cachedResources = [];
+var forgeCachedResources = [];
 let cachedTeam = [];
 let currentModal = null;
 let editingIndex = null;
@@ -824,41 +936,42 @@ async function loadForgeTasks() {
 }
 
 function renderForgeTasks() {
-  const tbody = document.getElementById('forgeTasksBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+  const container = document.getElementById('forgeTasksBody');
+  if (!cachedTasks) return;
+  const tasks = cachedTasks.filter(t => t.status === 'Open' || t.status === 'Assigned');
   
-  const activeTasks = adminTasks.filter(t => t.status !== 'Completed');
-  if (activeTasks.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);">No active bounties.</td></tr>';
+  if (tasks.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);width:100%;">No active bounties.</div>';
     return;
   }
-
-  activeTasks.forEach(t => {
-    let statColor = 'var(--text3)';
-    if (t.status === 'Under Review') statColor = 'var(--yellow)';
-    if (t.status === 'Open') statColor = 'var(--green)';
+  
+  // Create grid container instead of table rows
+  let html = '<div class="bounty-grid">';
+  tasks.forEach(t => {
+    let diffClass = 'diff-easy';
+    if(t.difficulty === 'Medium') diffClass = 'diff-medium';
+    if(t.difficulty === 'Hard') diffClass = 'diff-hard';
     
     html += `
-      <tr>
-        <td style="color:var(--text3); font-size:12px;">${t.taskId}</td>
-        <td><strong>${t.title}</strong><br><span style="color:var(--text3);font-size:12px;">${(t.description||'').substring(0,60)}${t.description && t.description.length > 60 ? '…' : ''}</span></td>
-        <td><span style="color:var(--accent2); font-weight:600;">${t.xp} XP</span></td>
-        <td><span class="status-badge" style="background:var(--bg3);color:var(--text);">${t.assignedTo}</span></td>
-        <td style="color:${statColor}; font-weight:600;">${t.status}</td>
-        <td>
-          <div style="display:flex; gap:6px;">
-            <button class="btn-sm" style="background:var(--bg3); color:var(--text); border:1px solid var(--border);" 
-              onclick="openEditModal('${t.taskId}', '${(t.title||'').replace(/'/g,"\\'")}',' ${(t.description||'').replace(/'/g,"\\'").replace(/\n/g,' ')}', '${t.xp}', '${t.difficulty}', '${t.assignedTo}')">
-              ✏️ Edit
-            </button>
-            <button class="btn-sm" style="background:rgba(255,59,59,0.15); color:var(--red); border:1px solid var(--red);" 
-              onclick="adminDeleteTask('${t.taskId}', '${(t.title||'').replace(/'/g,"\\'")}')">🗑️ Delete</button>
-          </div>
-        </td>
-      </tr>
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+          <h4 style="margin:0;">${escHtml(t.title)}</h4>
+          <span class="xp-orb">${t.xp} XP</span>
+        </div>
+        <div style="margin-bottom:12px;">
+          <span class="diff-badge ${diffClass}">${t.difficulty || 'Easy'}</span>
+          <span style="font-size:12px; color:var(--text3); margin-left:8px;">Assignee: ${t.assignedTo === 'Open' ? 'Anyone' : escHtml(t.assignedTo)}</span>
+        </div>
+        <p style="font-size:13px; color:var(--text2); margin-bottom:16px;">${escHtml(t.desc)}</p>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-sm" style="background:var(--bg3); color:var(--text); flex:1;" onclick="openEditDrawer('${t.id}')">✏ Edit</button>
+          <button class="btn-sm btn-reject" style="flex:1;" onclick="adminDeleteTask('${t.id}')">🗑 Delete</button>
+        </div>
+      </div>
     `;
   });
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function renderForgeReviews() {
@@ -2601,6 +2714,141 @@ async function certReqAction(rowIndex, status) {
     loadCertRequests();
   } catch(e) { showToast('Error updating request', 'error'); }
 }
+
+// ══════════════════════════════════════════════════════════════
+//  NEW UI JS & RESOURCES
+// ══════════════════════════════════════════════════════════════
+function autoCalcXP() {
+  const diff = document.getElementById('tkDiff').value;
+  const xpField = document.getElementById('tkXP');
+  if (diff === 'Easy') xpField.value = 50;
+  if (diff === 'Medium') xpField.value = 100;
+  if (diff === 'Hard') xpField.value = 300;
+}
+
+function openBountyDrawer() {
+  document.getElementById('drawerTitle').textContent = 'Create Bounty';
+  document.getElementById('tkId').value = '';
+  document.getElementById('tkTitle').value = '';
+  document.getElementById('tkDesc').value = '';
+  document.getElementById('tkDiff').value = 'Medium';
+  document.getElementById('tkXP').value = 100;
+  document.getElementById('tkAssign').value = 'Open';
+  
+  document.getElementById('bountyOverlay').style.display = 'block';
+  setTimeout(() => { document.getElementById('bountyDrawer').classList.add('open'); }, 10);
+}
+
+function closeBountyDrawer() {
+  document.getElementById('bountyDrawer').classList.remove('open');
+  setTimeout(() => { document.getElementById('bountyOverlay').style.display = 'none'; }, 300);
+}
+
+function openEditDrawer(taskId) {
+  const t = cachedTasks.find(x => x.id === taskId);
+  if (!t) return;
+  
+  document.getElementById('drawerTitle').textContent = 'Edit Bounty';
+  document.getElementById('tkId').value = t.id;
+  document.getElementById('tkTitle').value = t.title;
+  document.getElementById('tkDesc').value = t.desc;
+  document.getElementById('tkDiff').value = t.difficulty || 'Medium';
+  document.getElementById('tkXP').value = t.xp || 100;
+  document.getElementById('tkAssign').value = t.assignedTo || 'Open';
+  
+  document.getElementById('bountyOverlay').style.display = 'block';
+  setTimeout(() => { document.getElementById('bountyDrawer').classList.add('open'); }, 10);
+}
+
+async function adminSaveTask() {
+  const id = document.getElementById('tkId').value;
+  if (id) {
+    // Edit existing
+    const title = document.getElementById('tkTitle').value.trim();
+    const desc = document.getElementById('tkDesc').value.trim();
+    const xp = document.getElementById('tkXP').value;
+    const difficulty = document.getElementById('tkDiff').value;
+    const assignedTo = document.getElementById('tkAssign').value.trim();
+    
+    try {
+      showToast('Saving...', 'info');
+      await apiWrite('admin_edit_task', { taskId: id, title, desc, xp, difficulty, assignedTo });
+      showToast('Bounty Updated!', 'success');
+      closeBountyDrawer();
+      await loadForgeTasks();
+    } catch(e) {
+      showToast('Failed to edit bounty', 'error');
+    }
+  } else {
+    // Create new
+    await adminCreateTask(); 
+    closeBountyDrawer();
+  }
+}
+
+// Ensure loadForgeResources exists
+var forgeCachedResources = [];
+async function loadForgeResources() {
+  try {
+    const data = await apiGet('forge_get_resources');
+    forgeCachedResources = data.resources || [];
+    renderForgeResourcesAdmin();
+  } catch(e) {
+    console.error('loadForgeResources error:', e);
+  }
+}
+
+function renderForgeResourcesAdmin() {
+  const tbody = document.getElementById('resourcesBody');
+  if(!tbody) return;
+  if (forgeCachedResources.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No resources found.</td></tr>';
+    return;
+  }
+  let html = '';
+  forgeCachedResources.forEach(r => {
+    html += `<tr>
+      <td>${escHtml(r.title)}</td>
+      <td>${escHtml(r.category)}</td>
+      <td><a href="${escHtml(r.link)}" target="_blank" style="color:var(--blue);">View Link</a></td>
+      <td><button class="btn-sm btn-reject" onclick="adminDeleteResource('${r.id}')">Delete</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+async function adminAddResource() {
+  const title = document.getElementById('resTitle').value.trim();
+  const category = document.getElementById('resCategory').value.trim();
+  const link = document.getElementById('resLink').value.trim();
+  
+  if(!title || !link) return showToast('Title and Link required', 'error');
+  
+  try {
+    showToast('Adding Resource...', 'info');
+    await apiWrite('admin_add_resource', { title, category, link });
+    showToast('Resource Added!', 'success');
+    document.getElementById('resTitle').value = '';
+    document.getElementById('resCategory').value = '';
+    document.getElementById('resLink').value = '';
+    await loadForgeResources();
+  } catch(e) {
+    showToast('Failed to add resource', 'error');
+  }
+}
+
+async function adminDeleteResource(id) {
+  if(!confirm('Delete this resource?')) return;
+  try {
+    showToast('Deleting...', 'info');
+    await apiWrite('admin_delete_resource', { id });
+    showToast('Deleted', 'success');
+    await loadForgeResources();
+  } catch(e) {
+    showToast('Failed to delete', 'error');
+  }
+}
+
 </script>
 </body>
 </html>
