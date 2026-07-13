@@ -1277,9 +1277,14 @@
   // Randomize Core Team
   const teamGrid = document.querySelector('.arsenal-grid');
   if (teamGrid) {
-    for (let i = teamGrid.children.length; i >= 0; i--) {
-      teamGrid.appendChild(teamGrid.children[Math.random() * i | 0]);
-    }
+    const cards = Array.from(teamGrid.children);
+    cards.sort(() => Math.random() - 0.5);
+    cards.forEach((card, index) => {
+      // Also update the delay classes so they fade in smoothly in their new order
+      card.className = card.className.replace(/delay-\d+/g, '');
+      card.classList.add('delay-' + ((index % 4) + 1));
+      teamGrid.appendChild(card);
+    });
   }
 </script>
 </body>
