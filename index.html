@@ -1018,15 +1018,15 @@
 </section>
 
 <!-- ══ PARTNERS ═════════════════════════════════════════════════ -->
-<section class="partners-section container">
+<section class="partners-section container" style="margin-bottom: 120px;">
   <div class="partners-inner fade-up">
     <div class="partners-label">Supported by Institutions of Excellence</div>
     <div class="partners-logos" style="display: flex; align-items: center; justify-content: center; gap: 100px; flex-wrap: wrap;">
       <a href="#" class="partner-logo" aria-label="Kalvium">
-        <img src="assets/kalvium-logo.png" alt="Kalvium" style="height: 60px; width: auto; object-fit: contain;" />
+        <img src="assets/kalvium-logo.png" alt="Kalvium" style="height: 90px; width: auto; object-fit: contain;" />
       </a>
       <a href="#" class="partner-logo" aria-label="Yenepoya University">
-        <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" style="height: 60px; width: auto; object-fit: contain;" />
+        <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" style="height: 100px; width: auto; object-fit: contain;" />
       </a>
     </div>
   </div>
@@ -1117,7 +1117,7 @@
 </section>
 
 <!-- ══ CTA ══════════════════════════════════════════════════════ -->
-<section class="cta-section container fade-up">
+<section class="cta-section container fade-up" style="margin-bottom: 120px;">
   <div class="cta-inner">
     <h2 class="cta-title">Begin your <span class="italic">trajectory.</span></h2>
     <p class="hero-sub" style="margin-bottom:40px;">Join an elite cohort of builders shaping the digital frontier. Batch 2026 applications are closing soon.</p>
@@ -1274,6 +1274,13 @@
       });
     }, 50);
   });
+  // Randomize Core Team
+  const teamGrid = document.querySelector('.arsenal-grid');
+  if (teamGrid) {
+    for (let i = teamGrid.children.length; i >= 0; i--) {
+      teamGrid.appendChild(teamGrid.children[Math.random() * i | 0]);
+    }
+  }
 </script>
 </body>
 </html>
