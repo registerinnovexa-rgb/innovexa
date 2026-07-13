@@ -312,9 +312,15 @@
            data-logo_alignment="left"
            style="margin-bottom: 24px; display: flex; justify-content: center;">
       </div>
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input class="form-control" id="fullName" type="text" placeholder="As per official records" />
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" id="fullName" type="text" placeholder="As per official records" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">University / College</label>
+          <input class="form-control" id="college" type="text" placeholder="e.g. Yenepoya University" />
+        </div>
       </div>
 
       <div class="grid-2">
@@ -685,7 +691,7 @@
       return;
     }
 
-    ['fullName','email','phone','dob','year','gender','branch'].forEach(id => {
+    ['fullName','college','email','phone','dob','year','gender','branch'].forEach(id => {
       const v = document.getElementById(id).value.trim();
       if (!v) { showError(id, 'Required field'); valid = false; }
     });
@@ -790,6 +796,7 @@
       fullName: document.getElementById('fullName').value.trim(),
       email: document.getElementById('email').value.trim(),
       phone: document.getElementById('phone').value.trim(),
+      college: document.getElementById('college').value.trim(),
       dob: document.getElementById('dob').value,
       year: document.getElementById('year').value,
       gender: document.getElementById('gender').value,

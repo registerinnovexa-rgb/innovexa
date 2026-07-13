@@ -322,7 +322,8 @@ function doGet(e) {
           forgeAccess: String(rows[i][18] || '').trim(),
           xp: String(rows[i][19] || '0'),
           rank: String(rows[i][20] || 'Apprentice'),
-          squad: String(rows[i][21] || 'Unassigned')
+          squad: String(rows[i][21] || 'Unassigned'),
+          college: String(rows[i][22] || '')
         });
       }
       return respond({ success: true, members: members });
@@ -708,7 +709,14 @@ function doPost(e) {
         operativeId,
         payload.photoUrl    || '',
         payload.paymentUrl  || '',
-        payload.gender      || ''
+        payload.gender      || '',
+        '', // 16 forgeRole
+        '', // 17 linkedMentor
+        '', // 18 forgeAccess
+        '', // 19 xp
+        '', // 20 rank
+        '', // 21 squad
+        payload.college     || '' // 22 college
       ]);
 
       try {
