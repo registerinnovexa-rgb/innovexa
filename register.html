@@ -104,6 +104,9 @@
     
     .form-control {
       width: 100%;
+      box-sizing: border-box;
+      appearance: none;
+      -webkit-appearance: none;
       background: transparent;
       border: none;
       border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -115,8 +118,16 @@
       transition: all 0.3s ease;
     }
     input[type="date"].form-control {
-      height: 48px; /* Fix vertical alignment on mobile */
-      line-height: 1.5;
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      box-sizing: border-box !important;
+      height: 48px !important;
+      line-height: normal !important;
+      text-align: left !important;
+      padding: 12px 16px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      display: block !important;
     }
     .form-control:focus { outline: none; border-bottom-color: var(--text-1); }
     .form-control::placeholder { color: rgba(0,0,0,0.25); }
