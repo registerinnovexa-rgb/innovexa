@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/design.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     body { background: #f4f3ef; }
@@ -295,6 +296,22 @@
 
     <!-- STEP 1: Personal Info -->
     <div id="step-1">
+      <div id="g_id_onload"
+           data-client_id="716046248385-t0sm55a2lsistn37a51cbbn8pbr2no9d.apps.googleusercontent.com"
+           data-context="signup"
+           data-ux_mode="popup"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="continue_with"
+           data-size="large"
+           data-logo_alignment="left"
+           style="margin-bottom: 24px; display: flex; justify-content: center;">
+      </div>
       <div class="form-group">
         <label class="form-label">Full Name</label>
         <input class="form-control" id="fullName" type="text" placeholder="As per official records" />
@@ -484,6 +501,44 @@
 
 <script src="/js/api.js"></script>
 <script>
+    // --- Google Sign-In Logic ---
+    function decodeJwtResponse(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    function handleCredentialResponse(response) {
+      try {
+        const responsePayload = decodeJwtResponse(response.credential);
+        
+        document.getElementById('fullName').value = responsePayload.name || '';
+        document.getElementById('email').value = responsePayload.email || '';
+        document.getElementById('email').readOnly = true;
+        document.getElementById('email').style.opacity = '0.7';
+        document.getElementById('email').style.cursor = 'not-allowed';
+        
+        if (responsePayload.picture) {
+          photoData = responsePayload.picture;
+          const photoPreview = document.getElementById('photoPreview');
+          const photoText = document.getElementById('photoText');
+          if(photoPreview && photoText) {
+            photoPreview.src = photoData;
+            photoPreview.style.display = 'block';
+            photoText.style.display = 'none';
+          }
+        }
+        
+        showToast('Google Account linked successfully!', 'success');
+      } catch (err) {
+        console.error('Error handling Google Sign-In:', err);
+        showToast('Google Sign-In failed.', 'error');
+      }
+    }
+
   // Navbar scroll
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
