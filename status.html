@@ -134,6 +134,12 @@
         </div>
 
         <div class="action-row">
+          <button class="btn-magnetic" id="copy-id-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; display:inline-block;">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>Copy INVX ID
+          </button>
           <a href="https://chat.whatsapp.com/CQIRUl4Np26BQp22Mglz8s?mode=gi_t" target="_blank" class="btn-outline">Join Comm Link</a>
         </div>
       </div>
@@ -322,6 +328,18 @@
 
   document.getElementById('query-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') document.getElementById('check-btn').click();
+  });
+
+  document.getElementById('copy-id-btn')?.addEventListener('click', () => {
+    const opId = document.getElementById('card-id').textContent;
+    if (opId && opId !== 'INVX-XX') {
+      navigator.clipboard.writeText(opId).then(() => {
+        showToast('INVX ID copied to clipboard!', 'success');
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        showToast('Failed to copy ID', 'error');
+      });
+    }
   });
 
 </script>
