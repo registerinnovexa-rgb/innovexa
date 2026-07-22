@@ -37,7 +37,7 @@ function doGet(e) {
     }
 
     // Count members
-    if (action === 'count' || (!p.email && !p.utr && !action)) {
+    if (action === 'count' || (!p.email && !p.utr && !p.phone && !action)) {
       var rows = sheet.getDataRange().getValues();
       return respond({ success: true, data: { count: Math.max(0, rows.length - 1) } });
     }
