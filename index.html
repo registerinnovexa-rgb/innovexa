@@ -108,6 +108,41 @@
   </div>
 </section>
 
+<!-- ══ GALLERY ══════════════════════════════════════════════════ -->
+<section class="gallery-section fade-up" style="margin: 80px 0; overflow: hidden; position: relative;">
+  <div class="container" style="margin-bottom: 40px; text-align: center;">
+    <h2 style="font-size: 32px; font-family: var(--font-d); letter-spacing: -0.03em;">Glimpses of <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Action.</span></h2>
+  </div>
+  
+  <div class="gallery-track-container" style="width: 100vw; margin-left: calc(-50vw + 50%); overflow: hidden; position: relative;">
+    <div class="gallery-track" style="display: flex; gap: 20px; width: max-content; animation: scrollGallery 25s linear infinite; padding: 10px 0;">
+      <!-- Original Set -->
+      <img src="assets/gallery/1.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/2.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/3.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/4.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/5.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      
+      <!-- Duplicate Set for infinite loop -->
+      <img src="assets/gallery/1.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/2.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/3.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/4.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img src="assets/gallery/5.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes scrollGallery {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 10px)); }
+}
+.gallery-track:hover {
+  animation-play-state: paused;
+}
+</style>
+
 <!-- ══ BENTO GRID ══════════════════════════════════════════════ -->
 <section class="bento-section container" id="ecosystem">
   <div class="bento-header fade-up">
