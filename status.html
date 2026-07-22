@@ -279,48 +279,16 @@
           document.getElementById('card-id').textContent = opId;
           document.getElementById('card-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified_' + opId;
           
-          
           let actionRow = document.querySelector('.action-row');
-          // Reset to just the download button first
-          const dlBtn = document.createElement('button');
-          dlBtn.className = 'btn-magnetic';
-          dlBtn.id = 'download-id-btn';
-          dlBtn.textContent = 'Download ID Card';
-          actionRow.appendChild(dlBtn);
           
+          // Add Forge button only if granted and not already present
           if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
-            actionRow.insertAdjacentHTML('beforeend', `<a href="forge.html" class="btn-magnetic" style="background:#000; border-color:#333; margin-left:12px;">⚡ Enter Forge Ops</a>`);
+            if (!document.getElementById('forge-ops-btn')) {
+              actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html" class="btn-magnetic" style="background:#000; border-color:#333; margin-left:12px;">⚡ Enter Forge Ops</a>`);
+            }
           }
           
-          // Re-attach inline logic from below (since we blew away the old button)
-          document.getElementById('download-id-btn').addEventListener('click', () => {
-            const printCard = document.getElementById('print-card');
-            const styleContent = `body{font-family:sans-serif;margin:0;padding:0} #print-card{background:#111;color:#fff;border-radius:16px;padding:24px;width:340px;margin:0 auto}`;
-            const win = window.open('', '_blank');
-            win.document.write(`
-              <html>
-                <head>
-                  <title>Operative ID Card</title>
-  <meta property="og:image" content="https://innovexa-portal-hgbqn4t2i-innovexahubbangalore-8824s-projects.vercel.app/assets/logo.png" />
-
-                  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
-                  <style>
-                    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #fff; }
-                    ${styleContent}
-                    .id-card-preview { width: 340px; box-shadow: none; border: 1px solid #ddd; }
-                  </style>
-                </head>
-                <body>
-                  <div class="id-card-preview">
-                    ${printCard.innerHTML}
-                  </div>
-                  <script>window.onload = () => { window.print(); window.close(); }<\/script>
-                </body>
-              </html>
-            `);
-            win.document.close();
-          });
-
+          document.getElementById('result-panel').style.display = 'block';         
           approvedAssets.classList.remove('hidden');
         } else {
           resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
