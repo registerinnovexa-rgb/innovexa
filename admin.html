@@ -2155,7 +2155,7 @@ function renderResources() {
       <td>
         <div class="btn-actions">
           <button class="btn-sm btn-edit" onclick="editResource(${i})">✎</button>
-          <button class="btn-sm btn-delete" onclick="deleteResource('${r.resourceId}')">✕</button>
+          <button class="btn-sm btn-delete" onclick="deleteResource(${r.rowIndex})">✕</button>
         </div>
       </td>
     </tr>
@@ -2167,10 +2167,11 @@ function editResource(i) {
   openModal('resource', cachedResources[i]);
 }
 
-async function deleteResource(resourceId) {
+async function deleteResource(rowIndex) {
+  console.log("Attempting to delete resource with row index:", rowIndex);
   if (!confirm('Delete this resource?')) return;
   try {
-    const data = await apiWrite('admin_delete_resource', { resourceId });
+    const data = await apiWrite('admin_delete_resource', { rowIndex });
     if (data.success) { showToast('Resource deleted'); loadResources(); loadOverview(); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
@@ -2314,7 +2315,7 @@ function closeModal() {
 
 async function saveModal() {
   const config = modalConfigs[currentModal];
-  const opMap = { event: editingIndex ? 'editEvent' : 'addEvent', resource: editingIndex ? 'editResource' : 'addResource', team: editingIndex ? 'editTeam' : 'addTeam' };
+  const opMap = { event: editingIndex ? 'admin_edit_event' : 'admin_create_event', resource: editingIndex ? 'admin_edit_resource' : 'admin_add_resource', team: editingIndex ? 'editTeam' : 'addTeam' };
   const op = opMap[currentModal];
   const payload = {};
   if (editingIndex) payload.rowIndex = editingIndex;

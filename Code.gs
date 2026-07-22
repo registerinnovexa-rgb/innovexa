@@ -782,15 +782,31 @@ function doPost(e) {
         new Date().toISOString(),
         payload.title || 'Untitled',
         payload.category || 'General',
-        payload.url || '',
+        payload.url || payload.link || '',
         'Admin'
       ]);
+      SpreadsheetApp.flush();
       return respond({ success: true, message: 'Resource added.', resourceId: resourceId });
+    }
+
+    // ADMIN: Edit Resource
+    if (op === 'admin_edit_resource') {
+      var rSheet = getOrCreateSheet(ss, 'ForgeResources', ['ResourceID', 'Timestamp', 'Title', 'Category', 'URL', 'AddedBy']);
+      if (!payload.rowIndex) return respond({ success: false, message: 'Row index required.' });
+      if (payload.title) rSheet.getRange(payload.rowIndex, 3).setValue(payload.title);
+      if (payload.category) rSheet.getRange(payload.rowIndex, 4).setValue(payload.category);
+      if (payload.url || payload.link) rSheet.getRange(payload.rowIndex, 5).setValue(payload.url || payload.link);
+      SpreadsheetApp.flush();
+      return respond({ success: true, message: 'Resource updated.' });
     }
 
     // ADMIN: Delete Resource
     if (op === 'admin_delete_resource') {
       var rSheet = getOrCreateSheet(ss, 'ForgeResources', ['ResourceID', 'Timestamp', 'Title', 'Category', 'URL', 'AddedBy']);
+      if (payload.rowIndex) {
+        rSheet.deleteRow(payload.rowIndex);
+        return respond({ success: true, message: 'Resource deleted by row.' });
+      }
       var rRows = rSheet.getDataRange().getValues();
       for (var i = 1; i < rRows.length; i++) {
         if (rRows[i][0] === payload.resourceId) {
