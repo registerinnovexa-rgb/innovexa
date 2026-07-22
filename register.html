@@ -340,11 +340,65 @@
           }
         }
         
-        showToast('Google Account linked successfully!', 'success');
+        // ── Duplicate email check ──
+        const email = responsePayload.email || '';
+        checkEmailDuplicate(email);
+
       } catch (err) {
         console.error('Error handling Google Sign-In:', err);
         showToast('Google Sign-In failed.', 'error');
       }
+    }
+
+    async function checkEmailDuplicate(email) {
+      try {
+        const res = await gasGet(SCRIPT_URL + '?email=' + encodeURIComponent(email));
+        if (res && res.found) {
+          // Block the form and show already-registered banner
+          showAlreadyRegistered(res.data);
+        } else {
+          showToast('Google Account linked successfully!', 'success');
+        }
+      } catch(e) {
+        showToast('Google Account linked successfully!', 'success');
+      }
+    }
+
+    function showAlreadyRegistered(data) {
+      // Hide the whole form
+      const formContainer = document.getElementById('form-container');
+      
+      // Remove existing duplicate banner if any
+      const existing = document.getElementById('already-registered-banner');
+      if (existing) existing.remove();
+
+      const status = (data.status || 'Pending').toLowerCase();
+      const statusColor = status === 'approved' ? '#25D366' : status === 'rejected' ? '#ef4444' : '#f59e0b';
+      const statusLabel = status === 'approved' ? 'APPROVED ✓' : status === 'rejected' ? 'REJECTED ✗' : 'PENDING REVIEW';
+
+      const banner = document.createElement('div');
+      banner.id = 'already-registered-banner';
+      banner.innerHTML = `
+        <div style="max-width:560px; margin:40px auto; background:#fff; border:2px solid ${statusColor}; border-radius:20px; padding:40px; text-align:center; box-shadow:0 0 40px rgba(0,0,0,0.08);">
+          <div style="width:64px;height:64px;border-radius:50%;background:${statusColor}22;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${statusColor}" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style="font-family:var(--font-m);font-size:12px;font-weight:700;letter-spacing:3px;color:${statusColor};margin-bottom:12px;">${statusLabel}</div>
+          <h2 style="font-family:var(--font-d);font-size:28px;font-weight:600;margin-bottom:8px;">Already Registered!</h2>
+          <p style="color:#666;font-size:15px;margin-bottom:24px;">The email <strong>${data.email}</strong> has already been used to register as an Innovexa Hub Operative.</p>
+          <div style="background:#f9f9f7;border-radius:12px;padding:20px;margin-bottom:24px;text-align:left;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;"><span style="color:#888;">Name</span><span style="font-weight:600;">${data.name || '—'}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;"><span style="color:#888;">Operative ID</span><span style="font-weight:600;font-family:var(--font-m);">${data.operativeId || 'Pending'}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;"><span style="color:#888;">Status</span><span style="font-weight:700;color:${statusColor};">${statusLabel}</span></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="status.html" style="padding:12px 28px;background:#111;color:#fff;border-radius:100px;font-weight:600;font-size:14px;text-decoration:none;">Check My Status</a>
+            <a href="index.html" style="padding:12px 28px;border:1px solid #ddd;color:#333;border-radius:100px;font-weight:500;font-size:14px;text-decoration:none;">Back to Home</a>
+          </div>
+        </div>
+      `;
+      formContainer.style.display = 'none';
+      formContainer.parentNode.insertBefore(banner, formContainer);
     }
 
   // Navbar scroll
