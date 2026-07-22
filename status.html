@@ -134,7 +134,6 @@
         </div>
 
         <div class="action-row">
-          <button class="btn-magnetic" id="download-id-btn">Download ID Card</button>
           <a href="https://chat.whatsapp.com/CQIRUl4Np26BQp22Mglz8s?mode=gi_t" target="_blank" class="btn-outline">Join Comm Link</a>
         </div>
       </div>
@@ -325,43 +324,6 @@
     if (e.key === 'Enter') document.getElementById('check-btn').click();
   });
 
-  // Download ID
-  document.getElementById('download-id-btn')?.addEventListener('click', () => {
-    const printCard = document.getElementById('print-card');
-    const win = window.open('', '_blank');
-    win.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Operative ID Card</title>
-          <base href="${window.location.href}">
-          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
-          <link rel="stylesheet" href="css/design.css" />
-          <link rel="stylesheet" href="css/main.css" />
-          <style>
-            body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #000; }
-            .id-card-preview-wrap { margin: 0 auto; transform: none !important; }
-            /* Force background colors and remove margins for printing */
-            @media print {
-              body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: #000 !important; }
-              @page { size: auto; margin: 0mm; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="id-card-preview-wrap">
-            ${printCard.outerHTML}
-          </div>
-          <script>
-            window.onload = () => { 
-              setTimeout(() => { window.print(); window.close(); }, 500); 
-            };
-          <\/script>
-        </body>
-      </html>
-    `);
-    win.document.close();
-  });
 </script>
 </body>
 </html>
