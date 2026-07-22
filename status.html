@@ -328,26 +328,35 @@
   // Download ID
   document.getElementById('download-id-btn')?.addEventListener('click', () => {
     const printCard = document.getElementById('print-card');
-    const styleContent = `body{font-family:sans-serif;margin:0;padding:0} #print-card{background:#111;color:#fff;border-radius:16px;padding:24px;width:340px;margin:0 auto}`;
     const win = window.open('', '_blank');
     win.document.write(`
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Operative ID Card</title>
-  <meta property="og:image" content="https://innovexa-portal-hgbqn4t2i-innovexahubbangalore-8824s-projects.vercel.app/assets/logo.png" />
-
-          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
+          <base href="\${window.location.href}">
+          <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+          <link rel="stylesheet" href="css/design.css" />
+          <link rel="stylesheet" href="css/main.css" />
           <style>
-            body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #fff; }
-            ${styleContent}
-            .id-card-preview { width: 340px; box-shadow: none; border: 1px solid #ddd; }
+            body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #000; }
+            .id-card-preview-wrap { margin: 0 auto; transform: none !important; }
+            /* Force background colors and remove margins for printing */
+            @media print {
+              body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: #000 !important; }
+              @page { size: auto; margin: 0mm; }
+            }
           </style>
         </head>
         <body>
-          <div class="id-card-preview">
-            ${printCard.innerHTML}
+          <div class="id-card-preview-wrap">
+            \${printCard.outerHTML}
           </div>
-          <script>window.onload = () => { window.print(); window.close(); }<\/script>
+          <script>
+            window.onload = () => { 
+              setTimeout(() => { window.print(); window.close(); }, 500); 
+            };
+          <\/script>
         </body>
       </html>
     `);
