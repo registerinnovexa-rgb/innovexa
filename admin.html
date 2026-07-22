@@ -2136,7 +2136,7 @@ async function loadResources() {
   document.getElementById('resourcesLoading').style.display = 'flex';
   document.getElementById('resourcesTable').style.display = 'none';
   try {
-    const data = await apiGet('resources');
+    const data = await apiGet('forge_get_resources');
     cachedResources = (data.resources || []).map((r, i) => ({ ...r, rowIndex: i + 2 }));
     renderResources();
   } catch(e) { showToast('Failed to load resources', 'error'); }
@@ -2155,7 +2155,7 @@ function renderResources() {
       <td>
         <div class="btn-actions">
           <button class="btn-sm btn-edit" onclick="editResource(${i})">✎</button>
-          <button class="btn-sm btn-delete" onclick="deleteResource(${r.rowIndex})">✕</button>
+          <button class="btn-sm btn-delete" onclick="deleteResource('${r.resourceId}')">✕</button>
         </div>
       </td>
     </tr>
@@ -2167,10 +2167,10 @@ function editResource(i) {
   openModal('resource', cachedResources[i]);
 }
 
-async function deleteResource(rowIndex) {
+async function deleteResource(resourceId) {
   if (!confirm('Delete this resource?')) return;
   try {
-    const data = await apiWrite('deleteResource', { rowIndex });
+    const data = await apiWrite('admin_delete_resource', { resourceId });
     if (data.success) { showToast('Resource deleted'); loadResources(); loadOverview(); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }

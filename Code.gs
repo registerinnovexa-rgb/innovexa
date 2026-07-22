@@ -805,6 +805,7 @@ function doPost(e) {
       var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
       var taskId = 'TSK-' + Date.now();
       tasksSheet.appendRow([taskId, timestamp, payload.title, payload.description, payload.xp, payload.difficulty, 'Open', payload.assignedTo || 'Open', '', '']);
+      SpreadsheetApp.flush();
       return respond({ success: true, message: 'Task created.' });
     }
 
