@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Feedback - Innovexa Hub</title>
+  <link rel="stylesheet" href="css/design.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: var(--font-m);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .feedback-card {
+      background: rgba(20, 20, 25, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    
+    .rating-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      flex-direction: row-reverse; /* For CSS sibling selector trick */
+    }
+    
+    .rating-group input {
+      display: none;
+    }
+    
+    .rating-group label {
+      font-size: 32px;
+      color: var(--border2);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    
+    .rating-group label:hover,
+    .rating-group label:hover ~ label,
+    .rating-group input:checked ~ label {
+      color: #fbbf24; /* Gold */
+    }
+    
+    textarea {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-family: var(--font-m);
+      margin-top: 15px;
+      resize: vertical;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text2);
+      font-size: 14px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      color: #fff;
+      font-family: var(--font-c);
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <div class="bg-orb" style="top: -10%; left: -10%; width: 50vw; height: 50vw;"></div>
+    <div class="bg-orb" style="bottom: -20%; right: -10%; width: 60vw; height: 60vw; animation-delay: -5s;"></div>
+  </div>
+  <div class="bg-grid"></div>
+
+  <div class="feedback-card glass-panel fade-up">
+    <h1 style="font-family: var(--font-b); font-size: 28px; margin-bottom: 10px;" class="text-gradient">Mission Feedback</h1>
+    <p style="color: var(--text2); font-size: 14px; margin-bottom: 30px;">Your telemetry helps us optimize future operations.</p>
+    
+    <div id="loadingState" style="display:none; color:var(--accent);">Transmitting data...</div>
+    <div id="successState" style="display:none;">
+      <h2 style="color:#34d399; margin-bottom: 10px;">Transmission Received</h2>
+      <p style="color:var(--text2); font-size:14px;">Thank you for your feedback, Operative.</p>
+      <a href="index.html" class="btn btn-outline" style="margin-top:20px; display:inline-block;">Return to Hub</a>
+    </div>
+
+    <form id="feedbackForm" onsubmit="submitFeedback(event)">
+      <div class="form-group">
+        <label>Operative ID</label>
+        <input type="text" id="opId" placeholder="INVX-XX" required>
+      </div>
+      
+      <div class="form-group" style="text-align: center;">
+        <label>Rate the Operation (1-5)</label>
+        <div class="rating-group">
+          <input type="radio" id="star5" name="rating" value="5" required><label for="star5">★</label>
+          <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+          <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+          <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+          <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>After Action Report (Comments)</label>
+        <textarea id="comments" rows="4" placeholder="What went well? What could be improved?" required></textarea>
+      </div>
+      
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top:10px;">Submit Telemetry</button>
+    </form>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    function showToast(msg, type='info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast show ' + (type === 'error' ? 'toast-error' : (type === 'success' ? 'toast-success' : ''));
+      setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+    }
+
+    async function submitFeedback(e) {
+      e.preventDefault();
+      
+      // Get Event ID from URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const eventId = urlParams.get('eventId');
+      
+      if(!eventId) {
+        return showToast("Error: Missing Event ID in URL.", "error");
+      }
+      
+      const opId = document.getElementById('opId').value.trim().toUpperCase();
+      const rating = document.querySelector('input[name="rating"]:checked').value;
+      const comments = document.getElementById('comments').value.trim();
+      
+      document.getElementById('feedbackForm').style.display = 'none';
+      document.getElementById('loadingState').style.display = 'block';
+      
+      try {
+        const res = await apiWrite('public_submit_feedback', {
+          eventId: eventId,
+          operativeId: opId,
+          rating: rating,
+          comments: comments
+        });
+        
+        document.getElementById('loadingState').style.display = 'none';
+        
+        if(res.success) {
+          document.getElementById('successState').style.display = 'block';
+        } else {
+          document.getElementById('feedbackForm').style.display = 'block';
+          showToast(res.message, 'error');
+        }
+      } catch(err) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('feedbackForm').style.display = 'block';
+        showToast("Network connection failed.", "error");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -15,8 +15,7 @@ async function gasGet(gasUrl) {
   const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
-    // Direct fetch to GAS (bypassing SSO-blocked proxy)
-    const r2   = await fetch(gasUrl, { method: 'GET', redirect: 'follow', signal: ctrl.signal });
+    const r2   = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(timer);
     const text = await r2.text();
     try {

@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Innovexa Forge — Operative Portal</title>
+  <meta property="og:image" content="https://innovexa-portal-hgbqn4t2i-innovexahubbangalore-8824s-projects.vercel.app/assets/logo.png" />
+
   <meta name="description" content="Innovexa Forge — Restricted access portal for approved operatives." />
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,196 +14,7 @@
   
   <link rel="stylesheet" href="css/design.css" />
   
-  <style>
-    /* ── FORGE SPECIFIC STYLES OVERRIDING DESIGN.CSS AS NEEDED ── */
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    /* ── BACKGROUND ORBS ── */
-    .hero-bg {
-      position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden;
-    }
-    .shape-1 {
-      position: absolute; top: -10%; left: 60%;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
-      border-radius: 50%; filter: blur(40px); animation: float 12s ease-in-out infinite;
-    }
-    .shape-2 {
-      position: absolute; top: 40%; left: -10%;
-      width: 400px; height: 400px;
-      background: linear-gradient(135deg, rgba(17,17,16,0.04) 0%, transparent 100%);
-      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-      filter: blur(30px); animation: float 15s ease-in-out infinite reverse;
-    }
-    @keyframes float {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      33% { transform: translate(30px, -50px) rotate(10deg); }
-      66% { transform: translate(-20px, 20px) rotate(-5deg); }
-      100% { transform: translate(0, 0) rotate(0deg); }
-    }
-
-    /* ── VIEWS ── */
-    #login-view {
-      flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; margin-top: 68px;
-    }
-    #dashboard-view { 
-      display: none; flex-direction: column; flex: 1; margin-top: 68px;
-    }
-
-    /* ── LOGIN CARD ── */
-    .login-card {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 48px 40px;
-      width: 100%;
-      max-width: 420px;
-      backdrop-filter: blur(20px);
-      text-align: center;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.06);
-    }
-    .login-logo { width: 52px; height: 52px; object-fit: contain; margin-bottom: 24px; border-radius: 12px; }
-    .login-title { font-family: var(--font-d); font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.03em; }
-    .login-subtitle { font-size: 14px; color: var(--text-2); margin-bottom: 32px; line-height: 1.5; }
-
-    .form-group { text-align: left; margin-bottom: 16px; }
-    .form-label { display: block; font-family: var(--font-m); font-size: 11px; color: var(--text-3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
-    .form-input {
-      width: 100%; padding: 12px 16px;
-      background: rgba(255,255,255,0.8);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-1);
-      font-family: var(--font-m);
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .form-input:focus { outline: none; border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); background: #fff; }
-
-    .login-error { color: #ef4444; font-size: 13px; margin-top: 12px; min-height: 18px; font-weight: 500; }
-    .back-link { display: inline-block; margin-top: 24px; color: var(--text-3); font-size: 13px; font-weight: 500; transition: color 0.2s; }
-    .back-link:hover { color: var(--text-1); }
-
-    /* ── DASHBOARD LAYOUT ── */
-    .dash-body { display: flex; flex: 1; max-width: var(--max-w); margin: 0 auto; width: 100%; }
-    .sidebar {
-      width: 280px; flex-shrink: 0;
-      border-right: 1px solid var(--border);
-      padding: 32px 24px;
-      background: rgba(255,255,255,0.4);
-      backdrop-filter: blur(10px);
-    }
-    
-    .profile-widget {
-      text-align: center;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
-    }
-    .prof-avatar {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: var(--bg-dark); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px; font-weight: 700; margin: 0 auto 16px;
-      font-family: var(--font-d);
-    }
-    .prof-name { font-weight: 700; font-size: 18px; font-family: var(--font-d); color: var(--text-1); margin-bottom: 4px; }
-    .prof-email { font-size: 13px; color: var(--text-3); font-family: var(--font-m); margin-bottom: 12px; word-break: break-all; }
-    .prof-badge {
-      display: inline-block; background: rgba(0,0,0,0.06); color: var(--text-2);
-      padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--font-m);
-    }
-
-    .nav-menu { display: flex; flex-direction: column; gap: 8px; }
-    .nav-item {
-      padding: 12px 16px; border-radius: 10px; cursor: pointer;
-      font-size: 14px; font-weight: 500; color: var(--text-2);
-      transition: all 0.2s; display: flex; align-items: center; gap: 12px;
-    }
-    .nav-item:hover { background: rgba(0,0,0,0.04); color: var(--text-1); }
-    .nav-item.active { background: #111; color: #fff; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-    
-    .nav-item-icon { font-size: 18px; }
-
-    .main-content {
-      flex: 1; padding: 40px; min-width: 0;
-    }
-    .view-section { display: none; animation: fadeIn 0.3s ease; }
-    .view-section.active { display: block; }
-    .section-title { font-family: var(--font-d); font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--text-1); letter-spacing: -0.02em; }
-    .section-desc { font-size: 15px; color: var(--text-2); margin-bottom: 32px; }
-
-    /* ── CARDS ── */
-    .glass-card {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.02);
-    }
-    
-    /* ── RESOURCES GRID ── */
-    .resources-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
-    }
-    .resource-card {
-      background: rgba(255,255,255,0.8);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      transition: all 0.3s ease;
-      display: flex; flex-direction: column;
-    }
-    .resource-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(0,0,0,0.2);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
-    }
-    .res-type {
-      font-family: var(--font-m); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--text-3); margin-bottom: 8px; font-weight: 600;
-    }
-    .res-title { font-size: 16px; font-weight: 600; color: var(--text-1); margin-bottom: 12px; font-family: var(--font-d); }
-    .res-desc { font-size: 13px; color: var(--text-2); margin-bottom: 20px; flex: 1; line-height: 1.5; }
-    
-    .empty-state {
-      text-align: center; padding: 60px 20px;
-      background: rgba(255,255,255,0.5); border: 1px dashed var(--border); border-radius: 16px;
-      color: var(--text-3); font-size: 14px; font-weight: 500;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .dash-body { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
-      .nav-menu { flex-direction: row; overflow-x: auto; padding-bottom: 8px; }
-      .nav-item { white-space: nowrap; padding: 10px 16px; }
-      .main-content { padding: 24px 20px; }
-    }
-    
-    /* ── TOAST ── */
-    #toast-container {
-      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
-    }
-    .toast {
-      background: var(--bg-dark); color: #fff;
-      padding: 12px 20px; border-radius: 12px;
-      font-size: 13px; font-weight: 500; font-family: var(--font-b);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-      transform: translateY(20px); opacity: 0;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.error { background: #ef4444; }
-    .toast.success { background: #10b981; color: #fff; }
-  </style>
+  <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
@@ -239,8 +52,8 @@
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Home</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Status</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Forge</a>
   <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#fff;" onclick="closeMobileMenu()">Atlas</a>
-  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500; color:#a78bfa;" onclick="closeMobileMenu()">⚡ Forge</a>
 </div>
 
 
@@ -256,12 +69,13 @@
         <input type="text" id="loginId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
       </div>
       <div class="form-group">
-        <label class="form-label">Registered Email</label>
-        <input type="email" id="loginEmail" class="form-input" placeholder="operative@example.com" />
+        <label class="form-label">Date of Birth (Security Key)</label>
+        <input type="date" id="loginDob" class="form-input" />
       </div>
 
       <button id="loginBtn" class="btn-dark" style="width:100%; margin-top:12px; padding:14px;" onclick="handleLogin()">Initialize Link</button>
-      <div id="loginError" class="login-error"></div>
+      
+      <div id="loginError" class="login-error" style="margin-top:12px;"></div>
       <a href="index.html" class="back-link">← Return to Hub</a>
     </div>
   </div>
@@ -284,6 +98,9 @@
           </div>
           <div class="nav-item" onclick="switchTab('missions')">
             <span class="nav-item-icon">🎯</span> Missions
+          </div>
+          <div class="nav-item" onclick="switchTab('history')">
+            <span class="nav-item-icon">📜</span> History
           </div>
           <div class="nav-item" onclick="switchTab('leaderboard')">
             <span class="nav-item-icon">🏆</span> Leaderboard
@@ -342,6 +159,20 @@
           <div id="missionsLoading" class="empty-state" style="display:none;">Loading missions...</div>
           <div id="missionsContainer">
             <!-- Missions injected here -->
+          </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="tab-history" class="view-section">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+            <div>
+              <h2 class="section-title">Bounty History</h2>
+              <p class="section-desc" style="margin-bottom:0;">Track your submitted and completed missions.</p>
+            </div>
+            <button class="btn-dark" onclick="loadMissions()">↻ Refresh</button>
+          </div>
+          <div id="historyContainer">
+            <!-- History injected here -->
           </div>
         </div>
 
@@ -419,6 +250,15 @@
         .replace(/'/g, "&#039;");
     }
 
+    function parseMarkdown(text) {
+      if (!text) return "";
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent); text-decoration:underline;">$1</a>');
+    }
+
     // ══════════════════════════════════════════
     //  API HELPERS
     // ══════════════════════════════════════════
@@ -427,7 +267,7 @@
       const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
       const gasUrl = MAIN_SCRIPT_URL + '?' + params.toString();
       try {
-        const r = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+        const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
         const text = await r.text();
         try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
       } catch (e) {
@@ -435,10 +275,9 @@
       }
     }
 
-    // Fetch from Main Admin Code.gs — direct GAS call (no proxy)
     async function apiGetMain(action) {
       const gasUrl = MAIN_SCRIPT_URL + '?action=' + action + '&_t=' + Date.now();
-      const r = await fetch(gasUrl, { method: 'GET', redirect: 'follow', cache: 'no-store' });
+      const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
       return await r.json();
     }
 
@@ -469,11 +308,11 @@
         if (raw) {
           const stored = JSON.parse(raw);
           // Always re-verify with server — never trust localStorage blindly
-          const res = await gasGet('forge_login', { invxId: stored.operativeId, email: stored.email });
+          const res = await gasGet('forge_login', { invxId: stored.operativeId, dob: stored.dob });
           if (res.success && res.data) {
             session = {
               operativeId: res.data.operativeId,
-              email: stored.email,
+              dob: stored.dob,
               name: res.data.name,
               xp: res.data.xp,
               rank: res.data.rank,
@@ -515,25 +354,25 @@
     // ══════════════════════════════════════════
     async function handleLogin() {
       const id = document.getElementById('loginId').value.trim();
-      const email = document.getElementById('loginEmail').value.trim();
+      const dob = document.getElementById('loginDob').value.trim();
       const err = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
 
-      if (!id || !email) {
-        err.textContent = 'Enter Operative ID and Email.';
+      if (!id || !dob) {
+        err.textContent = 'Enter Operative ID and Date of Birth.';
         return;
       }
       
       err.textContent = '';
       btn.disabled = true;
-      btn.textContent = 'Authenticating...';
+      btn.textContent = 'Decrypting Access...';
 
       try {
-        const res = await gasGet('forge_login', { invxId: id, email });
+        const res = await gasGet('forge_login', { invxId: id, dob: dob });
         if (res.success && res.data) {
           session = {
             operativeId: res.data.operativeId,
-            email: email,
+            dob: dob,
             name: res.data.name,
             xp: res.data.xp,
             rank: res.data.rank,
@@ -611,17 +450,16 @@
       loader.style.display = 'block';
 
       try {
-        const res = await apiGetMain('resources');
+        const res = await apiGetMain('forge_get_resources');
         loader.style.display = 'none';
         
         if (res.resources && res.resources.length > 0) {
           cachedResources = res.resources;
           grid.innerHTML = cachedResources.map(r => `
             <div class="resource-card">
-              <div class="res-type">${escHtml(r.type || 'Document')}</div>
+              <div class="res-type">${escHtml(r.category || 'Document')}</div>
               <div class="res-title">${escHtml(r.title)}</div>
-              <div class="res-desc">${escHtml(r.description || 'No description available.')}</div>
-              <button class="btn-dark" style="width:100%; padding:10px;" onclick="window.open('${r.link}', '_blank')">Access Resource ↗</button>
+              <button class="btn-dark" style="width:100%; padding:10px; margin-top:20px;" onclick="window.open('${r.url}', '_blank')">Access Resource ↗</button>
             </div>
           `).join('');
         } else {
@@ -638,8 +476,12 @@
     // ══════════════════════════════════════════
     async function loadMissions() {
       const container = document.getElementById('missionsContainer');
+      const histContainer = document.getElementById('historyContainer');
       const loader = document.getElementById('missionsLoading');
+      
       container.innerHTML = '';
+      if(histContainer) histContainer.innerHTML = '';
+      
       loader.style.display = 'block';
 
       try {
@@ -648,12 +490,18 @@
         
         if (!data.success || !data.tasks || data.tasks.length === 0) {
           container.innerHTML = '<div class="empty-state">No active missions available.</div>';
+          if(histContainer) histContainer.innerHTML = '<div class="empty-state">No mission history available.</div>';
           return;
         }
 
+        let activeCount = 0;
+        let histCount = 0;
+
         data.tasks.forEach(t => {
           let actionHtml = '';
-          if (t.status === 'Open' || t.status === 'In Progress') {
+          const isActive = (t.status === 'Open' || t.status === 'In Progress');
+          
+          if (isActive) {
             actionHtml = `
               <div style="margin-top:16px;">
                 <input type="text" id="submitLink_${t.taskId}" class="form-input" placeholder="Paste proof link (GitHub, Drive, etc.)" style="margin-bottom:8px;">
@@ -663,23 +511,83 @@
           } else {
             actionHtml = `<div style="margin-top:16px; font-weight:600; color:var(--accent2);">${t.status}</div>`;
             if (t.feedback) actionHtml += `<div style="margin-top:8px; font-size:13px; color:var(--text-3);">Admin Feedback: ${escHtml(t.feedback)}</div>`;
+            
+            if (t.status === 'Under Review') {
+                actionHtml += `
+                <div style="margin-top:12px; padding:12px; background:rgba(0,0,0,0.03); border-radius:8px; border:1px solid var(--border);">
+                  <label style="font-size:11px; color:var(--text-3); text-transform:uppercase; margin-bottom:4px; display:block;">Update Submission</label>
+                  <input type="text" id="editLink_${t.taskId}" class="form-input" value="${escHtml(t.submitLink)}" style="margin-bottom:8px;">
+                  <div style="display:flex; gap:8px;">
+                      <button class="btn-dark" style="flex:1; padding:8px 12px; font-size:12px;" onclick="editMission('${t.taskId}')">Update Link</button>
+                      <button class="btn-dark" style="flex:1; padding:8px 12px; font-size:12px; background:#ef4444;" onclick="recallMission('${t.taskId}')">Recall Submission</button>
+                  </div>
+                </div>
+                `;
+            } else if (t.status === 'Completed' || t.status === 'Approved') {
+                actionHtml += `<div style="margin-top:8px; font-size:12px; color:var(--text-3);">Submitted Link: <a href="${escHtml(t.submitLink)}" target="_blank" style="color:var(--accent2); text-decoration:underline;">View ↗</a></div>`;
+            }
           }
 
-          container.innerHTML += `
+          const card = `
             <div class="glass-card" style="margin-bottom:16px; border-left:4px solid var(--accent2);">
               <div style="display:flex; justify-content:space-between;">
                 <h3 style="font-family:var(--font-d); font-size:18px;">${escHtml(t.title)}</h3>
                 <span class="prof-badge">${escHtml(t.difficulty)} | ${t.xp} XP</span>
               </div>
-              <p style="color:var(--text-2); font-size:14px; margin-top:8px;">${escHtml(t.description)}</p>
+              <p style="color:var(--text-2); font-size:14px; margin-top:8px;">${parseMarkdown(t.description)}</p>
               ${actionHtml}
             </div>
           `;
+          
+          if (isActive) {
+             container.innerHTML += card;
+             activeCount++;
+          } else {
+             if(histContainer) histContainer.innerHTML += card;
+             histCount++;
+          }
         });
+        
+        if (activeCount === 0) container.innerHTML = '<div class="empty-state">No active missions available.</div>';
+        if (histCount === 0 && histContainer) histContainer.innerHTML = '<div class="empty-state">No mission history available.</div>';
+
       } catch (e) {
         loader.style.display = 'none';
         container.innerHTML = '<div class="empty-state">Failed to load missions.</div>';
+        if(histContainer) histContainer.innerHTML = '<div class="empty-state">Failed to load history.</div>';
       }
+    }
+
+    async function editMission(taskId) {
+      const linkInput = document.getElementById('editLink_' + taskId);
+      const submitLink = linkInput.value.trim();
+      if (!submitLink) return toast('Please provide a submission link', 'error');
+      
+      toast('Updating submission...');
+      try {
+        const r = await fetch('https://innovexareg.vercel.app/api/proxy', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_edit_task', taskId, submitLink } })
+        });
+        const res = await r.json();
+        if (res.success) { toast('Link updated successfully.', 'success'); loadMissions(); }
+        else { toast(res.message || 'Error updating', 'error'); }
+      } catch(e) { toast('Network error', 'error'); }
+    }
+
+    async function recallMission(taskId) {
+      if(!confirm("Are you sure you want to recall this submission? It will be moved back to Active Missions.")) return;
+      
+      toast('Recalling submission...');
+      try {
+        const r = await fetch('https://innovexareg.vercel.app/api/proxy', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_recall_task', taskId } })
+        });
+        const res = await r.json();
+        if (res.success) { toast('Submission recalled.', 'success'); loadMissions(); }
+        else { toast(res.message || 'Error recalling', 'error'); }
+      } catch(e) { toast('Network error', 'error'); }
     }
 
     async function submitMission(taskId) {
@@ -687,19 +595,27 @@
       const submitLink = linkInput.value.trim();
       if (!submitLink) return toast('Please provide a submission link', 'error');
       
+      const actionDiv = linkInput.parentElement;
+      const originalHTML = actionDiv.innerHTML;
+      
+      // Optimistic UI Update
+      actionDiv.innerHTML = `<div style="margin-top:16px; font-weight:600; color:var(--accent2);">Under Review</div>`;
+      toast('Mission submitted for review!');
+      
       try {
-        await fetch('https://innovexareg.vercel.app/api/proxy', {
+        fetch('https://innovexareg.vercel.app/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })
+        }).then(r => r.json()).then(res => {
+          if (!res || !res.success) throw new Error('Backend rejection');
+        }).catch(e => {
+          toast('Network error. Reverting...', 'error');
+          actionDiv.innerHTML = originalHTML; // Revert UI
         });
-        
-        toast('Mission submitted for review!');
-        // wait for GAS to process then reload
-        await new Promise(r => setTimeout(r, 1500));
-        loadMissions();
       } catch(e) { 
         toast('Network error. Try again.', 'error'); 
+        actionDiv.innerHTML = originalHTML;
       }
     }
 

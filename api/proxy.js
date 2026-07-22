@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // Default to no-cache, override later for GET
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
@@ -21,6 +22,11 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
+      // Vercel Edge Cache: Cache successful GET requests for 60 seconds
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+      res.removeHeader('Pragma');
+      res.removeHeader('Expires');
+      
       // Build GAS URL — forward all query params except 'url' wrapper
       const params = { ...req.query };
       delete params.url; // remove internal routing param if present
@@ -59,9 +65,12 @@ export default async function handler(req, res) {
         payload.adminKey = 'INNOVEXA_SECURE_KEY_2025';
       }
 
+      const isGas = targetUrl.includes('script.google.com');
+      const contentType = isGas ? 'text/plain;charset=utf-8' : 'application/json';
+
       const gasRes = await fetch(targetUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': contentType },
         body: JSON.stringify(typeof payload === 'string' ? JSON.parse(payload) : payload),
         redirect: 'follow',
       });

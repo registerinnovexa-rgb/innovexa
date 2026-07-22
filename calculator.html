@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator — Innovexa Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/design.css" />
+  <style>
+    :root {
+      --font-d: 'Space Grotesk', sans-serif;
+      --font-b: 'Inter', sans-serif;
+      --font-m: 'Geist Mono', monospace;
+      --bg: #f4f3ef;
+      --text-1: #111110;
+      --text-2: #6b6375;
+      --text-3: #9ca3af;
+      --border: rgba(0,0,0,0.08);
+      --max-w: 1300px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-b);
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .calculator {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 32px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+    }
+    .display {
+      background: rgba(0,0,0,0.03);
+      border-radius: 20px;
+      padding: 24px 20px;
+      margin-bottom: 24px;
+      text-align: right;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      word-break: break-all;
+    }
+    .display .expression {
+      font-family: var(--font-m);
+      font-size: 18px;
+      color: var(--text-2);
+      min-height: 28px;
+      transition: color 0.2s;
+    }
+    .display .result {
+      font-family: var(--font-d);
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-top: 8px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .btn {
+      font-family: var(--font-b);
+      font-size: 20px;
+      font-weight: 500;
+      padding: 18px 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.7);
+      color: var(--text-1);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .btn:hover { background: rgba(255,255,255,0.95); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); background: rgba(0,0,0,0.04); }
+    .btn-op {
+      background: rgba(0,0,0,0.04);
+      color: var(--text-1);
+    }
+    .btn-op:hover { background: rgba(0,0,0,0.08); }
+    .btn-eq {
+      background: var(--text-1);
+      color: var(--bg);
+      border-color: var(--text-1);
+    }
+    .btn-eq:hover { opacity: 0.85; }
+    .btn-clear {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+    .btn-span-2 { grid-column: span 2; }
+    .brand {
+      text-align: center;
+      margin-top: 20px;
+      font-family: var(--font-m);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display">
+      <div class="expression" id="expression"></div>
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="buttons">
+      <button class="btn btn-clear" data-action="clear">AC</button>
+      <button class="btn btn-op" data-action="sign">±</button>
+      <button class="btn btn-op" data-action="percent">%</button>
+      <button class="btn btn-op" data-action="divide">÷</button>
+
+      <button class="btn" data-value="7">7</button>
+      <button class="btn" data-value="8">8</button>
+      <button class="btn" data-value="9">9</button>
+      <button class="btn btn-op" data-action="multiply">×</button>
+
+      <button class="btn" data-value="4">4</button>
+      <button class="btn" data-value="5">5</button>
+      <button class="btn" data-value="6">6</button>
+      <button class="btn btn-op" data-action="subtract">−</button>
+
+      <button class="btn" data-value="1">1</button>
+      <button class="btn" data-value="2">2</button>
+      <button class="btn" data-value="3">3</button>
+      <button class="btn btn-op" data-action="add">+</button>
+
+      <button class="btn btn-span-2" data-value="0">0</button>
+      <button class="btn" data-value=".">.</button>
+      <button class="btn btn-eq" data-action="equals">=</button>
+    </div>
+    <div class="brand">Innovexa Hub — Calculator</div>
+  </div>
+  <script>
+    const resultEl = document.getElementById('result');
+    const exprEl = document.getElementById('expression');
+
+    let current = '0';
+    let previous = '';
+    let operation = null;
+    let resetNext = false;
+
+    function updateDisplay() {
+      resultEl.textContent = current;
+      if (operation && previous) {
+        exprEl.textContent = `${previous} ${opSymbol(operation)}`;
+      } else {
+        exprEl.textContent = '';
+      }
+    }
+
+    function opSymbol(op) {
+      return { add: '+', subtract: '−', multiply: '×', divide: '÷' }[op] || '';
+    }
+
+    function inputDigit(digit) {
+      if (resetNext) { current = ''; resetNext = false; }
+      if (digit === '.' && current.includes('.')) return;
+      if (current === '0' && digit !== '.') current = digit;
+      else current += digit;
+    }
+
+    function chooseOp(op) {
+      if (operation && !resetNext) calculate();
+      previous = current;
+      operation = op;
+      resetNext = true;
+    }
+
+    function calculate() {
+      if (!operation || !previous) return;
+      const a = parseFloat(previous);
+      const b = parseFloat(current);
+      if (isNaN(a) || isNaN(b)) return;
+      let result;
+      switch (operation) {
+        case 'add': result = a + b; break;
+        case 'subtract': result = a - b; break;
+        case 'multiply': result = a * b; break;
+        case 'divide': result = b === 0 ? 'Error' : a / b; break;
+      }
+      if (result === 'Error') {
+        current = 'Error';
+        operation = null;
+        previous = '';
+      } else {
+        current = String(parseFloat(result.toFixed(10)));
+        operation = null;
+        previous = '';
+      }
+      resetNext = true;
+    }
+
+    function clear() {
+      current = '0';
+      previous = '';
+      operation = null;
+      resetNext = false;
+    }
+
+    function toggleSign() {
+      if (current === '0') return;
+      current = String(-parseFloat(current));
+    }
+
+    function percent() {
+      current = String(parseFloat(current) / 100);
+    }
+
+    document.querySelector('.buttons').addEventListener('click', e => {
+      const btn = e.target.closest('.btn');
+      if (!btn) return;
+
+      const value = btn.dataset.value;
+      const action = btn.dataset.action;
+
+      if (action === 'clear') { clear(); updateDisplay(); return; }
+      if (action === 'sign') { toggleSign(); updateDisplay(); return; }
+      if (action === 'percent') { percent(); updateDisplay(); return; }
+      if (action === 'equals') { calculate(); updateDisplay(); return; }
+      if (action === 'add' || action === 'subtract' || action === 'multiply' || action === 'divide') {
+        chooseOp(action); updateDisplay(); return;
+      }
+      if (value !== undefined) { inputDigit(value); updateDisplay(); }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key >= '0' && e.key <= '9') { inputDigit(e.key); updateDisplay(); return; }
+      if (e.key === '.') { inputDigit('.'); updateDisplay(); return; }
+      if (e.key === '+') { chooseOp('add'); updateDisplay(); return; }
+      if (e.key === '-') { chooseOp('subtract'); updateDisplay(); return; }
+      if (e.key === '*') { chooseOp('multiply'); updateDisplay(); return; }
+      if (e.key === '/') { e.preventDefault(); chooseOp('divide'); updateDisplay(); return; }
+      if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calculate(); updateDisplay(); return; }
+      if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') { clear(); updateDisplay(); return; }
+      if (e.key === '%') { percent(); updateDisplay(); return; }
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>

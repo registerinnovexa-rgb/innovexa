@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pathfinder — Innovexa Hub</title>
+  
+  <meta name="description" content="Intensive zero-to-one learning modules focusing on modern stacks, AI engineering, and systems architecture." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/design.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <script src="/js/shield.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
+    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="width:28px; height:28px; object-fit:contain;" />
+      <span style="letter-spacing:-0.02em;">Innovexa<span style="opacity:0.5;">Hub</span></span>
+    </a>
+    <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
+      <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="pathfinder.html" class="nav-link active" style="font-size:14px; font-weight:500;">Pathfinder</a>
+      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Forge</a>
+      <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+    </div>
+    <div class="nav-cta">
+      <a href="register.html" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Initialize Membership</a>
+    </div>
+    <button class="hamburger" id="hamburger-btn">
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+  <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Forge</a>
+  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home" style="min-height: 60vh; align-items: center; justify-content: center; padding-top: 120px;">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+    <div class="shape-1" style="background: rgba(0, 112, 243, 0.3);"></div>
+    <div class="shape-2"></div>
+  </div>
+
+  <div class="hero-content container" style="text-align: center;">
+    <div class="hero-badge fade-up">
+      <span class="badge-dot" style="background:#fbbf24;"></span>
+      Active Protocol
+    </div>
+
+    <h1 class="hero-headline fade-up delay-1">
+      Pathfinder <br>
+      <span class="italic">Bootcamps.</span>
+    </h1>
+
+    <p class="hero-sub fade-up delay-2" style="max-width: 600px; margin: 0 auto 32px auto;">
+      Intensive, zero-to-one learning modules designed to build raw engineering competence. Built by those who build.
+    </p>
+  </div>
+</section>
+
+<!-- BOOTCAMP 1 SECTION -->
+<section class="bento-section container" style="margin-top: -60px; position: relative; z-index: 10; padding-bottom: 120px;">
+  <div class="bento-grid" style="grid-template-columns: 1fr; grid-auto-rows: auto; max-width: 900px; margin: 0 auto;">
+    
+    <div class="bento-card fade-up delay-3" style="padding: 40px; border: 1px solid var(--accent); box-shadow: 0 0 40px rgba(0, 112, 243, 0.15); overflow: visible; height: auto;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div style="color:var(--accent); font-family:var(--font-m); font-weight:600; font-size:14px; letter-spacing: 2px; text-transform:uppercase; margin-bottom: 12px;">Bootcamp 01</div>
+          <h2 style="font-family:var(--font-d); font-size: 36px; margin: 0; line-height: 1.2;">Web Foundations &amp; <br>Frontend Systems</h2>
+        </div>
+        <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid #25D366; color: #25D366; padding: 8px 16px; border-radius: 4px; font-family:var(--font-m); font-size: 13px; font-weight: 600; white-space: nowrap;">
+          Registration Open
+        </div>
+      </div>
+
+      <div style="display:flex; gap: 40px; margin-bottom: 32px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="color:var(--text3); font-size: 11px; text-transform:uppercase; letter-spacing:1px; margin-bottom: 6px;">Duration</div>
+          <div style="font-weight: 600; font-size: 15px;">4 Weeks</div>
+        </div>
+        <div>
+          <div style="color:var(--text3); font-size: 11px; text-transform:uppercase; letter-spacing:1px; margin-bottom: 6px;">Difficulty</div>
+          <div style="font-weight: 600; font-size: 15px; display:flex; gap: 4px; align-items:center;">
+            <div style="width:8px; height:8px; background:var(--accent); border-radius:50%;"></div>
+            <div style="width:8px; height:8px; background:var(--bg3); border-radius:50%;"></div>
+            <div style="width:8px; height:8px; background:var(--bg3); border-radius:50%;"></div>
+            <span style="margin-left: 8px;">Beginner</span>
+          </div>
+        </div>
+        <div>
+          <div style="color:var(--text3); font-size: 11px; text-transform:uppercase; letter-spacing:1px; margin-bottom: 6px;">Outcome</div>
+          <div style="font-weight: 600; font-size: 15px;">Deploy 3 Live Projects</div>
+        </div>
+      </div>
+
+      <p style="color:var(--text2); font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+        This is where your journey begins. Bootcamp 01 strips away the abstraction and teaches you the absolute core of the web: HTML, Vanilla CSS, and modern JavaScript. You will not just follow tutorials; you will build real interfaces, implement glassmorphism designs, fetch APIs, and deploy your code to the world.
+      </p>
+
+      <div style="margin-bottom: 40px;">
+        <h3 style="font-size:18px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">The Syllabus</h3>
+        
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+          <div style="background:var(--bg2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="font-weight:600; margin-bottom:4px;">Week 1: Structure</div>
+            <div style="color:var(--text3); font-size:13px;">Semantic HTML5, Layout Systems (Flexbox & Grid), Responsive Design patterns.</div>
+          </div>
+          <div style="background:var(--bg2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="font-weight:600; margin-bottom:4px;">Week 2: Aesthetics</div>
+            <div style="color:var(--text3); font-size:13px;">Advanced CSS, CSS Variables, Animations, Glassmorphism, and UI/UX basics.</div>
+          </div>
+          <div style="background:var(--bg2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="font-weight:600; margin-bottom:4px;">Week 3: Logic</div>
+            <div style="color:var(--text3); font-size:13px;">Vanilla JavaScript, DOM Manipulation, Event Listeners, and State Management.</div>
+          </div>
+          <div style="background:var(--bg2); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="font-weight:600; margin-bottom:4px;">Week 4: Deployment</div>
+            <div style="color:var(--text3); font-size:13px;">Git/GitHub workflows, API integration, and deploying to Vercel/Netlify.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:24px; margin-top:8px;">
+        <h3 style="font-size:16px; margin-bottom:16px;">Register for Bootcamp 01</h3>
+        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+          <a href="https://wa.me/919943509981?text=I%20want%20to%20register%20for%20Pathfinder%20Bootcamp%201" target="_blank" style="flex:1; min-width:220px; display:flex; align-items:center; gap:12px; padding:16px 20px; background:rgba(37,211,102,0.08); border:1px solid rgba(37,211,102,0.3); border-radius:8px; text-decoration:none; color:inherit; transition:all 0.2s;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <div>
+              <div style="font-weight:600; font-size:14px;">WhatsApp</div>
+              <div style="font-size:13px; color:var(--text3); font-family:var(--font-m);">+91 99435 09981</div>
+            </div>
+          </a>
+          <a href="mailto:innovexahub.bangalore@gmail.com?subject=Pathfinder%20Bootcamp%2001%20Registration" style="flex:1; min-width:220px; display:flex; align-items:center; gap:12px; padding:16px 20px; background:rgba(0,112,243,0.06); border:1px solid rgba(0,112,243,0.2); border-radius:8px; text-decoration:none; color:inherit; transition:all 0.2s;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <div>
+              <div style="font-weight:600; font-size:14px;">Email</div>
+              <div style="font-size:13px; color:var(--text3); font-family:var(--font-m);">innovexahub.bangalore@gmail.com</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner container">
+    <a href="index.html" class="footer-logo">
+      <img src="assets/logo.png" alt="Innovexa Hub" />
+      Innovexa<span style="opacity:0.4;">Hub</span>
+    </a>
+    <div class="footer-links">
+      <a href="index.html" class="footer-link">Home</a>
+      <a href="register.html" class="footer-link">Register</a>
+      <a href="status.html" class="footer-link">Status</a>
+      <a href="atlas.html" class="footer-link">Atlas</a>
+    </div>
+    <div class="footer-copy">© 2026 Innovexa Hub. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
+    }
+  }, { passive: true });
+
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
+  });
+  function closeMobileMenu() {
+    mobileMenu.style.transform = 'translateY(-100%)';
+  }
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
+
+  // Intersection Observer for scroll animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fade-up').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(40px)';
+      el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+      if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+      if(el.classList.contains('delay-2')) el.style.transitionDelay = '0.2s';
+      if(el.classList.contains('delay-3')) el.style.transitionDelay = '0.3s';
+      observer.observe(el);
+      
+      // Force reveal hero immediately
+      if(el.closest('.hero')) {
+          setTimeout(() => {
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0)';
+          }, 50);
+      }
+    });
+  });
+</script>
+</body>
+</html>

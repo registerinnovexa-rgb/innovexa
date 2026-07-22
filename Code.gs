@@ -73,7 +73,9 @@ function doGet(e) {
               paymentProofUrl:String(row[14] || ''),
               gender:         String(row[15] || ''),
               forgeRole:      String(row[16] || ''),
-              linkedMentor:   String(row[17] || '')
+              linkedMentor:   String(row[17] || ''),
+              forgeAccess:    String(row[18] || ''),
+              college:        String(row[22] || '')
             }
           });
         }
@@ -81,18 +83,50 @@ function doGet(e) {
       if (!action) return respond({ success: false, found: false, message: 'No member found.' });
     }
 
+
     // FORGE: Login
     if (action === 'forge_login') {
-      if (!p.invxId || !p.email) return respond({ success: false, message: 'Missing credentials.' });
+      if (!p.invxId || !p.dob) return respond({ success: false, message: 'Missing Operative ID or Date of Birth.' });
+      
+      var reqOpId = String(p.invxId).trim().toUpperCase();
+      var reqDob = String(p.dob).trim();
+
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
         var rowOpId = String(row[12] || '').trim().toUpperCase();
-        var rowEmail = String(row[2] || '').trim().toLowerCase();
-        var reqOpId = String(p.invxId).trim().toUpperCase();
-        var reqEmail = String(p.email).trim().toLowerCase();
+        var rowDob = row[7];
         
-        if (rowOpId === reqOpId && rowEmail === reqEmail) {
+        // Google Sheets sometimes formats dates weirdly, so we compare the first 10 characters (YYYY-MM-DD)
+        // Extract local timezone date instead of UTC toISOString() to avoid off-by-one errors
+        var rowDobStr = "";
+        if (rowDob) {
+          if (rowDob instanceof Date || Object.prototype.toString.call(rowDob) === '[object Date]') {
+            var y = rowDob.getFullYear();
+            var m = String(rowDob.getMonth() + 1).padStart(2, '0');
+            var d = String(rowDob.getDate()).padStart(2, '0');
+            rowDobStr = y + '-' + m + '-' + d;
+          } else {
+            var ds = String(rowDob).trim();
+            // Handle if Google Sheets casted Date to String like "Sat May 15 2004"
+            var parsed = new Date(ds);
+            if (!isNaN(parsed.getTime())) {
+                var y = parsed.getFullYear();
+                var m = String(parsed.getMonth() + 1).padStart(2, '0');
+                var d = String(parsed.getDate()).padStart(2, '0');
+                rowDobStr = y + '-' + m + '-' + d;
+            } else if (ds.length >= 10 && (ds.charAt(2) === '-' || ds.charAt(2) === '/')) {
+                // DD-MM-YYYY format
+                var parts = ds.split(/[\-\/]/);
+                rowDobStr = parts[2] + '-' + parts[1] + '-' + parts[0];
+            } else {
+                rowDobStr = ds.substring(0, 10);
+            }
+          }
+        }
+        var reqDobStr = reqDob.substring(0, 10);
+        
+        if (rowOpId === reqOpId && rowDobStr === reqDobStr) {
           var status = String(row[10] || '').trim();
           if (status !== 'Approved' && status !== 'Confirmed') {
             return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
@@ -117,7 +151,7 @@ function doGet(e) {
           });
         }
       }
-      return respond({ success: false, message: 'Invalid INVX ID or Email.' });
+      return respond({ success: false, message: 'Invalid INVX ID or Date of Birth.' });
     }
     
     // ADMIN: Login
@@ -133,7 +167,7 @@ function doGet(e) {
         
         if (rowOpId === reqOpId && rowEmail === reqEmail) {
           var role = String(row[16] || '').trim().toLowerCase(); // Column Q
-          if (role !== 'admin' && rowOpId !== 'INVX-01') {
+          if (role !== 'admin' && !['INVX-01', 'INVX-09', 'INVX-02', 'INVX-03'].includes(rowOpId)) {
             return respond({ success: false, message: 'Access Denied. You do not have Admin privileges.' });
           }
           return respond({
@@ -145,7 +179,7 @@ function doGet(e) {
           });
         }
       }
-      return respond({ success: false, message: 'Invalid INVX ID or Email.' });
+      return respond({ success: false, message: 'Invalid INVX ID or Date of Birth.' });
     }
 
     // FORGE: Get Mentors
@@ -329,6 +363,86 @@ function doGet(e) {
       return respond({ success: true, members: members });
     }
 
+
+    // ADMIN: Get Events
+    if (action === 'admin_get_events') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var rows = eventsSheet.getDataRange().getValues();
+      var events = [];
+      for (var i = 1; i < rows.length; i++) {
+        events.push({
+          eventId: String(rows[i][0] || ''),
+          timestamp: String(rows[i][1] || ''),
+          title: String(rows[i][2] || ''),
+          date: String(rows[i][3] || ''),
+          description: String(rows[i][4] || ''),
+          coverUrl: String(rows[i][5] || ''),
+          status: String(rows[i][6] || ''),
+          eventType: String(rows[i][7] || 'Event')
+        });
+      }
+      return respond({ success: true, events: events.reverse() });
+    }
+
+    // PUBLIC: Get Events
+    if (action === 'get_public_events') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var rows = eventsSheet.getDataRange().getValues();
+      var events = [];
+      for (var i = 1; i < rows.length; i++) {
+        var type = String(rows[i][7] || 'Event');
+        if (type === 'Session') continue; // Hide sessions from public
+        
+        events.push({
+          eventId: String(rows[i][0] || ''),
+          title: String(rows[i][2] || ''),
+          date: String(rows[i][3] || ''),
+          description: String(rows[i][4] || ''),
+          coverUrl: String(rows[i][5] || ''),
+          status: String(rows[i][6] || ''),
+          eventType: type
+        });
+      }
+      return respond({ success: true, events: events.reverse() });
+    }
+
+    // ADMIN: Get Attendance
+    if (action === 'admin_get_attendance') {
+      if (!p.eventId) return respond({ success: false, message: 'Missing Event ID.' });
+      var attSheet = getOrCreateSheet(ss, 'ForgeAttendance', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
+      var rows = attSheet.getDataRange().getValues();
+      var attendance = [];
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(p.eventId)) {
+          attendance.push({
+            operativeId: String(rows[i][1]),
+            timestamp: String(rows[i][2]),
+            operativeName: String(rows[i][3])
+          });
+        }
+      }
+      return respond({ success: true, attendance: attendance });
+    }
+
+    // ADMIN: Get Feedback
+    if (action === 'admin_get_feedback') {
+      if (!p.eventId) return respond({ success: false, message: 'Missing Event ID.' });
+      var fbSheet = getOrCreateSheet(ss, 'ForgeFeedback', ['EventID', 'OperativeID', 'Rating', 'Comments', 'Timestamp']);
+      var rows = fbSheet.getDataRange().getValues();
+      var feedback = [];
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(p.eventId)) {
+          feedback.push({
+            operativeId: String(rows[i][1]),
+            rating: String(rows[i][2]),
+            comments: String(rows[i][3]),
+            timestamp: String(rows[i][4])
+          });
+        }
+      }
+      return respond({ success: true, feedback: feedback });
+    }
+
     // ADMIN & FORGE: Get Tasks
     if (action === 'admin_get_tasks' || action === 'forge_get_my_tasks') {
       var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
@@ -338,7 +452,8 @@ function doGet(e) {
         var assignedTo = String(rows[i][7] || '').trim();
         // If forge_get_my_tasks, only return 'Open' tasks or tasks assigned to this user
         if (action === 'forge_get_my_tasks' && p.invxId) {
-           if (assignedTo !== 'Open' && assignedTo !== String(p.invxId).trim()) continue;
+           var assignedArr = assignedTo.split(',').map(function(s) { return s.trim().toUpperCase(); });
+           if (assignedTo.toUpperCase() !== 'OPEN' && assignedArr.indexOf(String(p.invxId).trim().toUpperCase()) === -1) continue;
         }
         tasks.push({
           taskId: rows[i][0],
@@ -537,6 +652,34 @@ function doPost(e) {
       return respond({ success: false, message: 'Task not found.' });
     }
 
+
+    // FORGE: Edit Task
+    if (action === 'forge_edit_task') {
+      var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+      var rows = tasksSheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (rows[i][0] === payload.taskId) {
+          tasksSheet.getRange(i + 1, 9).setValue(payload.submitLink || '');
+          return respond({ success: true, message: 'Submission link updated.' });
+        }
+      }
+      return respond({ success: false, message: 'Task not found.' });
+    }
+
+    // FORGE: Recall Task
+    if (action === 'forge_recall_task') {
+      var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+      var rows = tasksSheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (rows[i][0] === payload.taskId) {
+          // Change status back to In Progress
+          tasksSheet.getRange(i + 1, 7).setValue('In Progress');
+          return respond({ success: true, message: 'Task recalled.' });
+        }
+      }
+      return respond({ success: false, message: 'Task not found.' });
+    }
+
     // Verify Admin Key
     if (payload.adminKey !== 'INNOVEXA_SECURE_KEY_2025') {
       return respond({ success: false, message: 'Unauthorized POST request.' });
@@ -677,6 +820,226 @@ function doPost(e) {
       return respond({ success: false, message: 'Task not found.' });
     }
 
+
+    // ADMIN: Create Event
+    if (op === 'admin_create_event') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var eventId = 'EVT-' + Math.floor(10000 + Math.random() * 90000);
+      eventsSheet.appendRow([
+        eventId,
+        new Date().toISOString(),
+        payload.title || '',
+        payload.date || '',
+        payload.description || '',
+        payload.coverUrl || '',
+        'Active',
+        payload.eventType || 'Event'
+      ]);
+      return respond({ success: true, message: 'Event created.' });
+    }
+
+    // ADMIN: Delete Event
+    if (op === 'admin_delete_event') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var rows = eventsSheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(payload.eventId)) {
+          eventsSheet.deleteRow(i + 1);
+          return respond({ success: true, message: 'Event deleted.' });
+        }
+      }
+      return respond({ success: false, message: 'Event not found.' });
+    }
+
+    // ADMIN: Edit Event
+    if (op === 'admin_edit_event') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var rows = eventsSheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][0]) === String(payload.eventId)) {
+          eventsSheet.getRange(i + 1, 3).setValue(payload.title || rows[i][2]);
+          eventsSheet.getRange(i + 1, 4).setValue(payload.date || rows[i][3]);
+          eventsSheet.getRange(i + 1, 5).setValue(payload.description || rows[i][4]);
+          eventsSheet.getRange(i + 1, 6).setValue(payload.coverUrl || rows[i][5]);
+          eventsSheet.getRange(i + 1, 8).setValue(payload.eventType || rows[i][7] || 'Event');
+          return respond({ success: true, message: 'Event updated.' });
+        }
+      }
+      return respond({ success: false, message: 'Event not found.' });
+    }
+
+    // ADMIN: Log Attendance (QR Scanner)
+    if (op === 'admin_log_attendance') {
+      if (!payload.eventId || !payload.operativeId) return respond({ success: false, message: 'Missing Event ID or Operative ID.' });
+      
+      // 1. Verify Operative ID exists and get name
+      var regRows = sheet.getDataRange().getValues();
+      var opName = '';
+      var opFound = false;
+      for (var i = 1; i < regRows.length; i++) {
+        if (String(regRows[i][12]).trim().toUpperCase() === String(payload.operativeId).trim().toUpperCase()) {
+          opName = String(regRows[i][1]);
+          opFound = true;
+          break;
+        }
+      }
+      if (!opFound) return respond({ success: false, message: 'Invalid Operative ID.' });
+
+      // 2. Check if already logged
+      var attSheet = getOrCreateSheet(ss, 'ForgeAttendance', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
+      var attRows = attSheet.getDataRange().getValues();
+      for (var j = 1; j < attRows.length; j++) {
+        if (String(attRows[j][0]) === String(payload.eventId) && String(attRows[j][1]).toUpperCase() === String(payload.operativeId).toUpperCase()) {
+          return respond({ success: false, message: 'Attendance already logged for this operative.' });
+        }
+      }
+
+      // 3. Log it
+      attSheet.appendRow([
+        payload.eventId,
+        payload.operativeId.toUpperCase(),
+        new Date().toISOString(),
+        opName
+      ]);
+      return respond({ success: true, message: 'Attendance logged successfully.', data: { name: opName } });
+    }
+
+    // ADMIN: Remove Attendance
+    if (op === 'admin_remove_attendance') {
+      if (!payload.eventId || !payload.operativeId) return respond({ success: false, message: 'Missing Event ID or Operative ID.' });
+      var attSheet = getOrCreateSheet(ss, 'ForgeAttendance', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
+      var attRows = attSheet.getDataRange().getValues();
+      for (var j = 1; j < attRows.length; j++) {
+        if (String(attRows[j][0]) === String(payload.eventId) && String(attRows[j][1]).toUpperCase() === String(payload.operativeId).toUpperCase()) {
+          attSheet.deleteRow(j + 1);
+          return respond({ success: true, message: 'Attendance removed.' });
+        }
+      }
+      return respond({ success: false, message: 'Attendance record not found.' });
+    }
+
+    // ADMIN: Issue Certificates
+    if (op === 'admin_issue_certificates') {
+      if (!payload.eventId || !payload.templateId || !payload.operatives) return respond({ success: false, message: 'Missing parameters.' });
+      
+      var opsToIssue = payload.operatives;
+      var sentCount = 0;
+      
+      // 1. Get Event Details
+      var eventSheet = getOrCreateSheet(ss, 'ForgeEvents');
+      var evRows = eventSheet.getDataRange().getValues();
+      var eventName = "Event";
+      for (var evt = 1; evt < evRows.length; evt++) {
+        if (String(evRows[evt][0]) === String(payload.eventId)) {
+          eventName = String(evRows[evt][1]);
+          break;
+        }
+      }
+      
+      // 2. Loop through all registered operatives to get names & emails
+      var regRows = sheet.getDataRange().getValues();
+      for (var i = 1; i < regRows.length; i++) {
+        var opId = String(regRows[i][12]).trim().toUpperCase();
+        var email = String(regRows[i][2]).trim();
+        var name = String(regRows[i][1]).trim();
+        
+        if (opsToIssue.indexOf(opId) !== -1 && email) {
+          try {
+            // Duplicate Template
+            var file = DriveApp.getFileById(payload.templateId).makeCopy(name + " - Certificate");
+            var presentation = SlidesApp.openById(file.getId());
+            var slides = presentation.getSlides();
+            
+            // Replace tags
+            for (var s = 0; s < slides.length; s++) {
+              slides[s].replaceAllText("{{NAME}}", name.toUpperCase());
+              slides[s].replaceAllText("{{EVENT}}", eventName.toUpperCase());
+            }
+            presentation.saveAndClose();
+            
+            // Get PDF Blob
+            var pdfBlob = file.getAs(MimeType.PDF);
+            
+            // Send Email
+            MailApp.sendEmail({
+              to: email,
+              subject: "Innovexa Hub - Your Certificate of Initialization",
+              body: "Hello " + name + ",\n\nAttached is your certificate for successfully executing protocols at " + eventName + ".\n\nBest,\nInnovexa Core Command",
+              attachments: [pdfBlob]
+            });
+            
+            // Cleanup Temp File
+            file.setTrashed(true);
+            sentCount++;
+          } catch(err) {
+            // Skip on fail
+          }
+        }
+      }
+      
+      return respond({ success: true, message: 'Dispatched ' + sentCount + ' certificates.' });
+    }
+
+    // ADMIN: Send Broadcast Email
+    if (op === 'admin_send_broadcast') {
+      if (!payload.subject || !payload.body || !payload.emails || !payload.emails.length) {
+        return respond({ success: false, message: 'Missing subject, body, or recipient list.' });
+      }
+      
+      var sentCount = 0;
+      var emails = payload.emails;
+      
+      try {
+        var chunkSize = 50; 
+        for (var i = 0; i < emails.length; i += chunkSize) {
+          var chunk = emails.slice(i, i + chunkSize);
+          MailApp.sendEmail({
+            to: "admin@innovexahub.com",
+            bcc: chunk.join(","),
+            subject: payload.subject,
+            body: payload.body
+          });
+          sentCount += chunk.length;
+        }
+        return respond({ success: true, message: 'Blasted email to ' + sentCount + ' operatives.' });
+      } catch (err) {
+        return respond({ success: false, message: 'Error sending broadcast: ' + err.toString() });
+      }
+    }
+
+    // PUBLIC: RSVP to Event
+    if (op === 'public_rsvp_event') {
+      if (!payload.eventId || !payload.operativeId) return respond({ success: false, message: 'Missing Event ID or Operative ID.' });
+      
+      var regRows = sheet.getDataRange().getValues();
+      var opName = '';
+      var opFound = false;
+      for (var i = 1; i < regRows.length; i++) {
+        if (String(regRows[i][12]).trim().toUpperCase() === String(payload.operativeId).trim().toUpperCase()) {
+          opName = String(regRows[i][1]);
+          opFound = true;
+          break;
+        }
+      }
+      if (!opFound) return respond({ success: false, message: 'Invalid Operative ID.' });
+
+      var rsvpSheet = getOrCreateSheet(ss, 'EventRSVPs', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
+      var rsvpRows = rsvpSheet.getDataRange().getValues();
+      for (var j = 1; j < rsvpRows.length; j++) {
+        if (String(rsvpRows[j][0]) === String(payload.eventId) && String(rsvpRows[j][1]).toUpperCase() === String(payload.operativeId).toUpperCase()) {
+          return respond({ success: true, message: 'You have already RSVPd to this event!' });
+        }
+      }
+
+      rsvpSheet.appendRow([
+        payload.eventId,
+        payload.operativeId.toUpperCase(),
+        new Date().toISOString(),
+        opName
+      ]);
+      return respond({ success: true, message: 'RSVP Successful! See you there.' });
+    }
+
     // ORIGINAL: Registration logic
     if (!action && !op) {
       // Duplicate email / UTR check
@@ -690,8 +1053,13 @@ function doPost(e) {
         }
       }
 
-      var nextNum     = sheet.getLastRow();
-      var operativeId = 'INVX-' + String(nextNum).padStart(3, '0');
+      // Generate a Random 5-character Alphanumeric ID
+      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      var randomStr = '';
+      for (var k = 0; k < 5; k++) {
+        randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      var operativeId = 'INVX-' + randomStr;
 
       sheet.appendRow([
         timestamp,
@@ -730,6 +1098,22 @@ function doPost(e) {
       return respond({ success: true, message: 'Registered!', data: { operativeId: operativeId } });
     }
     
+    // PUBLIC: Submit Feedback
+    if (op === 'public_submit_feedback') {
+      if (!payload.eventId || !payload.operativeId || !payload.rating) {
+        return respond({ success: false, message: 'Missing parameters.' });
+      }
+      var fbSheet = getOrCreateSheet(ss, 'ForgeFeedback', ['EventID', 'OperativeID', 'Rating', 'Comments', 'Timestamp']);
+      fbSheet.appendRow([
+        payload.eventId,
+        payload.operativeId,
+        payload.rating,
+        payload.comments || '',
+        new Date().toISOString()
+      ]);
+      return respond({ success: true, message: 'Feedback submitted.' });
+    }
+
     return respond({ success: false, message: 'Unknown POST action.' });
 
   } catch (err) {
@@ -741,4 +1125,30 @@ function respond(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+// ==========================================
+// MIGRATION SCRIPT: Run this ONCE to randomize existing IDs
+// ==========================================
+function MIGRATION_UpdateAllIDsToRandom() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations") || SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var data = sheet.getDataRange().getValues();
+  
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  // Start from row 2 (index 1) to skip headers
+  for (var i = 1; i < data.length; i++) {
+    var currentId = data[i][12]; // Column M is index 12
+    if (currentId && String(currentId).startsWith("INVX-")) {
+      var randomStr = '';
+      for (var k = 0; k < 5; k++) {
+        randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      var newId = 'INVX-' + randomStr;
+      
+      // Update Column M (which is column number 13)
+      sheet.getRange(i + 1, 13).setValue(newId);
+    }
+  }
 }
