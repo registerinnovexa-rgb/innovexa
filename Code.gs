@@ -680,6 +680,55 @@ function doPost(e) {
       return respond({ success: false, message: 'Task not found.' });
     }
 
+    // PUBLIC: RSVP to Event
+    if (op === 'public_rsvp_event') {
+      if (!payload.eventId || !payload.operativeId) return respond({ success: false, message: 'Missing Event ID or Operative ID.' });
+      
+      var regRows = sheet.getDataRange().getValues();
+      var opName = '';
+      var opFound = false;
+      for (var i = 1; i < regRows.length; i++) {
+        if (String(regRows[i][12]).trim().toUpperCase() === String(payload.operativeId).trim().toUpperCase()) {
+          opName = String(regRows[i][1]);
+          opFound = true;
+          break;
+        }
+      }
+      if (!opFound) return respond({ success: false, message: 'Invalid Operative ID.' });
+
+      var rsvpSheet = getOrCreateSheet(ss, 'EventRSVPs', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
+      var rsvpRows = rsvpSheet.getDataRange().getValues();
+      for (var j = 1; j < rsvpRows.length; j++) {
+        if (String(rsvpRows[j][0]) === String(payload.eventId) && String(rsvpRows[j][1]).toUpperCase() === String(payload.operativeId).toUpperCase()) {
+          return respond({ success: true, message: 'You have already RSVPd to this event!' });
+        }
+      }
+
+      rsvpSheet.appendRow([
+        payload.eventId,
+        payload.operativeId.toUpperCase(),
+        new Date().toISOString(),
+        opName
+      ]);
+      return respond({ success: true, message: 'RSVP Successful! See you there.' });
+    }
+
+    // PUBLIC: Submit Feedback
+    if (op === 'public_submit_feedback') {
+      if (!payload.eventId || !payload.operativeId || !payload.rating) {
+        return respond({ success: false, message: 'Missing parameters.' });
+      }
+      var fbSheet = getOrCreateSheet(ss, 'ForgeFeedback', ['EventID', 'OperativeID', 'Rating', 'Comments', 'Timestamp']);
+      fbSheet.appendRow([
+        payload.eventId,
+        payload.operativeId,
+        payload.rating,
+        payload.comments || '',
+        new Date().toISOString()
+      ]);
+      return respond({ success: true, message: 'Feedback submitted.' });
+    }
+
     // Verify Admin Key
     if (payload.adminKey !== 'INNOVEXA_SECURE_KEY_2025') {
       return respond({ success: false, message: 'Unauthorized POST request.' });
@@ -931,7 +980,7 @@ function doPost(e) {
       var eventName = "Event";
       for (var evt = 1; evt < evRows.length; evt++) {
         if (String(evRows[evt][0]) === String(payload.eventId)) {
-          eventName = String(evRows[evt][1]);
+          eventName = String(evRows[evt][2]);
           break;
         }
       }
@@ -994,7 +1043,7 @@ function doPost(e) {
         for (var i = 0; i < emails.length; i += chunkSize) {
           var chunk = emails.slice(i, i + chunkSize);
           MailApp.sendEmail({
-            to: "admin@innovexahub.com",
+            to: "innovexahub.bangalore@gmail.com",
             bcc: chunk.join(","),
             subject: payload.subject,
             body: payload.body
@@ -1007,38 +1056,7 @@ function doPost(e) {
       }
     }
 
-    // PUBLIC: RSVP to Event
-    if (op === 'public_rsvp_event') {
-      if (!payload.eventId || !payload.operativeId) return respond({ success: false, message: 'Missing Event ID or Operative ID.' });
-      
-      var regRows = sheet.getDataRange().getValues();
-      var opName = '';
-      var opFound = false;
-      for (var i = 1; i < regRows.length; i++) {
-        if (String(regRows[i][12]).trim().toUpperCase() === String(payload.operativeId).trim().toUpperCase()) {
-          opName = String(regRows[i][1]);
-          opFound = true;
-          break;
-        }
-      }
-      if (!opFound) return respond({ success: false, message: 'Invalid Operative ID.' });
 
-      var rsvpSheet = getOrCreateSheet(ss, 'EventRSVPs', ['EventID', 'OperativeID', 'Timestamp', 'OperativeName']);
-      var rsvpRows = rsvpSheet.getDataRange().getValues();
-      for (var j = 1; j < rsvpRows.length; j++) {
-        if (String(rsvpRows[j][0]) === String(payload.eventId) && String(rsvpRows[j][1]).toUpperCase() === String(payload.operativeId).toUpperCase()) {
-          return respond({ success: true, message: 'You have already RSVPd to this event!' });
-        }
-      }
-
-      rsvpSheet.appendRow([
-        payload.eventId,
-        payload.operativeId.toUpperCase(),
-        new Date().toISOString(),
-        opName
-      ]);
-      return respond({ success: true, message: 'RSVP Successful! See you there.' });
-    }
 
     // ORIGINAL: Registration logic
     if (!action && !op) {
@@ -1098,21 +1116,7 @@ function doPost(e) {
       return respond({ success: true, message: 'Registered!', data: { operativeId: operativeId } });
     }
     
-    // PUBLIC: Submit Feedback
-    if (op === 'public_submit_feedback') {
-      if (!payload.eventId || !payload.operativeId || !payload.rating) {
-        return respond({ success: false, message: 'Missing parameters.' });
-      }
-      var fbSheet = getOrCreateSheet(ss, 'ForgeFeedback', ['EventID', 'OperativeID', 'Rating', 'Comments', 'Timestamp']);
-      fbSheet.appendRow([
-        payload.eventId,
-        payload.operativeId,
-        payload.rating,
-        payload.comments || '',
-        new Date().toISOString()
-      ]);
-      return respond({ success: true, message: 'Feedback submitted.' });
-    }
+
 
     return respond({ success: false, message: 'Unknown POST action.' });
 

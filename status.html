@@ -51,8 +51,7 @@
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
-      <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
   <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Forge</a>
   <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
 </div>
@@ -283,7 +282,11 @@
           
           let actionRow = document.querySelector('.action-row');
           // Reset to just the download button first
-          actionRow.innerHTML = `<button class="btn-magnetic" id="download-id-btn">Download ID Card</button>`;
+          const dlBtn = document.createElement('button');
+          dlBtn.className = 'btn-magnetic';
+          dlBtn.id = 'download-id-btn';
+          dlBtn.textContent = 'Download ID Card';
+          actionRow.appendChild(dlBtn);
           
           if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
             actionRow.insertAdjacentHTML('beforeend', `<a href="forge.html" class="btn-magnetic" style="background:#000; border-color:#333; margin-left:12px;">⚡ Enter Forge Ops</a>`);
@@ -292,6 +295,7 @@
           // Re-attach inline logic from below (since we blew away the old button)
           document.getElementById('download-id-btn').addEventListener('click', () => {
             const printCard = document.getElementById('print-card');
+            const styleContent = `body{font-family:sans-serif;margin:0;padding:0} #print-card{background:#111;color:#fff;border-radius:16px;padding:24px;width:340px;margin:0 auto}`;
             const win = window.open('', '_blank');
             win.document.write(`
               <html>
@@ -302,7 +306,7 @@
                   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
                   <style>
                     body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #fff; }
-                    ${document.querySelector('style').innerHTML}
+                    ${styleContent}
                     .id-card-preview { width: 340px; box-shadow: none; border: 1px solid #ddd; }
                   </style>
                 </head>
@@ -349,9 +353,14 @@
     }
   });
 
+  document.getElementById('query-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('check-btn').click();
+  });
+
   // Download ID
   document.getElementById('download-id-btn')?.addEventListener('click', () => {
     const printCard = document.getElementById('print-card');
+    const styleContent = `body{font-family:sans-serif;margin:0;padding:0} #print-card{background:#111;color:#fff;border-radius:16px;padding:24px;width:340px;margin:0 auto}`;
     const win = window.open('', '_blank');
     win.document.write(`
       <html>
@@ -362,7 +371,7 @@
           <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet" />
           <style>
             body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #fff; }
-            ${document.querySelector('style').innerHTML}
+            ${styleContent}
             .id-card-preview { width: 340px; box-shadow: none; border: 1px solid #ddd; }
           </style>
         </head>

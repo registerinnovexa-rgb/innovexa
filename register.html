@@ -52,7 +52,6 @@
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
       <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
   <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Forge</a>
   <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
@@ -205,9 +204,10 @@
 
       <div class="form-group">
         <label class="form-label">Profile ID Photo</label>
-        <div class="file-drop" id="photo-drop" style="pointer-events:none; border:1px dashed rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div class="file-drop" id="photo-drop" style="border:1px dashed rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;">
+          <input type="file" id="photo" accept="image/*" style="display:none;" />
           <img id="photoPreview" src="" alt="Profile Preview" style="width: 80px; height: 80px; border-radius: 50%; display: none; margin-bottom:12px; object-fit: cover; border: 2px solid var(--accent);" />
-          <div id="photoText" style="color:var(--text3); font-size:13px;">Photo will be synced securely from Google</div>
+          <div id="photoText" style="color:var(--text3); font-size:13px;">Drag & drop or click to upload photo</div>
         </div>
       </div>
 
@@ -299,8 +299,8 @@
       <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
       <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
       <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
-      <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
-      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Forge</a>
+      <a href='pathfinder.html' class='footer-link'>Pathfinder</a>
+      <a href='forge.html' class='footer-link'>Forge</a>
       <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
     </div>
     <div class="footer-copy" style="font-family:var(--font-m); font-size:12px; color:var(--text-3);">© 2026 Innovexa Hub. All rights reserved.</div>
@@ -516,7 +516,7 @@
     }
   }
 
-  handleFile(document.getElementById('photo'), document.getElementById('photo-drop'), document.getElementById('photo-text'), res => photoData = res);
+  handleFile(document.getElementById('photo'), document.getElementById('photo-drop'), document.getElementById('photoText'), res => photoData = res);
   // FIX: Missing payment file handler!
   handleFile(document.getElementById('payment-proof'), document.getElementById('payment-drop'), document.getElementById('payment-text'), res => paymentData = res);
   
@@ -643,6 +643,9 @@
     if (isSubmitting) return;
     const utr = document.getElementById('utr').value.trim();
     if (!utr) { showError('utr', 'UTR is required'); return; }
+    if (!/^\d{12}$/.test(utr)) { showError('utr', 'UTR must be exactly 12 digits'); return; }
+
+    if (!paymentData) { showToast('Please upload your payment proof screenshot.', 'error'); return; }
 
     const captchaAns = document.getElementById('captcha-answer').value.trim();
     if (captchaAns.toLowerCase() !== currentCaptcha.toLowerCase()) {

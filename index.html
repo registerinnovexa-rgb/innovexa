@@ -55,8 +55,7 @@
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
-      <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
   <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Forge</a>
   <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
 </div>
@@ -264,7 +263,8 @@
         <p class="arsenal-desc">Offensive security, cryptography, and securing modern application infrastructure.</p>
       </div>
     </div>
-
+  </div>
+</section>
 
 <!-- ══ SKILL TREE VISUALIZER ════════════════════════════════════════ -->
 <section class="roadmap-section container" style="margin-top:120px;">
@@ -328,10 +328,10 @@
   <div class="partners-inner fade-up">
     <div class="partners-label">Supported by Institutions of Excellence</div>
     <div class="partners-logos" style="display: flex; align-items: center; justify-content: center; gap: 100px; flex-wrap: wrap;">
-      <a href="#" class="partner-logo" aria-label="Kalvium">
+      <a href="https://kalvium.community" target="_blank" rel="noopener" class="partner-logo" aria-label="Kalvium">
         <img src="assets/kalvium-logo.png" alt="Kalvium" loading="lazy" style="height: 90px; width: auto; object-fit: contain;" />
       </a>
-      <a href="#" class="partner-logo" aria-label="Yenepoya University">
+      <a href="https://yenepoya.edu.in" target="_blank" rel="noopener" class="partner-logo" aria-label="Yenepoya University">
         <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" loading="lazy" style="height: 160px; width: auto; object-fit: contain;" />
       </a>
     </div>
@@ -527,6 +527,8 @@
       <a href="index.html" class="footer-link">Home</a>
       <a href="register.html" class="footer-link">Register</a>
       <a href="status.html" class="footer-link">Status</a>
+      <a href="pathfinder.html" class="footer-link">Pathfinder</a>
+      <a href="forge.html" class="footer-link">Forge</a>
       <a href="atlas.html" class="footer-link">Atlas</a>
     </div>
     <div class="footer-copy">© 2026 Innovexa Hub. All rights reserved.</div>
@@ -708,14 +710,14 @@ function switchEventTab(tab) {
 
 function renderEventsGrid() {
   const grid = document.getElementById('eventsGrid');
-  const now = new Date();
+  const todayMs = new Date().setHours(0, 0, 0, 0);
   
   const filtered = allPublicEvents.filter(ev => {
-    const evDate = new Date(ev.date);
+    const evDate = new Date(ev.date).getTime();
     if(currentEventTab === 'upcoming') {
-      return evDate >= now.setHours(0,0,0,0);
+      return evDate >= todayMs;
     } else {
-      return evDate < now.setHours(0,0,0,0);
+      return evDate < todayMs;
     }
   });
 

@@ -51,8 +51,7 @@
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
-      <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
   <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Forge</a>
   <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
 </div>
@@ -252,6 +251,10 @@
   const grid = document.getElementById('resources-grid');
   
   function renderResources(items) {
+    if (items.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-2);"><div style="font-size:40px; margin-bottom:16px;">🔍</div><div style="font-size:18px; font-weight:500;">No resources found</div><div style="font-size:14px; margin-top:8px; opacity:0.6;">Try a different search or category.</div></div>`;
+      return;
+    }
     grid.innerHTML = items.map(r => `
       <div class="resource-card">
         <div class="badge badge-primary">${r.cat}</div>
@@ -265,27 +268,28 @@
   renderResources(resources);
 
   // Filters
+  let activeCategory = 'all';
   const tabs = document.querySelectorAll('.filter-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const cat = tab.dataset.cat;
-      const filtered = cat === 'all' ? resources : resources.filter(r => r.cat === cat);
+      activeCategory = tab.dataset.cat;
+      const searchQ = document.getElementById('search-input').value.toLowerCase();
+      let filtered = activeCategory === 'all' ? resources : resources.filter(r => r.cat === activeCategory);
+      if (searchQ) filtered = filtered.filter(r => r.title.toLowerCase().includes(searchQ) || r.desc.toLowerCase().includes(searchQ));
       renderResources(filtered);
     });
   });
 
-  // Search
+  // Search — preserves active category
   document.getElementById('search-input').addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase();
-    const filtered = resources.filter(r => 
+    let filtered = activeCategory === 'all' ? resources : resources.filter(r => r.cat === activeCategory);
+    if (q) filtered = filtered.filter(r =>
       r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q)
     );
     renderResources(filtered);
-    // Reset tabs
-    tabs.forEach(t => t.classList.remove('active'));
-    document.querySelector('.filter-tab[data-cat="all"]').classList.add('active');
   });
 </script>
 </body>
