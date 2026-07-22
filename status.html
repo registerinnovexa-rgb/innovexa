@@ -68,13 +68,13 @@
 <section class="status-section">
   <div class="check-card fade-up delay-1">
     <div class="toggle-group" id="query-toggle">
-      <button class="toggle-pill active" data-type="email">Search by Email</button>
+      <button class="toggle-pill active" data-type="email_phone">Email or Phone</button>
       <button class="toggle-pill" data-type="utr">Search by UTR</button>
     </div>
 
     <div class="search-group">
       <div class="search-group-row">
-        <input class="form-control" id="query-input" type="email" placeholder="operative@example.com" />
+        <input class="form-control" id="query-input" type="text" placeholder="operative@example.com or phone" />
         <button class="btn-magnetic" id="check-btn">Fetch Status</button>
       </div>
       <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:8px; display:none;"></div>
@@ -212,16 +212,16 @@
   });
 
   // Toggle Input Type
-  let queryType = 'email';
+  let queryType = 'email_phone';
   const inputEl = document.getElementById('query-input');
   document.querySelectorAll('.toggle-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.toggle-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       queryType = btn.dataset.type;
-      if (queryType === 'email') {
-        inputEl.type = 'email';
-        inputEl.placeholder = 'operative@example.com';
+      if (queryType === 'email_phone') {
+        inputEl.type = 'text';
+        inputEl.placeholder = 'operative@example.com or phone';
       } else {
         inputEl.type = 'text';
         inputEl.placeholder = 'Enter 12-digit UTR';
@@ -252,7 +252,16 @@
     panel.classList.add('hidden');
 
     try {
-      const url = SCRIPT_URL + '?' + queryType + '=' + encodeURIComponent(query);
+      let url = '';
+      if (queryType === 'email_phone') {
+        if (query.includes('@')) {
+          url = SCRIPT_URL + '?email=' + encodeURIComponent(query);
+        } else {
+          url = SCRIPT_URL + '?phone=' + encodeURIComponent(query);
+        }
+      } else {
+        url = SCRIPT_URL + '?' + queryType + '=' + encodeURIComponent(query);
+      }
       const res = await gasGet(url);
 
       const resIcon = document.getElementById('res-icon');

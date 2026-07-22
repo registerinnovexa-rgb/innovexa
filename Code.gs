@@ -42,17 +42,19 @@ function doGet(e) {
       return respond({ success: true, data: { count: Math.max(0, rows.length - 1) } });
     }
 
-    // Existing: Search by email or UTR
-    if (p.email || p.utr) {
+    // Existing: Search by email or UTR or Phone
+    if (p.email || p.utr || p.phone) {
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row        = rows[i];
         var rowEmail   = String(row[2] || '').trim().toLowerCase();
+        var rowPhone   = String(row[3] || '').trim();
         var rowUtr     = String(row[9] || '').trim();
         var matchEmail = p.email && rowEmail === String(p.email).trim().toLowerCase();
+        var matchPhone = p.phone && rowPhone === String(p.phone).trim();
         var matchUtr   = p.utr   && rowUtr   === String(p.utr).trim();
 
-        if (matchEmail || matchUtr) {
+        if (matchEmail || matchUtr || matchPhone) {
           return respond({
             success: true,
             found:   true,
