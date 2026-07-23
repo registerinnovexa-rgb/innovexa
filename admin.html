@@ -1143,12 +1143,6 @@ function cancelFaceLogin() {
   btn.textContent = 'Scan Face to Login';
 }
 
-  document.getElementById('loginCardFace').style.display = 'none';
-  document.getElementById('loginCardCreds').style.display = 'block';
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = false; btn.textContent = 'Proceed to Biometrics';
-}
-
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
