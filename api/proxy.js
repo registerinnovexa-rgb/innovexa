@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const GAS_BASE = 'https://script.google.com/macros/s/AKfycbxI_So03xHLAyvrcjbGao6J9wfIt43aHO4wpHF_dXz96ccML2vbAquhVfGm2s-lFnhYcw/exec';
+  const GAS_BASE = 'https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec';
 
   try {
     if (req.method === 'GET') {
