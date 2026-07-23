@@ -794,8 +794,14 @@
   .floating-icons { opacity: 0.6; }
   .float-icon { max-width: 45px !important; }
   
-  /* Arsenal card width for mobile */
-  .arsenal-card { flex: 0 0 260px; padding: 24px 20px; }
+  /* Make team grid stack vertically on mobile */
+  .arsenal-grid {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+  .arsenal-card { width: 100%; flex: none; padding: 32px 20px; }
   
   /* Fix countdown timer overflow */
   #countdown { gap: 8px !important; }
