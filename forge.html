@@ -411,7 +411,7 @@
           dob: dob,
           newPassword: pwd
         };
-        const res = await gasGet(SCRIPT_URL + '?action=forge_set_password&invxId=' + id + '&dob=' + dob + '&newPassword=' + encodeURIComponent(pwd));
+        const res = await gasGet('forge_set_password', { invxId: id, dob: dob, newPassword: pwd });
         
         if (res.success) {
            toast(res.message, 'success');
