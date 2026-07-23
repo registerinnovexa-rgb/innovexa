@@ -1029,15 +1029,28 @@ async function startFaceRecognitionLogin() {
 
     // 2. Load into LabeledFaceDescriptors
     btn.textContent = 'Building Face Matcher...';
-    allFaceDescriptors = data.faces.map(f => {
-      return {
-        profile: f,
-        labeledDescriptor: new faceapi.LabeledFaceDescriptors(
-          f.operativeId,
-          [new Float32Array(JSON.parse(f.descriptor))]
-        )
-      };
-    });
+    allFaceDescriptors = [];
+    for (const f of data.faces) {
+      try {
+        const parsed = JSON.parse(f.descriptor);
+        // faceapi uses 128-dimensional vectors
+        if (Array.isArray(parsed) && parsed.length === 128) {
+          allFaceDescriptors.push({
+            profile: f,
+            labeledDescriptor: new faceapi.LabeledFaceDescriptors(
+              f.operativeId,
+              [new Float32Array(parsed)]
+            )
+          });
+        }
+      } catch (err) {
+        console.warn(`Skipping invalid biometric data for ${f.operativeId}:`, err.message);
+      }
+    }
+
+    if (allFaceDescriptors.length === 0) {
+      throw new Error('No valid facial biometrics found in the database.');
+    }
 
     // 3. Switch UI
     document.getElementById('loginCardCreds').style.display = 'none';
