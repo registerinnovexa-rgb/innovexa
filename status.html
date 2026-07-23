@@ -146,7 +146,7 @@
           </div>
         </div>
 
-        <div class="action-row">
+        <div class="action-row" style="flex-wrap: wrap;">
           <button class="btn-magnetic" id="copy-id-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; display:inline-block;">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -293,13 +293,7 @@
           // Add Forge button only if granted and not already present
           if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
             if (!document.getElementById('forge-ops-btn')) {
-              let btn = document.createElement('button');
-              btn.id = 'forge-ops-btn';
-              btn.className = 'btn-magnetic';
-              btn.style = 'background:var(--accent); color:#111; margin-left:12px;';
-              btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; display:inline-block;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Enter Forge';
-              btn.onclick = () => window.location.href = 'forge.html';
-              actionRow.appendChild(btn);
+              actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html" class="btn-magnetic" style="background:#fff; color:#111; margin-top:12px; border:1px solid rgba(0,0,0,0.1); width:100%; text-align:center; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Dashboard</a>`);
             }
           }
           approvedAssets.classList.remove('hidden');
