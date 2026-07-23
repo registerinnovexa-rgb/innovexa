@@ -88,47 +88,23 @@ function doGet(e) {
 
     // FORGE: Login
     if (action === 'forge_login') {
-      if (!p.invxId || !p.dob) return respond({ success: false, message: 'Missing Operative ID or Date of Birth.' });
+      if (!p.invxId || !p.password) return respond({ success: false, message: 'Missing Operative ID or Password.' });
       
       var reqOpId = String(p.invxId).trim().toUpperCase();
-      var reqDob = String(p.dob).trim();
+      var reqPwd = String(p.password).trim();
+      var reqPwdHash = hashPassword(reqPwd);
 
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
         var rowOpId = String(row[12] || '').trim().toUpperCase();
-        var rowDob = row[7];
+        var rowPwdHash = String(row[23] || '').trim(); // Column X
         
-        // Google Sheets sometimes formats dates weirdly, so we compare the first 10 characters (YYYY-MM-DD)
-        // Extract local timezone date instead of UTC toISOString() to avoid off-by-one errors
-        var rowDobStr = "";
-        if (rowDob) {
-          if (rowDob instanceof Date || Object.prototype.toString.call(rowDob) === '[object Date]') {
-            var y = rowDob.getFullYear();
-            var m = String(rowDob.getMonth() + 1).padStart(2, '0');
-            var d = String(rowDob.getDate()).padStart(2, '0');
-            rowDobStr = y + '-' + m + '-' + d;
-          } else {
-            var ds = String(rowDob).trim();
-            // Handle if Google Sheets casted Date to String like "Sat May 15 2004"
-            var parsed = new Date(ds);
-            if (!isNaN(parsed.getTime())) {
-                var y = parsed.getFullYear();
-                var m = String(parsed.getMonth() + 1).padStart(2, '0');
-                var d = String(parsed.getDate()).padStart(2, '0');
-                rowDobStr = y + '-' + m + '-' + d;
-            } else if (ds.length >= 10 && (ds.charAt(2) === '-' || ds.charAt(2) === '/')) {
-                // DD-MM-YYYY format
-                var parts = ds.split(/[\-\/]/);
-                rowDobStr = parts[2] + '-' + parts[1] + '-' + parts[0];
-            } else {
-                rowDobStr = ds.substring(0, 10);
-            }
+        if (rowOpId === reqOpId) {
+          if (rowPwdHash === '') {
+             return respond({ success: false, message: 'Password not set. Please use the "First time setup" link to set your password.' });
           }
-        }
-        var reqDobStr = reqDob.substring(0, 10);
-        
-        if (rowOpId === reqOpId && rowDobStr === reqDobStr) {
+          if (rowPwdHash === reqPwdHash) {
           var status = String(row[10] || '').trim();
           if (status !== 'Approved' && status !== 'Confirmed') {
             return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
@@ -156,6 +132,58 @@ function doGet(e) {
       return respond({ success: false, message: 'Invalid INVX ID or Date of Birth.' });
     }
     
+    // FORGE: Set Password
+    if (action === 'forge_set_password') {
+      if (!p.invxId || !p.dob || !p.newPassword) return respond({ success: false, message: 'Missing required fields.' });
+      
+      var reqOpId = String(p.invxId).trim().toUpperCase();
+      var reqDob = String(p.dob).trim();
+      var reqDobStr = reqDob.substring(0, 10);
+
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        var rowOpId = String(row[12] || '').trim().toUpperCase();
+        var rowDob = row[7];
+        
+        if (rowOpId === reqOpId) {
+            var rowDobStr = "";
+            if (rowDob) {
+              if (rowDob instanceof Date || Object.prototype.toString.call(rowDob) === '[object Date]') {
+                var y = rowDob.getFullYear();
+                var m = String(rowDob.getMonth() + 1).padStart(2, '0');
+                var d = String(rowDob.getDate()).padStart(2, '0');
+                rowDobStr = y + '-' + m + '-' + d;
+              } else {
+                var ds = String(rowDob).trim();
+                var parsed = new Date(ds);
+                if (!isNaN(parsed.getTime())) {
+                    var y = parsed.getFullYear();
+                    var m = String(parsed.getMonth() + 1).padStart(2, '0');
+                    var d = String(parsed.getDate()).padStart(2, '0');
+                    rowDobStr = y + '-' + m + '-' + d;
+                } else if (ds.length >= 10 && (ds.charAt(2) === '-' || ds.charAt(2) === '/')) {
+                    var parts = ds.split(/[\-\/]/);
+                    rowDobStr = parts[2] + '-' + parts[1] + '-' + parts[0];
+                } else {
+                    rowDobStr = ds.substring(0, 10);
+                }
+              }
+            }
+            
+            if (rowDobStr === reqDobStr) {
+                // DOB verified. Set password.
+                var newPwdHash = hashPassword(p.newPassword);
+                sheet.getRange(i + 1, 24).setValue(newPwdHash); // Column X (Index 24 in 1-based)
+                return respond({ success: true, message: 'Password set successfully. You can now login.' });
+            } else {
+                return respond({ success: false, message: 'Date of Birth does not match our records.' });
+            }
+        }
+      }
+      return respond({ success: false, message: 'Operative ID not found.' });
+    }
+
     // ADMIN: Login
     if (action === 'admin_login') {
       if (!p.invxId || !p.email) return respond({ success: false, message: 'Missing credentials.' });
@@ -1098,6 +1126,7 @@ function doPost(e) {
       }
       var operativeId = 'INVX-' + randomStr;
 
+      var hashedPassword = payload.password ? hashPassword(payload.password) : '';
       sheet.appendRow([
         timestamp,
         payload.fullName    || '',
@@ -1121,7 +1150,8 @@ function doPost(e) {
         '', // 19 xp
         '', // 20 rank
         '', // 21 squad
-        payload.college     || '' // 22 college
+        payload.college     || '', // 22 college
+        hashedPassword             // 23 password
       ]);
 
       try {
@@ -1142,6 +1172,24 @@ function doPost(e) {
   } catch (err) {
     return respond({ success: false, message: 'Error: ' + err.toString() });
   }
+}
+
+
+function hashPassword(password) {
+  if (!password) return '';
+  var rawHash = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(password));
+  var txtHash = '';
+  for (var i = 0; i < rawHash.length; i++) {
+    var hashVal = rawHash[i];
+    if (hashVal < 0) {
+      hashVal += 256;
+    }
+    if (hashVal.toString(16).length == 1) {
+      txtHash += '0';
+    }
+    txtHash += hashVal.toString(16);
+  }
+  return txtHash;
 }
 
 function respond(obj) {

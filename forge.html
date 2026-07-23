@@ -69,14 +69,42 @@
         <input type="text" id="loginId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
       </div>
       <div class="form-group">
-        <label class="form-label">Date of Birth (Security Key)</label>
-        <input type="date" id="loginDob" class="form-input" />
+        <label class="form-label">Password</label>
+        <input type="password" id="loginPwd" class="form-input" placeholder="Enter your password" />
       </div>
 
       <button id="loginBtn" class="btn-dark" style="width:100%; margin-top:12px; padding:14px;" onclick="handleLogin()">Initialize Link</button>
       
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" onclick="document.getElementById('setPasswordModal').style.display='flex'; return false;" style="color:var(--text3); font-size:13px; text-decoration:underline;">First time setup or forgot password?</a>
+      </div>
+
       <div id="loginError" class="login-error" style="margin-top:12px;"></div>
       <a href="index.html" class="back-link">← Return to Hub</a>
+      
+      <!-- SET PASSWORD MODAL -->
+      <div id="setPasswordModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div class="login-card" style="position:relative; width:100%; max-width:400px; padding:32px;">
+          <button onclick="document.getElementById('setPasswordModal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:24px;">&times;</button>
+          <h2 style="font-size:20px; margin-bottom:8px;">Account Setup</h2>
+          <p style="color:var(--text3); font-size:14px; margin-bottom:24px;">Set a secure password using your Date of Birth as verification.</p>
+          
+          <div class="form-group">
+            <label class="form-label">Operative ID</label>
+            <input type="text" id="setupId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" id="setupDob" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" id="setupPwd" class="form-input" placeholder="Min 6 characters" />
+          </div>
+          <button id="setupBtn" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleSetPassword()">Set Password</button>
+          <div id="setupError" class="login-error" style="margin-top:12px;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -352,14 +380,63 @@
     // ══════════════════════════════════════════
     //  LOGIN
     // ══════════════════════════════════════════
+    
+    // ══════════════════════════════════════════
+    //  SET PASSWORD
+    // ══════════════════════════════════════════
+    async function handleSetPassword() {
+      const id = document.getElementById('setupId').value.trim();
+      const dob = document.getElementById('setupDob').value.trim();
+      const pwd = document.getElementById('setupPwd').value.trim();
+      const err = document.getElementById('setupError');
+      const btn = document.getElementById('setupBtn');
+
+      if (!id || !dob || !pwd) {
+        err.textContent = 'Please fill in all fields.';
+        return;
+      }
+      if (pwd.length < 6) {
+        err.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+      
+      err.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      try {
+        const payload = {
+          action: 'forge_set_password',
+          invxId: id,
+          dob: dob,
+          newPassword: pwd
+        };
+        const res = await gasGet(SCRIPT_URL + '?action=forge_set_password&invxId=' + id + '&dob=' + dob + '&newPassword=' + encodeURIComponent(pwd));
+        
+        if (res.success) {
+           toast(res.message, 'success');
+           document.getElementById('setPasswordModal').style.display = 'none';
+           document.getElementById('loginId').value = id;
+           document.getElementById('loginPwd').value = pwd;
+        } else {
+           err.textContent = res.message || 'Verification failed.';
+        }
+      } catch(e) {
+        err.textContent = 'Network error. Try again.';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Set Password';
+    }
+
     async function handleLogin() {
       const id = document.getElementById('loginId').value.trim();
-      const dob = document.getElementById('loginDob').value.trim();
+      const pwd = document.getElementById('loginPwd').value.trim();
       const err = document.getElementById('loginError');
       const btn = document.getElementById('loginBtn');
 
-      if (!id || !dob) {
-        err.textContent = 'Enter Operative ID and Date of Birth.';
+      if (!id || !pwd) {
+        err.textContent = 'Enter Operative ID and Password.';
         return;
       }
       
@@ -368,11 +445,11 @@
       btn.textContent = 'Decrypting Access...';
 
       try {
-        const res = await gasGet('forge_login', { invxId: id, dob: dob });
+        const res = await gasGet('forge_login', { invxId: id, password: pwd });
         if (res.success && res.data) {
           session = {
             operativeId: res.data.operativeId,
-            dob: dob,
+            password: pwd,
             name: res.data.name,
             xp: res.data.xp,
             rank: res.data.rank,
