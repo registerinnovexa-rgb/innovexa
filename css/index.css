@@ -790,8 +790,9 @@
 }
 
 @media (max-width: 768px) {
-  /* Scale down floating icons */
-  .floating-icons { transform: scale(0.5); transform-origin: top center; opacity: 0.6; }
+  /* Scale down individual floating icons so they stay spread out */
+  .floating-icons { opacity: 0.6; }
+  .float-icon { max-width: 45px !important; }
   
   /* Arsenal card width for mobile */
   .arsenal-card { flex: 0 0 260px; padding: 24px 20px; }
