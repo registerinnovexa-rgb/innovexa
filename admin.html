@@ -1225,7 +1225,7 @@ async function startBiometricEnrollment() {
           // Send to backend
           const descriptorJSON = JSON.stringify(Array.from(detections.descriptor));
           try {
-            const res = await apiPost('admin_enroll_face', { invxId: adminSession.id, descriptor: descriptorJSON });
+            const res = await apiWrite('admin_enroll_face', { invxId: adminSession.id, descriptor: descriptorJSON });
             if (res.success) {
               toast('Biometrics registered successfully!', 'success');
               cancelBiometricEnrollment();
@@ -1276,7 +1276,7 @@ async function handleSetRole() {
   btn.disabled = true; btn.textContent = 'Updating...'; err.textContent = '';
   
   try {
-    const res = await apiPost('admin_set_role', { adminId: adminSession.id, targetId: targetId, newRole: newRole });
+    const res = await apiWrite('admin_set_role', { adminId: adminSession.id, targetId: targetId, newRole: newRole });
     if (res.success) {
       toast('Role updated successfully!', 'success');
       document.getElementById('roleTargetId').value = '';
