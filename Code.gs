@@ -86,55 +86,8 @@ function doGet(e) {
     }
 
 
-    // FORGE: Login
-    if (action === 'forge_login') {
-      if (!p.invxId || !p.password) return respond({ success: false, message: 'Missing Operative ID or Password.' });
-      
-      var reqOpId = String(p.invxId).trim().toUpperCase();
-      var reqPwd = String(p.password).trim();
-      var reqPwdHash = hashPassword(reqPwd);
-
-      var rows = sheet.getDataRange().getValues();
-      for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        var rowOpId = String(row[12] || '').trim().toUpperCase();
-        var rowPwdHash = String(row[23] || '').trim(); // Column X
-        
-        if (rowOpId === reqOpId) {
-          if (rowPwdHash === '') {
-             return respond({ success: false, message: 'Password not set. Please use the "First time setup" link to set your password.' });
-          }
-          if (rowPwdHash === reqPwdHash) {
-          var status = String(row[10] || '').trim();
-          if (status !== 'Approved' && status !== 'Confirmed') {
-            return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
-          }
-          
-          var accessStatus = String(row[18] || '').trim(); // Column S = ForgeAccess
-          if (accessStatus.toLowerCase() !== 'granted') {
-            return respond({ success: false, message: 'Access Denied. Forge access has not been granted by Admin.' });
-          }
-          
-          return respond({
-            success: true,
-            data: {
-              name: String(row[1] || ''),
-              operativeId: rowOpId,
-              forgeAccess: accessStatus,
-              xp: String(row[19] || '0'),
-              rank: String(row[20] || 'Apprentice'),
-              squad: String(row[21] || 'Unassigned'),
-              role: String(row[16] || '').trim() // Column Q = ForgeRole
-            }
-          });
-        }
-      }
-      }
-      return respond({ success: false, message: 'Invalid INVX ID or Password.' });
-    }
-    
-    // FORGE: Request Password Reset OTP
-    if (action === 'forge_request_reset') {
+    // FORGE: Request Login OTP
+    if (action === 'forge_request_otp') {
       if (!p.invxId) return respond({ success: false, message: 'Missing Operative ID.' });
       var reqOpId = String(p.invxId).trim().toUpperCase();
       var rows = sheet.getDataRange().getValues();
@@ -145,18 +98,18 @@ function doGet(e) {
           if (!userEmail) return respond({ success: false, message: 'No email associated with this ID.' });
           
           var otp = Math.floor(100000 + Math.random() * 900000).toString();
-          sheet.getRange(i + 1, 25).setValue(otp); // Col Y (Index 25 in 1-based)
+          sheet.getRange(i + 1, 25).setValue(otp); // Col Y
           sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
           
           try {
             MailApp.sendEmail({
               to: userEmail,
-              subject: 'Innovexa Hub — Password Reset Verification Code',
-              body: 'Your verification code is: ' + otp + '\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via innovexahub.bangalore@gmail.com)'
+              subject: 'Innovexa Hub — Dashboard Login Code',
+              body: 'Your dashboard login code is: ' + otp + '\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via innovexahub.bangalore@gmail.com)'
             });
             var parts = userEmail.split('@');
             var maskedEmail = parts[0].substring(0, 2) + '***@' + parts[1];
-            return respond({ success: true, message: 'Verification code sent to ' + maskedEmail });
+            return respond({ success: true, message: 'Login code sent to ' + maskedEmail });
           } catch (e) {
             return respond({ success: false, message: 'Failed to send email. ' + e.toString() });
           }
@@ -165,30 +118,51 @@ function doGet(e) {
       return respond({ success: false, message: 'Operative ID not found.' });
     }
 
-    // FORGE: Verify Reset OTP and Set Password
-    if (action === 'forge_verify_reset') {
-      if (!p.invxId || !p.otp || !p.newPassword) return respond({ success: false, message: 'Missing fields.' });
+    // FORGE: Verify Login OTP
+    if (action === 'forge_verify_otp') {
+      if (!p.invxId || !p.otp) return respond({ success: false, message: 'Missing fields.' });
       var reqOpId = String(p.invxId).trim().toUpperCase();
       var reqOtp = String(p.otp).trim();
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
         if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
-          var storedOtp = String(row[24] || '').trim(); // Col Y (Index 24 in 0-based array)
+          var storedOtp = String(row[24] || '').trim(); // Col Y
           var storedTime = row[25]; // Col Z
           
           if (!storedOtp || storedOtp !== reqOtp) {
-            return respond({ success: false, message: 'Invalid verification code.' });
+            return respond({ success: false, message: 'Invalid login code.' });
           }
           if (new Date().getTime() - storedTime > 15 * 60 * 1000) {
-            return respond({ success: false, message: 'Verification code expired. Please request a new one.' });
+            return respond({ success: false, message: 'Login code expired. Please request a new one.' });
           }
           
-          var newPwdHash = hashPassword(p.newPassword);
-          sheet.getRange(i + 1, 24).setValue(newPwdHash); // Col X (Index 24 in 1-based)
+          var status = String(row[10] || '').trim();
+          if (status !== 'Approved' && status !== 'Confirmed') {
+            return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
+          }
+          
+          var accessStatus = String(row[18] || '').trim(); // Column S
+          if (accessStatus.toLowerCase() !== 'granted') {
+            return respond({ success: false, message: 'Access Denied. Forge access has not been granted by Admin.' });
+          }
+          
           sheet.getRange(i + 1, 25).setValue(''); // Clear OTP
           sheet.getRange(i + 1, 26).setValue(''); // Clear Time
-          return respond({ success: true, message: 'Password reset successfully! You can now log in.' });
+          
+          return respond({
+            success: true,
+            message: 'Authentication successful.',
+            data: {
+              name: String(row[1] || ''),
+              operativeId: reqOpId,
+              forgeAccess: accessStatus,
+              xp: String(row[19] || '0'),
+              rank: String(row[20] || 'Apprentice'),
+              squad: String(row[21] || 'Unassigned'),
+              role: String(row[16] || '').trim()
+            }
+          });
         }
       }
       return respond({ success: false, message: 'Operative ID not found.' });
@@ -1136,7 +1110,7 @@ function doPost(e) {
       }
       var operativeId = 'INVX-' + randomStr;
 
-      var hashedPassword = payload.password ? hashPassword(payload.password) : '';
+
       sheet.appendRow([
         timestamp,
         payload.fullName    || '',
@@ -1161,7 +1135,7 @@ function doPost(e) {
         '', // 20 rank
         '', // 21 squad
         payload.college     || '', // 22 college
-        hashedPassword             // 23 password
+        ''                         // 23 password (deprecated)
       ]);
 
       try {

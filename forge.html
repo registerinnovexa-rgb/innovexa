@@ -62,58 +62,31 @@
     <div class="login-card fade-up visible">
       <img src="assets/logo.png" class="login-logo" style="filter:invert(1); background:#111; padding:10px;" alt="Logo" />
       <h1 class="login-title">Operative Access</h1>
-      <p class="login-subtitle">Authenticate to enter the Member Dashboard</p>
+      <p id="loginDesc" class="login-subtitle">Enter your Operative ID to receive a secure login code.</p>
 
-      <div class="form-group">
-        <label class="form-label">Operative ID</label>
-        <input type="text" id="loginId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
+      <!-- Step 1: Request Code -->
+      <div id="loginStep1">
+        <div class="form-group">
+          <label class="form-label">Operative ID</label>
+          <input type="text" id="loginId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
+        </div>
+        <button id="loginBtn1" class="btn-dark" style="width:100%; margin-top:12px; padding:14px;" onclick="handleRequestLoginCode()">Send Login Code</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" id="loginPwd" class="form-input" placeholder="Enter your password" />
-      </div>
-
-      <button id="loginBtn" class="btn-dark" style="width:100%; margin-top:12px; padding:14px;" onclick="handleLogin()">Initialize Link</button>
       
-      <div style="text-align:center; margin-top:16px;">
-        <a href="#" onclick="document.getElementById('setPasswordModal').style.display='flex'; return false;" style="color:var(--text3); font-size:13px; text-decoration:underline;">First time setup or forgot password?</a>
+      <!-- Step 2: Verify Code -->
+      <div id="loginStep2" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Login Code (OTP)</label>
+          <input type="text" id="loginOtp" class="form-input" placeholder="6-digit code" />
+        </div>
+        <button id="loginBtn2" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleVerifyLoginCode()">Authenticate</button>
+        <div style="text-align:center; margin-top:12px;">
+          <a href="#" onclick="resetLoginView(); return false;" style="color:var(--text3); font-size:13px; text-decoration:underline;">Start Over</a>
+        </div>
       </div>
 
       <div id="loginError" class="login-error" style="margin-top:12px;"></div>
       <a href="index.html" class="back-link">← Return to Hub</a>
-      
-      <!-- SET PASSWORD MODAL -->
-      <div id="setPasswordModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-        <div class="login-card" style="position:relative; width:100%; max-width:400px; padding:32px;">
-          <button onclick="document.getElementById('setPasswordModal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:24px;">&times;</button>
-          <h2 style="font-size:20px; margin-bottom:8px;">Account Recovery</h2>
-          <p id="setupDesc" style="color:var(--text3); font-size:14px; margin-bottom:24px;">Enter your Operative ID. We will send a verification code to your registered email address.</p>
-          
-          <!-- Step 1: Request OTP -->
-          <div id="setupStep1">
-            <div class="form-group">
-              <label class="form-label">Operative ID</label>
-              <input type="text" id="setupId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
-            </div>
-            <button id="setupBtn1" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleRequestOtp()">Send Verification Code</button>
-          </div>
-          
-          <!-- Step 2: Verify OTP & Set Password -->
-          <div id="setupStep2" style="display:none;">
-            <div class="form-group">
-              <label class="form-label">Verification Code (OTP)</label>
-              <input type="text" id="setupOtp" class="form-input" placeholder="6-digit code" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">New Password</label>
-              <input type="password" id="setupPwd" class="form-input" placeholder="Min 6 characters" />
-            </div>
-            <button id="setupBtn2" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleVerifyOtp()">Reset Password</button>
-          </div>
-          
-          <div id="setupError" class="login-error" style="margin-top:12px;"></div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -387,16 +360,13 @@
     }
 
     // ══════════════════════════════════════════
-    //  LOGIN
     // ══════════════════════════════════════════
-    
+    //  PASSWORDLESS OTP LOGIN
     // ══════════════════════════════════════════
-    //  RESET PASSWORD (OTP FLOW)
-    // ══════════════════════════════════════════
-    async function handleRequestOtp() {
-      const id = document.getElementById('setupId').value.trim();
-      const err = document.getElementById('setupError');
-      const btn = document.getElementById('setupBtn1');
+    async function handleRequestLoginCode() {
+      const id = document.getElementById('loginId').value.trim();
+      const err = document.getElementById('loginError');
+      const btn = document.getElementById('loginBtn1');
 
       if (!id) {
         err.textContent = 'Please enter your Operative ID.';
@@ -408,13 +378,13 @@
       btn.textContent = 'Sending...';
 
       try {
-        const res = await gasGet('forge_request_reset', { invxId: id });
+        const res = await gasGet('forge_request_otp', { invxId: id });
         
         if (res.success) {
            toast(res.message, 'success');
-           document.getElementById('setupDesc').textContent = 'Enter the 6-digit verification code sent to your email and set your new password.';
-           document.getElementById('setupStep1').style.display = 'none';
-           document.getElementById('setupStep2').style.display = 'block';
+           document.getElementById('loginDesc').textContent = 'Enter the 6-digit login code sent to your email.';
+           document.getElementById('loginStep1').style.display = 'none';
+           document.getElementById('loginStep2').style.display = 'block';
         } else {
            err.textContent = res.message || 'Failed to request code.';
         }
@@ -423,97 +393,58 @@
       }
 
       btn.disabled = false;
-      btn.textContent = 'Send Verification Code';
+      btn.textContent = 'Send Login Code';
     }
 
-    async function handleVerifyOtp() {
-      const id = document.getElementById('setupId').value.trim();
-      const otp = document.getElementById('setupOtp').value.trim();
-      const pwd = document.getElementById('setupPwd').value.trim();
-      const err = document.getElementById('setupError');
-      const btn = document.getElementById('setupBtn2');
-
-      if (!otp || !pwd) {
-        err.textContent = 'Please fill in all fields.';
-        return;
-      }
-      if (pwd.length < 6) {
-        err.textContent = 'Password must be at least 6 characters.';
-        return;
-      }
-      
-      err.textContent = '';
-      btn.disabled = true;
-      btn.textContent = 'Verifying...';
-
-      try {
-        const res = await gasGet('forge_verify_reset', { invxId: id, otp: otp, newPassword: pwd });
-        
-        if (res.success) {
-           toast(res.message, 'success');
-           document.getElementById('setPasswordModal').style.display = 'none';
-           // Reset modal state for future use
-           document.getElementById('setupStep1').style.display = 'block';
-           document.getElementById('setupStep2').style.display = 'none';
-           document.getElementById('setupDesc').textContent = 'Enter your Operative ID. We will send a verification code to your registered email address.';
-           document.getElementById('setupOtp').value = '';
-           document.getElementById('setupPwd').value = '';
-           
-           // Pre-fill login
-           document.getElementById('loginId').value = id;
-           document.getElementById('loginPwd').value = pwd;
-        } else {
-           err.textContent = res.message || 'Verification failed.';
-        }
-      } catch(e) {
-        err.textContent = 'Network error. Try again.';
-      }
-
-      btn.disabled = false;
-      btn.textContent = 'Reset Password';
-    }
-
-    async function handleLogin() {
+    async function handleVerifyLoginCode() {
       const id = document.getElementById('loginId').value.trim();
-      const pwd = document.getElementById('loginPwd').value.trim();
+      const otp = document.getElementById('loginOtp').value.trim();
       const err = document.getElementById('loginError');
-      const btn = document.getElementById('loginBtn');
+      const btn = document.getElementById('loginBtn2');
 
-      if (!id || !pwd) {
-        err.textContent = 'Enter Operative ID and Password.';
+      if (!otp) {
+        err.textContent = 'Please enter the 6-digit code.';
         return;
       }
       
       err.textContent = '';
       btn.disabled = true;
-      btn.textContent = 'Decrypting Access...';
+      btn.textContent = 'Authenticating...';
 
       try {
-        const res = await gasGet('forge_login', { invxId: id, password: pwd });
+        const res = await gasGet('forge_verify_otp', { invxId: id, otp: otp });
+        
         if (res.success && res.data) {
-          session = {
-            operativeId: res.data.operativeId,
-            password: pwd,
-            name: res.data.name,
-            xp: res.data.xp,
-            rank: res.data.rank,
-            squad: res.data.squad
-          };
-          localStorage.setItem('forge_session', JSON.stringify(session));
-          toast('Link established.', 'success');
-          bootDashboard();
+           toast('Authentication successful.', 'success');
+           
+           // Create session
+           const sessionData = {
+              timestamp: new Date().getTime(),
+              ...res.data
+           };
+           localStorage.setItem('invx_session', JSON.stringify(sessionData));
+           
+           // Boot Dashboard
+           bootDashboard(sessionData);
         } else {
-          err.textContent = res.message || 'Access denied.';
+           err.textContent = res.message || 'Authentication failed.';
         }
       } catch(e) {
         err.textContent = 'Network error. Try again.';
       }
 
       btn.disabled = false;
-      btn.textContent = 'Initialize Link';
+      btn.textContent = 'Authenticate';
+    }
+    
+    function resetLoginView() {
+      document.getElementById('loginStep1').style.display = 'block';
+      document.getElementById('loginStep2').style.display = 'none';
+      document.getElementById('loginDesc').textContent = 'Enter your Operative ID to receive a secure login code.';
+      document.getElementById('loginOtp').value = '';
+      document.getElementById('loginError').textContent = '';
     }
 
-    // ══════════════════════════════════════════
     //  DASHBOARD INIT
     // ══════════════════════════════════════════
     function bootDashboard() {
