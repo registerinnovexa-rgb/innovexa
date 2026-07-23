@@ -86,22 +86,31 @@
       <div id="setPasswordModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; padding:20px;">
         <div class="login-card" style="position:relative; width:100%; max-width:400px; padding:32px;">
           <button onclick="document.getElementById('setPasswordModal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:24px;">&times;</button>
-          <h2 style="font-size:20px; margin-bottom:8px;">Account Setup</h2>
-          <p style="color:var(--text3); font-size:14px; margin-bottom:24px;">Set a secure password using your Date of Birth as verification.</p>
+          <h2 style="font-size:20px; margin-bottom:8px;">Account Recovery</h2>
+          <p id="setupDesc" style="color:var(--text3); font-size:14px; margin-bottom:24px;">Enter your Operative ID. We will send a verification code to your registered email address.</p>
           
-          <div class="form-group">
-            <label class="form-label">Operative ID</label>
-            <input type="text" id="setupId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
+          <!-- Step 1: Request OTP -->
+          <div id="setupStep1">
+            <div class="form-group">
+              <label class="form-label">Operative ID</label>
+              <input type="text" id="setupId" class="form-input" placeholder="INVX-XXX" style="text-transform:uppercase;" />
+            </div>
+            <button id="setupBtn1" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleRequestOtp()">Send Verification Code</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Date of Birth</label>
-            <input type="date" id="setupDob" class="form-input" />
+          
+          <!-- Step 2: Verify OTP & Set Password -->
+          <div id="setupStep2" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Verification Code (OTP)</label>
+              <input type="text" id="setupOtp" class="form-input" placeholder="6-digit code" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" id="setupPwd" class="form-input" placeholder="Min 6 characters" />
+            </div>
+            <button id="setupBtn2" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleVerifyOtp()">Reset Password</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">New Password</label>
-            <input type="password" id="setupPwd" class="form-input" placeholder="Min 6 characters" />
-          </div>
-          <button id="setupBtn" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleSetPassword()">Set Password</button>
+          
           <div id="setupError" class="login-error" style="margin-top:12px;"></div>
         </div>
       </div>
@@ -382,16 +391,49 @@
     // ══════════════════════════════════════════
     
     // ══════════════════════════════════════════
-    //  SET PASSWORD
+    //  RESET PASSWORD (OTP FLOW)
     // ══════════════════════════════════════════
-    async function handleSetPassword() {
+    async function handleRequestOtp() {
       const id = document.getElementById('setupId').value.trim();
-      const dob = document.getElementById('setupDob').value.trim();
+      const err = document.getElementById('setupError');
+      const btn = document.getElementById('setupBtn1');
+
+      if (!id) {
+        err.textContent = 'Please enter your Operative ID.';
+        return;
+      }
+      
+      err.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const res = await gasGet('forge_request_reset', { invxId: id });
+        
+        if (res.success) {
+           toast(res.message, 'success');
+           document.getElementById('setupDesc').textContent = 'Enter the 6-digit verification code sent to your email and set your new password.';
+           document.getElementById('setupStep1').style.display = 'none';
+           document.getElementById('setupStep2').style.display = 'block';
+        } else {
+           err.textContent = res.message || 'Failed to request code.';
+        }
+      } catch(e) {
+        err.textContent = 'Network error. Try again.';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Send Verification Code';
+    }
+
+    async function handleVerifyOtp() {
+      const id = document.getElementById('setupId').value.trim();
+      const otp = document.getElementById('setupOtp').value.trim();
       const pwd = document.getElementById('setupPwd').value.trim();
       const err = document.getElementById('setupError');
-      const btn = document.getElementById('setupBtn');
+      const btn = document.getElementById('setupBtn2');
 
-      if (!id || !dob || !pwd) {
+      if (!otp || !pwd) {
         err.textContent = 'Please fill in all fields.';
         return;
       }
@@ -402,20 +444,22 @@
       
       err.textContent = '';
       btn.disabled = true;
-      btn.textContent = 'Processing...';
+      btn.textContent = 'Verifying...';
 
       try {
-        const payload = {
-          action: 'forge_set_password',
-          invxId: id,
-          dob: dob,
-          newPassword: pwd
-        };
-        const res = await gasGet('forge_set_password', { invxId: id, dob: dob, newPassword: pwd });
+        const res = await gasGet('forge_verify_reset', { invxId: id, otp: otp, newPassword: pwd });
         
         if (res.success) {
            toast(res.message, 'success');
            document.getElementById('setPasswordModal').style.display = 'none';
+           // Reset modal state for future use
+           document.getElementById('setupStep1').style.display = 'block';
+           document.getElementById('setupStep2').style.display = 'none';
+           document.getElementById('setupDesc').textContent = 'Enter your Operative ID. We will send a verification code to your registered email address.';
+           document.getElementById('setupOtp').value = '';
+           document.getElementById('setupPwd').value = '';
+           
+           // Pre-fill login
            document.getElementById('loginId').value = id;
            document.getElementById('loginPwd').value = pwd;
         } else {
@@ -426,7 +470,7 @@
       }
 
       btn.disabled = false;
-      btn.textContent = 'Set Password';
+      btn.textContent = 'Reset Password';
     }
 
     async function handleLogin() {

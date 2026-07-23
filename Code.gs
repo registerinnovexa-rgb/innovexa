@@ -133,53 +133,62 @@ function doGet(e) {
       return respond({ success: false, message: 'Invalid INVX ID or Password.' });
     }
     
-    // FORGE: Set Password
-    if (action === 'forge_set_password') {
-      if (!p.invxId || !p.dob || !p.newPassword) return respond({ success: false, message: 'Missing required fields.' });
-      
+    // FORGE: Request Password Reset OTP
+    if (action === 'forge_request_reset') {
+      if (!p.invxId) return respond({ success: false, message: 'Missing Operative ID.' });
       var reqOpId = String(p.invxId).trim().toUpperCase();
-      var reqDob = String(p.dob).trim();
-      var reqDobStr = reqDob.substring(0, 10);
-
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
-        var rowOpId = String(row[12] || '').trim().toUpperCase();
-        var rowDob = row[7];
-        
-        if (rowOpId === reqOpId) {
-            var rowDobStr = "";
-            if (rowDob) {
-              if (rowDob instanceof Date || Object.prototype.toString.call(rowDob) === '[object Date]') {
-                var y = rowDob.getFullYear();
-                var m = String(rowDob.getMonth() + 1).padStart(2, '0');
-                var d = String(rowDob.getDate()).padStart(2, '0');
-                rowDobStr = y + '-' + m + '-' + d;
-              } else {
-                var ds = String(rowDob).trim();
-                var parsed = new Date(ds);
-                if (!isNaN(parsed.getTime())) {
-                    var y = parsed.getFullYear();
-                    var m = String(parsed.getMonth() + 1).padStart(2, '0');
-                    var d = String(parsed.getDate()).padStart(2, '0');
-                    rowDobStr = y + '-' + m + '-' + d;
-                } else if (ds.length >= 10 && (ds.charAt(2) === '-' || ds.charAt(2) === '/')) {
-                    var parts = ds.split(/[\-\/]/);
-                    rowDobStr = parts[2] + '-' + parts[1] + '-' + parts[0];
-                } else {
-                    rowDobStr = ds.substring(0, 10);
-                }
-              }
-            }
-            
-            if (rowDobStr === reqDobStr) {
-                // DOB verified. Set password.
-                var newPwdHash = hashPassword(p.newPassword);
-                sheet.getRange(i + 1, 24).setValue(newPwdHash); // Column X (Index 24 in 1-based)
-                return respond({ success: true, message: 'Password set successfully. You can now login.' });
-            } else {
-                return respond({ success: false, message: 'Date of Birth does not match our records.' });
-            }
+        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
+          var userEmail = String(row[2] || '').trim();
+          if (!userEmail) return respond({ success: false, message: 'No email associated with this ID.' });
+          
+          var otp = Math.floor(100000 + Math.random() * 900000).toString();
+          sheet.getRange(i + 1, 25).setValue(otp); // Col Y (Index 25 in 1-based)
+          sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
+          
+          try {
+            MailApp.sendEmail({
+              to: userEmail,
+              subject: 'Innovexa Hub — Password Reset Verification Code',
+              body: 'Your verification code is: ' + otp + '\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via innovexahub.bangalore@gmail.com)'
+            });
+            var parts = userEmail.split('@');
+            var maskedEmail = parts[0].substring(0, 2) + '***@' + parts[1];
+            return respond({ success: true, message: 'Verification code sent to ' + maskedEmail });
+          } catch (e) {
+            return respond({ success: false, message: 'Failed to send email. ' + e.toString() });
+          }
+        }
+      }
+      return respond({ success: false, message: 'Operative ID not found.' });
+    }
+
+    // FORGE: Verify Reset OTP and Set Password
+    if (action === 'forge_verify_reset') {
+      if (!p.invxId || !p.otp || !p.newPassword) return respond({ success: false, message: 'Missing fields.' });
+      var reqOpId = String(p.invxId).trim().toUpperCase();
+      var reqOtp = String(p.otp).trim();
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
+          var storedOtp = String(row[24] || '').trim(); // Col Y (Index 24 in 0-based array)
+          var storedTime = row[25]; // Col Z
+          
+          if (!storedOtp || storedOtp !== reqOtp) {
+            return respond({ success: false, message: 'Invalid verification code.' });
+          }
+          if (new Date().getTime() - storedTime > 15 * 60 * 1000) {
+            return respond({ success: false, message: 'Verification code expired. Please request a new one.' });
+          }
+          
+          var newPwdHash = hashPassword(p.newPassword);
+          sheet.getRange(i + 1, 24).setValue(newPwdHash); // Col X (Index 24 in 1-based)
+          sheet.getRange(i + 1, 25).setValue(''); // Clear OTP
+          sheet.getRange(i + 1, 26).setValue(''); // Clear Time
+          return respond({ success: true, message: 'Password reset successfully! You can now log in.' });
         }
       }
       return respond({ success: false, message: 'Operative ID not found.' });
