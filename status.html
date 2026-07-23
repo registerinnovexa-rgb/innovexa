@@ -16,6 +16,7 @@
 
   <link rel="stylesheet" href="css/main.css" />
   <script src="/js/shield.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -67,17 +68,29 @@
 <!-- STATUS CHECKER -->
 <section class="status-section">
   <div class="check-card fade-up delay-1">
-    <div class="toggle-group" id="query-toggle">
-      <button class="toggle-pill active" data-type="email_phone">Email or Phone</button>
-      <button class="toggle-pill" data-type="utr">Search by UTR</button>
-    </div>
-
-    <div class="search-group">
-      <div class="search-group-row">
-        <input class="form-control" id="query-input" type="text" placeholder="operative@example.com or phone" />
-        <button class="btn-magnetic" id="check-btn">Fetch Status</button>
+    <!-- Google OAuth Verification -->
+    <div style="text-align: center; margin-top: 24px;">
+      <p style="color:var(--text-2); font-size:14px; margin-bottom:16px;">Securely verify your status using your registered Google account.</p>
+      
+      <div id="g_id_onload"
+           data-client_id="716046248385-t0sm55a2lsistn37a51cbbn8pbr2no9d.apps.googleusercontent.com"
+           data-context="use"
+           data-ux_mode="popup"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
       </div>
-      <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:8px; display:none;"></div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="continue_with"
+           data-size="large"
+           data-logo_alignment="left"
+           style="display:flex; justify-content:center;">
+      </div>
+      
+      <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:16px; display:none;"></div>
+      <div id="loading-spinner" style="display:none; color:var(--text-1); font-size:14px; font-weight:500; margin-top:16px;">Scanning Database...</div>
     </div>
   </div>
 
