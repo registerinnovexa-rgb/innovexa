@@ -389,17 +389,9 @@
         <p style="margin-bottom:0">Innovexa Hub — Authorized Admins Only</p>
       </div>
     </div>
-    <p>Step 1: Enter your Operative ID to locate your profile.</p>
-    <div class="form-group">
-      <label>Operative ID</label>
-      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b); text-transform:uppercase;" placeholder="INVX-XXX" />
-    </div>
-    <div class="form-group">
-      <label>Registered Email</label>
-      <input type="email" id="loginEmail" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="admin@example.com" />
-    </div>
-    <button class="btn-primary" id="loginBtn" onclick="handlePreLogin()">
-      Proceed to Biometrics
+    <p style="text-align:center; margin-bottom:20px; color:var(--text2);">Look directly at the camera to securely authenticate your identity.</p>
+    <button class="btn-primary" id="loginBtn" onclick="startFaceRecognitionLogin()" style="width:100%;">
+      Scan Face to Login
     </button>
     <div class="login-error" id="loginError"></div>
   </div>
@@ -1013,67 +1005,55 @@ let preLoginData = null;
 let loginStream = null;
 let loginInterval = null;
 
-async function handlePreLogin() {
-  const id = document.getElementById('loginId').value.trim().toUpperCase();
-  const email = document.getElementById('loginEmail').value.trim();
-  const err = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
 
-  if (!id || !email) { err.textContent = 'Please fill all fields.'; return; }
-  
-  btn.disabled = true; btn.textContent = 'Verifying Credentials...'; err.textContent = '';
+let allFaceDescriptors = [];
+
+async function startFaceRecognitionLogin() {
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Initializing Neural Net...';
 
   try {
-    const data = await apiGet(`admin_login&invxId=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}`);
-    if (!data.success) { 
-      err.textContent = data.message || 'Verification failed.'; 
-      btn.disabled = false; btn.textContent = 'Proceed to Biometrics'; 
-      return; 
+    // 1. Fetch all descriptors
+    btn.textContent = 'Syncing Database...';
+    const data = await apiGet('admin_get_all_descriptors');
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to sync faces');
     }
 
-    preLoginData = data.data; // { name, operativeId, role, hasFaceRegistered }
-    preLoginData.email = email;
-
-    // Load models while transitioning
-    loadFaceModels();
-
-    // Check if face registered
-    if (!preLoginData.hasFaceRegistered) {
-      // First time fallback: Let them in to enroll their face!
-      adminSession = { id: preLoginData.operativeId, email: email, name: preLoginData.name, role: preLoginData.role };
-      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-      showDashboard();
-      setTimeout(() => {
-        showToast('Biometrics not found. Please enroll your face immediately!', 'error');
-        startBiometricEnrollment();
-      }, 1000);
-      return;
+    if (!data.faces || data.faces.length === 0) {
+      throw new Error('No faces enrolled in the system yet.');
     }
 
-    // Fetch descriptor
-    btn.textContent = 'Fetching Biometric Data...';
-    const descData = await apiGet(`admin_get_descriptor&invxId=${encodeURIComponent(id)}`);
-    if (!descData.success) {
-      throw new Error('Failed to fetch biometric descriptor');
-    }
-    
-    // Parse descriptor
-    preLoginData.descriptor = new Float32Array(JSON.parse(descData.descriptor));
-    
-    // Start Face Verification UI
+    // 2. Load into LabeledFaceDescriptors
+    btn.textContent = 'Building Face Matcher...';
+    allFaceDescriptors = data.faces.map(f => {
+      return {
+        profile: f,
+        labeledDescriptor: new faceapi.LabeledFaceDescriptors(
+          f.operativeId,
+          [new Float32Array(JSON.parse(f.descriptor))]
+        )
+      };
+    });
+
+    // 3. Switch UI
     document.getElementById('loginCardCreds').style.display = 'none';
     document.getElementById('loginCardFace').style.display = 'block';
-    
-    startFaceVerification();
 
-  } catch(e) {
+    startFaceRecognitionStream();
+
+  } catch (e) {
     console.error(e);
-    err.textContent = 'Network or Biometric error.';
-    btn.disabled = false; btn.textContent = 'Proceed to Biometrics';
+    err.textContent = e.message || 'Network or Biometric error.';
+    btn.disabled = false;
+    btn.textContent = 'Scan Face to Login';
   }
 }
 
-async function startFaceVerification() {
+async function startFaceRecognitionStream() {
   const video = document.getElementById('loginVideo');
   const canvas = document.getElementById('loginCanvas');
   const statusEl = document.getElementById('faceStatus');
@@ -1096,6 +1076,9 @@ async function startFaceVerification() {
       const displaySize = { width: video.width, height: video.height };
       faceapi.matchDimensions(canvas, displaySize);
       
+      // Build the matcher using all known labeled descriptors
+      const faceMatcher = new faceapi.FaceMatcher(allFaceDescriptors.map(f => f.labeledDescriptor), 0.5);
+      
       loginInterval = setInterval(async () => {
         const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
         
@@ -1106,28 +1089,32 @@ async function startFaceVerification() {
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
           faceapi.draw.drawDetections(canvas, resizedDetections);
           
-          // Compare
-          const distance = faceapi.euclideanDistance(detections.descriptor, preLoginData.descriptor);
+          // Match the detected face
+          const bestMatch = faceMatcher.findBestMatch(detections.descriptor);
           
-          if (distance < 0.5) {
+          if (bestMatch.label !== 'unknown') {
             // MATCH!
             clearInterval(loginInterval);
-            statusEl.textContent = 'Identity Verified. Access Granted.';
+            
+            // Find the full profile from our array
+            const matchedProfile = allFaceDescriptors.find(f => f.profile.operativeId === bestMatch.label).profile;
+            
+            statusEl.textContent = `Identity Verified: ${bestMatch.label}. Access Granted.`;
             statusEl.style.color = '#10b981';
             
             setTimeout(() => {
               cancelFaceLogin(); // just to cleanup stream
               adminSession = { 
-                id: preLoginData.operativeId, 
-                email: preLoginData.email, 
-                name: preLoginData.name, 
-                role: preLoginData.role 
+                id: matchedProfile.operativeId, 
+                email: matchedProfile.email, 
+                name: matchedProfile.name, 
+                role: matchedProfile.role 
               };
               sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
               showDashboard();
             }, 1000);
           } else {
-            statusEl.textContent = `Identity Mismatch (Dist: ${distance.toFixed(2)})`;
+            statusEl.textContent = `Identity Unknown (Dist: ${bestMatch.distance.toFixed(2)})`;
             statusEl.style.color = '#ef4444';
           }
         } else {
@@ -1148,6 +1135,14 @@ function cancelFaceLogin() {
     loginStream.getTracks().forEach(t => t.stop());
     loginStream = null;
   }
+  document.getElementById('loginCardFace').style.display = 'none';
+  document.getElementById('loginCardCreds').style.display = 'block';
+  
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = false;
+  btn.textContent = 'Scan Face to Login';
+}
+
   document.getElementById('loginCardFace').style.display = 'none';
   document.getElementById('loginCardCreds').style.display = 'block';
   const btn = document.getElementById('loginBtn');
