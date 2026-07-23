@@ -129,7 +129,8 @@ function doGet(e) {
           });
         }
       }
-      return respond({ success: false, message: 'Invalid INVX ID or Date of Birth.' });
+      }
+      return respond({ success: false, message: 'Invalid INVX ID or Password.' });
     }
     
     // FORGE: Set Password
