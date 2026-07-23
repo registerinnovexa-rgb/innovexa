@@ -389,14 +389,14 @@
         <p style="margin-bottom:0">Innovexa Hub — Authorized Admins Only</p>
       </div>
     </div>
-    <p>Step 1: Enter your Operative ID to locate your profile.</p>
+    <p>Step 1: Enter your master credentials.</p>
     <div class="form-group">
-      <label>Operative ID</label>
-      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b); text-transform:uppercase;" placeholder="INVX-XXX" />
+      <label>Username</label>
+      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter username" />
     </div>
     <div class="form-group">
-      <label>Registered Email</label>
-      <input type="email" id="loginEmail" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="admin@example.com" />
+      <label>Password</label>
+      <input type="password" id="loginEmail" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter password" />
     </div>
     <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%;">
       Login
@@ -998,8 +998,11 @@ async function handleLogin() {
   const idInput = document.getElementById('loginId');
   const emailInput = document.getElementById('loginEmail');
   
-  if (!idInput.value || !emailInput.value) {
-    err.textContent = 'Please enter both ID and Email.';
+  const user = idInput.value.trim();
+  const pass = emailInput.value;
+  
+  if (!user || !pass) {
+    err.textContent = 'Please enter both Username and Password.';
     return;
   }
   
@@ -1008,24 +1011,25 @@ async function handleLogin() {
   btn.textContent = 'Authenticating...';
   
   try {
-    const data = await apiGet(`admin_login&invxId=${encodeURIComponent(idInput.value)}&email=${encodeURIComponent(emailInput.value)}`);
-    if (!data.success) {
-      throw new Error(data.message || 'Verification failed.');
+    // Simulate network delay
+    await new Promise(r => setTimeout(r, 800));
+    
+    if (user === 'admin@invx' && pass === 'Jaiakash@2255') {
+      // Login successful
+      adminSession = {
+        id: 'INVX-01',
+        email: 'admin@invx',
+        name: 'Master Admin',
+        role: 'president'
+      };
+      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+      showDashboard();
+    } else {
+      throw new Error('Invalid username or password.');
     }
-    
-    // Login successful
-    adminSession = {
-      id: data.data.operativeId,
-      email: emailInput.value,
-      name: data.data.name,
-      role: data.data.role
-    };
-    sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-    showDashboard();
-    
   } catch (e) {
     console.error(e);
-    err.textContent = e.message || 'Network error.';
+    err.textContent = e.message || 'Authentication failed.';
   } finally {
     btn.disabled = false;
     btn.textContent = 'Login';
