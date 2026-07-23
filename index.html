@@ -95,13 +95,84 @@
     </div>
   </div>
 </section>
-<!-- ══ LATEST INTEL TICKER ═════════════════════════════════════════════════ -->
-<div class="marquee-section fade-up" style="background: #111110; border: none; padding: 14px 0;">
-  <div class="marquee-track" style="animation: scrollMarquee 40s linear infinite;">
-    <div class="marquee-text" style="color: #edeae4; font-size: 13px; font-weight: 600;">&gt; LATEST INTEL: INNOVEXA FORGE IS NOW LIVE &nbsp;&nbsp;&nbsp;&nbsp; &gt; ACCESS YOUR MEMBER DASHBOARD &nbsp;&nbsp;&nbsp;&nbsp; &gt; LATEST INTEL: INNOVEXA FORGE IS NOW LIVE &nbsp;&nbsp;&nbsp;&nbsp; &gt; ACCESS YOUR MEMBER DASHBOARD &nbsp;&nbsp;&nbsp;&nbsp;</div>
-    <div class="marquee-text" style="color: #edeae4; font-size: 13px; font-weight: 600;">&gt; LATEST INTEL: INNOVEXA FORGE IS NOW LIVE &nbsp;&nbsp;&nbsp;&nbsp; &gt; ACCESS YOUR MEMBER DASHBOARD &nbsp;&nbsp;&nbsp;&nbsp; &gt; LATEST INTEL: INNOVEXA FORGE IS NOW LIVE &nbsp;&nbsp;&nbsp;&nbsp; &gt; ACCESS YOUR MEMBER DASHBOARD &nbsp;&nbsp;&nbsp;&nbsp;</div>
+<!-- ══ LAUNCH SEQUENCE (COUNTDOWN & STACK) ═════════════════════════════════════════════════ -->
+<section class="launch-section fade-up" style="background: #111110; padding: 60px 24px; border-top: 1px solid #222; border-bottom: 1px solid #222; overflow: hidden;">
+  <div class="container" style="text-align: center; margin-bottom: 48px;">
+    <div style="font-family: var(--font-m); font-size: 12px; letter-spacing: 0.1em; color: #edeae4; opacity: 0.6; margin-bottom: 16px; text-transform: uppercase;">System Initialization Sequence</div>
+    <div style="font-family: var(--font-d); font-size: 32px; color: #edeae4; margin-bottom: 32px;">Founding Cohort Registration Closes In</div>
+    
+    <!-- Countdown Timer -->
+    <div id="countdown" style="display: flex; justify-content: center; gap: 16px; font-family: var(--font-m);">
+      <div style="display: flex; flex-direction: column; align-items: center; background: #1a1a19; padding: 16px 20px; border-radius: 16px; border: 1px solid #333; min-width: 90px;">
+        <div id="cd-days" style="font-size: 40px; font-weight: bold; color: #edeae4; line-height: 1;">00</div>
+        <div style="font-size: 11px; color: #edeae4; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;">Days</div>
+      </div>
+      <div style="font-size: 40px; color: #444; line-height: 1; align-self: center; margin-top: -24px;">:</div>
+      <div style="display: flex; flex-direction: column; align-items: center; background: #1a1a19; padding: 16px 20px; border-radius: 16px; border: 1px solid #333; min-width: 90px;">
+        <div id="cd-hours" style="font-size: 40px; font-weight: bold; color: #edeae4; line-height: 1;">00</div>
+        <div style="font-size: 11px; color: #edeae4; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;">Hours</div>
+      </div>
+      <div style="font-size: 40px; color: #444; line-height: 1; align-self: center; margin-top: -24px;">:</div>
+      <div style="display: flex; flex-direction: column; align-items: center; background: #1a1a19; padding: 16px 20px; border-radius: 16px; border: 1px solid #333; min-width: 90px;">
+        <div id="cd-mins" style="font-size: 40px; font-weight: bold; color: #edeae4; line-height: 1;">00</div>
+        <div style="font-size: 11px; color: #edeae4; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;">Mins</div>
+      </div>
+      <div style="font-size: 40px; color: #444; line-height: 1; align-self: center; margin-top: -24px;">:</div>
+      <div style="display: flex; flex-direction: column; align-items: center; background: #1a1a19; padding: 16px 20px; border-radius: 16px; border: 1px solid #333; min-width: 90px;">
+        <div id="cd-secs" style="font-size: 40px; font-weight: bold; color: #fff; line-height: 1;">00</div>
+        <div style="font-size: 11px; color: #edeae4; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;">Secs</div>
+      </div>
+    </div>
   </div>
-</div>
+
+  <!-- Tech Stack Marquee -->
+  <div>
+    <div style="font-family: var(--font-m); font-size: 11px; letter-spacing: 0.1em; color: #edeae4; opacity: 0.5; margin-bottom: 20px; text-transform: uppercase; text-align: center;">Target Architectures & Frameworks</div>
+    <div class="marquee-section" style="background: transparent; border: none; padding: 0; width: 100vw; margin-left: calc(-50vw + 50%);">
+      <div class="marquee-track" style="animation: scrollMarquee 25s linear infinite; opacity: 0.8;">
+        <div class="marquee-text" style="color: #edeae4; font-size: 18px; font-family: var(--font-m); font-weight: 500;">
+          [ REACT.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ NODE.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ PYTHON ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ AWS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ NEXT.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ TYPESCRIPT ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ FIGMA ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ MONGODB ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="marquee-text" style="color: #edeae4; font-size: 18px; font-family: var(--font-m); font-weight: 500;">
+          [ REACT.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ NODE.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ PYTHON ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ AWS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ NEXT.JS ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ TYPESCRIPT ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ FIGMA ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ MONGODB ] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    // Set a dynamic target date for demo purposes: 14 days from now
+    const countDownDate = new Date();
+    countDownDate.setDate(countDownDate.getDate() + 14);
+    const targetTime = countDownDate.getTime();
+
+    const x = setInterval(function() {
+      const now = new Date().getTime();
+      const distance = targetTime - now;
+
+      if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("cd-days").innerText = "00";
+        document.getElementById("cd-hours").innerText = "00";
+        document.getElementById("cd-mins").innerText = "00";
+        document.getElementById("cd-secs").innerText = "00";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("cd-days").innerText = days.toString().padStart(2, '0');
+      document.getElementById("cd-hours").innerText = hours.toString().padStart(2, '0');
+      document.getElementById("cd-mins").innerText = minutes.toString().padStart(2, '0');
+      document.getElementById("cd-secs").innerText = seconds.toString().padStart(2, '0');
+    }, 1000);
+  })();
+</script>
 
 
 <!-- ══ MISSION ══════════════════════════════════════════════════ -->
