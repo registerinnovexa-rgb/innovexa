@@ -790,5 +790,15 @@
 }
 
 @media (max-width: 768px) {
-  .floating-icons { opacity: 0.4; }
+  /* Scale down floating icons */
+  .floating-icons { transform: scale(0.5); transform-origin: top center; opacity: 0.6; }
+  
+  /* Arsenal card width for mobile */
+  .arsenal-card { flex: 0 0 260px; padding: 24px 20px; }
+  
+  /* Fix countdown timer overflow */
+  #countdown { gap: 8px !important; }
+  #countdown > div:nth-child(odd) { min-width: 60px !important; padding: 12px 10px !important; }
+  #countdown > div:nth-child(odd) > div:first-child { font-size: 28px !important; }
+  #countdown > div:nth-child(even) { font-size: 28px !important; margin-top: -16px !important; }
 }
