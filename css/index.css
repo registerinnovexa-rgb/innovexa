@@ -777,3 +777,37 @@ section:not(.hero)::after {
   mask-image: linear-gradient(to top, black, transparent);
   -webkit-mask-image: linear-gradient(to top, black, transparent);
 }
+
+/* ── FLOATING ICONS ──────────────────────── */
+.floating-icons {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.float-icon {
+  position: absolute;
+  opacity: 0.15;
+  filter: grayscale(100%);
+  animation: float-icon 10s ease-in-out infinite;
+}
+
+.float-icon.icon-1 { width: 40px; top: 20%; left: 10%; animation-delay: 0s; animation-duration: 12s; }
+.float-icon.icon-2 { width: 35px; top: 65%; left: 5%; animation-delay: -2s; animation-duration: 15s; }
+.float-icon.icon-3 { width: 50px; top: 15%; right: 12%; animation-delay: -5s; animation-duration: 18s; }
+.float-icon.icon-4 { width: 30px; top: 75%; right: 8%; animation-delay: -1s; animation-duration: 14s; }
+.float-icon.icon-5 { width: 45px; top: 85%; left: 25%; animation-delay: -7s; animation-duration: 11s; }
+.float-icon.icon-6 { width: 55px; top: 10%; right: 35%; animation-delay: -4s; animation-duration: 16s; }
+.float-icon.icon-7 { width: 40px; top: 55%; right: 20%; animation-delay: -8s; animation-duration: 13s; }
+
+@keyframes float-icon {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+  33% { transform: translateY(-25px) rotate(5deg); opacity: 0.25; }
+  66% { transform: translateY(15px) rotate(-5deg); opacity: 0.1; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+}
+
+@media (max-width: 768px) {
+  .floating-icons { opacity: 0.4; }
+}
