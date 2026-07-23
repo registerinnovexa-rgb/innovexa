@@ -792,13 +792,18 @@ section:not(.hero)::after {
   animation: float-icon 10s ease-in-out infinite;
 }
 
-.float-icon.icon-1 { width: 40px; top: 20%; left: 10%; animation-delay: 0s; animation-duration: 12s; }
-.float-icon.icon-2 { width: 35px; top: 65%; left: 5%; animation-delay: -2s; animation-duration: 15s; }
-.float-icon.icon-3 { width: 50px; top: 15%; right: 12%; animation-delay: -5s; animation-duration: 18s; }
-.float-icon.icon-4 { width: 30px; top: 75%; right: 8%; animation-delay: -1s; animation-duration: 14s; }
-.float-icon.icon-5 { width: 45px; top: 85%; left: 25%; animation-delay: -7s; animation-duration: 11s; }
-.float-icon.icon-6 { width: 55px; top: 10%; right: 35%; animation-delay: -4s; animation-duration: 16s; }
-.float-icon.icon-7 { width: 40px; top: 55%; right: 20%; animation-delay: -8s; animation-duration: 13s; }
+.float-icon.icon-1 { width: 80px; top: 15%; left: 8%; animation-delay: 0s; animation-duration: 14s; }
+.float-icon.icon-2 { width: 70px; top: 70%; left: 4%; animation-delay: -2s; animation-duration: 17s; }
+.float-icon.icon-3 { width: 90px; top: 12%; right: 10%; animation-delay: -5s; animation-duration: 20s; }
+.float-icon.icon-4 { width: 65px; top: 80%; right: 7%; animation-delay: -1s; animation-duration: 15s; }
+.float-icon.icon-5 { width: 85px; top: 85%; left: 22%; animation-delay: -7s; animation-duration: 12s; }
+.float-icon.icon-6 { width: 100px; top: 8%; right: 30%; animation-delay: -4s; animation-duration: 18s; }
+.float-icon.icon-7 { width: 75px; top: 50%; right: 15%; animation-delay: -8s; animation-duration: 14s; }
+.float-icon.icon-8 { width: 85px; top: 40%; left: 15%; animation-delay: -3s; animation-duration: 19s; }
+.float-icon.icon-9 { width: 70px; top: 25%; left: 35%; animation-delay: -6s; animation-duration: 16s; }
+.float-icon.icon-10 { width: 90px; top: 65%; right: 35%; animation-delay: -9s; animation-duration: 22s; }
+.float-icon.icon-11 { width: 60px; top: 30%; right: 25%; animation-delay: -11s; animation-duration: 13s; }
+.float-icon.icon-12 { width: 80px; top: 55%; left: 30%; animation-delay: -10s; animation-duration: 21s; }
 
 @keyframes float-icon {
   0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
