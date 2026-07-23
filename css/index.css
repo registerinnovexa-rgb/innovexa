@@ -788,8 +788,7 @@ section:not(.hero)::after {
 }
 .float-icon {
   position: absolute;
-  opacity: 0.15;
-  filter: grayscale(100%);
+  opacity: 0.3;
   animation: float-icon 10s ease-in-out infinite;
 }
 
@@ -802,10 +801,10 @@ section:not(.hero)::after {
 .float-icon.icon-7 { width: 40px; top: 55%; right: 20%; animation-delay: -8s; animation-duration: 13s; }
 
 @keyframes float-icon {
-  0% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
-  33% { transform: translateY(-25px) rotate(5deg); opacity: 0.25; }
-  66% { transform: translateY(15px) rotate(-5deg); opacity: 0.1; }
-  100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+  33% { transform: translateY(-25px) rotate(5deg); opacity: 0.45; }
+  66% { transform: translateY(15px) rotate(-5deg); opacity: 0.2; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
 }
 
 @media (max-width: 768px) {
