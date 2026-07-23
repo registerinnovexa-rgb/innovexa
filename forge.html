@@ -340,6 +340,14 @@
       
       // Show login screen
       document.getElementById('login-view').style.display = 'flex';
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const prefillId = urlParams.get('id');
+      if (prefillId) {
+        document.getElementById('loginId').value = prefillId;
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
       setTimeout(() => {
         document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
       }, 100);
