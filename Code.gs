@@ -208,52 +208,7 @@ function doGet(e) {
       return respond({ success: false, message: 'Invalid Credentials.' });
     }
 
-    // ADMIN: Get Face Descriptor
-    if (action === 'admin_get_descriptor') {
-      if (!p.invxId) return respond({ success: false, message: 'Missing INVX ID.' });
-      var rows = sheet.getDataRange().getValues();
-      for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        var rowOpId = String(row[12] || '').trim().toUpperCase();
-        if (rowOpId === String(p.invxId).trim().toUpperCase()) {
-          var desc = String(row[17] || '').trim(); // Column R
-          if (!desc) return respond({ success: false, message: 'No face enrolled.' });
-          return respond({ success: true, descriptor: desc });
-        }
-      }
-      return respond({ success: false, message: 'Operative not found.' });
-    }
 
-    // ADMIN: Get All Face Descriptors
-    if (action === 'admin_get_all_descriptors') {
-      var rows = sheet.getDataRange().getValues();
-      var faces = [];
-      for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        var rowOpId = String(row[12] || '').trim().toUpperCase(); // Column M
-        var desc = String(row[17] || '').trim(); // Column R
-        var role = String(row[16] || '').trim().toLowerCase(); // Column Q
-        var email = String(row[2] || '').trim().toLowerCase(); // Column C
-        var name = String(row[1] || '').trim(); // Column B
-        
-        if (rowOpId && desc) {
-          var finalRole = role;
-          if (!finalRole) {
-            if (['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(rowOpId)) finalRole = 'president';
-            else if (['INVX-02', 'INVX-03'].includes(rowOpId)) finalRole = 'admin';
-          }
-          
-          faces.push({
-            operativeId: rowOpId,
-            name: name,
-            email: email,
-            role: finalRole,
-            descriptor: desc
-          });
-        }
-      }
-      return respond({ success: true, faces: faces });
-    }
 
     // FORGE: Get Mentors
     if (action === 'forge_get_mentors') {
