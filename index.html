@@ -799,7 +799,7 @@
     });
 
     // Auto-scroll logic
-    let scrollSpeed = 0.6;
+    let scrollSpeed = 1;
     let direction = 1;
     let isInteracting = false;
 
@@ -812,7 +812,7 @@
       if (!isInteracting) {
         teamGrid.scrollLeft += scrollSpeed * direction;
         // Check boundaries to reverse direction
-        if (teamGrid.scrollLeft >= teamGrid.scrollWidth - teamGrid.clientWidth - 1) {
+        if (Math.ceil(teamGrid.scrollLeft) >= teamGrid.scrollWidth - teamGrid.clientWidth) {
           direction = -1;
         } else if (teamGrid.scrollLeft <= 0) {
           direction = 1;
