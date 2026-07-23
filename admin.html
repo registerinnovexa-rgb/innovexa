@@ -1044,7 +1044,7 @@ async function handlePreLogin() {
       sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
       showDashboard();
       setTimeout(() => {
-        toast('Biometrics not found. Please enroll your face immediately!', 'error');
+        showToast('Biometrics not found. Please enroll your face immediately!', 'error');
         startBiometricEnrollment();
       }, 1000);
       return;
@@ -1227,7 +1227,7 @@ async function startBiometricEnrollment() {
           try {
             const res = await apiWrite('admin_enroll_face', { invxId: adminSession.id, descriptor: descriptorJSON });
             if (res.success) {
-              toast('Biometrics registered successfully!', 'success');
+              showToast('Biometrics registered successfully!', 'success');
               cancelBiometricEnrollment();
             } else {
               throw new Error(res.message);
@@ -1278,7 +1278,7 @@ async function handleSetRole() {
   try {
     const res = await apiWrite('admin_set_role', { adminId: adminSession.id, targetId: targetId, newRole: newRole });
     if (res.success) {
-      toast('Role updated successfully!', 'success');
+      showToast('Role updated successfully!', 'success');
       document.getElementById('roleTargetId').value = '';
     } else {
       err.textContent = res.message || 'Failed to update role';
