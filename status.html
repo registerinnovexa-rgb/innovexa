@@ -224,69 +224,51 @@
     observer.observe(el);
   });
 
-  // Toggle Input Type
-  let queryType = 'email_phone';
-  const inputEl = document.getElementById('query-input');
-  document.querySelectorAll('.toggle-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.toggle-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      queryType = btn.dataset.type;
-      if (queryType === 'email_phone') {
-        inputEl.type = 'text';
-        inputEl.placeholder = 'operative@example.com or phone';
-      } else {
-        inputEl.type = 'text';
-        inputEl.placeholder = 'Enter 12-digit UTR';
-      }
-      inputEl.value = '';
-    });
-  });
+  // ══════════════════════════════════════════
+  //  GOOGLE AUTHENTICATION (STATUS CHECK)
+  // ══════════════════════════════════════════
+  function decodeJwtResponse(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }
 
-  // Check Status
-  let isChecking = false;
-  document.getElementById('check-btn').addEventListener('click', async () => {
-    if (isChecking) return;
-    const query = inputEl.value.trim();
+  async function handleCredentialResponse(response) {
     const errEl = document.getElementById('query-error');
-    if (!query) {
-      errEl.textContent = 'Please enter a value to search';
-      errEl.style.display = 'block';
-      return;
-    }
-    errEl.style.display = 'none';
-
-    const btn = document.getElementById('check-btn');
-    isChecking = true;
-    btn.classList.add('btn-loading');
-    btn.textContent = 'Scanning Database...';
-
+    const spinner = document.getElementById('loading-spinner');
     const panel = document.getElementById('result-panel');
+    
+    errEl.style.display = 'none';
     panel.classList.add('hidden');
+    spinner.style.display = 'block';
 
     try {
-      let url = '';
-      if (queryType === 'email_phone') {
-        if (query.includes('@')) {
-          url = SCRIPT_URL + '?email=' + encodeURIComponent(query);
-        } else {
-          url = SCRIPT_URL + '?phone=' + encodeURIComponent(query);
-        }
-      } else {
-        url = SCRIPT_URL + '?' + queryType + '=' + encodeURIComponent(query);
+      const payload = decodeJwtResponse(response.credential);
+      const email = payload.email;
+      
+      if (!email) {
+        throw new Error("No email found in Google response.");
       }
+
+      // Fetch status via email
+      const url = SCRIPT_URL + '?email=' + encodeURIComponent(email);
       const res = await gasGet(url);
 
       const resIcon = document.getElementById('res-icon');
       const resMsg = document.getElementById('res-msg');
       const approvedAssets = document.getElementById('approved-assets');
 
+      spinner.style.display = 'none';
+
       if (res && res.success) {
         const d = res.data || res;
         const status = (d.status || '').trim().toLowerCase();
         
         document.getElementById('res-name').textContent = d.name || 'Operative';
-        document.getElementById('res-identifier').textContent = d.email || d.utr || query;
+        document.getElementById('res-identifier').textContent = d.email || email;
         document.getElementById('res-status-text').textContent = status.charAt(0).toUpperCase() + status.slice(1);
 
         resIcon.className = 'result-icon ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
@@ -311,19 +293,29 @@
           // Add Forge button only if granted and not already present
           if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
             if (!document.getElementById('forge-ops-btn')) {
-              actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html" class="btn-magnetic" style="background:#000; border-color:#333; margin-left:12px;">⚡ Enter Forge Ops</a>`);
+              let btn = document.createElement('button');
+              btn.id = 'forge-ops-btn';
+              btn.className = 'btn-magnetic';
+              btn.style = 'background:var(--accent); color:#111; margin-left:12px;';
+              btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px; vertical-align:middle; display:inline-block;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Enter Forge';
+              btn.onclick = () => window.location.href = 'forge.html';
+              actionRow.appendChild(btn);
             }
           }
-          
-          document.getElementById('result-panel').style.display = 'block';         
           approvedAssets.classList.remove('hidden');
+        } else if (status === 'rejected') {
+          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+          resMsg.innerHTML = 'Your application has been <strong>rejected</strong> due to invalid information or payment verification failure.';
+          approvedAssets.classList.add('hidden');
         } else {
-          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-          resMsg.textContent = 'Application not approved. Please contact support for details.';
+          // Unknown status
+          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+          resMsg.textContent = 'Status unknown. Contact support.';
           approvedAssets.classList.add('hidden');
         }
 
         panel.classList.remove('hidden');
+        
         // Re-trigger fade
         panel.style.opacity = '0';
         panel.style.transform = 'translateY(20px)';
@@ -334,25 +326,17 @@
         }, 50);
 
       } else {
-        errEl.textContent = res.message || 'No record found. Please verify your details.';
+        errEl.textContent = 'No record found for this Google Account.';
         errEl.style.display = 'block';
       }
-    } catch (e) {
-      console.error(e);
-      errEl.textContent = e.message || 'Connection error. Please try again.';
+    } catch(e) {
+      spinner.style.display = 'none';
+      errEl.textContent = 'An error occurred during verification. Please try again.';
       errEl.style.display = 'block';
-    } finally {
-      isChecking = false;
-      btn.classList.remove('btn-loading');
-      btn.textContent = 'Fetch Status';
     }
-  });
+  }
 
-  document.getElementById('query-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') document.getElementById('check-btn').click();
-  });
-
-  document.getElementById('copy-id-btn')?.addEventListener('click', () => {
+    document.getElementById('copy-id-btn')?.addEventListener('click', () => {
     const opId = document.getElementById('card-id').textContent;
     if (opId && opId !== 'INVX-XX') {
       navigator.clipboard.writeText(opId).then(() => {
