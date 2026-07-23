@@ -752,6 +752,14 @@
 .gallery-track img {
   max-width: none !important;
   flex-shrink: 0;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+@media (max-width: 768px) {
+  .gallery-track img {
+    height: 200px !important;
+  }
 }
 
 
