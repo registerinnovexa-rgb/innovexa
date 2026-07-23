@@ -375,12 +375,13 @@
     .CodeMirror-cursor { border-left-color: var(--text) !important; }
     .editor-preview { background: var(--bg); color: var(--text); }
   </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 </head>
 <body>
 
 <!-- ════════ LOGIN SCREEN ════════ -->
 <div id="loginScreen">
-  <div class="login-card">
+  <div class="login-card" id="loginCardCreds">
     <div class="logo-row">
       <div class="logo-icon">IX</div>
       <div>
@@ -388,28 +389,36 @@
         <p style="margin-bottom:0">Innovexa Hub — Authorized Admins Only</p>
       </div>
     </div>
-    <p>Verify your identity to access the admin dashboard.</p>
+    <p>Step 1: Enter your Operative ID to locate your profile.</p>
     <div class="form-group">
       <label>Operative ID</label>
-      <select id="loginId" style="width:100%;">
-        <option value="INVX-01">INVX-01 (President)</option>
-        <option value="INVX-09">INVX-09 (Admin)</option>
-        <option value="INVX-02">INVX-02 (Admin)</option>
-        <option value="INVX-03">INVX-03 (Admin)</option>
-      </select>
+      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b); text-transform:uppercase;" placeholder="INVX-XXX" />
     </div>
     <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" id="loginEmail" placeholder="Your registered email">
+      <label>Registered Email</label>
+      <input type="email" id="loginEmail" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="admin@example.com" />
     </div>
-    <div class="form-group">
-      <label>Last 5 Digits of Phone</label>
-      <input type="text" id="loginPhone" maxlength="5" placeholder="e.g. 12345">
-    </div>
-    <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
-      Verify &amp; Access Dashboard
+    <button class="btn-primary" id="loginBtn" onclick="handlePreLogin()">
+      Proceed to Biometrics
     </button>
     <div class="login-error" id="loginError"></div>
+  </div>
+
+  <div class="login-card" id="loginCardFace" style="display:none; text-align:center;">
+    <div class="logo-row" style="justify-content:center;">
+      <div class="logo-icon">IX</div>
+    </div>
+    <h2>Facial Recognition</h2>
+    <p style="font-size:13px; color:var(--text3); margin-bottom:20px;">Please look directly at the camera to verify your identity.</p>
+    
+    <div style="position:relative; width:100%; max-width:320px; margin:0 auto 20px; border-radius:16px; overflow:hidden; border:2px solid var(--border); background:#000;">
+      <video id="loginVideo" width="320" height="240" autoplay muted playsinline style="display:block; width:100%; object-fit:cover;"></video>
+      <canvas id="loginCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
+    </div>
+    
+    <div id="faceStatus" style="font-family:var(--font-d); font-size:14px; font-weight:600; color:var(--accent); margin-bottom:16px;">Initializing Neural Engine...</div>
+    <div class="login-error" id="faceError"></div>
+    <button class="btn-cancel" style="width:100%;" onclick="cancelFaceLogin()">Cancel</button>
   </div>
 </div>
 
@@ -452,6 +461,10 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Events & Ops
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('roleMgmt')" id="navRoleMgmt" style="display:none;">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      Manage Admins
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -459,7 +472,12 @@
 
     <!-- ── OVERVIEW TAB ── -->
     <div class="tab-content active" id="tabOverview">
-      <h2 style="font-size:24px;font-weight:800;margin-bottom:20px">Dashboard</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <h2 style="font-size:24px;font-weight:800;">Dashboard</h2>
+        <button class="btn-primary" id="btnEnrollBio" onclick="startBiometricEnrollment()" style="width:auto; padding:8px 16px; font-size:12px;">
+          Enroll Face Biometrics
+        </button>
+      </div>
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-label">Total Operatives</div>
@@ -496,6 +514,30 @@
           <h3>Members by Branch</h3>
           <canvas id="branchChart" style="max-width:100%; max-height:250px;"></canvas>
         </div>
+      </div>
+    </div>
+
+  <!-- ── ROLE MANAGEMENT TAB ── -->
+    <div class="tab-content" id="tabRoleMgmt">
+      <div class="section-header">
+        <h2 style="font-size:24px;font-weight:800;">Manage Admins</h2>
+      </div>
+      <div class="admin-card" style="max-width:500px;">
+        <p style="margin-bottom:20px;">Authorize operatives with Admin or President privileges.</p>
+        <div class="form-group">
+          <label>Target Operative ID</label>
+          <input type="text" id="roleTargetId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b); text-transform:uppercase;" placeholder="INVX-XXX">
+        </div>
+        <div class="form-group">
+          <label>Assign Role</label>
+          <select id="roleSelect" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);">
+            <option value="member">Core Operative (Member)</option>
+            <option value="admin">Admin</option>
+            <option value="president">President</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="roleBtn" onclick="handleSetRole()">Update Role</button>
+        <div id="roleError" class="login-error"></div>
       </div>
     </div>
 
@@ -945,40 +987,308 @@ function statusBadge(s) {
 // ══════════════════════════════════════════════════════════════
 //  LOGIN
 // ══════════════════════════════════════════════════════════════
-async function handleLogin() {
-  const id = document.getElementById('loginId').value.trim();
+// ══════════════════════════════════════════════════════════════
+//  FACE API & MODELS
+// ══════════════════════════════════════════════════════════════
+let modelsLoaded = false;
+async function loadFaceModels() {
+  if (modelsLoaded) return;
+  try {
+    const MODEL_URL = '/models';
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+    ]);
+    modelsLoaded = true;
+  } catch(e) {
+    console.error('Failed to load Face-API models:', e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOGIN (BIOMETRIC UPGRADE)
+// ══════════════════════════════════════════════════════════════
+let preLoginData = null;
+let loginStream = null;
+let loginInterval = null;
+
+async function handlePreLogin() {
+  const id = document.getElementById('loginId').value.trim().toUpperCase();
   const email = document.getElementById('loginEmail').value.trim();
-  const phone = document.getElementById('loginPhone').value.trim();
   const err = document.getElementById('loginError');
   const btn = document.getElementById('loginBtn');
 
-  // Allowed admin operative IDs
-  const ADMIN_IDS = ['INVX-01', 'INVX-09', 'INVX-02', 'INVX-03'];
-
-  if (!email || !phone) { err.textContent = 'Please fill all fields.'; return; }
-  if (phone.length !== 5) { err.textContent = 'Enter exactly 5 digits.'; return; }
-  if (!ADMIN_IDS.includes(id)) { err.textContent = 'Operative not authorized.'; return; }
-
-  btn.disabled = true; btn.textContent = 'Verifying...'; err.textContent = '';
+  if (!id || !email) { err.textContent = 'Please fill all fields.'; return; }
+  
+  btn.disabled = true; btn.textContent = 'Verifying Credentials...'; err.textContent = '';
 
   try {
     const data = await apiGet(`admin_login&invxId=${encodeURIComponent(id)}&email=${encodeURIComponent(email)}`);
-    if (!data.success) { err.textContent = data.message || 'Verification failed.'; btn.disabled = false; btn.textContent = 'Verify & Access Dashboard'; return; }
+    if (!data.success) { 
+      err.textContent = data.message || 'Verification failed.'; 
+      btn.disabled = false; btn.textContent = 'Proceed to Biometrics'; 
+      return; 
+    }
 
-    adminSession = { id, email, phone, name: (data.data && data.data.name) || id };
-    sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
-    showDashboard();
+    preLoginData = data.data; // { name, operativeId, role, hasFaceRegistered }
+    preLoginData.email = email;
+
+    // Load models while transitioning
+    loadFaceModels();
+
+    // Check if face registered
+    if (!preLoginData.hasFaceRegistered) {
+      // First time fallback: Let them in to enroll their face!
+      adminSession = { id: preLoginData.operativeId, email: email, name: preLoginData.name, role: preLoginData.role };
+      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+      showDashboard();
+      setTimeout(() => {
+        toast('Biometrics not found. Please enroll your face immediately!', 'error');
+        startBiometricEnrollment();
+      }, 1000);
+      return;
+    }
+
+    // Fetch descriptor
+    btn.textContent = 'Fetching Biometric Data...';
+    const descData = await apiGet(`admin_get_descriptor&invxId=${encodeURIComponent(id)}`);
+    if (!descData.success) {
+      throw new Error('Failed to fetch biometric descriptor');
+    }
+    
+    // Parse descriptor
+    preLoginData.descriptor = new Float32Array(JSON.parse(descData.descriptor));
+    
+    // Start Face Verification UI
+    document.getElementById('loginCardCreds').style.display = 'none';
+    document.getElementById('loginCardFace').style.display = 'block';
+    
+    startFaceVerification();
+
   } catch(e) {
-    err.textContent = 'Network error.';
-    btn.disabled = false; btn.textContent = 'Verify & Access Dashboard';
+    console.error(e);
+    err.textContent = 'Network or Biometric error.';
+    btn.disabled = false; btn.textContent = 'Proceed to Biometrics';
   }
+}
+
+async function startFaceVerification() {
+  const video = document.getElementById('loginVideo');
+  const canvas = document.getElementById('loginCanvas');
+  const statusEl = document.getElementById('faceStatus');
+  const errEl = document.getElementById('faceError');
+  errEl.textContent = '';
+  
+  try {
+    statusEl.textContent = 'Activating Camera...';
+    loginStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    video.srcObject = loginStream;
+    
+    video.onplaying = async () => {
+      // Ensure models loaded
+      while (!modelsLoaded) {
+        statusEl.textContent = 'Loading Neural Models...';
+        await new Promise(r => setTimeout(r, 500));
+      }
+      
+      statusEl.textContent = 'Scanning Face...';
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+      
+      loginInterval = setInterval(async () => {
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+        
+        // Clear canvas
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (detections) {
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          faceapi.draw.drawDetections(canvas, resizedDetections);
+          
+          // Compare
+          const distance = faceapi.euclideanDistance(detections.descriptor, preLoginData.descriptor);
+          
+          if (distance < 0.5) {
+            // MATCH!
+            clearInterval(loginInterval);
+            statusEl.textContent = 'Identity Verified. Access Granted.';
+            statusEl.style.color = '#10b981';
+            
+            setTimeout(() => {
+              cancelFaceLogin(); // just to cleanup stream
+              adminSession = { 
+                id: preLoginData.operativeId, 
+                email: preLoginData.email, 
+                name: preLoginData.name, 
+                role: preLoginData.role 
+              };
+              sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+              showDashboard();
+            }, 1000);
+          } else {
+            statusEl.textContent = `Identity Mismatch (Dist: ${distance.toFixed(2)})`;
+            statusEl.style.color = '#ef4444';
+          }
+        } else {
+          statusEl.textContent = 'No face detected...';
+          statusEl.style.color = 'var(--text3)';
+        }
+      }, 500);
+    };
+  } catch(e) {
+    console.error(e);
+    errEl.textContent = 'Camera access denied or unavailable.';
+  }
+}
+
+function cancelFaceLogin() {
+  if (loginInterval) clearInterval(loginInterval);
+  if (loginStream) {
+    loginStream.getTracks().forEach(t => t.stop());
+    loginStream = null;
+  }
+  document.getElementById('loginCardFace').style.display = 'none';
+  document.getElementById('loginCardCreds').style.display = 'block';
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = false; btn.textContent = 'Proceed to Biometrics';
 }
 
 function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   document.getElementById('adminName').textContent = adminSession.name;
+  
+  // Show Role Mgmt if president
+  if (adminSession.role === 'president') {
+    const rmBtn = document.getElementById('navRoleMgmt');
+    if (rmBtn) rmBtn.style.display = 'flex';
+  }
+  
   loadOverview();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ENROLL BIOMETRICS
+// ══════════════════════════════════════════════════════════════
+let enrollStream = null;
+let enrollInterval = null;
+
+async function startBiometricEnrollment() {
+  await loadFaceModels();
+  document.getElementById('enrollModal').classList.add('open');
+  
+  const video = document.getElementById('enrollVideo');
+  const canvas = document.getElementById('enrollCanvas');
+  const statusEl = document.getElementById('enrollStatus');
+  
+  statusEl.textContent = 'Activating Camera...';
+  statusEl.style.color = 'var(--text3)';
+  
+  try {
+    enrollStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    video.srcObject = enrollStream;
+    
+    video.onplaying = async () => {
+      // Ensure models loaded
+      while (!modelsLoaded) {
+        statusEl.textContent = 'Loading Neural Models...';
+        await new Promise(r => setTimeout(r, 500));
+      }
+      
+      statusEl.textContent = 'Analyzing Facial Geometry... Keep still.';
+      
+      const checkFace = async () => {
+        if (!enrollStream) return; // cancelled
+        const displaySize = { width: video.videoWidth, height: video.videoHeight };
+        if (displaySize.width > 0) faceapi.matchDimensions(canvas, displaySize);
+        
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+        
+        if (displaySize.width > 0) {
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        if (detections) {
+          if (displaySize.width > 0) {
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+          }
+          
+          statusEl.textContent = 'Geometry Mapped. Saving to Neural DB...';
+          statusEl.style.color = 'var(--accent)';
+          
+          // Stop checking
+          clearTimeout(enrollInterval);
+          
+          // Send to backend
+          const descriptorJSON = JSON.stringify(Array.from(detections.descriptor));
+          try {
+            const res = await apiPost('admin_enroll_face', { invxId: adminSession.id, descriptor: descriptorJSON });
+            if (res.success) {
+              toast('Biometrics registered successfully!', 'success');
+              cancelBiometricEnrollment();
+            } else {
+              throw new Error(res.message);
+            }
+          } catch(e) {
+            console.error(e);
+            statusEl.textContent = 'Failed to save biometrics: ' + e.message;
+            statusEl.style.color = '#ef4444';
+            enrollInterval = setTimeout(checkFace, 2000); // retry
+          }
+        } else {
+          statusEl.textContent = 'No face detected in frame.';
+          enrollInterval = setTimeout(checkFace, 500);
+        }
+      };
+      
+      enrollInterval = setTimeout(checkFace, 1000);
+    };
+  } catch (e) {
+    console.error(e);
+    statusEl.textContent = 'Camera access denied.';
+    statusEl.style.color = '#ef4444';
+  }
+}
+
+function cancelBiometricEnrollment() {
+  document.getElementById('enrollModal').classList.remove('open');
+  if (enrollInterval) clearTimeout(enrollInterval);
+  if (enrollStream) {
+    enrollStream.getTracks().forEach(t => t.stop());
+    enrollStream = null;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ROLE MANAGEMENT
+// ══════════════════════════════════════════════════════════════
+async function handleSetRole() {
+  const targetId = document.getElementById('roleTargetId').value.trim().toUpperCase();
+  const newRole = document.getElementById('roleSelect').value;
+  const btn = document.getElementById('roleBtn');
+  const err = document.getElementById('roleError');
+  
+  if (!targetId) { err.textContent = 'Provide Target ID'; return; }
+  
+  btn.disabled = true; btn.textContent = 'Updating...'; err.textContent = '';
+  
+  try {
+    const res = await apiPost('admin_set_role', { adminId: adminSession.id, targetId: targetId, newRole: newRole });
+    if (res.success) {
+      toast('Role updated successfully!', 'success');
+      document.getElementById('roleTargetId').value = '';
+    } else {
+      err.textContent = res.message || 'Failed to update role';
+    }
+  } catch(e) {
+    console.error(e);
+    err.textContent = 'Network error.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update Role';
+  }
 }
 
 function logout() {
@@ -1921,7 +2231,8 @@ function printIDCards(htmlContent) {
         <title>Operative ID Card</title>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
         <style>${idCardCss}</style>
-      </head>
+        <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
       <body>
         ${htmlContent}
         <script>
@@ -1929,7 +2240,25 @@ function printIDCards(htmlContent) {
             setTimeout(() => { window.print(); window.close(); }, 500); 
           }
         <\/script>
-      </body>
+      <!-- ════════ BIOMETRICS ENROLLMENT MODAL ════════ -->
+<div class="modal-overlay" id="enrollModal">
+  <div class="modal-box" style="max-width:400px; text-align:center;">
+    <h2>Enroll Face Biometrics</h2>
+    <p style="font-size:13px; color:var(--text3); margin-bottom:20px;">Position your face clearly in the frame.</p>
+    
+    <div style="position:relative; width:100%; border-radius:16px; overflow:hidden; border:2px solid var(--border); background:#000; aspect-ratio: 4/3;">
+      <video id="enrollVideo" autoplay muted playsinline style="display:block; width:100%; height:100%; object-fit:cover;"></video>
+      <canvas id="enrollCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
+    </div>
+    
+    <div id="enrollStatus" style="font-family:var(--font-d); font-size:14px; font-weight:600; color:var(--accent); margin-top:16px; margin-bottom:16px;">Waiting for camera...</div>
+    
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn-cancel" onclick="cancelBiometricEnrollment()" style="width:100%">Cancel</button>
+    </div>
+  </div>
+</div>
+</body>
     </html>
   `);
   win.document.close();

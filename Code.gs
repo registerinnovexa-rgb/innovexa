@@ -181,19 +181,100 @@ function doGet(e) {
         
         if (rowOpId === reqOpId && rowEmail === reqEmail) {
           var role = String(row[16] || '').trim().toLowerCase(); // Column Q
-          if (role !== 'admin' && !['INVX-01', 'INVX-09', 'INVX-02', 'INVX-03'].includes(rowOpId)) {
+          var isPresident = (role === 'president' || ['INVX-01', 'INVX-09'].includes(rowOpId));
+          var isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(rowOpId));
+          
+          if (!isAdmin) {
             return respond({ success: false, message: 'Access Denied. You do not have Admin privileges.' });
           }
+          
+          // Force explicit roles if empty but part of hardcoded list
+          var finalRole = role;
+          if (!finalRole) {
+            finalRole = isPresident ? 'president' : 'admin';
+          }
+
           return respond({
             success: true,
             data: {
               name: String(row[1] || ''),
-              operativeId: rowOpId
+              operativeId: rowOpId,
+              role: finalRole,
+              hasFaceRegistered: !!row[17] // Column R
             }
           });
         }
       }
-      return respond({ success: false, message: 'Invalid INVX ID or Date of Birth.' });
+      return respond({ success: false, message: 'Invalid Credentials.' });
+    }
+
+    // ADMIN: Get Face Descriptor
+    if (action === 'admin_get_descriptor') {
+      if (!p.invxId) return respond({ success: false, message: 'Missing INVX ID.' });
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        var rowOpId = String(row[12] || '').trim().toUpperCase();
+        if (rowOpId === String(p.invxId).trim().toUpperCase()) {
+          var desc = String(row[17] || '').trim(); // Column R
+          if (!desc) return respond({ success: false, message: 'No face enrolled.' });
+          return respond({ success: true, descriptor: desc });
+        }
+      }
+      return respond({ success: false, message: 'Operative not found.' });
+    }
+
+    // ADMIN: Enroll Face
+    if (action === 'admin_enroll_face') {
+      if (!p.invxId || !p.descriptor) return respond({ success: false, message: 'Missing parameters.' });
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        var rowOpId = String(row[12] || '').trim().toUpperCase();
+        if (rowOpId === String(p.invxId).trim().toUpperCase()) {
+          // Verify they are admin first
+          var role = String(row[16] || '').trim().toLowerCase();
+          var isAdmin = (role === 'admin' || role === 'president' || ['INVX-01', 'INVX-09', 'INVX-02', 'INVX-03'].includes(rowOpId));
+          if (!isAdmin) return respond({ success: false, message: 'Unauthorized.' });
+          
+          // Save to column R (18th column)
+          sheet.getRange(i + 1, 18).setValue(p.descriptor);
+          return respond({ success: true, message: 'Biometrics saved successfully.' });
+        }
+      }
+      return respond({ success: false, message: 'Operative not found.' });
+    }
+
+    // ADMIN: Set Role
+    if (action === 'admin_set_role') {
+      if (!p.adminId || !p.targetId || !p.newRole) return respond({ success: false, message: 'Missing parameters.' });
+      
+      var rows = sheet.getDataRange().getValues();
+      var isAdminAuth = false;
+      
+      // Verify caller is President
+      for (var i = 1; i < rows.length; i++) {
+        var rowOpId = String(rows[i][12] || '').trim().toUpperCase();
+        if (rowOpId === String(p.adminId).trim().toUpperCase()) {
+          var role = String(rows[i][16] || '').trim().toLowerCase();
+          if (role === 'president' || ['INVX-01', 'INVX-09'].includes(rowOpId)) {
+            isAdminAuth = true;
+          }
+          break;
+        }
+      }
+      
+      if (!isAdminAuth) return respond({ success: false, message: 'Permission Denied. Only Presidents can manage roles.' });
+      
+      // Find target and update role
+      for (var i = 1; i < rows.length; i++) {
+        var rowOpId = String(rows[i][12] || '').trim().toUpperCase();
+        if (rowOpId === String(p.targetId).trim().toUpperCase()) {
+          sheet.getRange(i + 1, 17).setValue(p.newRole.toLowerCase()); // Column Q
+          return respond({ success: true, message: 'Role updated successfully to ' + p.newRole });
+        }
+      }
+      return respond({ success: false, message: 'Target Operative not found.' });
     }
 
     // FORGE: Get Mentors
