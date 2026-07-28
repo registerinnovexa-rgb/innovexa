@@ -1845,7 +1845,7 @@ function renderMembersHTML(members) {
     return;
   }
   tbody.innerHTML = members.map(m => {
-    const mData = encodeURIComponent(JSON.stringify(m));
+    const mData = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
     const isConfirmed = (m.status||'').trim().toLowerCase().includes('confirmed');
     return `
     <tr>
@@ -2051,7 +2051,7 @@ function openProfileModal(encodedData) {
     </div>
     
     <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-      <button class="btn-sm" style="background:#25D366; color:#fff;" onclick="window.open('https://wa.me/91${escHtml(m.phone).replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(m.name)},%20this%20is%20the%20Innovexa%20Core%20Team%20regarding%20your%20membership.')">💬 Chat on WhatsApp</button>
+      <button class="btn-sm" style="background:#25D366; color:#fff;" onclick="window.open('https://wa.me/91${escHtml(m.phone).replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(m.name).replace(/'/g, '%27')},%20this%20is%20the%20Innovexa%20Core%20Team%20regarding%20your%20membership.')">💬 Chat on WhatsApp</button>
       <button class="btn-sm" style="background:var(--accent); color:#fff;" onclick="generateIDCard('${encodedData}')">🪪 Generate ID Card</button>
     </div>
 
