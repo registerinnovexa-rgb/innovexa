@@ -15,7 +15,7 @@ async function gasGet(gasUrl) {
   const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
-    const r2   = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
+    const r2   = await fetch(gasUrl, { method: 'GET', signal: ctrl.signal, redirect: 'follow' });
     clearTimeout(timer);
     const text = await r2.text();
     try {

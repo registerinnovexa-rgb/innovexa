@@ -160,7 +160,8 @@ function doGet(e) {
               xp: String(row[19] || '0'),
               rank: String(row[20] || 'Apprentice'),
               squad: String(row[21] || 'Unassigned'),
-              role: String(row[16] || '').trim()
+              role: String(row[16] || '').trim(),
+              email: String(row[2] || '').trim()
             }
           });
         }
