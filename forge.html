@@ -317,26 +317,18 @@
         const raw = localStorage.getItem('forge_session');
         if (raw) {
           const stored = JSON.parse(raw);
-          // Always re-verify with server — never trust localStorage blindly
-          const res = await gasGet('forge_login', { invxId: stored.operativeId, dob: stored.dob });
-          if (res.success && res.data) {
-            session = {
-              operativeId: res.data.operativeId,
-              dob: stored.dob,
-              name: res.data.name,
-              xp: res.data.xp,
-              rank: res.data.rank,
-              squad: res.data.squad
-            };
-            localStorage.setItem('forge_session', JSON.stringify(session));
+          // Check if session is less than 7 days old
+          if (stored.operativeId && stored.timestamp && (new Date().getTime() - stored.timestamp < 7 * 24 * 60 * 60 * 1000)) {
+            session = stored;
             bootDashboard();
             return;
           } else {
-            // Access revoked or denied — clear session and show login
+            // Expired or invalid session
             localStorage.removeItem('forge_session');
           }
         }
       } catch(_) { localStorage.removeItem('forge_session'); }
+
       
       // Show login screen
       document.getElementById('login-view').style.display = 'flex';
@@ -426,14 +418,14 @@
            toast('Authentication successful.', 'success');
            
            // Create session
-           const sessionData = {
+           session = {
               timestamp: new Date().getTime(),
               ...res.data
            };
-           localStorage.setItem('invx_session', JSON.stringify(sessionData));
+           localStorage.setItem('forge_session', JSON.stringify(session));
            
            // Boot Dashboard
-           bootDashboard(sessionData);
+           bootDashboard();
         } else {
            err.textContent = res.message || 'Authentication failed.';
         }
