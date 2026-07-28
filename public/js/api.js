@@ -5,7 +5,7 @@
  * Load as plain script: <script src="/js/api.js"></script>
  */
 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD9vs6rCur7GDuOgq76MWXa8do2kjBqjUt7wTJ5umcW_Z7FYzIObp2Hu5nya6buVE6Ug/exec';
 
 // ── GET via server-side proxy ────────────────────────────────────
 // Passes all query params through /api/proxy so the browser
@@ -15,41 +15,58 @@ async function gasGet(gasUrl) {
   const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
-    const r2   = await fetch(gasUrl, { method: 'GET', signal: ctrl.signal, redirect: 'follow' });
+    const proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
+    const r2   = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal });
     clearTimeout(timer);
-    const text = await r2.text();
-    try {
-      return JSON.parse(text);
-    } catch (_) {
-      throw new Error('Invalid JSON from server');
-    }
+    return await r2.json();
   } catch (err) {
     clearTimeout(timer);
-    if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
-    throw err;
+    console.error("gasGet proxy failed:", err);
+    // Fallback: direct fetch
+    try {
+      const r3 = await fetch(gasUrl, { method: 'GET', redirect: 'follow' });
+      return await r3.json();
+    } catch(e) {
+      throw err;
+    }
   }
 }
 
-// ── POST direct (no-cors) ────────────────────────────────────────
+// ── POST direct or proxy ────────────────────────────────────────
 async function gasPost(url, payload) {
   const ctrl  = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
-    await fetch(url, {
-      method:  'POST',
-      mode:    'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body:    JSON.stringify(payload),
-      signal:  ctrl.signal,
+    const proxyUrl = '/api/proxy';
+    const r2 = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetUrl: url, payload }),
+      signal: ctrl.signal
     });
     clearTimeout(timer);
-    return { success: true, message: 'Submitted successfully' };
+    return await r2.json();
   } catch (err) {
     clearTimeout(timer);
-    if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
-    throw err;
+    // Fallback: direct no-cors fetch
+    try {
+      await fetch(url, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify(payload),
+      });
+      return { success: true, message: 'Submitted successfully (no-cors)' };
+    } catch (e) {
+      throw err;
+    }
   }
 }
+
+// Export for global use
+window.gasGet = gasGet;
+window.gasPost = gasPost;
+window.SCRIPT_URL = SCRIPT_URL;
 
 // ── Toast ────────────────────────────────────────────────────────
 function showToast(message, type = 'info') {

@@ -106,9 +106,17 @@ function doGet(e) {
           var userEmail = String(row[2] || '').trim();
           if (!userEmail) return respond({ success: false, message: 'No email associated with this ID.' });
           
-          var otp = Math.floor(100000 + Math.random() * 900000).toString();
-          sheet.getRange(i + 1, 25).setValue(otp); // Col Y
-          sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
+          var existingOtp = String(row[24] || '').trim();
+          var existingTime = row[25];
+          var otp = '';
+          
+          if (existingOtp && existingTime && (new Date().getTime() - existingTime < 2 * 60 * 1000)) {
+            otp = existingOtp; // Reuse recent OTP if requested within 2 mins
+          } else {
+            otp = Math.floor(100000 + Math.random() * 900000).toString();
+            sheet.getRange(i + 1, 25).setValue(otp); // Col Y
+            sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
+          }
           
           try {
             MailApp.sendEmail({
@@ -162,7 +170,7 @@ function doGet(e) {
           // Tracking: Update Login Count (Col AA - 27) and Last Login Time (Col AB - 28)
           var loginCount = parseInt(row[26]) || 0;
           sheet.getRange(i + 1, 27).setValue(loginCount + 1);
-          sheet.getRange(i + 1, 28).setValue(timestamp);
+          sheet.getRange(i + 1, 28).setValue(new Date().toISOString());
           
           // Log movement
           logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
@@ -520,10 +528,33 @@ function doGet(e) {
           description: String(rows[i][4] || ''),
           coverUrl: String(rows[i][5] || ''),
           status: String(rows[i][6] || ''),
-          eventType: String(rows[i][7] || 'Event')
+          eventType: String(rows[i][7] || 'Event'),
+          imageUrls: String(rows[i][8] || '[]')
         });
       }
       return respond({ success: true, events: events.reverse() });
+    }
+
+    // FORGE: Get Sessions
+    if (action === 'forge_get_sessions') {
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var rows = eventsSheet.getDataRange().getValues();
+      var sessions = [];
+      for (var i = 1; i < rows.length; i++) {
+        var type = String(rows[i][7] || 'Event');
+        if (type !== 'Session') continue;
+        
+        sessions.push({
+          eventId: String(rows[i][0] || ''),
+          title: String(rows[i][2] || ''),
+          date: String(rows[i][3] || ''),
+          description: String(rows[i][4] || ''),
+          coverUrl: String(rows[i][5] || ''),
+          status: String(rows[i][6] || ''),
+          eventType: type
+        });
+      }
+      return respond({ success: true, sessions: sessions.reverse() });
     }
 
     // PUBLIC: Get Events
@@ -1148,18 +1179,53 @@ function doPost(e) {
 
 
     // ADMIN: Create Event
+    if (op === 'admin_upload_event_image') {
+      try {
+        // payload.imageData = base64 string, payload.mimeType = 'image/jpeg' etc, payload.fileName
+        var imageData = payload.imageData || '';
+        var mimeType = payload.mimeType || 'image/jpeg';
+        var fileName = payload.fileName || ('event_img_' + Date.now() + '.jpg');
+        
+        // Decode base64
+        var decoded = Utilities.base64Decode(imageData);
+        var blob = Utilities.newBlob(decoded, mimeType, fileName);
+        
+        // Save to Drive folder named 'InnovexaEventImages'
+        var folders = DriveApp.getFoldersByName('InnovexaEventImages');
+        var folder;
+        if (folders.hasNext()) {
+          folder = folders.next();
+        } else {
+          folder = DriveApp.createFolder('InnovexaEventImages');
+        }
+        
+        var file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        
+        var fileId = file.getId();
+        var publicUrl = 'https://drive.google.com/uc?export=view&id=' + fileId;
+        
+        return respond({ success: true, url: publicUrl, fileId: fileId });
+      } catch(err) {
+        return respond({ success: false, message: 'Upload failed: ' + err.message });
+      }
+    }
+
     if (op === 'admin_create_event') {
-      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType', 'ImageUrls']);
       var eventId = 'EVT-' + Math.floor(10000 + Math.random() * 90000);
+      var imageUrls = payload.imageUrls || [];
+      var coverUrl = payload.coverUrl || (imageUrls.length > 0 ? imageUrls[0] : '');
       eventsSheet.appendRow([
         eventId,
         new Date().toISOString(),
         payload.title || '',
         payload.date || '',
         payload.description || '',
-        payload.coverUrl || '',
+        coverUrl,
         'Active',
-        payload.eventType || 'Event'
+        payload.eventType || 'Event',
+        JSON.stringify(imageUrls)
       ]);
       return respond({ success: true, message: 'Event created.' });
     }
@@ -1179,15 +1245,18 @@ function doPost(e) {
 
     // ADMIN: Edit Event
     if (op === 'admin_edit_event') {
-      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType']);
+      var eventsSheet = getOrCreateSheet(ss, 'ForgeEvents', ['EventID', 'Timestamp', 'Title', 'Date', 'Description', 'CoverUrl', 'Status', 'EventType', 'ImageUrls']);
       var rows = eventsSheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         if (String(rows[i][0]) === String(payload.eventId)) {
+          var imageUrls = payload.imageUrls || [];
+          var coverUrl = payload.coverUrl || (imageUrls.length > 0 ? imageUrls[0] : (rows[i][5] || ''));
           eventsSheet.getRange(i + 1, 3).setValue(payload.title || rows[i][2]);
           eventsSheet.getRange(i + 1, 4).setValue(payload.date || rows[i][3]);
           eventsSheet.getRange(i + 1, 5).setValue(payload.description || rows[i][4]);
-          eventsSheet.getRange(i + 1, 6).setValue(payload.coverUrl || rows[i][5]);
+          eventsSheet.getRange(i + 1, 6).setValue(coverUrl);
           eventsSheet.getRange(i + 1, 8).setValue(payload.eventType || rows[i][7] || 'Event');
+          eventsSheet.getRange(i + 1, 9).setValue(JSON.stringify(imageUrls));
           return respond({ success: true, message: 'Event updated.' });
         }
       }

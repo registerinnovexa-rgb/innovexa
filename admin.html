@@ -723,19 +723,58 @@
         <table class="data-table">
           <thead>
             <tr>
+              <th>Cover</th>
               <th>Event Title</th>
               <th>Date</th>
+              <th>Type</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="eventsListTbody">
-            <tr><td colspan="4" style="text-align:center;padding:40px;">Loading events...</td></tr>
+            <tr><td colspan="6" style="text-align:center;padding:40px;">Loading events...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
     
+    <!-- ── COMMS & ALERTS TAB ── -->
+    <div class="tab-content" id="tabComms">
+      <div class="section-header">
+        <h2 style="font-size:24px;font-weight:800;">Comms & Alerts</h2>
+      </div>
+      
+      <div style="display:flex; flex-wrap:wrap; gap:20px;">
+        <!-- Global Broadcast -->
+        <div class="admin-card" style="flex:1; min-width:300px;">
+          <h3 style="margin-bottom:12px; font-family:var(--font-d);">Global Email Broadcast</h3>
+          <p style="margin-bottom:20px; font-size:13px; color:var(--text3);">Blast an email to all registered operatives.</p>
+          
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="commsSubject" placeholder="e.g. INVX Directive: Code Red" class="search-box" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label>Message Body</label>
+            <textarea id="commsBody" rows="6" placeholder="Write your broadcast message..." class="search-box" style="width:100%; border-radius:8px; padding:12px;"></textarea>
+          </div>
+          <button class="btn-primary" onclick="commsBroadcast()" style="width:100%; background:var(--blue);">Send Broadcast</button>
+        </div>
+        
+        <!-- Feed Post -->
+        <div class="admin-card" style="flex:1; min-width:300px;">
+          <h3 style="margin-bottom:12px; font-family:var(--font-d);">Dashboard Announcement</h3>
+          <p style="margin-bottom:20px; font-size:13px; color:var(--text3);">Post a critical alert to the Operative Dashboard Feed.</p>
+          
+          <div class="form-group">
+            <label>Announcement Text</label>
+            <textarea id="commsFeed" rows="4" placeholder="Enter announcement to show on everyone's dashboard feed..." class="search-box" style="width:100%; border-radius:8px; padding:12px;"></textarea>
+          </div>
+          <button class="btn-primary" onclick="commsPostFeed()" style="width:100%;">Post to Feed</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ── SURVEILLANCE & LOGS TAB ── -->
     <div class="tab-content" id="tabSurveillance">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -795,8 +834,28 @@
         <textarea id="evDesc" rows="3" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;"></textarea>
       </div>
       <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Cover Image URL</label>
-        <input type="text" id="evCover" placeholder="https://..." style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
+        <label style="font-size:12px;color:var(--text3);margin-bottom:8px;display:block;">Event Images <span style="opacity:0.5;">(upload multiple)</span></label>
+
+        <!-- Drop zone / file picker -->
+        <div id="evImgDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--bg2);"
+             onclick="document.getElementById('evImgInput').click()"
+             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+             ondragleave="this.style.borderColor='var(--border)'"
+             ondrop="handleEvImgDrop(event)">
+          <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+          <div style="font-size:13px;color:var(--text3);">Click or drag &amp; drop images here</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;opacity:0.6;">JPG, PNG, GIF, WEBP — multiple allowed</div>
+        </div>
+        <input type="file" id="evImgInput" multiple accept="image/*" style="display:none;" onchange="handleEvImgFiles(this.files)">
+
+        <!-- Upload progress & thumbnails -->
+        <div id="evImgPreviews" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;"></div>
+        <div id="evImgStatus" style="font-size:12px;color:var(--text3);margin-top:6px;"></div>
+
+        <!-- Hidden: stores final uploaded URLs as JSON array -->
+        <input type="hidden" id="evImageUrls" value="[]">
+        <!-- Legacy single cover URL (kept for backward compat) -->
+        <input type="hidden" id="evCover" value="">
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeEventModal()">Cancel</button>
@@ -907,7 +966,7 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD9vs6rCur7GDuOgq76MWXa8do2kjBqjUt7wTJ5umcW_Z7FYzIObp2Hu5nya6buVE6Ug/exec';
 const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
 const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 
@@ -1417,6 +1476,7 @@ function switchAdminTab(tab) {
   if (tab === 'forgeOps') switchForgeSubTab('access');
   if (tab === 'events') loadEvents();
   if (tab === 'surveillance') loadAuditLogs();
+  if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
 }
 
 let allAuditLogs = [];
@@ -3448,7 +3508,7 @@ function closeEventModal() {
 
 async function loadEvents() {
   const tbody = document.getElementById('eventsListTbody');
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
   
   try {
     const res = await apiGet('admin_get_events'); // Using existing apiGet
@@ -3458,15 +3518,21 @@ async function loadEvents() {
     tbody.innerHTML = '';
     
     if (currentEvents.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text3);">No events initialized.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3);">No events initialized.</td></tr>';
       return;
     }
     
     currentEvents.forEach(e => {
+      const imgCell = e.coverUrl
+        ? `<img src="${escHtml(e.coverUrl)}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'">`
+        : `<div style="width:64px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">🖼️</div>`;
+      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(139,92,246,0.15);color:#a78bfa;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
       tbody.innerHTML += `
         <tr>
+          <td>${imgCell}</td>
           <td><strong style="color:var(--accent2)">${escHtml(e.title)}</strong></td>
           <td>${escHtml(e.date)}</td>
+          <td>${typeLabel}</td>
           <td><span class="status-badge status-confirmed">${escHtml(e.status)}</span></td>
           <td>
             <div class="btn-actions">
@@ -3480,9 +3546,117 @@ async function loadEvents() {
       `;
     });
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--red);padding:20px;">${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px;">${e.message}</td></tr>`;
   }
 }
+
+// ══ MULTI-IMAGE UPLOAD FOR EVENTS ══════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyD9vs6rCur7GDuOgq76MWXa8do2kjBqjUt7wTJ5umcW_Z7FYzIObp2Hu5nya6buVE6Ug/exec';
+let evUploadedUrls = []; // tracks all uploaded image URLs
+
+function handleEvImgDrop(event) {
+  event.preventDefault();
+  document.getElementById('evImgDropZone').style.borderColor = 'var(--border)';
+  handleEvImgFiles(event.dataTransfer.files);
+}
+
+function handleEvImgFiles(files) {
+  if (!files || files.length === 0) return;
+  Array.from(files).forEach(file => uploadEvImg(file));
+}
+
+async function uploadEvImg(file) {
+  const statusEl = document.getElementById('evImgStatus');
+  const previewsEl = document.getElementById('evImgPreviews');
+
+  // Local preview placeholder while uploading
+  const thumbId = 'thumb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  const localUrl = URL.createObjectURL(file);
+  previewsEl.insertAdjacentHTML('beforeend', `
+    <div id="${thumbId}" style="position:relative;width:90px;height:70px;border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);">
+      <img src="${localUrl}" style="width:100%;height:100%;object-fit:cover;">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+        <div style="width:20px;height:20px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+      </div>
+    </div>
+  `);
+  statusEl.textContent = 'Uploading ' + file.name + '…';
+
+  try {
+    // Convert to base64
+    const base64 = await fileToBase64(file);
+    // Strip data:mime/type;base64, prefix
+    const b64Data = base64.split(',')[1];
+
+    const payload = {
+      op: 'admin_upload_event_image',
+      adminKey: 'INNOVEXA_SECURE_KEY_2025',
+      imageData: b64Data,
+      mimeType: file.type,
+      fileName: file.name
+    };
+
+    const res = await fetch('https://innovexareg.vercel.app/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetUrl: GAS_URL, payload })
+    }).then(r => r.json());
+
+    const thumbEl = document.getElementById(thumbId);
+    if (res.success) {
+      evUploadedUrls.push(res.url);
+      document.getElementById('evImageUrls').value = JSON.stringify(evUploadedUrls);
+      // Set first image as cover
+      if (evUploadedUrls.length === 1) document.getElementById('evCover').value = res.url;
+
+      // Replace spinner with final thumb + remove button
+      thumbEl.innerHTML = `
+        <img src="${res.url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='${localUrl}'">
+        <button onclick="removeEvImg('${res.url}', '${thumbId}')" style="position:absolute;top:2px;right:2px;background:rgba(239,68,68,0.85);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+      `;
+      statusEl.textContent = evUploadedUrls.length + ' image(s) uploaded.';
+    } else {
+      thumbEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:20px;">❌</div>`;
+      statusEl.textContent = 'Upload failed: ' + (res.message || 'Unknown error');
+    }
+  } catch(err) {
+    document.getElementById(thumbId).innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:20px;">❌</div>`;
+    statusEl.textContent = 'Error: ' + err.message;
+  }
+}
+
+function removeEvImg(url, thumbId) {
+  evUploadedUrls = evUploadedUrls.filter(u => u !== url);
+  document.getElementById('evImageUrls').value = JSON.stringify(evUploadedUrls);
+  document.getElementById('evCover').value = evUploadedUrls[0] || '';
+  const el = document.getElementById(thumbId);
+  if (el) el.remove();
+  document.getElementById('evImgStatus').textContent = evUploadedUrls.length + ' image(s) ready.';
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function resetEvImgUploader(existingUrls = []) {
+  evUploadedUrls = [...existingUrls];
+  document.getElementById('evImageUrls').value = JSON.stringify(evUploadedUrls);
+  document.getElementById('evCover').value = evUploadedUrls[0] || '';
+  document.getElementById('evImgPreviews').innerHTML = existingUrls.map((url, i) => `
+    <div id="thumb_existing_${i}" style="position:relative;width:90px;height:70px;border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+      <button onclick="removeEvImg('${url}', 'thumb_existing_${i}')" style="position:absolute;top:2px;right:2px;background:rgba(239,68,68,0.85);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('evImgStatus').textContent = existingUrls.length > 0 ? existingUrls.length + ' existing image(s).' : '';
+  document.getElementById('evImgInput').value = '';
+}
+// ════════════════════════════════════════════════════════════════
 
 let editingEventId = null;
 
@@ -3492,7 +3666,7 @@ function openCreateEventModal() {
   document.getElementById('evDate').value = '';
   document.getElementById('evType').value = 'Event';
   if (mdeEventDesc) mdeEventDesc.value('');
-  document.getElementById('evCover').value = '';
+  resetEvImgUploader([]);
   document.querySelector('#modalCreateEvent h2').textContent = 'Initialize New Event';
   document.querySelector('#modalCreateEvent .btn-save').textContent = 'Initialize Event';
   document.getElementById('modalCreateEvent').classList.add('open');
@@ -3507,7 +3681,11 @@ function openEditEventModal(id) {
   document.getElementById('evDate').value = (ev.date || '').split('T')[0];
   document.getElementById('evType').value = ev.eventType || 'Event';
   if (mdeEventDesc) mdeEventDesc.value(ev.description || '');
-  document.getElementById('evCover').value = ev.coverUrl || '';
+  // Load existing images
+  let existingImgs = [];
+  try { existingImgs = JSON.parse(ev.imageUrls || '[]'); } catch(e) { existingImgs = ev.coverUrl ? [ev.coverUrl] : []; }
+  if (!existingImgs.length && ev.coverUrl) existingImgs = [ev.coverUrl];
+  resetEvImgUploader(existingImgs);
   document.querySelector('#modalCreateEvent h2').textContent = 'Edit Event';
   document.querySelector('#modalCreateEvent .btn-save').textContent = 'Save Changes';
   document.getElementById('modalCreateEvent').classList.add('open');
@@ -3520,6 +3698,7 @@ async function submitCreateEvent(btn) {
   const eventType = document.getElementById('evType').value;
   const desc = mdeEventDesc ? mdeEventDesc.value() : document.getElementById('evDesc').value;
   const coverUrl = document.getElementById('evCover').value;
+  const imageUrls = JSON.parse(document.getElementById('evImageUrls').value || '[]');
   if(!title || !date) return showToast('Title and Date are required.', 'error');
   
   btn.disabled = true; 
@@ -3527,9 +3706,9 @@ async function submitCreateEvent(btn) {
   try {
     let res;
     if (editingEventId) {
-      res = await apiWrite('admin_edit_event', { eventId: editingEventId, title, date, eventType, description: desc, coverUrl });
+      res = await apiWrite('admin_edit_event', { eventId: editingEventId, title, date, eventType, description: desc, coverUrl, imageUrls });
     } else {
-      res = await apiWrite('admin_create_event', { title, date, eventType, description: desc, coverUrl });
+      res = await apiWrite('admin_create_event', { title, date, eventType, description: desc, coverUrl, imageUrls });
     }
     
     if(res.success) {
@@ -3801,6 +3980,58 @@ async function viewFeedback(eventId, title) {
     }
   } catch(e) {
     list.innerHTML = `<div style="text-align:center; color:var(--red); padding:20px;">Network error.</div>`;
+  }
+}
+
+// ── COMMS TAB FUNCTIONS ──
+async function commsBroadcast() {
+  const subj = document.getElementById('commsSubject').value.trim();
+  const body = document.getElementById('commsBody').value.trim();
+  if (!subj || !body) return showToast('Subject and body are required.', 'error');
+  if (!confirm('Are you absolutely sure you want to email ALL operatives?')) return;
+
+  // Load all member emails
+  let emails = [];
+  if (window.allMembers && window.allMembers.length) {
+    emails = window.allMembers.map(m => m.email).filter(e => e && e.includes('@'));
+  }
+  if (!emails.length) {
+    showToast('No member emails loaded. Click "Members" tab first to load them, then return here.', 'error');
+    return;
+  }
+
+  showToast('Sending broadcast... please wait.', 'info');
+
+  try {
+    const res = await apiWrite('admin_send_broadcast', { subject: subj, body: body, emails: emails });
+    if (res.success) {
+      showToast(res.message, 'success');
+      document.getElementById('commsSubject').value = '';
+      document.getElementById('commsBody').value = '';
+    } else {
+      showToast(res.message || 'Failed to send.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error. Try again.', 'error');
+  }
+}
+
+async function commsPostFeed() {
+  const text = document.getElementById('commsFeed').value.trim();
+  if (!text) return showToast('Enter an announcement first.', 'error');
+
+  showToast('Posting...', 'info');
+
+  try {
+    const res = await apiWrite('admin_post_feed', { content: text });
+    if (res.success) {
+      showToast('Announcement posted to operative feed!', 'success');
+      document.getElementById('commsFeed').value = '';
+    } else {
+      showToast(res.message || 'Failed to post.', 'error');
+    }
+  } catch (err) {
+    showToast('Network error. Try again.', 'error');
   }
 }
 

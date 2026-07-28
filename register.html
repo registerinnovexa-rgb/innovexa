@@ -29,6 +29,7 @@
     </a>
     <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
       <a href="index.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="events.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Events</a>
       <a href="register.html" class="nav-link active" style="font-size:14px; font-weight:500;">Register</a>
       <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
       <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
@@ -50,6 +51,7 @@
 <div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
   <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
   <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="events.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Events</a>
   <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
   <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
       <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
@@ -354,7 +356,7 @@
 
     async function checkEmailDuplicate(email) {
       try {
-        const res = await gasGet(SCRIPT_URL + '?email=' + encodeURIComponent(email));
+        const res = await gasGet(window.SCRIPT_URL + '?email=' + encodeURIComponent(email));
         if (res && res.found) {
           // Block the form and show already-registered banner
           showAlreadyRegistered(res.data);
@@ -685,7 +687,7 @@
       const resp = await fetch('https://innovexareg.vercel.app/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUrl: SCRIPT_URL, payload: payload })
+        body: JSON.stringify({ targetUrl: window.SCRIPT_URL, payload: payload })
       });
       
       const result = await resp.json();

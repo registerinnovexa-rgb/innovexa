@@ -149,6 +149,20 @@
               </div>
             </div>
             
+            <div style="margin-top:32px;">
+              <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Forge Sessions</h3>
+              <div id="forgeSessionsContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                <p style="color:var(--text-3); font-size:13px;">Decrypting session logs...</p>
+              </div>
+            </div>
+            
+            <div style="margin-top:32px;">
+              <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Global Announcements</h3>
+              <div id="forgeFeedContainer" style="display:flex; flex-direction:column; gap:12px;">
+                <p style="color:var(--text-3); font-size:13px;">Scanning frequencies...</p>
+              </div>
+            </div>
+            
             <div style="margin-top:32px; padding:24px; background:rgba(17,17,16,0.9); border-radius:16px; color:#fff;">
               <h4 style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Need Assistance?</h4>
               <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.5;">Reach out to the Core Team on the official WhatsApp group for any queries or guidance.</p>
@@ -245,7 +259,7 @@
     // ══════════════════════════════════════════
     //  GLOBALS & CONSTANTS
     // ══════════════════════════════════════════
-    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
+    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyD9vs6rCur7GDuOgq76MWXa8do2kjBqjUt7wTJ5umcW_Z7FYzIObp2Hu5nya6buVE6Ug/exec';
     
     let session = null;
     let cachedResources = [];
@@ -474,6 +488,8 @@
       }, 50);
 
       switchTab('dashboard');
+      loadFeed();
+      loadSessions();
     }
 
     // ══════════════════════════════════════════
@@ -534,7 +550,70 @@
     }
 
     // ══════════════════════════════════════════
-    //  MISSIONS
+    //  FEED LOGIC
+    // ══════════════════════════════════════════
+    async function loadFeed() {
+      const container = document.getElementById('forgeFeedContainer');
+      try {
+        const res = await gasGet('forge_get_feed');
+        if (res.success && res.data.length > 0) {
+          const broadcasts = res.data.filter(f => f.type === 'BROADCAST');
+          if (broadcasts.length > 0) {
+            container.innerHTML = broadcasts.slice(0, 5).map(f => {
+               const d = new Date(f.timestamp).toLocaleDateString();
+               return `
+                 <div style="padding:16px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.05); border-radius:12px;">
+                   <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                     <span style="font-weight:700; color:var(--accent); font-size:12px;">ANNOUNCEMENT</span>
+                     <span style="color:var(--text-3); font-size:11px;">${d}</span>
+                   </div>
+                   <div style="color:var(--text-1); font-size:14px; line-height:1.5;">${escHtml(f.message)}</div>
+                 </div>
+               `;
+            }).join('');
+          } else {
+            container.innerHTML = '<p style="color:var(--text-3); font-size:13px;">No recent broadcasts on the frequency.</p>';
+          }
+        } else {
+          container.innerHTML = '<p style="color:var(--text-3); font-size:13px;">No recent broadcasts on the frequency.</p>';
+        }
+      } catch (err) {
+        container.innerHTML = '<p style="color:#ef4444; font-size:13px;">Error decrypting broadcasts.</p>';
+      }
+    }
+
+    async function loadSessions() {
+      const container = document.getElementById('forgeSessionsContainer');
+      try {
+        const res = await gasGet('forge_get_sessions');
+        if (res.success && res.sessions && res.sessions.length > 0) {
+          container.innerHTML = res.sessions.map(ev => {
+             let statusBadge = '';
+             if (ev.status === 'UPCOMING') statusBadge = '<span style="background:var(--accent); color:#111; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">UPCOMING</span>';
+             else if (ev.status === 'COMPLETED') statusBadge = '<span style="background:#333; color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">COMPLETED</span>';
+             else statusBadge = `<span style="background:#333; color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">${escHtml(ev.status)}</span>`;
+
+             return `
+               <div style="padding:16px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.05); border-radius:12px; display:flex; flex-direction:column;">
+                 <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                   ${statusBadge}
+                   <span style="color:var(--text-3); font-size:11px; font-family:var(--font-m);">${ev.date || 'TBA'}</span>
+                 </div>
+                 <h4 style="font-size:16px; font-weight:600; margin-bottom:8px; color:var(--text-1); font-family:var(--font-d);">${escHtml(ev.title)}</h4>
+                 <p style="font-size:13px; color:var(--text-3); line-height:1.5; margin-bottom:0;">${escHtml(ev.description)}</p>
+               </div>
+             `;
+          }).join('');
+        } else {
+          container.innerHTML = '<p style="color:var(--text-3); font-size:13px;">No active Forge Sessions scheduled.</p>';
+        }
+      } catch (err) {
+        container.innerHTML = '<p style="color:#ef4444; font-size:13px;">Failed to load sessions.</p>';
+      }
+    }
+
+    // ══════════════════════════════════════════
+    //  INIT LOGIC
     // ══════════════════════════════════════════
     async function loadMissions() {
       const container = document.getElementById('missionsContainer');
