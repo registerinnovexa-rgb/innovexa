@@ -710,8 +710,14 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
 
-  // Set initial state for fade elements
+  // Set initial state for fade elements — SKIP hero elements (they're visible immediately)
   document.querySelectorAll('.fade-up').forEach(el => {
+    // If this element is inside the hero section, reveal it immediately
+    if (el.closest('.hero')) {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+      return;
+    }
     el.style.opacity = '0';
     el.style.transform = 'translateY(40px)';
     el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
