@@ -1573,9 +1573,9 @@ function notifySuperAdmin(subject, body) {
   // Send WhatsApp (Meta Cloud API)
   try {
     // ⚠️ Configure your Meta WhatsApp credentials here ⚠️
-    var metaAccessToken = 'YOUR_ACCESS_TOKEN'; 
-    var metaPhoneNumberId = 'YOUR_PHONE_NUMBER_ID'; // e.g. 101234567890123
-    var adminWhatsApp = 'YOUR_ADMIN_WHATSAPP_NUMBER'; // e.g. 919876543210 (include country code, no +)
+    var metaAccessToken = 'EAAWH8EHKNCsBSIxHG8NtGMy6bcZC7SHifwbyscQp0qk4Sz0E2F2huO9mdSZBNRyovSOIIZCae7EMgbw1T1QxZCzcmMNmCZCm1S9VjAJyFkCkGn4af4Fqly7YCQrPg3dSzQ0m2HkxUmZBzUITu9IQFc4T7vxilh15ukwSpKWBDeHGGVeftMxfun7rP2fgyKRWyw7AZDZD'; 
+    var metaPhoneNumberId = '1158555334018409'; // Phone Number ID
+    var adminWhatsApp = '919445253099'; 
 
     if (metaAccessToken !== 'YOUR_ACCESS_TOKEN' && metaPhoneNumberId !== 'YOUR_PHONE_NUMBER_ID') {
       var msg = '🔔 *' + subject + '*\n\n' + body;
