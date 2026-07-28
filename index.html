@@ -703,28 +703,15 @@
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+        entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-  // Set initial state for fade elements — SKIP hero elements (they're visible immediately)
-  document.querySelectorAll('.fade-up').forEach(el => {
-    // If this element is inside the hero section, reveal it immediately
-    if (el.closest('.hero')) {
-      el.style.opacity = '1';
-      el.style.transform = 'translateY(0)';
-      return;
-    }
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(40px)';
-    el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
-    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
-    if(el.classList.contains('delay-2')) el.style.transitionDelay = '0.2s';
-    if(el.classList.contains('delay-3')) el.style.transitionDelay = '0.3s';
-    observer.observe(el);
+  // Observe all fade-up elements EXCEPT hero (CSS already makes hero visible)
+  document.querySelectorAll('.fade-up:not(.hero .fade-up)').forEach(el => {
+    if (!el.closest('.hero')) observer.observe(el);
   });
 
   // Counter animation
@@ -792,13 +779,6 @@
   window.addEventListener('DOMContentLoaded', () => {
     loadMemberCount();
     loadConfirmedOperatives();
-    // Force immediate reveal of hero elements
-    setTimeout(() => {
-      document.querySelectorAll('.hero .fade-up').forEach(el => {
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-      });
-    }, 50);
   });
   // Randomize Core Team
   const teamGrid = document.querySelector('.arsenal-grid');
