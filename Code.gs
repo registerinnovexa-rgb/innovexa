@@ -1559,6 +1559,7 @@ function respond(obj) {
 }
 
 function notifySuperAdmin(subject, body) {
+  // Send Email
   try {
     MailApp.sendEmail({
       to: 'akash528tmy@gmail.com',
@@ -1567,6 +1568,21 @@ function notifySuperAdmin(subject, body) {
     });
   } catch (err) {
     // Ignore error if email fails
+  }
+
+  // Send WhatsApp (CallMeBot)
+  try {
+    // ⚠️ Configure your CallMeBot credentials here ⚠️
+    var whatsappPhone = 'YOUR_PHONE_NUMBER'; // e.g. +919876543210 (include country code, no + or spaces)
+    var whatsappApiKey = 'YOUR_API_KEY';       // e.g. 123456
+    
+    if (whatsappPhone !== 'YOUR_PHONE_NUMBER' && whatsappApiKey !== 'YOUR_API_KEY') {
+      var msg = '🔔 *' + subject + '*\n\n' + body;
+      var url = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(whatsappPhone) + '&text=' + encodeURIComponent(msg) + '&apikey=' + encodeURIComponent(whatsappApiKey);
+      UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    }
+  } catch (err) {
+    // Ignore error if whatsapp fails
   }
 }
 
