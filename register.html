@@ -348,7 +348,7 @@
 
       } catch (err) {
         console.error('Error handling Google Sign-In:', err);
-        showToast('Google Sign-In failed.', 'error');
+        alert('Google Sign-In failed.');
       }
     }
 
@@ -359,10 +359,10 @@
           // Block the form and show already-registered banner
           showAlreadyRegistered(res.data);
         } else {
-          showToast('Google Account linked successfully!', 'success');
+          alert('Google Account linked successfully!');
         }
       } catch(e) {
-        showToast('Google Account linked successfully!', 'success');
+        alert('Google Account linked successfully!');
       }
     }
 
@@ -554,7 +554,7 @@
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
     if (!fullName || !email) {
-      showToast('You must authenticate with Google first to continue.', 'error');
+      alert('You must authenticate with Google first to continue.');
       return;
     }
 
@@ -649,7 +649,7 @@
     if (!utr) { showError('utr', 'UTR is required'); return; }
     if (!/^\d{12}$/.test(utr)) { showError('utr', 'UTR must be exactly 12 digits'); return; }
 
-    if (!paymentData) { showToast('Please upload your payment proof screenshot.', 'error'); return; }
+    if (!paymentData) { alert('Please upload your payment proof screenshot.'); return; }
 
     const captchaAns = document.getElementById('captcha-answer').value.trim();
     if (captchaAns.toLowerCase() !== currentCaptcha.toLowerCase()) {
@@ -682,12 +682,19 @@
     };
 
     try {
-      await fetch('https://innovexareg.vercel.app/api/proxy', {
+      const resp = await fetch('https://innovexareg.vercel.app/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetUrl: SCRIPT_URL, payload: payload })
       });
       
+      const result = await resp.json();
+      if (!result.success) {
+        alert(result.message || 'Registration failed.');
+        return;
+      }
+      
+
       // Fetch current member count to assign next sequential ID
       let nextNum = '??';
       try {
