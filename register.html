@@ -243,7 +243,7 @@
 
       <div class="form-group">
         <label class="form-label">Transaction Reference (UTR)</label>
-        <input class="form-control" id="utr" type="text" placeholder="Enter 12-digit UTR number" />
+        <input class="form-control" id="utr" type="text" placeholder="Enter 10-15 digit UTR number" />
       </div>
 
       <div class="form-group">
@@ -647,7 +647,7 @@
     if (isSubmitting) return;
     const utr = document.getElementById('utr').value.trim();
     if (!utr) { showError('utr', 'UTR is required'); return; }
-    if (!/^\d{12}$/.test(utr)) { showError('utr', 'UTR must be exactly 12 digits'); return; }
+    if (!/^\d{10,15}$/.test(utr)) { showError('utr', 'UTR must be between 10 and 15 digits'); return; }
 
     if (!paymentData) { alert('Please upload your payment proof screenshot.'); return; }
 
