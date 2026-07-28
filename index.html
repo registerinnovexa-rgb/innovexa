@@ -574,37 +574,7 @@
   </div>
 </section>
 
-<!-- ══ PUBLIC EVENTS SECTION ════════════════════════════════════════ -->
-<section class="bento-section container" id="events-section" style="margin-bottom: 40px;">
-  <div class="bento-header fade-up">
-    <h2>Operations <br><span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">& Intel.</span></h2>
-    <p>Discover our upcoming bootcamps, hackathons, and exclusive operative briefings. RSVP to secure your clearance.</p>
-    
-    <div style="display:flex; gap:16px; margin-top:24px; align-items:center; justify-content:center;">
-      <button class="nav-link active" id="btnTabUpcoming" onclick="switchEventTab('upcoming')" style="background:none; border:none; padding:8px 16px; font-weight:500; font-size:16px; cursor:pointer; color:var(--text3); border-bottom:2px solid var(--text3);">Upcoming</button>
-      <button class="nav-link" id="btnTabPast" onclick="switchEventTab('past')" style="background:none; border:none; padding:8px 16px; font-weight:500; font-size:16px; cursor:pointer; color:var(--text3); border-bottom:2px solid transparent;">Archive</button>
-    </div>
-  </div>
 
-  <div class="bento-grid" id="eventsGrid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 40px;">
-    <div style="text-align:center; width:100%; grid-column: 1 / -1; padding:40px; color:var(--text3);">Establishing connection to Intel network...</div>
-  </div>
-</section>
-
-<!-- RSVP Modal -->
-<div class="modal-overlay" id="modalRsvp" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
-  <div class="modal-box" style="background:var(--bg); border:1px solid var(--border); padding:32px; border-radius:var(--radius); max-width:400px; width:90%; position:relative;">
-    <h3 style="margin-bottom:16px; color:var(--text3); font-family:var(--font-d); font-size:24px;">Confirm RSVP</h3>
-    <p style="margin-bottom:24px; color:var(--text3); font-size:14px;">Enter your Operative ID (INVX-XXXX) to authorize your attendance for this operation.</p>
-    
-    <input type="text" id="rsvpOpId" placeholder="INVX-XXXX" style="width:100%; padding:12px 16px; margin-bottom:24px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius); font-family:var(--font-m); outline:none;">
-    
-    <div style="display:flex; gap:12px;">
-      <button onclick="closeRsvpModal()" style="flex:1; padding:12px; background:transparent; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; font-weight:500; color:var(--text3);">Cancel</button>
-      <button id="btnSubmitRsvp" onclick="submitRsvp()" style="flex:1; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); cursor:pointer; font-weight:500;">Authorize</button>
-    </div>
-  </div>
-</div>
 
 
 
@@ -817,116 +787,7 @@
     requestAnimationFrame(autoScroll);
   }
 
-// ── Public Events & RSVP ──
-let allPublicEvents = [];
-let currentEventTab = 'upcoming';
-let activeRsvpEventId = null;
 
-async function loadPublicEvents() {
-  try {
-    const res = await window.gasGet(window.SCRIPT_URL + '?action=get_public_events');
-    if(res && res.success) {
-      allPublicEvents = res.events || [];
-      renderEventsGrid();
-    }
-  } catch(e) {
-    console.error("Failed to load events", e);
-    document.getElementById('eventsGrid').innerHTML = `<div style="text-align:center; width:100%; grid-column: 1 / -1; color:red;">Failed to retrieve intel.</div>`;
-  }
-}
-
-function switchEventTab(tab) {
-  currentEventTab = tab;
-  document.getElementById('btnTabUpcoming').style.color = tab === 'upcoming' ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('btnTabUpcoming').style.borderBottomColor = tab === 'upcoming' ? 'var(--text)' : 'transparent';
-  document.getElementById('btnTabPast').style.color = tab === 'past' ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('btnTabPast').style.borderBottomColor = tab === 'past' ? 'var(--text)' : 'transparent';
-  renderEventsGrid();
-}
-
-function renderEventsGrid() {
-  const grid = document.getElementById('eventsGrid');
-  const todayMs = new Date().setHours(0, 0, 0, 0);
-  
-  const filtered = allPublicEvents.filter(ev => {
-    const evDate = new Date(ev.date).getTime();
-    if(currentEventTab === 'upcoming') {
-      return evDate >= todayMs;
-    } else {
-      return evDate < todayMs;
-    }
-  });
-
-  if(filtered.length === 0) {
-    grid.innerHTML = `<div style="text-align:center; width:100%; grid-column: 1 / -1; padding:40px; color:var(--text3);">No ${currentEventTab} operations found.</div>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(ev => {
-    const evDate = new Date(ev.date);
-    const dateStr = evDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    // Only show RSVP button for upcoming events
-    const rsvpBtn = currentEventTab === 'upcoming' 
-      ? `<button onclick="openRsvpModal('${ev.eventId}')" style="margin-top:16px; padding:10px 16px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-pill); cursor:pointer; font-weight:500; font-size:14px;">RSVP Now</button>`
-      : `<div style="margin-top:16px; padding:6px 12px; display:inline-block; background:rgba(0,0,0,0.05); color:var(--text3); border-radius:var(--radius-pill); font-size:12px; font-weight:600;">COMPLETED</div>`;
-      
-    const imgHtml = ev.coverUrl 
-      ? `<div style="width:100%; height:160px; border-radius:var(--radius) var(--radius) 0 0; background:url('${ev.coverUrl}') center/cover; margin-bottom:16px;"></div>`
-      : `<div style="width:100%; height:16px;"></div>`;
-
-    return `
-      <div class="bento-card fade-up" style="padding:0; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; border:1px solid var(--border);">
-        ${imgHtml}
-        <div style="padding:0 24px 24px 24px;">
-          <div style="color:var(--text3); font-size:12px; font-weight:600; font-family:var(--font-m); margin-bottom:8px;">${dateStr}</div>
-          <h3 class="bento-title" style="margin-bottom:8px; font-size:20px;">${ev.title}</h3>
-          <div class="bento-desc markdown-body" style="font-size:14px; margin-bottom:16px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${marked.parse(ev.description || '')}</div>
-          ${rsvpBtn}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function openRsvpModal(eventId) {
-  activeRsvpEventId = eventId;
-  document.getElementById('rsvpOpId').value = '';
-  document.getElementById('modalRsvp').style.display = 'flex';
-}
-
-function closeRsvpModal() {
-  document.getElementById('modalRsvp').style.display = 'none';
-  activeRsvpEventId = null;
-}
-
-async function submitRsvp() {
-  const opId = document.getElementById('rsvpOpId').value.trim();
-  if(!opId) return alert("Operative ID is required.");
-  
-  const btn = document.getElementById('btnSubmitRsvp');
-  btn.disabled = true;
-  btn.textContent = "Authorizing...";
-  
-  try {
-    const res = await window.gasPost(window.SCRIPT_URL, { op: 'public_rsvp_event', eventId: activeRsvpEventId, operativeId: opId });
-    if(res && res.success) {
-      alert(res.message || "RSVP Successful!");
-      closeRsvpModal();
-    } else {
-      alert(res ? res.message : "Error submitting RSVP.");
-    }
-  } catch(e) {
-    alert("Network error.");
-  }
-  
-  btn.disabled = false;
-  btn.textContent = "Authorize";
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadPublicEvents();
-});
 </script>
 </body>
 </html>
