@@ -51,19 +51,34 @@ function doGet(e) {
       return respond({ success: true, data: { count: Math.max(0, rows.length - 1) } });
     }
 
-    // Existing: Search by email or UTR or Phone
-    if (p.email || p.utr || p.phone) {
+    // Existing: Search by email or UTR or Phone or ID
+    if (p.email || p.utr || p.phone || p.id) {
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row        = rows[i];
         var rowEmail   = String(row[2] || '').trim().toLowerCase();
         var rowPhone   = String(row[3] || '').trim();
         var rowUtr     = String(row[9] || '').trim();
+        var rowId      = String(row[12] || '').trim().toUpperCase();
+        
         var matchEmail = p.email && rowEmail === String(p.email).trim().toLowerCase();
         var matchPhone = p.phone && rowPhone === String(p.phone).trim();
         var matchUtr   = p.utr   && rowUtr   === String(p.utr).trim();
+        var matchId    = p.id    && rowId    === String(p.id).trim().toUpperCase();
 
-        if (matchEmail || matchUtr || matchPhone) {
+        if (matchEmail || matchUtr || matchPhone || matchId) {
+          notifySuperAdmin(
+            'Operative Status Checked: ' + String(row[1] || ''),
+            'A member has checked their application status.\n\n' +
+            'Name: ' + String(row[1] || '') + '\n' +
+            'Email: ' + String(row[2] || '') + '\n' +
+            'Phone: ' + String(row[3] || '') + '\n' +
+            'Operative ID: ' + String(row[12] || '') + '\n' +
+            'Status: ' + String(row[10] || 'Pending') + '\n' +
+            'Forge Access: ' + String(row[18] || '') + '\n' +
+            'Rank: ' + String(row[20] || '') + '\n' +
+            'Squad: ' + String(row[21] || '')
+          );
           return respond({
             success: true,
             found:   true,
@@ -174,6 +189,14 @@ function doGet(e) {
           
           // Log movement
           logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
+          
+          notifySuperAdmin(
+            'Operative Dashboard Login: ' + String(row[1] || ''),
+            'A member has successfully authenticated and logged into the Forge Dashboard.\n\n' +
+            'Name: ' + String(row[1] || '') + '\n' +
+            'Operative ID: ' + reqOpId + '\n' +
+            'Email: ' + String(row[2] || '')
+          );
           
           return respond({
             success: true,
