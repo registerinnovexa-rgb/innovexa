@@ -2,7 +2,7 @@ import requests
 import json
 import time
 
-URL = "https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec"
+URL = "https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec"
 payload = {
     "fullName": "Test User",
     "email": f"test_{int(time.time())}@example.com",

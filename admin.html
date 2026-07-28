@@ -12,16 +12,16 @@
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      --bg: #0a0a0a; 
-      --bg2: rgba(25, 25, 25, 0.6); 
-      --bg3: rgba(255, 255, 255, 0.05);
-      --border: rgba(255, 255, 255, 0.1); 
-      --border2: rgba(255, 255, 255, 0.2);
-      --text: #f3f4f6; 
-      --text2: #d1d5db; 
-      --text3: #9ca3af;
-      --accent: #a78bfa; 
-      --accent2: #8b5cf6;
+      --bg: #f9fafb; 
+      --bg2: #ffffff; 
+      --bg3: rgba(0, 0, 0, 0.05);
+      --border: rgba(0, 0, 0, 0.1); 
+      --border2: rgba(0, 0, 0, 0.2);
+      --text: #111827; 
+      --text2: #374151; 
+      --text3: #6b7280;
+      --accent: #6d28d9; 
+      --accent2: #4c1d95;
       --green: #10b981; --green-bg: rgba(16,185,129,0.15);
       --red: #ef4444; --red-bg: rgba(239,68,68,0.15);
       --yellow: #f59e0b; --yellow-bg: rgba(245,158,11,0.15);
@@ -43,7 +43,7 @@
     body::after {
       content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 180px 180px; opacity: 0.04; mix-blend-mode: screen;
+      background-size: 180px 180px; opacity: 0.04; mix-blend-mode: multiply;
     }
     
     /* Animated Background Orbs */
@@ -81,7 +81,7 @@
       border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);
       transition: border-color .2s, box-shadow .2s;
     }
-    .form-group select option { background: #111; color: #fff; }
+    .form-group select option { background: var(--bg2); color: var(--text); }
     .form-group input:focus, .form-group select:focus { outline:none; border-color:var(--accent); box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
     .btn-primary {
       width:100%; padding:14px; background: var(--text); color: var(--bg); border:none;
@@ -384,18 +384,15 @@
     <div class="logo-row">
       <div class="logo-icon">IX</div>
       <div>
-        <h1>Admin Console</h1>
-        <p style="margin-bottom:0">Innovexa Hub — Authorized Admins Only</p>
+        <h1 style="color:var(--text);">Admin Terminal</h1>
       </div>
     </div>
-    <p>Step 1: Enter your master credentials.</p>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter username" />
+    
+    <div class="form-group" style="margin-bottom:12px;">
+      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter username" />
     </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="loginEmail" style="width:100%; padding:12px 16px; background: rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter password" />
+    <div class="form-group" style="margin-bottom:24px;">
+      <input type="password" id="loginEmail" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter password" />
     </div>
     <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%;">
       Login
@@ -443,6 +440,14 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Events & Ops
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('comms')" id="navComms">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      Comms & Alerts
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('surveillance')" id="navSurveillance">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      Surveillance
+    </button>
     <button class="sidebar-btn" onclick="switchAdminTab('roleMgmt')" id="navRoleMgmt" style="display:none;">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
       Manage Admins
@@ -474,16 +479,32 @@
           <div class="stat-label">Confirmed Members</div>
           <div class="stat-value" id="statResources" style="color:var(--blue)">—</div>
         </div>
-      </div>
-      <div class="admin-card" style="max-width:500px">
-        <h3>Quick Actions</h3>
-        <p>Manage your hub directly from here.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn-add" onclick="switchAdminTab('members')">👥 Manage Members</button>
-          <button class="btn-add" onclick="switchAdminTab('forgeOps')" style="background:var(--green)">⚔️ Forge Ops</button>
+        <div class="stat-card">
+          <div class="stat-label">Active Bounties</div>
+          <div class="stat-value" id="statBounties" style="color:var(--orange)">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total XP Awarded</div>
+          <div class="stat-value" id="statXP" style="color:var(--cyan)">—</div>
         </div>
       </div>
-      
+      <div style="display:grid; grid-template-columns: 1fr 2fr; gap:20px; margin-top:20px;">
+        <div class="admin-card">
+          <h3>Quick Actions</h3>
+          <p>Manage your hub directly from here.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;">
+            <button class="btn-add" onclick="switchAdminTab('members')">👥 Manage Members</button>
+            <button class="btn-add" onclick="switchAdminTab('forgeOps')" style="background:var(--green)">⚔️ Forge Ops</button>
+            <button class="btn-add" onclick="switchAdminTab('comms')" style="background:var(--blue)">📡 Comms & Alerts</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3>Recent Activity Feed</h3>
+          <div id="recentActivityList" style="display:flex; flex-direction:column; gap:10px; max-height:250px; overflow-y:auto;">
+            <p style="color:var(--text3); font-size:14px;">Loading activity...</p>
+          </div>
+        </div>
+      </div>
       <div class="stats-grid" style="margin-top:24px;">
         <div class="admin-card">
           <h3>Members by Year</h3>
@@ -714,6 +735,37 @@
         </table>
       </div>
     </div>
+    
+    <!-- ── SURVEILLANCE & LOGS TAB ── -->
+    <div class="tab-content" id="tabSurveillance">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="font-size:24px;font-weight:800;color:var(--accent2);">Omniscient Telemetry & Audit Logs</h2>
+      </div>
+
+      <div class="admin-card" style="margin-bottom:20px;">
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="logSearchInput" onkeyup="filterLogs()" placeholder="Filter by Operative ID or Name..." style="flex:1; padding:10px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:6px;">
+          <button class="btn-dark" onclick="loadAuditLogs()">↻ Refresh Logs</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Operative ID</th>
+              <th>Name</th>
+              <th>Action Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="logsTbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;">Initializing God's Eye Feed...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
   </div> <!-- Close main-content -->
 
@@ -725,26 +777,26 @@
       <h2 style="color:var(--accent2)">Schedule Event</h2>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Event Title</label>
-        <input type="text" id="evTitle" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:#fff;border-radius:6px;">
+        <input type="text" id="evTitle" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Date</label>
-        <input type="date" id="evDate" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:#fff;border-radius:6px;">
+        <input type="date" id="evDate" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Type</label>
-        <select id="evType" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:#fff;border-radius:6px;">
+        <select id="evType" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
           <option value="Event">Public Event</option>
           <option value="Session">Forge Session</option>
         </select>
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Description</label>
-        <textarea id="evDesc" rows="3" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:#fff;border-radius:6px;"></textarea>
+        <textarea id="evDesc" rows="3" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;"></textarea>
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Cover Image URL</label>
-        <input type="text" id="evCover" placeholder="https://..." style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:#fff;border-radius:6px;">
+        <input type="text" id="evCover" placeholder="https://..." style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
       </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeEventModal()">Cancel</button>
@@ -855,7 +907,7 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
 const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
 const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 
@@ -1364,8 +1416,125 @@ function switchAdminTab(tab) {
   if (tab === 'members') loadMembers();
   if (tab === 'forgeOps') switchForgeSubTab('access');
   if (tab === 'events') loadEvents();
+  if (tab === 'surveillance') loadAuditLogs();
 }
 
+let allAuditLogs = [];
+
+async function loadAuditLogs() {
+  const tbody = document.getElementById('logsTbody');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Fetching logs from mainframe...</td></tr>';
+  
+  try {
+    const res = await apiGet('admin_get_audit_logs');
+    if (res.success) {
+      allAuditLogs = res.logs || [];
+      renderAuditLogs(allAuditLogs);
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);">${res.message}</td></tr>`;
+    }
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);">Network Error.</td></tr>';
+  }
+}
+
+function renderAuditLogs(logs) {
+  const tbody = document.getElementById('logsTbody');
+  if (!logs.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3);">No logs found.</td></tr>';
+    return;
+  }
+  
+  let html = '';
+  for (const log of logs) {
+    const dt = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Unknown';
+    let typeColor = 'var(--text)';
+    if (log.actionType === 'SYSTEM') typeColor = 'var(--blue)';
+    if (log.actionType === 'USER_ACTION') typeColor = 'var(--green)';
+    if (log.actionType === 'WARNING') typeColor = 'var(--red)';
+    
+    html += `
+      <tr>
+        <td style="font-size:12px;color:var(--text3);">${dt}</td>
+        <td style="font-family:var(--font-m); color:var(--accent2);">${escHtml(log.operativeId)}</td>
+        <td>${escHtml(log.name)}</td>
+        <td style="color:${typeColor}; font-weight:bold; font-size:11px;">${escHtml(log.actionType)}</td>
+        <td style="font-size:13px;">${escHtml(log.description)}</td>
+      </tr>
+    `;
+  }
+  tbody.innerHTML = html;
+}
+
+function filterLogs() {
+  const query = document.getElementById('logSearchInput').value.toLowerCase();
+  const filtered = allAuditLogs.filter(L => 
+    (L.operativeId || '').toLowerCase().includes(query) ||
+    (L.name || '').toLowerCase().includes(query) ||
+    (L.description || '').toLowerCase().includes(query)
+  );
+  renderAuditLogs(filtered);
+}
+
+async function adminSendBroadcast() {
+  const subject = document.getElementById('bcastSubject').value.trim();
+  const body = document.getElementById('bcastBody').value.trim();
+  
+  if (!subject || !body) return showToast('Subject and body required.', 'error');
+  if (!confirm('Are you sure you want to email EVERY operative?')) return;
+  
+  const btn = document.getElementById('btnSendBcast');
+  const origText = btn.innerText;
+  btn.innerText = 'Dispatching...';
+  btn.disabled = true;
+  
+  try {
+    // Collect all emails
+    const membersData = await apiGet('adminMembers');
+    const emails = membersData.members.map(m => m.email).filter(Boolean);
+    
+    if (emails.length === 0) throw new Error('No emails found.');
+    
+    const res = await apiWrite('admin_send_broadcast', { subject, body, emails });
+    if (res.success) {
+      showToast(res.message, 'success');
+      document.getElementById('bcastSubject').value = '';
+      document.getElementById('bcastBody').value = '';
+    } else {
+      showToast(res.message, 'error');
+    }
+  } catch(e) {
+    showToast('Failed to send broadcast.', 'error');
+  }
+  
+  btn.innerText = origText;
+  btn.disabled = false;
+}
+
+async function adminPostFeed() {
+  const content = document.getElementById('feedContent').value.trim();
+  if (!content) return showToast('Content is required.', 'error');
+  
+  const btn = document.getElementById('btnPostFeed');
+  const origText = btn.innerText;
+  btn.innerText = 'Posting...';
+  btn.disabled = true;
+  
+  try {
+    const res = await apiWrite('admin_post_feed', { content });
+    if (res.success) {
+      showToast('Posted to Global Feed!', 'success');
+      document.getElementById('feedContent').value = '';
+    } else {
+      showToast(res.message, 'error');
+    }
+  } catch(e) {
+    showToast('Failed to post to feed.', 'error');
+  }
+  
+  btn.innerText = origText;
+  btn.disabled = false;
+}
 let html5QrCode = null;
 
 async function populateAttendanceEvents() {
@@ -1552,6 +1721,28 @@ async function loadOverview() {
     const confirmedCount = members.filter(m => (m.status||'').trim().toLowerCase().includes('confirmed')).length;
     document.getElementById('statEvents').textContent = forgeCount;
     document.getElementById('statResources').textContent = confirmedCount;
+    
+    // New stats
+    document.getElementById('statBounties').textContent = membersData.activeBounties || '0';
+    document.getElementById('statXP').textContent = membersData.totalXPAwarded || '0';
+    
+    // Recent Activity
+    const actList = document.getElementById('recentActivityList');
+    const activities = membersData.recentActivity || [];
+    if (activities.length === 0) {
+      actList.innerHTML = '<p style="color:var(--text3); font-size:14px;">No recent activity.</p>';
+    } else {
+      actList.innerHTML = activities.map(act => {
+        const d = new Date(act.timestamp);
+        const timeStr = isNaN(d) ? '' : d.toLocaleString();
+        return `
+          <div style="background:var(--bg3); padding:10px; border-radius:8px; font-size:13px;">
+            <div style="color:var(--accent); font-weight:700; margin-bottom:4px;">${escHtml(act.type)} <span style="float:right; color:var(--text3); font-size:11px; font-weight:400;">${timeStr}</span></div>
+            <div style="color:var(--text);">${escHtml(act.content)}</div>
+          </div>
+        `;
+      }).join('');
+    }
     
     drawCharts(members);
   } catch(e) { console.error("Error loading overview:", e); }
@@ -1874,14 +2065,30 @@ function openProfileModal(encodedData) {
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Gender</span><br><strong>${escHtml(m.gender || 'N/A')}</strong></div>
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Date of Birth</span><br><strong>${escHtml(m.dob)}</strong></div>
       
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Squad</span><br><strong>${escHtml(m.squad || 'Unassigned')}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Rank & XP</span><br><strong>${escHtml(m.rank || 'Apprentice')} (${escHtml(m.xp || '0')} XP)</strong></div>
+      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Squad</span><br>
+        <input type="text" id="profSquad" value="${escHtml(m.squad || '')}" placeholder="e.g. Alpha" style="width:100%; margin-top:5px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+      </div>
+      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Rank & XP</span><br>
+        <div style="display:flex; gap:5px; margin-top:5px;">
+          <input type="text" id="profRank" value="${escHtml(m.rank || 'Apprentice')}" style="flex:1; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+          <input type="number" id="profXP" value="${escHtml(m.xp || '0')}" style="width:60px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+        </div>
+      </div>
       
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Forge Access</span><br><strong>${escHtml(m.forgeAccess || 'Pending')}</strong></div>
+      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Forge Access</span><br>
+        <select id="profForgeAccess" style="width:100%; margin-top:5px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+          <option value="Pending" ${m.forgeAccess === 'Pending' ? 'selected' : ''}>Pending</option>
+          <option value="Granted" ${m.forgeAccess === 'Granted' ? 'selected' : ''}>Granted</option>
+          <option value="Revoked" ${m.forgeAccess === 'Revoked' ? 'selected' : ''}>Revoked</option>
+        </select>
+      </div>
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Linked Mentor</span><br><strong>${escHtml(m.linkedMentor || 'None')}</strong></div>
       
       <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Payment Amount</span><br><strong>₹${escHtml(m.amount || '599')}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">UTR Number</span><br><strong style="font-family:monospace; color:var(--green);">${escHtml(m.utr)}</strong></div>
+      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">UTR Number</span><br>
+        <strong style="font-family:monospace; color:var(--green);">${escHtml(m.utr)}</strong>
+        ${m.paymentUrl ? `<br><button class="btn-sm" style="margin-top:8px; background:var(--bg3); border:1px solid var(--border);" onclick="window.open('${escHtml(m.paymentUrl)}')">🖼️ View Screenshot</button>` : ''}
+      </div>
     </div>
     
 
@@ -1889,9 +2096,41 @@ function openProfileModal(encodedData) {
   
   document.getElementById('modalTitle').textContent = 'Member Profile';
   document.getElementById('modalFields').innerHTML = html;
-  document.getElementById('modalSave').style.display = 'none';
+  
+  const saveBtn = document.getElementById('modalSave');
+  saveBtn.style.display = 'block';
+  saveBtn.onclick = () => adminUpdateProfile(m.rowIndex);
+  
   document.getElementById('modal').classList.add('open');
   document.getElementById('modal').style.display = '';
+}
+
+async function adminUpdateProfile(rowIndex) {
+  const squad = document.getElementById('profSquad').value;
+  const rank = document.getElementById('profRank').value;
+  const xp = document.getElementById('profXP').value;
+  const forgeAccess = document.getElementById('profForgeAccess').value;
+  
+  const btn = document.getElementById('modalSave');
+  const origText = btn.innerText;
+  btn.innerText = 'Saving...';
+  btn.disabled = true;
+  
+  try {
+    const res = await apiWrite('admin_update_profile', { rowIndex, squad, rank, xp, forgeAccess });
+    if (res.success) {
+      showToast('Profile updated!', 'success');
+      closeModal();
+      loadMembers();
+      loadOverview();
+    } else {
+      showToast(res.message, 'error');
+    }
+  } catch(e) {
+    showToast('Failed to update profile', 'error');
+  }
+  btn.innerText = origText;
+  btn.disabled = false;
 }
 
 

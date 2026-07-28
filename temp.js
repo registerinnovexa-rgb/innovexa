@@ -5,7 +5,7 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
 const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
 const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 

@@ -737,7 +737,7 @@
   async function loadMemberCount() {
     try {
       // NOTE: gasGet expects api.js to be loaded
-      const res = await gasGet('https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec?action=count');
+      const res = await gasGet('https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec?action=count');
       let count = 0;
       if (res && res.success && res.data) count = parseInt(res.data.count) || 0;
       else if (res && res.count) count = parseInt(res.count) || 0;
@@ -753,7 +753,7 @@
   // Fetch Confirmed Operatives
   async function loadConfirmedOperatives() {
     try {
-      const res = await gasGet('https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec?action=get_confirmed');
+      const res = await gasGet('https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec?action=get_confirmed');
       if (res && res.success && res.names && res.names.length > 0) {
         // Randomize the names array
         for (let i = res.names.length - 1; i > 0; i--) {

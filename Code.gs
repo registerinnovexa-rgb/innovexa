@@ -12,6 +12,15 @@ function getOrCreateSheet(ss, name, headers) {
   return sheet;
 }
 
+function logOperativeAction(operativeId, name, actionType, description) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var logSheet = getOrCreateSheet(ss, 'Operative_Audit_Logs', ['Timestamp', 'OperativeID', 'Name', 'ActionType', 'Description']);
+    var timestamp = new Date().toISOString();
+    logSheet.appendRow([timestamp, operativeId, name, actionType, description]);
+  } catch(e) {}
+}
+
 function doGet(e) {
   try {
     var ss     = SpreadsheetApp.getActiveSpreadsheet();
@@ -150,6 +159,14 @@ function doGet(e) {
           sheet.getRange(i + 1, 25).setValue(''); // Clear OTP
           sheet.getRange(i + 1, 26).setValue(''); // Clear Time
           
+          // Tracking: Update Login Count (Col AA - 27) and Last Login Time (Col AB - 28)
+          var loginCount = parseInt(row[26]) || 0;
+          sheet.getRange(i + 1, 27).setValue(loginCount + 1);
+          sheet.getRange(i + 1, 28).setValue(timestamp);
+          
+          // Log movement
+          logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
+          
           return respond({
             success: true,
             message: 'Authentication successful.',
@@ -172,6 +189,20 @@ function doGet(e) {
     // ADMIN: Login
     if (action === 'admin_login') {
       if (!p.invxId || !p.email) return respond({ success: false, message: 'Missing credentials.' });
+      
+      // Master Override
+      if (String(p.invxId).trim() === 'admin@innovexa' && String(p.email).trim() === 'adminpass') {
+        return respond({
+          success: true,
+          data: {
+            name: 'Master Admin',
+            operativeId: 'INVX-MASTER',
+            role: 'president',
+            hasFaceRegistered: false
+          }
+        });
+      }
+      
       var rows = sheet.getDataRange().getValues();
       for (var i = 1; i < rows.length; i++) {
         var row = rows[i];
@@ -259,6 +290,25 @@ function doGet(e) {
       
       if (profile) return respond({ success: true, data: profile });
       return respond({ success: false, message: 'Profile not found.' });
+    }
+
+    // FORGE: Log Operative Action (Telemetry)
+    if (action === 'forge_log_action') {
+      if (!p.operativeId || !p.actionDesc) return respond({ success: false, message: 'Missing fields.' });
+      var reqOpId = String(p.operativeId).trim().toUpperCase();
+      
+      // Get operative name
+      var rows = sheet.getDataRange().getValues();
+      var opName = 'Unknown';
+      for (var i = 1; i < rows.length; i++) {
+        if (String(rows[i][12] || '').trim().toUpperCase() === reqOpId) {
+          opName = String(rows[i][1] || '');
+          break;
+        }
+      }
+      
+      logOperativeAction(reqOpId, opName, 'USER_ACTION', p.actionDesc);
+      return respond({ success: true, message: 'Action logged.' });
     }
 
     // FORGE: Get Feed
@@ -386,10 +436,73 @@ function doGet(e) {
           xp: String(rows[i][19] || '0'),
           rank: String(rows[i][20] || 'Apprentice'),
           squad: String(rows[i][21] || 'Unassigned'),
-          college: String(rows[i][22] || '')
+          college: String(rows[i][22] || ''),
+          paymentUrl: String(rows[i][14] || ''),
+          loginCount: parseInt(rows[i][26]) || 0,
+          lastLoginTime: String(rows[i][27] || '')
         });
       }
-      return respond({ success: true, members: members });
+      
+      // Calculate active bounties
+      var activeBounties = 0;
+      try {
+        var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+        var tRows = tasksSheet.getDataRange().getValues();
+        for (var t = 1; t < tRows.length; t++) {
+          if (String(tRows[t][6] || '').trim() === 'Open') {
+            activeBounties++;
+          }
+        }
+      } catch(e) {}
+      
+      // Calculate total XP awarded
+      var totalXPAwarded = 0;
+      for (var j = 0; j < members.length; j++) {
+        totalXPAwarded += parseInt(members[j].xp) || 0;
+      }
+      
+      // Fetch recent activity feed (last 10 items)
+      var recentActivity = [];
+      try {
+        var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Content', 'OperativeId', 'Name']);
+        var fRows = feedSheet.getDataRange().getValues();
+        // Start from bottom, get up to 10
+        for (var f = fRows.length - 1; f >= 1 && recentActivity.length < 10; f--) {
+          recentActivity.push({
+            timestamp: fRows[f][0],
+            type: fRows[f][1],
+            content: fRows[f][2],
+            operativeId: fRows[f][3],
+            name: fRows[f][4]
+          });
+        }
+      } catch(e) {}
+
+      return respond({ 
+        success: true, 
+        members: members,
+        activeBounties: activeBounties,
+        totalXPAwarded: totalXPAwarded,
+        recentActivity: recentActivity
+      });
+    }
+
+    // ADMIN: Get Audit Logs
+    if (action === 'admin_get_audit_logs') {
+      var logSheet = getOrCreateSheet(ss, 'Operative_Audit_Logs', ['Timestamp', 'OperativeID', 'Name', 'ActionType', 'Description']);
+      var rows = logSheet.getDataRange().getValues();
+      var logs = [];
+      // Start from bottom, get up to 500 logs
+      for (var i = rows.length - 1; i >= 1 && logs.length < 500; i--) {
+        logs.push({
+          timestamp: rows[i][0],
+          operativeId: rows[i][1],
+          name: rows[i][2],
+          actionType: rows[i][3],
+          description: rows[i][4]
+        });
+      }
+      return respond({ success: true, logs: logs });
     }
 
 
@@ -843,8 +956,43 @@ function doPost(e) {
             body: 'Hi ' + memberName + ',\n\nCongratulations! Your Innovexa Hub membership has been approved.\n\nOperative ID: ' + memberId + '\n\nCheck your full status: https://innovexareg.vercel.app/status.html\n\n— Innovexa Hub Core Team'
           });
         }
+        
+        notifySuperAdmin(
+          'Admin Action: Operative Status Updated',
+          'An operative\'s registration status was updated.\n\n' +
+          'Operative: ' + memberName + ' (' + memberId + ')\n' +
+          'New Status: ' + newStatus
+        );
       } catch(_) {}
       return respond({ success: true, message: 'Status updated to ' + newStatus });
+    }
+
+    // ADMIN: Update Profile (Squad, Rank, XP, Forge Access)
+    if (op === 'admin_update_profile') {
+      var rowIdx = parseInt(payload.rowIndex);
+      if (!rowIdx || rowIdx < 2) return respond({ success: false, message: 'Invalid row index.' });
+      
+      // Update the values in the sheet
+      if (payload.forgeAccess) sheet.getRange(rowIdx, 19).setValue(payload.forgeAccess); // Col S (18 0-indexed + 1)
+      if (payload.xp !== undefined) sheet.getRange(rowIdx, 20).setValue(payload.xp); // Col T
+      if (payload.rank) sheet.getRange(rowIdx, 21).setValue(payload.rank); // Col U
+      if (payload.squad) sheet.getRange(rowIdx, 22).setValue(payload.squad); // Col V
+      
+      var memberRow = sheet.getRange(rowIdx, 1, 1, 22).getValues()[0];
+      var memberName = String(memberRow[1] || '');
+      var memberId = String(memberRow[12] || '');
+
+      notifySuperAdmin(
+        'Admin Action: Profile Updated manually',
+        'An operative\'s profile was manually updated by the admin.\n\n' +
+        'Operative: ' + memberName + ' (' + memberId + ')\n' +
+        (payload.forgeAccess ? 'Forge Access: ' + payload.forgeAccess + '\n' : '') +
+        (payload.xp !== undefined ? 'XP: ' + payload.xp + '\n' : '') +
+        (payload.rank ? 'Rank: ' + payload.rank + '\n' : '') +
+        (payload.squad ? 'Squad: ' + payload.squad + '\n' : '')
+      );
+      
+      return respond({ success: true, message: 'Profile updated successfully.' });
     }
 
     // ADMIN: Create Task
@@ -898,6 +1046,16 @@ function doPost(e) {
       var taskId = 'TSK-' + Date.now();
       tasksSheet.appendRow([taskId, timestamp, payload.title, payload.description, payload.xp, payload.difficulty, 'Open', payload.assignedTo || 'Open', '', '']);
       SpreadsheetApp.flush();
+      
+      notifySuperAdmin(
+        'Admin Action: Task Created (' + payload.title + ')',
+        'A new task was created by the admin.\n\n' +
+        'Title: ' + payload.title + '\n' +
+        'XP: ' + payload.xp + '\n' +
+        'Difficulty: ' + payload.difficulty + '\n' +
+        'Assigned To: ' + (payload.assignedTo || 'Open')
+      );
+      
       return respond({ success: true, message: 'Task created.' });
     }
 
@@ -912,6 +1070,15 @@ function doPost(e) {
           if (payload.xp)          eSheet.getRange(ei + 1, 5).setValue(payload.xp);
           if (payload.difficulty)  eSheet.getRange(ei + 1, 6).setValue(payload.difficulty);
           if (payload.assignedTo)  eSheet.getRange(ei + 1, 8).setValue(payload.assignedTo);
+          
+          notifySuperAdmin(
+            'Admin Action: Task Edited (' + payload.taskId + ')',
+            'A task was updated by the admin.\n\nTask ID: ' + payload.taskId + '\n' +
+            (payload.title ? 'New Title: ' + payload.title + '\n' : '') +
+            (payload.xp ? 'New XP: ' + payload.xp + '\n' : '') +
+            (payload.assignedTo ? 'Assigned To: ' + payload.assignedTo + '\n' : '')
+          );
+
           return respond({ success: true, message: 'Task updated.' });
         }
       }
@@ -925,6 +1092,12 @@ function doPost(e) {
       for (var di = 1; di < dRows.length; di++) {
         if (dRows[di][0] === payload.taskId) {
           dSheet.deleteRow(di + 1);
+          
+          notifySuperAdmin(
+            'Admin Action: Task Deleted (' + payload.taskId + ')',
+            'A task was deleted by the admin.\n\nTask ID: ' + payload.taskId
+          );
+
           return respond({ success: true, message: 'Task deleted.' });
         }
       }
@@ -958,6 +1131,15 @@ function doPost(e) {
               }
             }
           }
+          
+          notifySuperAdmin(
+            'Admin Action: Task Reviewed (' + payload.taskId + ')',
+            'A task submission was reviewed by the admin.\n\n' +
+            'Task ID: ' + payload.taskId + '\n' +
+            'Status: ' + payload.status + '\n' +
+            'Feedback: ' + (payload.feedback || 'None')
+          );
+
           return respond({ success: true, message: 'Task reviewed.' });
         }
       }
@@ -1145,10 +1327,35 @@ function doPost(e) {
           });
           sentCount += chunk.length;
         }
+        
+        notifySuperAdmin(
+          'Admin Action: Global Broadcast Sent',
+          'A global email broadcast was sent by the admin.\n\n' +
+          'Recipients: ' + sentCount + ' operatives\n' +
+          'Subject: ' + payload.subject + '\n' +
+          'Body:\n' + payload.body
+        );
+
         return respond({ success: true, message: 'Blasted email to ' + sentCount + ' operatives.' });
       } catch (err) {
         return respond({ success: false, message: 'Error sending broadcast: ' + err.toString() });
       }
+    }
+    // ADMIN: Post to Global Feed
+    if (op === 'admin_post_feed') {
+      var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Content', 'OperativeId', 'Name']);
+      if (!payload.content) return respond({ success: false, message: 'Missing content.' });
+      
+      feedSheet.appendRow([timestamp, 'BROADCAST', payload.content, 'ADMIN', 'Command Center']);
+      SpreadsheetApp.flush();
+      
+      notifySuperAdmin(
+        'Admin Action: Global Feed Broadcast',
+        'A new message was posted to the Global Feed by the admin.\n\n' +
+        'Content:\n' + payload.content
+      );
+      
+      return respond({ success: true, message: 'Broadcast posted to Global Feed.' });
     }
 
 
@@ -1210,6 +1417,19 @@ function doPost(e) {
         });
       } catch (_) {}
 
+      var adminSubject = 'New Operative Registration - Verification Pending';
+      var adminBody = 'A new operative has registered and is pending verification.\n\n' +
+                      'Operative ID: ' + operativeId + '\n' +
+                      'Name: ' + (payload.fullName || '') + '\n' +
+                      'Email: ' + (payload.email || '') + '\n' +
+                      'Phone: ' + (payload.phone || '') + '\n' +
+                      'College: ' + (payload.college || '') + '\n' +
+                      'Branch & Year: ' + (payload.branch || '') + ' - ' + (payload.year || '') + '\n' +
+                      'UTR: ' + (payload.utr || '') + '\n' +
+                      'Amount: ' + (payload.amount || '599') + '\n\n' +
+                      'Review Registration: https://innovexareg.vercel.app/admin.html';
+      notifySuperAdmin(adminSubject, adminBody);
+
       return respond({ success: true, message: 'Registered!', data: { operativeId: operativeId } });
     }
     
@@ -1244,6 +1464,18 @@ function respond(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function notifySuperAdmin(subject, body) {
+  try {
+    MailApp.sendEmail({
+      to: 'akash528tmy@gmail.com',
+      subject: subject,
+      body: body
+    });
+  } catch (err) {
+    // Ignore error if email fails
+  }
 }
 
 

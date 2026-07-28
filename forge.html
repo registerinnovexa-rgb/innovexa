@@ -245,7 +245,7 @@
     // ══════════════════════════════════════════
     //  GLOBALS & CONSTANTS
     // ══════════════════════════════════════════
-    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyF18nxF7idoX3e4ugNt_kyQ--Fy6VjmmKZ_IvP15-5AJoRrLPcfdYYzUmcO4w3_xIz/exec';
+    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfGKP1Fw9CTTOtsv4ZGV5TEP3ioQ3lM-OUO_SjSCCwrudNBwtWAFU_TcSk9RGCcH55FA/exec';
     
     let session = null;
     let cachedResources = [];
@@ -283,6 +283,13 @@
       } catch (e) {
         throw e;
       }
+    }
+    
+    // Telemetry Logger
+    function logAction(actionDesc) {
+      if (!session || !session.operativeId) return;
+      // Fire and forget
+      gasGet('forge_log_action', { operativeId: session.operativeId, actionDesc: actionDesc }).catch(() => {});
     }
 
     async function apiGetMain(action) {
@@ -489,6 +496,9 @@
       } else if (tabId === 'leaderboard') {
         loadLeaderboard();
       }
+      
+      // Log movement silently
+      logAction(`Navigated to ${tabId.toUpperCase()} tab.`);
     }
 
     // ══════════════════════════════════════════
@@ -622,7 +632,11 @@
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_edit_task', taskId, submitLink } })
         });
         const res = await r.json();
-        if (res.success) { toast('Link updated successfully.', 'success'); loadMissions(); }
+        if (res.success) { 
+          toast('Mission update submitted!', 'success'); 
+          logAction(`Edited mission submission for: ${taskId}`);
+          loadMissions(); 
+        }
         else { toast(res.message || 'Error updating', 'error'); }
       } catch(e) { toast('Network error', 'error'); }
     }
@@ -637,7 +651,11 @@
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_recall_task', taskId } })
         });
         const res = await r.json();
-        if (res.success) { toast('Submission recalled.', 'success'); loadMissions(); }
+        if (res.success) { 
+          toast('Submission recalled.', 'success'); 
+          logAction(`Recalled submission for: ${taskId}`);
+          loadMissions(); 
+        }
         else { toast(res.message || 'Error recalling', 'error'); }
       } catch(e) { toast('Network error', 'error'); }
     }
@@ -653,6 +671,7 @@
       // Optimistic UI Update
       actionDiv.innerHTML = `<div style="margin-top:16px; font-weight:600; color:var(--accent2);">Under Review</div>`;
       toast('Mission submitted for review!');
+      logAction(`Submitted mission for review: ${taskId}`);
       
       try {
         fetch('https://innovexareg.vercel.app/api/proxy', {
