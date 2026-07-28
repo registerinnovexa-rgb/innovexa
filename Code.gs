@@ -1570,16 +1570,37 @@ function notifySuperAdmin(subject, body) {
     // Ignore error if email fails
   }
 
-  // Send WhatsApp (CallMeBot)
+  // Send WhatsApp (Meta Cloud API)
   try {
-    // ⚠️ Configure your CallMeBot credentials here ⚠️
-    var whatsappPhone = 'YOUR_PHONE_NUMBER'; // e.g. +919876543210 (include country code, no + or spaces)
-    var whatsappApiKey = 'YOUR_API_KEY';       // e.g. 123456
-    
-    if (whatsappPhone !== 'YOUR_PHONE_NUMBER' && whatsappApiKey !== 'YOUR_API_KEY') {
+    // ⚠️ Configure your Meta WhatsApp credentials here ⚠️
+    var metaAccessToken = 'YOUR_ACCESS_TOKEN'; 
+    var metaPhoneNumberId = 'YOUR_PHONE_NUMBER_ID'; // e.g. 101234567890123
+    var adminWhatsApp = 'YOUR_ADMIN_WHATSAPP_NUMBER'; // e.g. 919876543210 (include country code, no +)
+
+    if (metaAccessToken !== 'YOUR_ACCESS_TOKEN' && metaPhoneNumberId !== 'YOUR_PHONE_NUMBER_ID') {
       var msg = '🔔 *' + subject + '*\n\n' + body;
-      var url = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(whatsappPhone) + '&text=' + encodeURIComponent(msg) + '&apikey=' + encodeURIComponent(whatsappApiKey);
-      UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+      var url = 'https://graph.facebook.com/v20.0/' + metaPhoneNumberId + '/messages';
+      
+      var payload = {
+        "messaging_product": "whatsapp",
+        "to": adminWhatsApp,
+        "type": "text",
+        "text": {
+          "body": msg
+        }
+      };
+
+      var options = {
+        "method": "post",
+        "contentType": "application/json",
+        "headers": {
+          "Authorization": "Bearer " + metaAccessToken
+        },
+        "payload": JSON.stringify(payload),
+        "muteHttpExceptions": true
+      };
+
+      UrlFetchApp.fetch(url, options);
     }
   } catch (err) {
     // Ignore error if whatsapp fails
