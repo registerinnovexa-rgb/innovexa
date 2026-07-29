@@ -671,7 +671,7 @@
         <h2 class="section-title">Members</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <select id="memberDetailSelect" class="search-box" style="width:200px;cursor:pointer;background:var(--bg3);font-weight:600;" onchange="loadMemberDetailView()">
-            <option value="">View Member Detail...</option>
+            <option value="">Select user</option>
           </select>
           <select id="memberStatusFilter" class="search-box" style="width:160px;cursor:pointer;" onchange="applyMemberFilters()">
             <option value="all">All Members</option>
@@ -2254,7 +2254,7 @@ function populateMemberDetailDropdown() {
   const select = document.getElementById('memberDetailSelect');
   if (!select) return;
   // Keep the first default option
-  select.innerHTML = '<option value="">View Member Detail...</option>';
+  select.innerHTML = '<option value="">Select user</option>';
   
   if (cachedMembers && cachedMembers.length > 0) {
     // Sort members alphabetically by name
