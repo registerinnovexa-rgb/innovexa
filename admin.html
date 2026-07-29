@@ -2250,13 +2250,14 @@ function populateMemberDetailDropdown() {
   // Keep the first default option
   select.innerHTML = '<option value="">View Member Detail...</option>';
   
-  if (window.cachedMembers) {
+  if (cachedMembers && cachedMembers.length > 0) {
     // Sort members alphabetically by name
-    const sorted = [...window.cachedMembers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    const sorted = [...cachedMembers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     sorted.forEach(m => {
-      // Only include confirmed members or those with an operative ID for this deep dive
-      if (m.operativeId && m.operativeId.trim() !== '') {
-        select.insertAdjacentHTML('beforeend', `<option value="${m.operativeId}">${escHtml(m.name)} (${escHtml(m.operativeId)})</option>`);
+      // Allow all members who have an operative ID or an email/phone fallback
+      if (m.operativeId || m.email || m.name) {
+        const id = m.operativeId || m.email || 'No-ID';
+        select.insertAdjacentHTML('beforeend', `<option value="${id}">${escHtml(m.name || 'Unnamed')} (${escHtml(id)})</option>`);
       }
     });
   }
@@ -2280,7 +2281,7 @@ async function loadMemberDetailView() {
   }
 
   // Find member name
-  const member = window.cachedMembers.find(m => m.operativeId === opId);
+  const member = cachedMembers.find(m => m.operativeId === opId || m.email === opId);
   document.getElementById('detailMemberName').textContent = member ? `Dossier: ${member.name}` : `Dossier: ${opId}`;
 
   // Hide main table and controls, show panel + loading
