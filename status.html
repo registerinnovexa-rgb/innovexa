@@ -306,11 +306,9 @@
         document.getElementById('card-id').textContent     = opId;
         document.getElementById('card-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified_' + opId;
         let actionRow = document.querySelector('.action-row');
-        if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
-          if (!document.getElementById('forge-ops-btn')) {
-            actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html?id=${opId}" class="btn-magnetic" style="background:#fff;color:#111;margin-top:12px;border:1px solid rgba(0,0,0,0.1);width:100%;text-align:center;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Dashboard</a>`);
+        if (!document.getElementById('forge-ops-btn')) {
+            actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html?id=${opId}" class="btn-magnetic" style="background:#fff;color:#111;margin-top:12px;border:1px solid rgba(0,0,0,0.1);width:100%;text-align:center;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Go to Dashboard</a>`);
           }
-        }
         approvedAssets.classList.remove('hidden');
       } else if (status === 'rejected') {
         resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
