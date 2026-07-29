@@ -518,6 +518,65 @@ function doGet(e) {
       });
     }
 
+    // ADMIN: Get Member Detail (Logs & Tasks)
+    if (action === 'admin_get_member_detail') {
+      var targetId = p.operativeId;
+      if (!targetId) return respond({ success: false, message: 'No operative ID provided' });
+
+      // 1. Fetch Logs for this member
+      var logSheet = getOrCreateSheet(ss, 'Operative_Audit_Logs', ['Timestamp', 'OperativeID', 'Name', 'ActionType', 'Description']);
+      var lRows = logSheet.getDataRange().getValues();
+      var memberLogs = [];
+      for (var l = lRows.length - 1; l >= 1; l--) {
+        if (String(lRows[l][1]) === targetId) {
+          memberLogs.push({
+            timestamp: lRows[l][0],
+            actionType: lRows[l][3],
+            description: lRows[l][4]
+          });
+        }
+      }
+
+      // 2. Fetch Tasks for this member
+      var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
+      var tRows = tasksSheet.getDataRange().getValues();
+      var memberTasks = [];
+      var activeTasksCount = 0;
+      var completedTasksCount = 0;
+
+      for (var t = tRows.length - 1; t >= 1; t--) {
+        var assignedTo = String(tRows[t][7] || '').trim();
+        var taskStatus = String(tRows[t][6] || '').trim();
+        
+        // Match assigned to this operative OR match generic 'Open' status if we want to show available ones (usually just assigned/submitted makes sense for a specific user's detail view). We will check if their ID is in AssignedTo.
+        if (assignedTo.indexOf(targetId) !== -1) {
+          memberTasks.push({
+            taskId: tRows[t][0],
+            title: tRows[t][2],
+            xp: tRows[t][4],
+            difficulty: tRows[t][5],
+            status: taskStatus,
+            submitLink: tRows[t][8],
+            feedback: tRows[t][9]
+          });
+          
+          if (taskStatus === 'Completed') completedTasksCount++;
+          if (taskStatus === 'Open' || taskStatus === 'Submitted') activeTasksCount++;
+        }
+      }
+
+      return respond({
+        success: true,
+        logs: memberLogs,
+        tasks: memberTasks,
+        stats: {
+          activeTasks: activeTasksCount,
+          completedTasks: completedTasksCount,
+          totalLogs: memberLogs.length
+        }
+      });
+    }
+
     // ADMIN: Get Audit Logs
     if (action === 'admin_get_audit_logs') {
       var logSheet = getOrCreateSheet(ss, 'Operative_Audit_Logs', ['Timestamp', 'OperativeID', 'Name', 'ActionType', 'Description']);

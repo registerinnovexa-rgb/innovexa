@@ -670,6 +670,9 @@
       <div class="section-header">
         <h2 class="section-title">Members</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <select id="memberDetailSelect" class="search-box" style="width:200px;cursor:pointer;background:var(--bg3);font-weight:600;" onchange="loadMemberDetailView()">
+            <option value="">View Member Detail...</option>
+          </select>
           <select id="memberStatusFilter" class="search-box" style="width:160px;cursor:pointer;" onchange="applyMemberFilters()">
             <option value="all">All Members</option>
             <option value="pending">Pending</option>
@@ -710,6 +713,54 @@
         <button class="btn-sm" style="background:var(--bg3); color:var(--text); padding:6px 12px;" onclick="changePage(-1)">Previous</button>
         <span style="font-size:13px; color:var(--text2);">Page <span id="currentPageDisplay">1</span> of <span id="totalPagesDisplay">1</span></span>
         <button class="btn-sm" style="background:var(--bg3); color:var(--text); padding:6px 12px;" onclick="changePage(1)">Next</button>
+      </div>
+      </div>
+      
+      <!-- Member Detail Panel (Hidden by default) -->
+      <div id="memberDetailPanel" style="display:none; margin-top:20px; background:var(--bg2); padding:20px; border-radius:12px; border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="font-size:20px; margin:0;" id="detailMemberName">Member Details</h3>
+          <button class="btn-sm" style="background:var(--bg3); border:1px solid var(--border);" onclick="closeMemberDetailView()">✕ Close View</button>
+        </div>
+        
+        <div id="detailLoading" class="loading" style="display:none;"><div class="spinner"></div> Fetching full dossier...</div>
+        
+        <div id="detailContent" style="display:none;">
+          <!-- Summary Stats -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;">
+            <div class="admin-card" style="margin:0;"><h4 style="color:var(--text3);font-size:12px;">Total Logins</h4><div id="detailStatLogins" style="font-size:24px;font-weight:700;">0</div></div>
+            <div class="admin-card" style="margin:0;"><h4 style="color:var(--text3);font-size:12px;">Active Tasks</h4><div id="detailStatActiveTasks" style="font-size:24px;font-weight:700;">0</div></div>
+            <div class="admin-card" style="margin:0;"><h4 style="color:var(--text3);font-size:12px;">Completed Tasks</h4><div id="detailStatCompletedTasks" style="font-size:24px;font-weight:700;">0</div></div>
+            <div class="admin-card" style="margin:0;"><h4 style="color:var(--text3);font-size:12px;">Total XP</h4><div id="detailStatXP" style="font-size:24px;font-weight:700;color:var(--accent);">0</div></div>
+          </div>
+
+          <!-- Logs & Tasks Tables -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            
+            <!-- Activity Logs -->
+            <div class="admin-card" style="margin:0;">
+              <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Activity Logs</h3>
+              <div style="max-height:300px; overflow-y:auto; padding-right:10px;" class="custom-scroll">
+                <table class="data-table" style="font-size:12px;">
+                  <thead><tr><th>Time</th><th>Action</th><th>Details</th></tr></thead>
+                  <tbody id="detailLogsBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Task History -->
+            <div class="admin-card" style="margin:0;">
+              <h3 style="font-size:16px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Task History</h3>
+              <div style="max-height:300px; overflow-y:auto; padding-right:10px;" class="custom-scroll">
+                <table class="data-table" style="font-size:12px;">
+                  <thead><tr><th>Title</th><th>XP</th><th>Status</th></tr></thead>
+                  <tbody id="detailTasksBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
     
@@ -1817,9 +1868,9 @@ async function loadMembers() {
     const data = await apiGet('adminMembers');
     if (!data || !data.success) throw new Error((data && data.message) || 'Bad response from server');
     cachedMembers = data.members || [];
-      populateOperativeDatalist();
-    renderMembers(cachedMembers);
     populateOperativeDatalist();
+    populateMemberDetailDropdown();
+    renderMembers(cachedMembers);
   } catch(e) {
     console.error('loadMembers error:', e);
     document.getElementById('membersLoading').innerHTML =
@@ -2192,6 +2243,125 @@ async function adminUpdateProfile(rowIndex) {
   btn.disabled = false;
 }
 
+// ════════ MEMBER DETAIL VIEW (NEW) ════════
+function populateMemberDetailDropdown() {
+  const select = document.getElementById('memberDetailSelect');
+  if (!select) return;
+  // Keep the first default option
+  select.innerHTML = '<option value="">View Member Detail...</option>';
+  
+  if (window.cachedMembers) {
+    // Sort members alphabetically by name
+    const sorted = [...window.cachedMembers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    sorted.forEach(m => {
+      // Only include confirmed members or those with an operative ID for this deep dive
+      if (m.operativeId && m.operativeId.trim() !== '') {
+        select.insertAdjacentHTML('beforeend', `<option value="${m.operativeId}">${escHtml(m.name)} (${escHtml(m.operativeId)})</option>`);
+      }
+    });
+  }
+}
+
+async function loadMemberDetailView() {
+  const select = document.getElementById('memberDetailSelect');
+  const opId = select.value;
+  
+  const membersTable = document.getElementById('membersTable');
+  const detailPanel = document.getElementById('memberDetailPanel');
+  const loading = document.getElementById('detailLoading');
+  const content = document.getElementById('detailContent');
+  const bulkActions = document.getElementById('bulkActions');
+  const pagination = document.getElementById('paginationControls');
+
+  if (!opId) {
+    // Close view if they select the default option
+    closeMemberDetailView();
+    return;
+  }
+
+  // Find member name
+  const member = window.cachedMembers.find(m => m.operativeId === opId);
+  document.getElementById('detailMemberName').textContent = member ? `Dossier: ${member.name}` : `Dossier: ${opId}`;
+
+  // Hide main table and controls, show panel + loading
+  membersTable.style.display = 'none';
+  if(bulkActions) bulkActions.style.display = 'none';
+  if(pagination) pagination.style.display = 'none';
+  
+  detailPanel.style.display = 'block';
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  try {
+    const res = await apiGet('admin_get_member_detail', { operativeId: opId });
+    loading.style.display = 'none';
+    
+    if (res.success) {
+      content.style.display = 'block';
+      
+      // Update Stats
+      document.getElementById('detailStatLogins').textContent = res.stats.totalLogs || 0; // Using total logs as a proxy for activity
+      document.getElementById('detailStatActiveTasks').textContent = res.stats.activeTasks || 0;
+      document.getElementById('detailStatCompletedTasks').textContent = res.stats.completedTasks || 0;
+      
+      // Calculate total XP from tasks (or use member profile XP)
+      const memberProfXP = member ? member.xp : 0;
+      document.getElementById('detailStatXP').textContent = memberProfXP || 0;
+
+      // Render Logs
+      const logsBody = document.getElementById('detailLogsBody');
+      if (res.logs && res.logs.length > 0) {
+        logsBody.innerHTML = res.logs.map(l => `
+          <tr>
+            <td style="color:var(--text3);">${new Date(l.timestamp).toLocaleString()}</td>
+            <td><strong>${escHtml(l.actionType)}</strong></td>
+            <td><span style="opacity:0.8;">${escHtml(l.description)}</span></td>
+          </tr>
+        `).join('');
+      } else {
+        logsBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);">No activity logs found.</td></tr>';
+      }
+
+      // Render Tasks
+      const tasksBody = document.getElementById('detailTasksBody');
+      if (res.tasks && res.tasks.length > 0) {
+        tasksBody.innerHTML = res.tasks.map(t => {
+          let statusColor = t.status === 'Completed' ? 'var(--green)' : (t.status === 'Submitted' ? 'var(--blue)' : 'var(--accent)');
+          return `
+          <tr>
+            <td><strong>${escHtml(t.title)}</strong></td>
+            <td style="color:var(--accent);">${t.xp} XP</td>
+            <td><span style="color:${statusColor}; font-weight:600; font-size:11px; padding:2px 6px; background:rgba(255,255,255,0.05); border-radius:4px;">${escHtml(t.status)}</span></td>
+          </tr>
+        `;
+        }).join('');
+      } else {
+        tasksBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);">No tasks assigned or submitted.</td></tr>';
+      }
+
+    } else {
+      showToast('Failed to load member details', 'error');
+      closeMemberDetailView();
+    }
+  } catch(e) {
+    console.error(e);
+    loading.style.display = 'none';
+    showToast('Error loading details', 'error');
+    closeMemberDetailView();
+  }
+}
+
+function closeMemberDetailView() {
+  document.getElementById('memberDetailSelect').value = '';
+  document.getElementById('memberDetailPanel').style.display = 'none';
+  document.getElementById('membersTable').style.display = 'block';
+  
+  // Restore pagination if needed
+  if (currentFilteredMembers.length > itemsPerPage) {
+    document.getElementById('paginationControls').style.display = 'flex';
+  }
+  updateBulkActions();
+}
 
 
 
