@@ -95,21 +95,6 @@
       <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:16px; display:none;"></div>
       <div id="loading-spinner" style="display:none; color:var(--text-1); font-size:14px; font-weight:500; margin-top:16px;">Scanning Database...</div>
     </div>
-
-    <!-- Manual ID / Email / Phone Lookup -->
-    <div style="margin-top:24px; padding-top:24px; border-top:1px solid rgba(0,0,0,0.08);">
-      <p style="color:var(--text-2); font-size:13px; margin-bottom:12px; text-align:center;">Or search by Operative ID / Email / Phone / UTR</p>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <input id="manual-query-input" type="text" placeholder="INVX-XXXXX or email or phone or UTR" 
-          style="flex:1; min-width:180px; padding:10px 16px; border:1px solid rgba(0,0,0,0.15); border-radius:8px; font-family:var(--font-b); font-size:14px; background:var(--bg); color:var(--text-1); outline:none;"
-          onkeydown="if(event.key==='Enter') handleManualSearch()"
-        />
-        <button onclick="handleManualSearch()" 
-          style="padding:10px 20px; background:var(--text-1); color:var(--bg); border:none; border-radius:8px; font-family:var(--font-b); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap;">
-          Search
-        </button>
-      </div>
-    </div>
   </div>
 
   <!-- RESULT PANEL -->
