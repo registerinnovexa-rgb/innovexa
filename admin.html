@@ -2347,13 +2347,14 @@ async function loadMemberDetailView() {
       }
 
     } else {
-      showToast('Failed to load member details', 'error');
+      console.error("Backend error:", res);
+      showToast(res.message || 'Failed to load member details', 'error');
       closeMemberDetailView();
     }
   } catch(e) {
-    console.error(e);
+    console.error("Fetch error:", e);
     loading.style.display = 'none';
-    showToast('Error loading details', 'error');
+    showToast('Error loading details: ' + e.message, 'error');
     closeMemberDetailView();
   }
 }
