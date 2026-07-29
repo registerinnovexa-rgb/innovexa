@@ -433,7 +433,10 @@
       btn.textContent = 'Authenticating...';
 
       try {
-        const res = await gasGet('forge_verify_otp', { invxId: id, otp: otp });
+        const ua = navigator.userAgent;
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
+        const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark Mode' : 'Light Mode';
+        const res = await gasGet('forge_verify_otp', { invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme });
         
         if (res.success && res.data) {
            toast('Authentication successful.', 'success');

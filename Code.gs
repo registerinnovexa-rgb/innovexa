@@ -190,12 +190,20 @@ function doGet(e) {
           // Log movement
           logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
           
+          var deviceStr = p.ua ? String(p.ua) : 'Unknown Device';
+          var screenStr = p.screen ? String(p.screen) : 'Unknown Screen';
+          var themeStr = p.theme ? String(p.theme) : 'Unknown Mode';
+
           notifySuperAdmin(
             'Operative Dashboard Login: ' + String(row[1] || ''),
             'A member has successfully authenticated and logged into the Forge Dashboard.\n\n' +
             'Name: ' + String(row[1] || '') + '\n' +
             'Operative ID: ' + reqOpId + '\n' +
-            'Email: ' + String(row[2] || '')
+            'Email: ' + String(row[2] || '') + '\n\n' +
+            '--- Session Telemetry ---\n' +
+            'Device: ' + deviceStr + '\n' +
+            'Resolution: ' + screenStr + '\n' +
+            'UI Mode: ' + themeStr
           );
           
           return respond({
