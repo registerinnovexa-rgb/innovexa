@@ -1087,12 +1087,18 @@ function driveImgUrl(url) {
   return url;
 }
 
-async function apiGet(action) {
+async function apiGet(action, params = {}) {
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  const gasUrl = encodeURIComponent(`${baseUrl}?action=${action}&_t=${Date.now()}`);
   
-  const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
+  let qString = `action=${action}&_t=${Date.now()}`;
+  for (const [k, v] of Object.entries(params)) {
+    qString += `&${k}=${encodeURIComponent(v)}`;
+  }
+  
+  const gasUrl = encodeURIComponent(`${baseUrl}?${qString}`);
+  
+  const r = await fetch(`/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
   const text = await r.text();
   try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
 }
