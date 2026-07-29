@@ -19,6 +19,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<div id="toast-container" style="position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px;"></div>
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
@@ -93,6 +94,21 @@
       
       <div id="query-error" style="color:#ef4444; font-size:12px; font-weight:500; margin-top:16px; display:none;"></div>
       <div id="loading-spinner" style="display:none; color:var(--text-1); font-size:14px; font-weight:500; margin-top:16px;">Scanning Database...</div>
+    </div>
+
+    <!-- Manual ID / Email / Phone Lookup -->
+    <div style="margin-top:24px; padding-top:24px; border-top:1px solid rgba(0,0,0,0.08);">
+      <p style="color:var(--text-2); font-size:13px; margin-bottom:12px; text-align:center;">Or search by Operative ID / Email / Phone / UTR</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <input id="manual-query-input" type="text" placeholder="INVX-XXXXX or email or phone or UTR" 
+          style="flex:1; min-width:180px; padding:10px 16px; border:1px solid rgba(0,0,0,0.15); border-radius:8px; font-family:var(--font-b); font-size:14px; background:var(--bg); color:var(--text-1); outline:none;"
+          onkeydown="if(event.key==='Enter') handleManualSearch()"
+        />
+        <button onclick="handleManualSearch()" 
+          style="padding:10px 20px; background:var(--text-1); color:var(--bg); border:none; border-radius:8px; font-family:var(--font-b); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap;">
+          Search
+        </button>
+      </div>
     </div>
   </div>
 
@@ -242,89 +258,16 @@
     const errEl = document.getElementById('query-error');
     const spinner = document.getElementById('loading-spinner');
     const panel = document.getElementById('result-panel');
-    
     errEl.style.display = 'none';
     panel.classList.add('hidden');
     spinner.style.display = 'block';
-
     try {
       const payload = decodeJwtResponse(response.credential);
       const email = payload.email;
-      
-      if (!email) {
-        throw new Error("No email found in Google response.");
-      }
-
-      // Fetch status via email
+      if (!email) throw new Error("No email found in Google response.");
       const url = window.SCRIPT_URL + '?email=' + encodeURIComponent(email);
       const res = await gasGet(url);
-
-      const resIcon = document.getElementById('res-icon');
-      const resMsg = document.getElementById('res-msg');
-      const approvedAssets = document.getElementById('approved-assets');
-
-      spinner.style.display = 'none';
-
-      if (res && res.success) {
-        const d = res.data || res;
-        const status = (d.status || '').trim().toLowerCase();
-        
-        document.getElementById('res-name').textContent = d.name || 'Operative';
-        document.getElementById('res-identifier').textContent = d.email || email;
-        document.getElementById('res-status-text').textContent = status.charAt(0).toUpperCase() + status.slice(1);
-
-        resIcon.className = 'result-icon ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
-        resMsg.className = 'status-msg ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
-
-        if (status === 'pending') {
-          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-          resMsg.textContent = 'Your application is currently under review by our administration. This process typically takes 24-48 hours. We will notify you once verified.';
-          approvedAssets.classList.add('hidden');
-        } else if (status === 'confirmed' || status === 'approved') {
-          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
-          resMsg.innerHTML = '<strong>Access Granted.</strong> Welcome to the collective. Your operative ID is generated below.';
-          
-          const opId = d.operativeId || 'INVX-XX';
-          document.getElementById('card-name').textContent = d.name || 'Operative';
-          document.getElementById('card-college').textContent = d.college || 'Yenepoya University';
-          document.getElementById('card-id').textContent = opId;
-          document.getElementById('card-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified_' + opId;
-          
-          let actionRow = document.querySelector('.action-row');
-          
-          // Add Forge button only if granted and not already present
-          if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
-            if (!document.getElementById('forge-ops-btn')) {
-              actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html?id=${opId}" class="btn-magnetic" style="background:#fff; color:#111; margin-top:12px; border:1px solid rgba(0,0,0,0.1); width:100%; text-align:center; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Dashboard</a>`);
-            }
-          }
-          approvedAssets.classList.remove('hidden');
-        } else if (status === 'rejected') {
-          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-          resMsg.innerHTML = 'Your application has been <strong>rejected</strong> due to invalid information or payment verification failure.';
-          approvedAssets.classList.add('hidden');
-        } else {
-          // Unknown status
-          resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-          resMsg.textContent = 'Status unknown. Contact support.';
-          approvedAssets.classList.add('hidden');
-        }
-
-        panel.classList.remove('hidden');
-        
-        // Re-trigger fade
-        panel.style.opacity = '0';
-        panel.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-          panel.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-          panel.style.opacity = '1';
-          panel.style.transform = 'translateY(0)';
-        }, 50);
-
-      } else {
-        errEl.textContent = 'No record found for this Google Account.';
-        errEl.style.display = 'block';
-      }
+      renderStatus(res, email);
     } catch(e) {
       spinner.style.display = 'none';
       errEl.textContent = 'An error occurred during verification. Please try again.';
@@ -343,6 +286,95 @@
       });
     }
   });
+
+  // ── Shared render function ───────────────────────────────────
+  function renderStatus(res, identifierLabel) {
+    const errEl  = document.getElementById('query-error');
+    const panel  = document.getElementById('result-panel');
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = 'none';
+
+    if (res && res.success && res.found !== false) {
+      const d = res.data || res;
+      const status = (d.status || '').trim().toLowerCase();
+      const resIcon = document.getElementById('res-icon');
+      const resMsg  = document.getElementById('res-msg');
+      const approvedAssets = document.getElementById('approved-assets');
+
+      document.getElementById('res-name').textContent = d.name || 'Operative';
+      document.getElementById('res-identifier').textContent = d.email || identifierLabel || '';
+      document.getElementById('res-status-text').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+
+      resIcon.className = 'result-icon ' + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
+      resMsg.className  = 'status-msg '  + (status === 'confirmed' || status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending');
+
+      if (status === 'pending') {
+        resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+        resMsg.textContent = 'Your application is currently under review. This process typically takes 24–48 hours. We will notify you once verified.';
+        approvedAssets.classList.add('hidden');
+      } else if (status === 'confirmed' || status === 'approved') {
+        resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        resMsg.innerHTML  = '<strong>Access Granted.</strong> Welcome to the collective. Your operative ID is generated below.';
+        const opId = d.operativeId || 'INVX-XX';
+        document.getElementById('card-name').textContent   = d.name || 'Operative';
+        document.getElementById('card-college').textContent = d.college || 'Yenepoya University';
+        document.getElementById('card-id').textContent     = opId;
+        document.getElementById('card-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified_' + opId;
+        let actionRow = document.querySelector('.action-row');
+        if ((d.forgeAccess || d.forgeRole || '').trim().toLowerCase() === 'granted') {
+          if (!document.getElementById('forge-ops-btn')) {
+            actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html?id=${opId}" class="btn-magnetic" style="background:#fff;color:#111;margin-top:12px;border:1px solid rgba(0,0,0,0.1);width:100%;text-align:center;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Dashboard</a>`);
+          }
+        }
+        approvedAssets.classList.remove('hidden');
+      } else if (status === 'rejected') {
+        resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+        resMsg.innerHTML  = 'Your application has been <strong>rejected</strong> due to invalid information or payment verification failure.';
+        approvedAssets.classList.add('hidden');
+      } else {
+        resIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+        resMsg.textContent = 'Status unknown. Please contact support.';
+        approvedAssets.classList.add('hidden');
+      }
+
+      panel.classList.remove('hidden');
+      panel.style.opacity = '0';
+      panel.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        panel.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        panel.style.opacity = '1';
+        panel.style.transform = 'translateY(0)';
+      }, 50);
+    } else {
+      errEl.textContent = 'No record found. Check your details and try again.';
+      errEl.style.display = 'block';
+    }
+  }
+
+  // ── Manual search handler ────────────────────────────────────
+  async function handleManualSearch() {
+    const q = (document.getElementById('manual-query-input').value || '').trim();
+    const errEl   = document.getElementById('query-error');
+    const spinner = document.getElementById('loading-spinner');
+    errEl.style.display = 'none';
+    if (!q) { errEl.textContent = 'Please enter an ID, email, phone, or UTR.'; errEl.style.display = 'block'; return; }
+    spinner.style.display = 'block';
+
+    try {
+      let paramKey = 'email';
+      if (q.toUpperCase().startsWith('INVX-')) paramKey = 'id';
+      else if (/^\d{7,}$/.test(q)) paramKey = (q.length >= 10 ? 'utr' : 'phone');
+      else if (/^\d{10}$/.test(q)) paramKey = 'phone';
+
+      const url = window.SCRIPT_URL + '?' + paramKey + '=' + encodeURIComponent(q);
+      const res = await gasGet(url);
+      renderStatus(res, q);
+    } catch(e) {
+      spinner.style.display = 'none';
+      errEl.textContent = 'An error occurred. Please try again.';
+      errEl.style.display = 'block';
+    }
+  }
 
 </script>
 </body>

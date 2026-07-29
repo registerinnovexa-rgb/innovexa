@@ -15,8 +15,17 @@ async function gasGet(gasUrl) {
   const timer = setTimeout(() => ctrl.abort(), 40000);
 
   try {
-    const proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
-    const r2   = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal });
+    // Extract query params from the full GAS URL and pass them to the proxy
+    let proxyUrl;
+    if (gasUrl && gasUrl.includes('?')) {
+      // Parse the query string from the GAS URL and forward it to /api/proxy
+      const qIndex = gasUrl.indexOf('?');
+      const queryString = gasUrl.substring(qIndex); // e.g. ?email=foo&action=bar
+      proxyUrl = '/api/proxy' + queryString;
+    } else {
+      proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
+    }
+    const r2 = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(timer);
     return await r2.json();
   } catch (err) {
