@@ -1681,27 +1681,76 @@ function notifySuperAdmin(subject, body) {
 }
 
 
+
 // ==========================================
-// MIGRATION SCRIPT: Run this ONCE to randomize existing IDs
+// MIGRATION SCRIPT: Run this ONCE to upgrade all existing IDs
+// to the new 4-char unambiguous alphanumeric format (INVX-XXXX)
+// HOW TO RUN: Open Apps Script editor → select "MIGRATION_UpgradeAllIDsToNew4Char" → click Run
 // ==========================================
-function MIGRATION_UpdateAllIDsToRandom() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registrations") || SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-  var data = sheet.getDataRange().getValues();
-  
-  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  
-  // Start from row 2 (index 1) to skip headers
+function MIGRATION_UpgradeAllIDsToNew4Char() {
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Members') || ss.getSheetByName('Registrations') || ss.getSheets()[0];
+  var data  = sheet.getDataRange().getValues();
+
+  var chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no ambiguous: 0,O,1,I,L
+
+  // Build a mapping: oldId → newId
+  var idMap = {};
+  var usedIds = [];
+
+  // First pass: generate new IDs for every member
   for (var i = 1; i < data.length; i++) {
-    var currentId = data[i][12]; // Column M is index 12
-    if (currentId && String(currentId).startsWith("INVX-")) {
+    var oldId = String(data[i][12] || '').trim().toUpperCase();
+    if (!oldId || !oldId.startsWith('INVX-')) continue;
+
+    // Generate unique 4-char ID
+    var newId;
+    do {
       var randomStr = '';
-      for (var k = 0; k < 5; k++) {
+      for (var k = 0; k < 4; k++) {
         randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
       }
-      var newId = 'INVX-' + randomStr;
-      
-      // Update Column M (which is column number 13)
-      sheet.getRange(i + 1, 13).setValue(newId);
-    }
+      newId = 'INVX-' + randomStr;
+    } while (usedIds.indexOf(newId) !== -1);
+
+    usedIds.push(newId);
+    idMap[oldId] = newId;
+
+    // Update Column M (13) in Members sheet
+    sheet.getRange(i + 1, 13).setValue(newId);
+    Logger.log('Remapped: ' + oldId + ' → ' + newId);
   }
+
+  // Second pass: update Operative_Audit_Logs (col B = OperativeID)
+  try {
+    var logSheet = ss.getSheetByName('Operative_Audit_Logs');
+    if (logSheet) {
+      var logData = logSheet.getDataRange().getValues();
+      for (var j = 1; j < logData.length; j++) {
+        var logId = String(logData[j][1] || '').trim().toUpperCase();
+        if (idMap[logId]) {
+          logSheet.getRange(j + 1, 2).setValue(idMap[logId]);
+        }
+      }
+    }
+  } catch(e) { Logger.log('Log sheet update error: ' + e); }
+
+  // Third pass: update Forge_Tasks if exists (col 3 = OperativeId)
+  try {
+    var taskSheet = ss.getSheetByName('Forge_Tasks');
+    if (taskSheet) {
+      var taskData = taskSheet.getDataRange().getValues();
+      for (var t = 1; t < taskData.length; t++) {
+        var taskId = String(taskData[t][3] || '').trim().toUpperCase();
+        if (idMap[taskId]) {
+          taskSheet.getRange(t + 1, 4).setValue(idMap[taskId]);
+        }
+      }
+    }
+  } catch(e) { Logger.log('Task sheet update error: ' + e); }
+
+  SpreadsheetApp.flush();
+  Logger.log('✅ Migration complete. ' + Object.keys(idMap).length + ' IDs updated.');
+  SpreadsheetApp.getUi().alert('✅ Migration complete!\n\n' + Object.keys(idMap).length + ' member IDs upgraded to new 4-char format.\n\nCheck the Apps Script logs for the full mapping.');
 }
+
