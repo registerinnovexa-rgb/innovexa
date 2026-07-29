@@ -697,15 +697,8 @@
       }
       
 
-      // Fetch current member count to assign next sequential ID
-      let nextNum = '??';
-      try {
-        const countRes = await fetch('https://innovexareg.vercel.app/api/proxy?action=count&_t=' + Date.now(), { cache: 'no-store' });
-        const countData = await countRes.json();
-        const count = parseInt(countData.count || countData.data || 0);
-        if (!isNaN(count)) nextNum = String(count + 1).padStart(2, '0');
-      } catch(_) {}
-      const genId = 'INVX-' + nextNum;
+      // Use the actual alphanumeric Operative ID returned by the backend
+      const genId = (result.data && result.data.operativeId) ? result.data.operativeId : 'INVX-?????';
       document.getElementById('generated-id').textContent = genId;
       document.getElementById('form-container').classList.add('hidden');
       document.getElementById('success-screen').classList.remove('hidden');

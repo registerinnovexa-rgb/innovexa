@@ -1532,13 +1532,19 @@ function doPost(e) {
         }
       }
 
-      // Generate a Random 5-character Alphanumeric ID
-      var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      var randomStr = '';
-      for (var k = 0; k < 5; k++) {
-        randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      var operativeId = 'INVX-' + randomStr;
+      // Generate a unique 4-character alphanumeric ID (no ambiguous chars: 0,O,1,I,L)
+      var chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      var operativeId, isDuplicate;
+      var existingIds = rows.map(function(r) { return String(r[12] || '').trim().toUpperCase(); });
+      do {
+        var randomStr = '';
+        for (var k = 0; k < 4; k++) {
+          randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        operativeId = 'INVX-' + randomStr;
+        isDuplicate = existingIds.indexOf(operativeId) !== -1;
+      } while (isDuplicate);
+
 
 
       sheet.appendRow([
