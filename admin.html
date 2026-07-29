@@ -1585,9 +1585,9 @@ function renderAuditLogs(logs) {
 function filterLogs() {
   const query = document.getElementById('logSearchInput').value.toLowerCase();
   const filtered = allAuditLogs.filter(L => 
-    (L.operativeId || '').toLowerCase().includes(query) ||
-    (L.name || '').toLowerCase().includes(query) ||
-    (L.description || '').toLowerCase().includes(query)
+    String(L.operativeId || '').toLowerCase().includes(query) ||
+    String(L.name || '').toLowerCase().includes(query) ||
+    String(L.description || '').toLowerCase().includes(query)
   );
   renderAuditLogs(filtered);
 }
@@ -2053,7 +2053,7 @@ function broadcastEmail() {
   const statusFilter = document.getElementById('memberStatusFilter').value;
   
   let filtered = cachedMembers.filter(m => {
-    const matchesQuery = (m.name||'').toLowerCase().includes(emailQuery) || (m.email||'').toLowerCase().includes(emailQuery) || (m.operativeId||'').toLowerCase().includes(emailQuery);
+    const matchesQuery = String(m.name||'').toLowerCase().includes(emailQuery) || String(m.email||'').toLowerCase().includes(emailQuery) || String(m.operativeId||'').toLowerCase().includes(emailQuery);
     const mStatus = (m.status||'').trim().toLowerCase();
     const matchesStatus = (statusFilter === 'all') || 
                           (statusFilter === 'pending' && !mStatus.includes('confirmed')) ||
@@ -2515,7 +2515,7 @@ function applyMemberFilters() {
   const statusFilter = document.getElementById('memberStatusFilter').value;
   
   let filtered = cachedMembers.filter(m => {
-    const matchesQuery = (m.name||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q) || (m.operativeId||'').toLowerCase().includes(q);
+    const matchesQuery = String(m.name||'').toLowerCase().includes(q) || String(m.email||'').toLowerCase().includes(q) || String(m.operativeId||'').toLowerCase().includes(q);
     const mStatus = (m.status||'').trim().toLowerCase();
     
     if (statusFilter === 'pending' && mStatus !== 'pending') return false;
