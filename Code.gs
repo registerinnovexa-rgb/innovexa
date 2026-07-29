@@ -1621,7 +1621,7 @@ function notifySuperAdmin(subject, body) {
   // Send Email
   try {
     MailApp.sendEmail({
-      to: 'akash528tmy@gmail.com',
+      to: 'updates.innovexa@zohomail.in',
       subject: subject,
       body: body
     });
