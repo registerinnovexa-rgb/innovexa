@@ -1165,7 +1165,9 @@ function doPost(e) {
     if (op === 'admin_create_task') {
       var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
       var taskId = 'TSK-' + Date.now();
-      tasksSheet.appendRow([taskId, timestamp, payload.title, payload.description, payload.xp, payload.difficulty, 'Open', payload.assignedTo || 'Open', '', '']);
+      var assignedTo = payload.assignedTo || 'Open';
+      
+      tasksSheet.appendRow([taskId, timestamp, payload.title, payload.description, payload.xp, payload.difficulty, 'Open', assignedTo, '', '']);
       SpreadsheetApp.flush();
       
       notifySuperAdmin(
@@ -1174,8 +1176,53 @@ function doPost(e) {
         'Title: ' + payload.title + '\n' +
         'XP: ' + payload.xp + '\n' +
         'Difficulty: ' + payload.difficulty + '\n' +
-        'Assigned To: ' + (payload.assignedTo || 'Open')
+        'Assigned To: ' + assignedTo
       );
+      
+      // Notify assigned members via email with full information
+      if (assignedTo !== 'Open' && assignedTo !== '') {
+        try {
+          var opIds = assignedTo.split(',').map(function(id) { return id.trim().toUpperCase(); });
+          var mSheet = ss.getSheetByName('Members') || ss.getSheetByName('Registrations') || ss.getSheets()[0];
+          var mData = mSheet.getDataRange().getValues();
+          var emailsToNotify = [];
+          
+          for (var mi = 1; mi < mData.length; mi++) {
+            var memId = String(mData[mi][12] || '').trim().toUpperCase(); // OperativeID
+            if (memId && opIds.indexOf(memId) !== -1) {
+              var memEmail = String(mData[mi][2] || '').trim(); // Email
+              if (memEmail && memEmail.indexOf('@') !== -1) {
+                emailsToNotify.push(memEmail);
+              }
+            }
+          }
+          
+          if (emailsToNotify.length > 0) {
+            var subject = 'New Bounty Assigned: ' + payload.title;
+            var body = 'Hello Operative,\n\n' +
+              'A new Forge Bounty has been assigned to you.\n\n' +
+              'MISSION BRIEFING:\n' +
+              '--------------------------------------------------------\n' +
+              'Title       : ' + payload.title + '\n' +
+              'Difficulty  : ' + payload.difficulty + '\n' +
+              'Reward      : ' + payload.xp + ' XP\n' +
+              'Task ID     : ' + taskId + '\n\n' +
+              'FULL DESCRIPTION:\n' + payload.description + '\n' +
+              '--------------------------------------------------------\n\n' +
+              'Please log in to the Forge portal (Innovexa Hub) to view and submit this task.\n\n' +
+              'Good luck,\n' +
+              'Innovexa Hub Administration';
+              
+            MailApp.sendEmail({
+              to: emailsToNotify.join(','),
+              subject: subject,
+              body: body
+            });
+          }
+        } catch (e) {
+          Logger.log('Failed to notify assigned members: ' + e);
+        }
+      }
       
       return respond({ success: true, message: 'Task created.' });
     }
