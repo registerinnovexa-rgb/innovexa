@@ -7,7 +7,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        events: resolve(__dirname, 'events.html'),
         register: resolve(__dirname, 'register.html'),
         status: resolve(__dirname, 'status.html'),
         atlas: resolve(__dirname, 'atlas.html'),
