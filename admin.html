@@ -1446,17 +1446,22 @@ async function adminCreateTask() {
     showToast('Deploying bounty...', 'info');
     await apiWrite('admin_create_task', { title, description: desc, xp, difficulty, assignedTo });
     showToast('Bounty deployed!', 'success');
-    document.getElementById('taskFormCard').style.display = 'none';
+    
+    closeBountyDrawer(); // Close the drawer correctly
+    
+    // Reset form
     document.getElementById('tkTitle').value = '';
     mdeCreate.value('');
     document.getElementById('tkXP').value = '100';
     document.getElementById('tkAssign').value = 'Open';
+    
     await new Promise(r => setTimeout(r, 500));
     loadForgeTasks();
   } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
 
 let adminTasks = [];
+
 async function loadForgeTasks() {
   try {
 
