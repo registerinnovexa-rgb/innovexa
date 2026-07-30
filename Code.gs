@@ -1282,21 +1282,60 @@ function doPost(e) {
           tasksSheet.getRange(i + 1, 10).setValue(payload.feedback || ''); // Feedback
 
           // If approved, grant XP
-          if (payload.status === 'Completed' && rows[i][7] !== 'Open') {
+          var memEmail = '';
+          var newXp = 0;
+          if (rows[i][7] !== 'Open') {
             var assignee = rows[i][7];
-            var xpReward = parseInt(rows[i][4]) || 0;
             var memRows = sheet.getDataRange().getValues();
             for (var m = 1; m < memRows.length; m++) {
               if (String(memRows[m][12]).trim() === String(assignee).trim()) {
-                var currentXp = parseInt(memRows[m][19]) || 0; // Col T = XP
-                var newXp = currentXp + xpReward;
-                sheet.getRange(m + 1, 20).setValue(newXp); // Col T (20)
-                var rank = 'Apprentice';
-                if (newXp >= 1000) rank = 'Elite';
-                else if (newXp >= 300) rank = 'Specialist';
-                sheet.getRange(m + 1, 21).setValue(rank); // Col U (21)
+                memEmail = String(memRows[m][2] || '').trim();
+                
+                if (payload.status === 'Completed') {
+                  var xpReward = parseInt(rows[i][4]) || 0;
+                  var currentXp = parseInt(memRows[m][19]) || 0; // Col T = XP
+                  newXp = currentXp + xpReward;
+                  sheet.getRange(m + 1, 20).setValue(newXp); // Col T (20)
+                  var rank = 'Apprentice';
+                  if (newXp >= 1000) rank = 'Elite';
+                  else if (newXp >= 300) rank = 'Specialist';
+                  sheet.getRange(m + 1, 21).setValue(rank); // Col U (21)
+                }
                 break;
               }
+            }
+            
+            // Send email to operative
+            if (memEmail && memEmail.indexOf('@') !== -1) {
+              try {
+                var taskTitle = rows[i][2];
+                var taskXp = rows[i][4];
+                var reviewStatus = payload.status;
+                var reviewFeedback = payload.feedback || 'No specific feedback provided.';
+                
+                var subj = 'Bounty Review: ' + reviewStatus + ' - ' + taskTitle;
+                var bdy = 'Hello Operative,\n\n' +
+                  'Your submission for the Forge Bounty "' + taskTitle + '" has been reviewed.\n\n' +
+                  'REVIEW RESULTS:\n' +
+                  '--------------------------------------------------------\n' +
+                  'Status      : ' + reviewStatus + '\n';
+                  
+                if (reviewStatus === 'Completed') {
+                  bdy += 'XP Awarded  : ' + taskXp + ' XP\n';
+                  bdy += 'New Total XP: ' + newXp + ' XP\n';
+                }
+                
+                bdy += 'Feedback    : ' + reviewFeedback + '\n' +
+                  '--------------------------------------------------------\n\n' +
+                  'View your profile on the Forge portal for more details.\n\n' +
+                  'Innovexa Hub Administration';
+                  
+                MailApp.sendEmail({
+                  to: memEmail,
+                  subject: subj,
+                  body: bdy
+                });
+              } catch (e) { Logger.log('Failed to notify reviewed operative: ' + e); }
             }
           }
           
