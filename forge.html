@@ -285,19 +285,61 @@
 
     // ══════════════════════════════════════════
     //  API HELPERS
-    // ══════════════════════════════════════════
-    // Fetch from GAS directly — bypasses SSO-blocked Vercel proxy
-    async function gasGet(action, extraParams = {}) {
+    // ── Forge API Cache (Stale-While-Revalidate) ─────────────────
+    const _fCache = {};
+    const _fInflight = {};
+    const F_TTL = 30000;
+    const F_STORE = 'invx_forge_';
+
+    function _fKey(action, params) { return action + '|' + JSON.stringify(params); }
+    function _fLoad(k) { try { const r = localStorage.getItem(F_STORE+k); return r ? JSON.parse(r) : null; } catch(_){return null;} }
+    function _fSave(k, e) { try { localStorage.setItem(F_STORE+k, JSON.stringify(e)); } catch(_){} }
+
+    async function _gasFetch(action, extraParams = {}) {
       const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
       const gasUrl = MAIN_SCRIPT_URL + '?' + params.toString();
-      try {
-        const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
-        const text = await r.text();
-        try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
-      } catch (e) {
-        throw e;
-      }
+      const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
+      const text = await r.text();
+      try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
     }
+
+    async function gasGet(action, extraParams = {}, { forceRefresh = false } = {}) {
+      // Write/auth actions — never cache
+      const noCache = ['forge_request_login_code','forge_verify_otp','forge_log_action','forge_submit_task','forge_request_doc','forge_request_cert'];
+      if (noCache.includes(action) || Object.keys(extraParams).some(k => ['otp','invxId','operativeId'].includes(k) && action !== 'forge_get_profile')) {
+        return _gasFetch(action, extraParams);
+      }
+
+      const key = _fKey(action, extraParams);
+      const now = Date.now();
+
+      if (!forceRefresh && _fCache[key] && (now - _fCache[key].ts) < F_TTL) return _fCache[key].data;
+
+      const stored = _fLoad(key);
+      if (!forceRefresh && stored && (now - stored.ts) < F_TTL * 10) {
+        _fCache[key] = stored;
+        if (!_fInflight[key]) {
+          _fInflight[key] = _gasFetch(action, extraParams).then(data => {
+            const e = {data, ts: Date.now()}; _fCache[key] = e; _fSave(key, e); delete _fInflight[key];
+          }).catch(() => { delete _fInflight[key]; });
+        }
+        return stored.data;
+      }
+
+      if (_fInflight[key]) return _fInflight[key];
+      _fInflight[key] = _gasFetch(action, extraParams).then(data => {
+        const e = {data, ts: Date.now()}; _fCache[key] = e; _fSave(key, e); delete _fInflight[key]; return data;
+      }).catch(err => { delete _fInflight[key]; throw err; });
+      return _fInflight[key];
+    }
+
+    function invalidateForgeCache(action, params={}) {
+      const k = _fKey(action, params);
+      delete _fCache[k];
+      try { localStorage.removeItem(F_STORE+k); } catch(_) {}
+    }
+    // ─────────────────────────────────────────────────────────────
+
     
     // Telemetry Logger
     function logAction(actionDesc) {
@@ -515,7 +557,14 @@
       switchTab('dashboard');
       loadFeed();
       loadSessions();
+
+      // Prefetch other tabs in background so switching is instant
+      setTimeout(() => {
+        gasGet('forge_get_resources').catch(() => {});
+        gasGet('forge_get_tasks', { operativeId: session.operativeId }).catch(() => {});
+      }, 800);
     }
+
 
     // ══════════════════════════════════════════
     //  TABS

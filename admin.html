@@ -1086,21 +1086,92 @@ function driveImgUrl(url) {
   return url;
 }
 
-async function apiGet(action, params = {}) {
+// ── API Cache (Stale-While-Revalidate) ──────────────────────────────────────
+const _apiCache = {};          // in-memory: { key: { data, ts } }
+const _apiInflight = {};       // dedup: { key: Promise }
+const CACHE_TTL   = 30000;     // 30s — show stale, refresh in background
+const CACHE_STORE = 'invx_api_cache'; // localStorage key prefix
+
+function _cacheKey(action, params) {
+  return action + '|' + JSON.stringify(params);
+}
+function _loadFromStorage(key) {
+  try {
+    const raw = localStorage.getItem(CACHE_STORE + key);
+    if (raw) return JSON.parse(raw);
+  } catch(_) {}
+  return null;
+}
+function _saveToStorage(key, entry) {
+  try { localStorage.setItem(CACHE_STORE + key, JSON.stringify(entry)); } catch(_) {}
+}
+
+async function _fetchFresh(action, params) {
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  
   let qString = `action=${action}&_t=${Date.now()}`;
   for (const [k, v] of Object.entries(params)) {
     qString += `&${k}=${encodeURIComponent(v)}`;
   }
-  
   const gasUrl = encodeURIComponent(`${baseUrl}?${qString}`);
-  
   const r = await fetch(`/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
   const text = await r.text();
   try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
 }
+
+async function apiGet(action, params = {}, { forceRefresh = false } = {}) {
+  const key = _cacheKey(action, params);
+  const now = Date.now();
+
+  // 1. Return from memory cache instantly if fresh
+  if (!forceRefresh && _apiCache[key] && (now - _apiCache[key].ts) < CACHE_TTL) {
+    return _apiCache[key].data;
+  }
+
+  // 2. Return from localStorage instantly (stale), then refresh in background
+  const stored = _loadFromStorage(key);
+  if (!forceRefresh && stored && (now - stored.ts) < CACHE_TTL * 10) {
+    _apiCache[key] = stored; // promote to memory
+    // Background refresh without awaiting
+    _refreshInBackground(action, params, key);
+    return stored.data;
+  }
+
+  // 3. Deduplicate in-flight requests for same key
+  if (_apiInflight[key]) return _apiInflight[key];
+
+  _apiInflight[key] = _fetchFresh(action, params).then(data => {
+    const entry = { data, ts: Date.now() };
+    _apiCache[key] = entry;
+    _saveToStorage(key, entry);
+    delete _apiInflight[key];
+    return data;
+  }).catch(err => {
+    delete _apiInflight[key];
+    throw err;
+  });
+
+  return _apiInflight[key];
+}
+
+function _refreshInBackground(action, params, key) {
+  if (_apiInflight[key]) return; // already refreshing
+  _apiInflight[key] = _fetchFresh(action, params).then(data => {
+    const entry = { data, ts: Date.now() };
+    _apiCache[key] = entry;
+    _saveToStorage(key, entry);
+    delete _apiInflight[key];
+  }).catch(() => { delete _apiInflight[key]; });
+}
+
+// Call this after any write operation to invalidate stale cache
+function invalidateCache(action, params = {}) {
+  const key = _cacheKey(action, params);
+  delete _apiCache[key];
+  try { localStorage.removeItem(CACHE_STORE + key); } catch(_) {}
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 
 async function apiWrite(op, payload) {
   payload.op = op;
@@ -1115,12 +1186,36 @@ async function apiWrite(op, payload) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUrl: targetScript, payload: payload })
     });
-    return await res.json();
+    const result = await res.json();
+
+    // Invalidate related read caches after write
+    const cacheMap = {
+      updateStatus:          ['adminMembers'],
+      admin_grant_forge_access: ['adminMembers'],
+      admin_set_role:        ['adminMembers'],
+      admin_update_profile:  ['adminMembers', 'admin_get_member_detail'],
+      admin_create_task:     ['admin_get_tasks'],
+      admin_review_task:     ['admin_get_tasks'],
+      admin_edit_task:       ['admin_get_tasks'],
+      admin_delete_task:     ['admin_get_tasks'],
+      addAsset:              ['assets'],
+      borrowAsset:           ['assets'],
+      returnAsset:           ['assets'],
+      docApprove:            ['docrequests'],
+      certApprove:           ['certreqs'],
+      addEvent:              ['events'],
+      editEvent:             ['events'],
+      deleteEvent:           ['events'],
+    };
+    (cacheMap[op] || []).forEach(a => invalidateCache(a));
+
+    return result;
   } catch (e) {
     console.error('API Write Error:', e);
     throw e;
   }
 }
+
 
 function statusBadge(s) {
   const st = (s||'').toLowerCase();
@@ -1186,12 +1281,20 @@ function showDashboard() {
   
   // Show Role Mgmt if president
   if (adminSession.role === 'president') {
-    const rmBtn = document.getElementById('navRoleMgmt');
+    const rmBtn = document.getElementById('navRoleMgmt');\
     if (rmBtn) rmBtn.style.display = 'flex';
   }
   
   loadOverview();
+
+  // Prefetch all major tabs in background so switching is instant
+  setTimeout(() => {
+    ['adminMembers', 'admin_get_tasks', 'admin_get_audit_logs', 'assets', 'docrequests', 'certreqs', 'forge_get_resources', 'team'].forEach(action => {
+      apiGet(action).catch(() => {});
+    });
+  }, 500);
 }
+
 
 // ══════════════════════════════════════════════════════════════
 //  ROLE MANAGEMENT

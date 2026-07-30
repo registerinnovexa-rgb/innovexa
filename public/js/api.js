@@ -1,44 +1,91 @@
 /**
  * Innovexa Hub — Shared API Helper
- * Uses /api/proxy (Vercel serverless) for GET requests to avoid CORS.
- * Uses no-cors direct POST for write operations.
- * Load as plain script: <script src="/js/api.js"></script>
+ * Stale-While-Revalidate cache: returns localStorage data instantly,
+ * then refreshes in background. Tab switches and reloads feel instant.
  */
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
 
-// ── GET via server-side proxy ────────────────────────────────────
-// Passes all query params through /api/proxy so the browser
-// never directly touches GAS (avoids CORS block entirely).
-async function gasGet(gasUrl) {
-  const ctrl  = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 40000);
+// ── Cache layer ──────────────────────────────────────────────────
+const _gc    = {};          // in-memory cache { url: { data, ts } }
+const _gInfl = {};          // in-flight dedup { url: Promise }
+const G_TTL  = 30000;       // 30s fresh window
+const G_STALE = G_TTL * 10; // 5min stale window (show instantly, refresh bg)
+const G_NS   = 'invx_gc_';  // localStorage namespace
 
+function _gLoad(k) {
+  try { const r = localStorage.getItem(G_NS+k); return r ? JSON.parse(r) : null; } catch(_) { return null; }
+}
+function _gSave(k, e) {
+  try { localStorage.setItem(G_NS+k, JSON.stringify(e)); } catch(_) {}
+}
+async function _gFetch(gasUrl) {
+  let proxyUrl;
+  if (gasUrl && gasUrl.includes('?')) {
+    const qIndex = gasUrl.indexOf('?');
+    proxyUrl = '/api/proxy' + gasUrl.substring(qIndex);
+  } else {
+    proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
-    // Extract query params from the full GAS URL and pass them to the proxy
-    let proxyUrl;
-    if (gasUrl && gasUrl.includes('?')) {
-      // Parse the query string from the GAS URL and forward it to /api/proxy
-      const qIndex = gasUrl.indexOf('?');
-      const queryString = gasUrl.substring(qIndex); // e.g. ?email=foo&action=bar
-      proxyUrl = '/api/proxy' + queryString;
-    } else {
-      proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
-    }
-    const r2 = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
+    const r = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(timer);
-    return await r2.json();
+    return await r.json();
   } catch (err) {
     clearTimeout(timer);
-    console.error("gasGet proxy failed:", err);
     // Fallback: direct fetch
     try {
-      const r3 = await fetch(gasUrl, { method: 'GET', redirect: 'follow' });
-      return await r3.json();
-    } catch(e) {
-      throw err;
-    }
+      const r2 = await fetch(gasUrl, { method: 'GET', redirect: 'follow' });
+      return await r2.json();
+    } catch(e) { throw err; }
   }
+}
+
+// ── GET via server-side proxy with SWR cache ─────────────────────
+async function gasGet(gasUrl, { forceRefresh = false } = {}) {
+  const key = gasUrl.replace(/[&?]_t=\d+/g, ''); // strip timestamp for stable key
+  const now = Date.now();
+
+  // 1. Memory cache — instant
+  if (!forceRefresh && _gc[key] && (now - _gc[key].ts) < G_TTL) {
+    return _gc[key].data;
+  }
+
+  // 2. localStorage cache — instant + background refresh
+  const stored = _gLoad(key);
+  if (!forceRefresh && stored && (now - stored.ts) < G_STALE) {
+    _gc[key] = stored;
+    // Refresh in background silently
+    if (!_gInfl[key]) {
+      _gInfl[key] = _gFetch(gasUrl).then(data => {
+        const e = { data, ts: Date.now() };
+        _gc[key] = e; _gSave(key, e); delete _gInfl[key];
+      }).catch(() => { delete _gInfl[key]; });
+    }
+    return stored.data;
+  }
+
+  // 3. Deduplicate concurrent requests for same URL
+  if (_gInfl[key]) return _gInfl[key];
+
+  _gInfl[key] = _gFetch(gasUrl).then(data => {
+    const e = { data, ts: Date.now() };
+    _gc[key] = e; _gSave(key, e); delete _gInfl[key]; return data;
+  }).catch(err => { delete _gInfl[key]; throw err; });
+
+  return _gInfl[key];
+}
+
+// Call after writes to bust cache for a URL pattern
+function invalidateGasCache(urlPattern) {
+  Object.keys(_gc).forEach(k => { if (k.includes(urlPattern)) delete _gc[k]; });
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith(G_NS) && k.includes(urlPattern)) localStorage.removeItem(k);
+    });
+  } catch(_) {}
 }
 
 // ── POST direct or proxy ────────────────────────────────────────
@@ -46,8 +93,7 @@ async function gasPost(url, payload) {
   const ctrl  = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
-    const proxyUrl = '/api/proxy';
-    const r2 = await fetch(proxyUrl, {
+    const r2 = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUrl: url, payload }),
@@ -57,7 +103,6 @@ async function gasPost(url, payload) {
     return await r2.json();
   } catch (err) {
     clearTimeout(timer);
-    // Fallback: direct no-cors fetch
     try {
       await fetch(url, {
         method:  'POST',
@@ -66,15 +111,14 @@ async function gasPost(url, payload) {
         body:    JSON.stringify(payload),
       });
       return { success: true, message: 'Submitted successfully (no-cors)' };
-    } catch (e) {
-      throw err;
-    }
+    } catch (e) { throw err; }
   }
 }
 
 // Export for global use
 window.gasGet = gasGet;
 window.gasPost = gasPost;
+window.invalidateGasCache = invalidateGasCache;
 window.SCRIPT_URL = SCRIPT_URL;
 
 // ── Toast ────────────────────────────────────────────────────────
