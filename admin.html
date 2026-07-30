@@ -1249,21 +1249,20 @@ async function handleLogin() {
   btn.textContent = 'Authenticating...';
   
   try {
-    // Simulate network delay
-    await new Promise(r => setTimeout(r, 800));
+    const res = await apiGet('admin_login', { invxId: user, email: pass });
     
-    if (user === 'admin@innovexa' && pass === 'adminpass') {
+    if (res.success) {
       // Login successful
       adminSession = {
-        id: 'INVX-01',
-        email: 'admin@invx',
-        name: 'Master Admin',
-        role: 'president'
+        id: res.data.operativeId,
+        email: user, // They logged in with this
+        name: res.data.name,
+        role: res.data.role
       };
       sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
       showDashboard();
     } else {
-      throw new Error('Invalid username or password.');
+      throw new Error(res.message || 'Invalid username or password.');
     }
   } catch (e) {
     console.error(e);
