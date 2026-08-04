@@ -22,11 +22,6 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Vercel Edge Cache: Cache successful GET requests for 60 seconds
-      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
-      res.removeHeader('Pragma');
-      res.removeHeader('Expires');
-      
       // Build GAS URL — forward all query params except 'url' wrapper
       const params = { ...req.query };
       delete params.url; // remove internal routing param if present
@@ -38,6 +33,18 @@ export default async function handler(req, res) {
       const targetUrl = params._gasUrl
         ? decodeURIComponent(params._gasUrl)
         : GAS_BASE + queryString;
+
+      // User-specific lookups must NEVER be cached at the CDN level
+      const isPersonalLookup = params.email || params.id || params.phone || params.utr || params.invxId;
+      if (isPersonalLookup) {
+        // No cache — always fresh
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      } else {
+        // Generic/public endpoints — allow short Vercel Edge cache
+        res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=15');
+        res.removeHeader('Pragma');
+        res.removeHeader('Expires');
+      }
 
       const gasRes = await fetch(targetUrl, {
         method: 'GET',
