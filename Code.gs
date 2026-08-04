@@ -720,6 +720,71 @@ function doPost(e) {
     var p = payload;
     var timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
+    // PUBLIC: Status Check
+    if (action === 'status_check') {
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row        = rows[i];
+        var rowEmail   = String(row[2] || '').trim().toLowerCase();
+        var rowPhone   = String(row[3] || '').trim();
+        var rowUtr     = String(row[9] || '').trim();
+        var rowId      = String(row[12] || '').trim().toUpperCase();
+        
+        var matchEmail = p.email && rowEmail === String(p.email).trim().toLowerCase();
+        var matchPhone = p.phone && rowPhone === String(p.phone).trim();
+        var matchUtr   = p.utr   && rowUtr   === String(p.utr).trim();
+        var matchId    = p.id    && rowId    === String(p.id).trim().toUpperCase();
+
+        if (matchEmail || matchUtr || matchPhone || matchId) {
+          // Notify admin that member checked their status
+          try {
+            notifySuperAdmin(
+              '[STATUS CHECK] ' + String(row[1] || 'Unknown') + ' (' + String(row[12] || '') + ')',
+              'A member has checked their application status.\n\n' +
+              'Name: ' + String(row[1] || '') + '\n' +
+              'Operative ID: ' + String(row[12] || '') + '\n' +
+              'Email: ' + String(row[2] || '') + '\n' +
+              'Phone: ' + String(row[3] || '') + '\n' +
+              'College: ' + String(row[22] || '') + '\n' +
+              'Branch & Year: ' + String(row[5] || '') + ' - ' + String(row[4] || '') + '\n' +
+              'Current Status: ' + String(row[10] || 'Pending') + '\n' +
+              'Forge Access: ' + String(row[18] || 'Not Granted') + '\n' +
+              'Rank: ' + String(row[20] || 'Apprentice') + '\n' +
+              'Squad: ' + String(row[21] || 'Unassigned') + '\n' +
+              'XP: ' + String(row[19] || '0') + '\n\n' +
+              'Time: ' + new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            );
+          } catch(e) {}
+          return respond({
+            success: true,
+            found:   true,
+            data: {
+              name:           String(row[1]  || ''),
+              email:          String(row[2]  || ''),
+              phone:          String(row[3]  || ''),
+              year:           String(row[4]  || ''),
+              branch:         String(row[5]  || ''),
+              skillLevel:     String(row[6]  || ''),
+              dob:            String(row[7]  || ''),
+              interests:      String(row[8]  || ''),
+              utr:            String(row[9]  || ''),
+              status:         String(row[10] || 'Pending'),
+              amount:         String(row[11] || ''),
+              operativeId:    String(row[12] || ''),
+              photoUrl:       String(row[13] || ''),
+              paymentProofUrl:String(row[14] || ''),
+              gender:         String(row[15] || ''),
+              forgeRole:      String(row[16] || ''),
+              linkedMentor:   String(row[17] || ''),
+              forgeAccess:    String(row[18] || ''),
+              college:        String(row[22] || '')
+            }
+          });
+        }
+      }
+      return respond({ success: true, found: false, message: 'No record found.' });
+    }
+
     // FORGE: Request Login OTP
     if (action === 'forge_request_otp') {
       if (!p.invxId) return respond({ success: false, message: 'Missing Operative ID.' });
@@ -1108,8 +1173,8 @@ function doPost(e) {
         var row = rows[i];
         var rowOpId = String(row[12] || '').trim().toUpperCase();
         if (rowOpId === String(p.invxId).trim().toUpperCase()) {
-          // Save to column R (18th column)
-          sheet.getRange(i + 1, 18).setValue(p.descriptor);
+          // Save to column AC (29th column) for Face Descriptor
+          sheet.getRange(i + 1, 29).setValue(p.descriptor);
           return respond({ success: true, message: 'Biometrics saved successfully.' });
         }
       }
