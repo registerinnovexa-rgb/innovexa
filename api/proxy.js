@@ -313,7 +313,7 @@ export default async function handler(req, res) {
     // ADMIN: Get Members
     if (action === 'adminMembers') {
       const members = await Member.find({}).sort({ rowIndex: 1 }).lean();
-      return res.status(200).json({ success: true, data: members });
+      return res.status(200).json({ success: true, members: members });
     }
 
     // FORGE: Get Member Profile
