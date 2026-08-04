@@ -188,6 +188,10 @@ export default async function handler(req, res) {
     if (action === 'register_member') {
         const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr } = payload;
         
+        if (!email || !fullName) {
+          return res.status(200).json({ success: false, message: 'Missing required fields (Email/Name).' });
+        }
+
         // Basic check for existing
         const existing = await Member.findOne({ email: email.trim().toLowerCase() });
         if (existing) {
