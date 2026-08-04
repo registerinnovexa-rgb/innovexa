@@ -67,18 +67,6 @@ function doGet(e) {
         var matchId    = p.id    && rowId    === String(p.id).trim().toUpperCase();
 
         if (matchEmail || matchUtr || matchPhone || matchId) {
-          notifySuperAdmin(
-            'Operative Status Checked: ' + String(row[1] || ''),
-            'A member has checked their application status.\n\n' +
-            'Name: ' + String(row[1] || '') + '\n' +
-            'Email: ' + String(row[2] || '') + '\n' +
-            'Phone: ' + String(row[3] || '') + '\n' +
-            'Operative ID: ' + String(row[12] || '') + '\n' +
-            'Status: ' + String(row[10] || 'Pending') + '\n' +
-            'Forge Access: ' + String(row[18] || '') + '\n' +
-            'Rank: ' + String(row[20] || '') + '\n' +
-            'Squad: ' + String(row[21] || '')
-          );
           return respond({
             success: true,
             found:   true,

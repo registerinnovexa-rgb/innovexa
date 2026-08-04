@@ -249,7 +249,7 @@
       const email = payload.email;
       if (!email) throw new Error("No email found in Google response.");
       const url = window.SCRIPT_URL + '?email=' + encodeURIComponent(email);
-      const res = await gasGet(url);
+      const res = await gasGet(url, { forceRefresh: true });
       renderStatus(res, email);
     } catch(e) {
       spinner.style.display = 'none';
