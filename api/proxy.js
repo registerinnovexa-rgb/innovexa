@@ -243,11 +243,13 @@ export default async function handler(req, res) {
       
       if (action === 'forge_get_my_tasks') {
         if (!invxId) return res.status(200).json({ success: false, message: 'Missing operative ID.' });
-        query.assignedTo = invxId.trim().toUpperCase();
+        // Match tasks assigned to this user OR open tasks
+        query = { $or: [{ assignedTo: invxId.trim().toUpperCase() }, { assignedTo: 'Open' }] };
       }
 
       const tasks = await Task.find(query).sort({ timestamp: -1 }).lean();
-      return res.status(200).json({ success: true, data: tasks });
+      // Return both `tasks` (for admin) and `data` (for forge)
+      return res.status(200).json({ success: true, tasks: tasks, data: tasks });
     }
 
     // FORGE: Submit Task
@@ -344,10 +346,10 @@ export default async function handler(req, res) {
       });
     }
 
-    // ADMIN: Get Audit Logs
+    // ADMIN: Audit Logs
     if (action === 'admin_get_audit_logs') {
       const logs = await ActionLog.find({}).sort({ timestamp: -1 }).limit(500).lean();
-      return res.status(200).json({ success: true, logs: logs });
+      return res.status(200).json({ success: true, logs: logs, data: logs });
     }
 
     // FORGE: Get Member Profile
@@ -554,7 +556,7 @@ export default async function handler(req, res) {
     // FORGE: Get Sessions
     if (action === 'forge_get_sessions') {
       const sessions = await Session.find({}).lean();
-      return res.status(200).json({ success: true, data: sessions });
+      return res.status(200).json({ success: true, data: sessions, sessions: sessions });
     }
 
     // FORGE: Get Resources
@@ -650,13 +652,16 @@ export default async function handler(req, res) {
     }
 
     // EVENTS & ATTENDANCE
-    if (action === 'get_public_events' || action === 'admin_get_events') {
+    // Also support bare 'events' action used in attendance section
+    if (action === 'get_public_events' || action === 'admin_get_events' || action === 'events') {
       const events = await Event.find({}).sort({ timestamp: -1 }).lean();
-      return res.status(200).json({ success: true, data: events });
+      return res.status(200).json({ success: true, data: events, events: events });
     }
     if (action === 'admin_get_attendance') {
-      const attendance = await Attendance.find({}).sort({ timestamp: -1 }).lean();
-      return res.status(200).json({ success: true, data: attendance });
+      const { eventId } = payload;
+      const query = eventId ? { eventId } : {};
+      const attendance = await Attendance.find(query).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: attendance, attendance: attendance });
     }
 
     // MISC missing features
@@ -672,36 +677,47 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, data: roles });
     }
     if (action === 'admin_get_feedback') {
-      const fb = await Feedback.find({}).sort({ timestamp: -1 }).lean();
-      return res.status(200).json({ success: true, data: fb });
+      const { eventId } = payload;
+      const query = eventId ? { eventId } : {};
+      const fb = await Feedback.find(query).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: fb, feedback: fb });
     }
     
-    // NEW ADMIN OPS (Bounties, Events, Broadcasts)
+    // NEW ADMIN OPS (Tasks/Bounties from Admin Dashboard)
+    // Admin creates tasks via 'admin_create_task' — stored in Task collection
+    // These show up as bounties in the forge/bounties view
     if (action === 'admin_create_task') {
       const { title, description, xp, difficulty, assignedTo } = payload;
       const t = new Task({
         taskId: 'TSK-' + Date.now(),
         timestamp: new Date(),
-        title, description, xp, difficulty,
+        title, description,
+        xp: parseInt(xp) || 0,
+        difficulty: difficulty || 'Easy',
         status: 'Open',
         assignedTo: assignedTo || 'Open',
         submitLink: '', feedback: ''
       });
       await t.save();
-      return res.status(200).json({ success: true, message: 'Task created' });
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'TASK_CREATED',
+        content: `Admin created task: ${title} (+${xp} XP)`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Bounty deployed!' });
     }
     if (action === 'admin_edit_task') {
        const { taskId, title, description, xp, difficulty, assignedTo, status } = payload;
        const t = await Task.findOne({ taskId });
-       if (t) {
-         if (title) t.title = title;
-         if (description) t.description = description;
-         if (xp) t.xp = xp;
-         if (difficulty) t.difficulty = difficulty;
-         if (assignedTo !== undefined) t.assignedTo = assignedTo;
-         if (status) t.status = status;
-         await t.save();
-       }
+       if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+       if (title !== undefined) t.title = title;
+       if (description !== undefined) t.description = description;
+       if (xp !== undefined) t.xp = parseInt(xp) || 0;
+       if (difficulty !== undefined) t.difficulty = difficulty;
+       if (assignedTo !== undefined) t.assignedTo = assignedTo;
+       if (status !== undefined) t.status = status;
+       await t.save();
        return res.status(200).json({ success: true, message: 'Task updated' });
     }
     if (action === 'admin_delete_task') {
@@ -712,24 +728,37 @@ export default async function handler(req, res) {
     if (action === 'admin_review_task') {
        const { taskId, status, feedback } = payload;
        const t = await Task.findOne({ taskId });
-       if (t) {
-         t.status = status; // e.g. "Completed" or "Rejected"
-         t.feedback = feedback || '';
-         await t.save();
-         
-         // Award XP if completed
-         if (status === 'Completed' && t.assignedTo && t.assignedTo !== 'Open') {
-           const member = await Member.findOne({ operativeId: t.assignedTo });
-           if (member) {
-             member.xp = (member.xp || 0) + (parseInt(t.xp) || 0);
-             await member.save();
-             const log = new ActionLog({
-               timestamp: new Date(), type: 'TASK_COMPLETED',
-               content: `Admin approved task: ${t.title} (+${t.xp} XP)`,
-               operativeId: member.operativeId, name: member.name
-             });
-             await log.save();
-           }
+       if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+       
+       t.status = status;
+       t.feedback = feedback || '';
+       await t.save();
+       
+       // Award XP if completed and assigned to a specific member
+       if (status === 'Completed' && t.assignedTo && t.assignedTo !== 'Open') {
+         const xpToAward = parseInt(t.xp) || 0;
+         const member = await Member.findOneAndUpdate(
+           { operativeId: t.assignedTo },
+           { $inc: { xp: xpToAward } },
+           { new: true }
+         );
+         if (member) {
+           // Update rank based on XP
+           let rank = 'Apprentice';
+           if (member.xp >= 3000) rank = 'Grandmaster';
+           else if (member.xp >= 1500) rank = 'Expert';
+           else if (member.xp >= 800) rank = 'Advanced';
+           else if (member.xp >= 400) rank = 'Skilled';
+           else if (member.xp >= 150) rank = 'Operative';
+           member.rank = rank;
+           await member.save();
+           
+           const log = new ActionLog({
+             timestamp: new Date(), type: 'TASK_COMPLETED',
+             content: `Task approved: ${t.title} (+${xpToAward} XP)`,
+             operativeId: member.operativeId, name: member.name
+           });
+           await log.save();
          }
        }
        return res.status(200).json({ success: true, message: 'Task reviewed' });
