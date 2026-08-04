@@ -202,17 +202,6 @@
         </div>
       </div>
 
-
-
-      <div class="form-group">
-        <label class="form-label">Profile ID Photo</label>
-        <div class="file-drop" id="photo-drop" style="border:1px dashed rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;">
-          <input type="file" id="photo" accept="image/*" style="display:none;" />
-          <img id="photoPreview" src="" alt="Profile Preview" style="width: 80px; height: 80px; border-radius: 50%; display: none; margin-bottom:12px; object-fit: cover; border: 2px solid var(--accent);" />
-          <div id="photoText" style="color:var(--text3); font-size:13px;">Drag & drop or click to upload photo</div>
-        </div>
-      </div>
-
       <div class="nav-btns">
         <button class="btn-magnetic" id="btn-next">Proceed to Verification →</button>
       </div>
@@ -228,8 +217,6 @@
           <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 12px; font-size:12px; cursor:pointer;" onclick="copyToClipboard('599', this)">Copy</button>
         </div>
 
-
-        
         <div class="qr-wrap">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dgpay-12200845070%40okbizaxis%26pn%3DInnovexa%2520Hub%26am%3D599.00%26cu%3DINR" alt="UPI QR Code" />
         </div>
@@ -244,16 +231,6 @@
       <div class="form-group">
         <label class="form-label">Transaction Reference (UTR)</label>
         <input class="form-control" id="utr" type="text" placeholder="Enter 10-15 digit UTR number" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Payment Proof Screenshot</label>
-        <div class="file-drop" id="payment-drop">
-          <input type="file" id="payment-proof" accept="image/*" />
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;margin:0 auto 12px;opacity:0.5;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-          <div id="payment-text">Drag & drop or click to upload screenshot</div>
-          <div class="form-hint">Format: JPG, PNG. Max size: 2MB.</div>
-        </div>
       </div>
 
       <!-- CAPTCHA -->
@@ -330,17 +307,6 @@
         document.getElementById('email').readOnly = true;
         document.getElementById('email').style.opacity = '0.7';
         document.getElementById('email').style.cursor = 'not-allowed';
-        
-        if (responsePayload.picture) {
-          photoData = responsePayload.picture;
-          const photoPreview = document.getElementById('photoPreview');
-          const photoText = document.getElementById('photoText');
-          if(photoPreview && photoText) {
-            photoPreview.src = photoData;
-            photoPreview.style.display = 'block';
-            photoText.style.display = 'none';
-          }
-        }
         
         // ── Duplicate email check ──
         const email = responsePayload.email || '';
@@ -649,8 +615,6 @@
     if (!utr) { showError('utr', 'UTR is required'); return; }
     if (!/^\d{10,15}$/.test(utr)) { showError('utr', 'UTR must be between 10 and 15 digits'); return; }
 
-    if (!paymentData) { alert('Please upload your payment proof screenshot.'); return; }
-
     const captchaAns = document.getElementById('captcha-answer').value.trim();
     if (captchaAns.toLowerCase() !== currentCaptcha.toLowerCase()) {
       document.getElementById('captcha-error').style.display = 'block';
@@ -665,6 +629,7 @@
     btn.textContent = 'Processing...';
 
     const payload = {
+      action: 'register_member',
       fullName: document.getElementById('fullName').value.trim(),
       email: document.getElementById('email').value.trim(),
       phone: document.getElementById('phone').value.trim(),
@@ -676,9 +641,7 @@
       skillLevel: currentSkill,
       interests: Array.from(selectedInterests).join(', '),
       amount: '599',
-      utr: utr,
-      photoUrl: photoData || '',
-      paymentUrl: paymentData || ''
+      utr: utr
     };
 
     try {

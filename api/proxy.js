@@ -44,6 +44,18 @@ export default async function handler(req, res) {
   try {
     await connectToDatabase();
     
+    // PUBLIC: Counter & Confirmed Ticker
+    if (action === 'count') {
+      const c = await Member.countDocuments({});
+      return res.status(200).json({ success: true, data: { count: c }, count: c });
+    }
+    
+    if (action === 'get_confirmed') {
+      const confirmed = await Member.find({ status: { $in: ['Approved', 'Confirmed'] } }, 'name').lean();
+      const names = confirmed.map(m => m.name);
+      return res.status(200).json({ success: true, names: names });
+    }
+
     // PUBLIC: Status Check
     if (action === 'status_check') {
       const { email, utr, phone, id } = payload;
@@ -53,45 +65,43 @@ export default async function handler(req, res) {
       if (phone) query.push({ phone: phone.trim() });
       if (id) query.push({ operativeId: id.trim().toUpperCase() });
       
-      if (query.length > 0) {
-        const member = await Member.findOne({ $or: query });
-        if (member) {
-          // Log status check
-          const log = new ActionLog({
-            timestamp: new Date(),
-            type: 'STATUS_CHECK',
-            content: `A member has checked their application status.`,
-            operativeId: member.operativeId,
-            name: member.name
-          });
-          await log.save();
+      if (query.length === 0) return res.status(200).json({ success: false, message: 'No search parameters provided.' });
 
-          return res.status(200).json({
-            success: true,
-            found: true,
-            data: {
-              name: member.name,
-              email: member.email,
-              phone: member.phone,
-              year: member.year,
-              branch: member.branch,
-              skillLevel: member.skillLevel,
-              dob: member.dob,
-              interests: member.interests,
-              utr: member.utr,
-              status: member.status,
-              amount: member.amount,
-              operativeId: member.operativeId,
-              photoUrl: member.photoUrl,
-              paymentProofUrl: member.paymentProofUrl,
-              gender: member.gender,
-              forgeRole: member.forgeRole,
-              linkedMentor: member.linkedMentor,
-              forgeAccess: member.forgeAccess,
-              college: member.college
-            }
-          });
-        }
+      const member = await Member.findOne({ $or: query });
+      if (member) {
+        // Log status check
+        const log = new ActionLog({
+          timestamp: new Date(),
+          type: 'STATUS_CHECK',
+          content: `A member has checked their application status.`,
+          operativeId: member.operativeId,
+          name: member.name
+        });
+        await log.save();
+
+        return res.status(200).json({
+          success: true,
+          found: true,
+          data: {
+            name: member.name,
+            email: member.email,
+            phone: member.phone,
+            year: member.year,
+            branch: member.branch,
+            skillLevel: member.skillLevel,
+            dob: member.dob,
+            interests: member.interests,
+            utr: member.utr,
+            status: member.status,
+            amount: member.amount,
+            operativeId: member.operativeId,
+            gender: member.gender,
+            forgeRole: member.forgeRole,
+            linkedMentor: member.linkedMentor,
+            forgeAccess: member.forgeAccess,
+            college: member.college
+          }
+        });
       }
       return res.status(200).json({ success: true, found: false, message: 'No record found.' });
     }
@@ -176,7 +186,52 @@ export default async function handler(req, res) {
     
     // PUBLIC: Registration
     if (action === 'register_member') {
-        return res.status(200).json({ success: false, message: 'Registration migration pending.' });
+        const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr } = payload;
+        
+        // Basic check for existing
+        const existing = await Member.findOne({ email: email.trim().toLowerCase() });
+        if (existing) {
+          return res.status(200).json({ success: false, message: 'A registration with this email already exists.' });
+        }
+        
+        // Generate unique Operative ID
+        let genId = '';
+        let isUnique = false;
+        while (!isUnique) {
+          const rand = Math.floor(10000 + Math.random() * 90000).toString();
+          genId = 'INVX-' + rand;
+          const check = await Member.findOne({ operativeId: genId });
+          if (!check) isUnique = true;
+        }
+
+        const newMember = new Member({
+          operativeId: genId,
+          name: fullName,
+          email: email.trim().toLowerCase(),
+          phone: phone,
+          college: college,
+          dob: dob,
+          year: year,
+          gender: gender,
+          branch: branch,
+          skillLevel: skillLevel,
+          interests: interests,
+          utr: utr,
+          status: 'Pending',
+          amount: '599',
+          xp: 0,
+          rank: 'Apprentice',
+          squad: 'Unassigned',
+          forgeRole: 'Apprentice',
+          forgeAccess: 'Pending'
+        });
+        
+        await newMember.save();
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Registration successful.', 
+          data: { operativeId: genId } 
+        });
     }
     
     // ADMIN: Login
@@ -273,17 +328,17 @@ export default async function handler(req, res) {
         const log = new ActionLog({
           timestamp: new Date(),
           type: 'TASK_SUBMITTED',
-          content: `Operative submitted task ${taskId}`,
+          content: `Operative ${member.name} submitted task: ${task.title}`,
           operativeId: member.operativeId,
           name: member.name
         });
         await log.save();
       }
       
-      return res.status(200).json({ success: true, message: 'Task submitted successfully.' });
+      return res.status(200).json({ success: true, message: 'Task submitted for review.' });
     }
 
-    // FORGE: Get Leaderboard
+    // FORGE: Leaderboard
     if (action === 'forge_get_leaderboard') {
       const members = await Member.find({ status: { $in: ['Approved', 'Confirmed'] } })
         .sort({ xp: -1 })
@@ -318,15 +373,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, members: members });
     }
 
-    // ADMIN: Get Member Detail
+    // ADMIN: Member Details
     if (action === 'admin_get_member_detail') {
       const { operativeId } = payload;
-      if (!operativeId) return res.status(200).json({ success: false, message: 'No operative ID provided' });
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+      
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() }).lean();
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
 
-      const targetId = operativeId.trim().toUpperCase();
-      const logs = await ActionLog.find({ operativeId: targetId }).sort({ timestamp: -1 }).lean();
-      const tasks = await Task.find({ assignedTo: targetId }).sort({ timestamp: -1 }).lean();
-
+      const logs = await ActionLog.find({ operativeId: member.operativeId }).sort({ timestamp: -1 }).lean();
+      const tasks = await Task.find({ assignedTo: member.operativeId }).sort({ timestamp: -1 }).lean();
+      
       let activeTasksCount = 0;
       let completedTasksCount = 0;
       tasks.forEach(t => {
@@ -336,14 +393,101 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        logs: logs,
-        tasks: tasks,
-        stats: {
-          activeTasks: activeTasksCount,
-          completedTasks: completedTasksCount,
-          totalLogs: logs.length
+        data: {
+          member,
+          logs,
+          tasks,
+          stats: {
+            activeTasks: activeTasksCount,
+            completedTasks: completedTasksCount,
+            totalLogs: logs.length
+          }
         }
       });
+    }
+
+    // ADMIN: Manage Member Status
+    if (action === 'updateStatus') {
+      const { email, status } = payload;
+      if (!email || !status) return res.status(200).json({ success: false, message: 'Missing fields.' });
+      
+      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      
+      member.status = status;
+      await member.save();
+      
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'STATUS_UPDATED',
+        content: `Application status updated to: ${status}`,
+        operativeId: member.operativeId, name: member.name
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Status updated to ' + status });
+    }
+
+    // ADMIN: Set Role
+    if (action === 'admin_set_role') {
+      const { email, role } = payload;
+      if (!email || !role) return res.status(200).json({ success: false, message: 'Missing fields.' });
+      
+      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      
+      member.forgeRole = role;
+      await member.save();
+      
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'ROLE_UPDATED',
+        content: `Role updated to: ${role}`,
+        operativeId: member.operativeId, name: member.name
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Role updated to ' + role });
+    }
+
+    // ADMIN: Grant Forge Access
+    if (action === 'admin_grant_forge_access') {
+      const { email, access } = payload;
+      if (!email || !access) return res.status(200).json({ success: false, message: 'Missing fields.' });
+      
+      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      
+      member.forgeAccess = access;
+      await member.save();
+      
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'ACCESS_UPDATED',
+        content: `Forge Access updated to: ${access}`,
+        operativeId: member.operativeId, name: member.name
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Access updated to ' + access });
+    }
+
+    // ADMIN: Update Profile
+    if (action === 'admin_update_profile') {
+      const { email, phone, college, skillLevel, interests, paymentProof } = payload;
+      if (!email) return res.status(200).json({ success: false, message: 'Missing email.' });
+      
+      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      
+      if (phone) member.phone = phone;
+      if (college) member.college = college;
+      if (skillLevel) member.skillLevel = skillLevel;
+      if (interests) member.interests = interests;
+      if (paymentProof) member.paymentProofUrl = paymentProof;
+      await member.save();
+      
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'PROFILE_UPDATED',
+        content: `Profile updated by Admin`,
+        operativeId: member.operativeId, name: member.name
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Profile updated' });
     }
 
     // ADMIN: Audit Logs
