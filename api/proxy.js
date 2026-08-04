@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback } from './models.js';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
@@ -557,23 +557,212 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, data: sessions });
     }
 
-    // Mock responses for unmigrated features to prevent frontend errors
+    // FORGE: Get Resources
     if (action === 'forge_get_resources') {
-      return res.status(200).json({ success: true, resources: [] });
-    }
-    if (action === 'admin_get_attendance') {
-      return res.status(200).json({ success: true, data: [] });
-    }
-    if (action === 'forge_get_apprentices') {
-      return res.status(200).json({ success: true, data: [] });
-    }
-    if (action === 'forge_get_all_roles') {
-      return res.status(200).json({ success: true, data: {} });
-    }
-    if (action === 'get_public_events') {
-      return res.status(200).json({ success: true, data: [] });
+      const resources = await Resource.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, resources: resources });
     }
 
+    // FORGE: Bounties
+    if (action === 'forge_get_bounties') {
+      const bounties = await Bounty.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: bounties });
+    }
+    if (action === 'forge_post_bounty') {
+      const { operativeId, name, title, description, xp } = payload;
+      const b = new Bounty({
+        bountyId: 'BTY-' + Date.now(),
+        timestamp: new Date(),
+        title, description, xp, status: 'open', claimedBy: ''
+      });
+      await b.save();
+      
+      const log = new ActionLog({
+        timestamp: new Date(),
+        type: 'BOUNTY_POSTED',
+        content: `Mentor ${name} posted bounty: ${title} (+${xp} XP)`,
+        operativeId, name
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Bounty posted.' });
+    }
+    if (action === 'forge_claim_bounty') {
+      const { rowIndex, operativeId, name } = payload;
+      // Note: In Code.gs it used rowIndex, but here we can just use bountyId. 
+      // If frontend still sends rowIndex, we might have to adapt it. 
+      // For now, if frontend sends bountyId in rowIndex field:
+      const bounty = await Bounty.findOne({ bountyId: rowIndex });
+      if (bounty) {
+        bounty.status = 'claimed';
+        bounty.claimedBy = operativeId;
+        await bounty.save();
+        
+        const log = new ActionLog({
+          timestamp: new Date(),
+          type: 'BOUNTY_CLAIMED',
+          content: `Operative ${name} claimed bounty: ${bounty.title}`,
+          operativeId, name
+        });
+        await log.save();
+      }
+      return res.status(200).json({ success: true, message: 'Bounty claimed.' });
+    }
+    if (action === 'forge_complete_bounty') {
+      const { rowIndex } = payload;
+      const bounty = await Bounty.findOne({ bountyId: rowIndex });
+      if (bounty) {
+        bounty.status = 'completed';
+        await bounty.save();
+        
+        const member = await Member.findOne({ operativeId: bounty.claimedBy });
+        if (member) {
+           const log = new ActionLog({
+             timestamp: new Date(),
+             type: 'BOUNTY_COMPLETED',
+             content: `Bounty completed: ${bounty.title}`,
+             operativeId: member.operativeId, name: member.name
+           });
+           await log.save();
+        }
+      }
+      return res.status(200).json({ success: true, message: 'Bounty completed.' });
+    }
+
+    // FORGE: Tasks (Edit/Recall)
+    if (action === 'forge_edit_task') {
+       const { taskId, title, description, xp, difficulty, feedback, status } = payload;
+       const t = await Task.findOne({ taskId });
+       if (t) {
+         if (title) t.title = title;
+         if (description) t.description = description;
+         if (xp) t.xp = xp;
+         if (difficulty) t.difficulty = difficulty;
+         if (feedback) t.feedback = feedback;
+         if (status) t.status = status;
+         await t.save();
+       }
+       return res.status(200).json({ success: true, message: 'Task updated' });
+    }
+    if (action === 'forge_recall_task') {
+       const { taskId } = payload;
+       await Task.deleteOne({ taskId });
+       return res.status(200).json({ success: true, message: 'Task recalled' });
+    }
+
+    // EVENTS & ATTENDANCE
+    if (action === 'get_public_events' || action === 'admin_get_events') {
+      const events = await Event.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: events });
+    }
+    if (action === 'admin_get_attendance') {
+      const attendance = await Attendance.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: attendance });
+    }
+
+    // MISC missing features
+    if (action === 'forge_get_apprentices') {
+      const apps = await Member.find({ 
+        $or: [{ forgeRole: 'Apprentice' }, { rank: 'Apprentice' }],
+        status: { $in: ['Approved', 'Confirmed'] }
+      }, 'name operativeId').lean();
+      return res.status(200).json({ success: true, data: apps });
+    }
+    if (action === 'forge_get_all_roles') {
+      const roles = await Member.find({}, 'name operativeId forgeRole').lean();
+      return res.status(200).json({ success: true, data: roles });
+    }
+    if (action === 'admin_get_feedback') {
+      const fb = await Feedback.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: fb });
+    }
+    
+    // NEW ADMIN OPS (Bounties, Events, Broadcasts)
+    if (action === 'admin_create_task') {
+      const { title, description, xp, difficulty, assignedTo } = payload;
+      const t = new Task({
+        taskId: 'TSK-' + Date.now(),
+        timestamp: new Date(),
+        title, description, xp, difficulty,
+        status: 'Open',
+        assignedTo: assignedTo || 'Open',
+        submitLink: '', feedback: ''
+      });
+      await t.save();
+      return res.status(200).json({ success: true, message: 'Task created' });
+    }
+    if (action === 'admin_edit_task') {
+       const { taskId, title, description, xp, difficulty, assignedTo, status } = payload;
+       const t = await Task.findOne({ taskId });
+       if (t) {
+         if (title) t.title = title;
+         if (description) t.description = description;
+         if (xp) t.xp = xp;
+         if (difficulty) t.difficulty = difficulty;
+         if (assignedTo !== undefined) t.assignedTo = assignedTo;
+         if (status) t.status = status;
+         await t.save();
+       }
+       return res.status(200).json({ success: true, message: 'Task updated' });
+    }
+    if (action === 'admin_delete_task') {
+       const { taskId } = payload;
+       await Task.deleteOne({ taskId });
+       return res.status(200).json({ success: true, message: 'Task deleted' });
+    }
+    if (action === 'admin_review_task') {
+       const { taskId, status, feedback } = payload;
+       const t = await Task.findOne({ taskId });
+       if (t) {
+         t.status = status; // e.g. "Completed" or "Rejected"
+         t.feedback = feedback || '';
+         await t.save();
+         
+         // Award XP if completed
+         if (status === 'Completed' && t.assignedTo && t.assignedTo !== 'Open') {
+           const member = await Member.findOne({ operativeId: t.assignedTo });
+           if (member) {
+             member.xp = (member.xp || 0) + (parseInt(t.xp) || 0);
+             await member.save();
+             const log = new ActionLog({
+               timestamp: new Date(), type: 'TASK_COMPLETED',
+               content: `Admin approved task: ${t.title} (+${t.xp} XP)`,
+               operativeId: member.operativeId, name: member.name
+             });
+             await log.save();
+           }
+         }
+       }
+       return res.status(200).json({ success: true, message: 'Task reviewed' });
+    }
+    
+    // Broadcast & Feed
+    if (action === 'admin_post_feed') {
+       const { message } = payload;
+       const log = new ActionLog({
+         timestamp: new Date(), type: 'SYSTEM',
+         content: message, operativeId: 'ADMIN', name: 'System Admin'
+       });
+       await log.save();
+       return res.status(200).json({ success: true, message: 'Posted to feed' });
+    }
+    if (action === 'admin_send_broadcast') {
+       const { subject, body, emails } = payload;
+       if (!subject || !body || !emails || !emails.length) {
+         return res.status(200).json({ success: false, message: 'Missing fields' });
+       }
+       
+       const mailOptions = {
+         from: process.env.EMAIL_USER,
+         to: process.env.EMAIL_USER, // Send to self, BCC everyone else
+         bcc: emails.join(','),
+         subject: subject,
+         text: body
+       };
+       await transporter.sendMail(mailOptions);
+       return res.status(200).json({ success: true, message: `Sent email to ${emails.length} operatives` });
+    }
+
+    // FALLBACK
     return res.status(200).json({ success: false, message: 'Unknown or unmigrated action: ' + action });
     
   } catch (err) {
