@@ -82,3 +82,58 @@ const SessionSchema = new mongoose.Schema({
 });
 
 export const Session = mongoose.models.Session || mongoose.model('Session', SessionSchema);
+
+const BountySchema = new mongoose.Schema({
+  bountyId: { type: String, unique: true },
+  timestamp: Date,
+  title: String,
+  description: String,
+  xp: Number,
+  status: { type: String, default: 'Open' },
+  claimedBy: String,
+  submitLink: String
+});
+
+export const Bounty = mongoose.models.Bounty || mongoose.model('Bounty', BountySchema);
+
+const ResourceSchema = new mongoose.Schema({
+  resourceId: { type: String, unique: true },
+  timestamp: Date,
+  title: String,
+  category: String,
+  url: String,
+  addedBy: String
+});
+
+export const Resource = mongoose.models.Resource || mongoose.model('Resource', ResourceSchema);
+
+const EventSchema = new mongoose.Schema({
+  eventId: { type: String, unique: true },
+  timestamp: Date,
+  title: String,
+  date: String,
+  location: String,
+  description: String,
+  status: { type: String, default: 'Upcoming' }
+});
+
+export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
+
+const AttendanceSchema = new mongoose.Schema({
+  eventId: String,
+  operativeId: String,
+  status: { type: String, default: 'Registered' },
+  timestamp: Date
+});
+
+export const Attendance = mongoose.models.Attendance || mongoose.model('Attendance', AttendanceSchema);
+
+const FeedbackSchema = new mongoose.Schema({
+  operativeId: String,
+  name: String,
+  comment: String,
+  rating: Number,
+  timestamp: Date
+});
+
+export const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', FeedbackSchema);
