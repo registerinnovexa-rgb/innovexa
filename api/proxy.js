@@ -48,7 +48,14 @@ export default async function handler(req, res) {
       const text = await gasRes.text();
       let json;
       try { json = JSON.parse(text); }
-      catch (_) { return res.status(502).json({ success: false, message: 'Invalid JSON from GAS', raw: text.slice(0, 200) }); }
+      catch (_) { 
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        return res.status(502).json({ success: false, message: 'Invalid JSON from GAS', raw: text.slice(0, 200) }); 
+      }
+
+      if (json && json.success === false) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      }
 
       return res.status(200).json(json);
     }

@@ -1181,7 +1181,7 @@ async function apiWrite(op, payload) {
   const targetScript = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
   
   try {
-    const res = await fetch('https://innovexareg.vercel.app/api/proxy', {
+    const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUrl: targetScript, payload: payload })
@@ -3879,7 +3879,7 @@ async function uploadEvImg(file) {
       fileName: file.name
     };
 
-    const res = await fetch('https://innovexareg.vercel.app/api/proxy', {
+    const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ targetUrl: GAS_URL, payload })

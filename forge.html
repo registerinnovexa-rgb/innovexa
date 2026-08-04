@@ -298,7 +298,7 @@
     async function _gasFetch(action, extraParams = {}) {
       const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
       const gasUrl = MAIN_SCRIPT_URL + '?' + params.toString();
-      const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
+      const r = await fetch(`/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
       const text = await r.text();
       try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
     }
@@ -350,7 +350,7 @@
 
     async function apiGetMain(action) {
       const gasUrl = MAIN_SCRIPT_URL + '?action=' + action + '&_t=' + Date.now();
-      const r = await fetch(`https://innovexareg.vercel.app/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
+      const r = await fetch(`/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
       return await r.json();
     }
 
@@ -780,7 +780,7 @@
       
       toast('Updating submission...');
       try {
-        const r = await fetch('https://innovexareg.vercel.app/api/proxy', {
+        const r = await fetch('/api/proxy', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_edit_task', taskId, submitLink } })
         });
@@ -799,7 +799,7 @@
       
       toast('Recalling submission...');
       try {
-        const r = await fetch('https://innovexareg.vercel.app/api/proxy', {
+        const r = await fetch('/api/proxy', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_recall_task', taskId } })
         });
@@ -827,7 +827,7 @@
       logAction(`Submitted mission for review: ${taskId}`);
       
       try {
-        fetch('https://innovexareg.vercel.app/api/proxy', {
+        fetch('/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })

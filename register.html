@@ -682,7 +682,7 @@
     };
 
     try {
-      const resp = await fetch('https://innovexareg.vercel.app/api/proxy', {
+      const resp = await fetch('/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetUrl: window.SCRIPT_URL, payload: payload })
