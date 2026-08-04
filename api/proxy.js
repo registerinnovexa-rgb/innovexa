@@ -316,6 +316,40 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, members: members });
     }
 
+    // ADMIN: Get Member Detail
+    if (action === 'admin_get_member_detail') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'No operative ID provided' });
+
+      const targetId = operativeId.trim().toUpperCase();
+      const logs = await ActionLog.find({ operativeId: targetId }).sort({ timestamp: -1 }).lean();
+      const tasks = await Task.find({ assignedTo: targetId }).sort({ timestamp: -1 }).lean();
+
+      let activeTasksCount = 0;
+      let completedTasksCount = 0;
+      tasks.forEach(t => {
+        if (t.status === 'Completed') completedTasksCount++;
+        if (t.status === 'Open' || t.status === 'Submitted') activeTasksCount++;
+      });
+
+      return res.status(200).json({
+        success: true,
+        logs: logs,
+        tasks: tasks,
+        stats: {
+          activeTasks: activeTasksCount,
+          completedTasks: completedTasksCount,
+          totalLogs: logs.length
+        }
+      });
+    }
+
+    // ADMIN: Get Audit Logs
+    if (action === 'admin_get_audit_logs') {
+      const logs = await ActionLog.find({}).sort({ timestamp: -1 }).limit(500).lean();
+      return res.status(200).json({ success: true, logs: logs });
+    }
+
     // FORGE: Get Member Profile
     if (action === 'forge_get_member_profile') {
       const { operativeId } = payload;
@@ -521,6 +555,23 @@ export default async function handler(req, res) {
     if (action === 'forge_get_sessions') {
       const sessions = await Session.find({}).lean();
       return res.status(200).json({ success: true, data: sessions });
+    }
+
+    // Mock responses for unmigrated features to prevent frontend errors
+    if (action === 'forge_get_resources') {
+      return res.status(200).json({ success: true, resources: [] });
+    }
+    if (action === 'admin_get_attendance') {
+      return res.status(200).json({ success: true, data: [] });
+    }
+    if (action === 'forge_get_apprentices') {
+      return res.status(200).json({ success: true, data: [] });
+    }
+    if (action === 'forge_get_all_roles') {
+      return res.status(200).json({ success: true, data: {} });
+    }
+    if (action === 'get_public_events') {
+      return res.status(200).json({ success: true, data: [] });
     }
 
     return res.status(200).json({ success: false, message: 'Unknown or unmigrated action: ' + action });
