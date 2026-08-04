@@ -117,121 +117,6 @@ function doGet(e) {
     }
 
 
-    // FORGE: Request Login OTP
-    if (action === 'forge_request_otp') {
-      if (!p.invxId) return respond({ success: false, message: 'Missing Operative ID.' });
-      var reqOpId = String(p.invxId).trim().toUpperCase();
-      var rows = sheet.getDataRange().getValues();
-      for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
-          var userEmail = String(row[2] || '').trim();
-          if (!userEmail) return respond({ success: false, message: 'No email associated with this ID.' });
-          
-          var existingOtp = String(row[24] || '').trim();
-          var existingTime = row[25];
-          var otp = '';
-          
-          if (existingOtp && existingTime && (new Date().getTime() - existingTime < 2 * 60 * 1000)) {
-            otp = existingOtp; // Reuse recent OTP if requested within 2 mins
-          } else {
-            otp = Math.floor(100000 + Math.random() * 900000).toString();
-            sheet.getRange(i + 1, 25).setValue(otp); // Col Y
-            sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
-          }
-          
-          try {
-            MailApp.sendEmail({
-              to: userEmail,
-              subject: 'Innovexa Hub — Dashboard Login Code',
-              body: 'Your dashboard login code is: ' + otp + '\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via innovexahub.bangalore@gmail.com)'
-            });
-            var parts = userEmail.split('@');
-            var maskedEmail = parts[0].substring(0, 2) + '***@' + parts[1];
-            return respond({ success: true, message: 'Login code sent to ' + maskedEmail });
-          } catch (e) {
-            return respond({ success: false, message: 'Failed to send email. ' + e.toString() });
-          }
-        }
-      }
-      return respond({ success: false, message: 'Operative ID not found.' });
-    }
-
-    // FORGE: Verify Login OTP
-    if (action === 'forge_verify_otp') {
-      if (!p.invxId || !p.otp) return respond({ success: false, message: 'Missing fields.' });
-      var reqOpId = String(p.invxId).trim().toUpperCase();
-      var reqOtp = String(p.otp).trim();
-      var rows = sheet.getDataRange().getValues();
-      for (var i = 1; i < rows.length; i++) {
-        var row = rows[i];
-        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
-          var storedOtp = String(row[24] || '').trim(); // Col Y
-          var storedTime = row[25]; // Col Z
-          
-          if (!storedOtp || storedOtp !== reqOtp) {
-            return respond({ success: false, message: 'Invalid login code.' });
-          }
-          if (new Date().getTime() - storedTime > 15 * 60 * 1000) {
-            return respond({ success: false, message: 'Login code expired. Please request a new one.' });
-          }
-          
-          var status = String(row[10] || '').trim();
-          if (status !== 'Approved' && status !== 'Confirmed') {
-            return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
-          }
-          
-          var accessStatus = String(row[18] || '').trim(); // Column S
-          if (accessStatus.toLowerCase() !== 'granted') {
-            return respond({ success: false, message: 'Access Denied. Forge access has not been granted by Admin.' });
-          }
-          
-          sheet.getRange(i + 1, 25).setValue(''); // Clear OTP
-          sheet.getRange(i + 1, 26).setValue(''); // Clear Time
-          
-          // Tracking: Update Login Count (Col AA - 27) and Last Login Time (Col AB - 28)
-          var loginCount = parseInt(row[26]) || 0;
-          sheet.getRange(i + 1, 27).setValue(loginCount + 1);
-          sheet.getRange(i + 1, 28).setValue(new Date().toISOString());
-          
-          // Log movement
-          logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
-          
-          var deviceStr = p.ua ? String(p.ua) : 'Unknown Device';
-          var screenStr = p.screen ? String(p.screen) : 'Unknown Screen';
-          var themeStr = p.theme ? String(p.theme) : 'Unknown Mode';
-
-          notifySuperAdmin(
-            'Operative Dashboard Login: ' + String(row[1] || ''),
-            'A member has successfully authenticated and logged into the Forge Dashboard.\n\n' +
-            'Name: ' + String(row[1] || '') + '\n' +
-            'Operative ID: ' + reqOpId + '\n' +
-            'Email: ' + String(row[2] || '') + '\n\n' +
-            '--- Session Telemetry ---\n' +
-            'Device: ' + deviceStr + '\n' +
-            'Resolution: ' + screenStr + '\n' +
-            'UI Mode: ' + themeStr
-          );
-          
-          return respond({
-            success: true,
-            message: 'Authentication successful.',
-            data: {
-              name: String(row[1] || ''),
-              operativeId: reqOpId,
-              forgeAccess: accessStatus,
-              xp: String(row[19] || '0'),
-              rank: String(row[20] || 'Apprentice'),
-              squad: String(row[21] || 'Unassigned'),
-              role: String(row[16] || '').trim(),
-              email: String(row[2] || '').trim()
-            }
-          });
-        }
-      }
-      return respond({ success: false, message: 'Operative ID not found.' });
-    }
-
     // ADMIN: Login
     if (action === 'admin_login') {
       if (!p.invxId || !p.email) return respond({ success: false, message: 'Missing credentials.' });
@@ -835,6 +720,122 @@ function doPost(e) {
     var p = payload;
     var timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
+    // FORGE: Request Login OTP
+    if (action === 'forge_request_otp') {
+      if (!p.invxId) return respond({ success: false, message: 'Missing Operative ID.' });
+      var reqOpId = String(p.invxId).trim().toUpperCase();
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
+          var userEmail = String(row[2] || '').trim();
+          if (!userEmail) return respond({ success: false, message: 'No email associated with this ID.' });
+          
+          var existingOtp = String(row[24] || '').trim();
+          var existingTime = row[25];
+          var otp = '';
+          
+          if (existingOtp && existingTime && (new Date().getTime() - existingTime < 2 * 60 * 1000)) {
+            otp = existingOtp; // Reuse recent OTP if requested within 2 mins
+          } else {
+            otp = Math.floor(100000 + Math.random() * 900000).toString();
+            sheet.getRange(i + 1, 25).setValue(otp); // Col Y
+            sheet.getRange(i + 1, 26).setValue(new Date().getTime()); // Col Z
+          }
+          
+          try {
+            MailApp.sendEmail({
+              to: userEmail,
+              subject: 'Innovexa Hub — Dashboard Login Code',
+              body: 'Your dashboard login code is: ' + otp + '\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via innovexahub.bangalore@gmail.com)'
+            });
+            var parts = userEmail.split('@');
+            var maskedEmail = parts[0].substring(0, 2) + '***@' + parts[1];
+            return respond({ success: true, message: 'Login code sent to ' + maskedEmail });
+          } catch (e) {
+            return respond({ success: false, message: 'Failed to send email. ' + e.toString() });
+          }
+        }
+      }
+      return respond({ success: false, message: 'Operative ID not found.' });
+    }
+
+    // FORGE: Verify Login OTP
+    if (action === 'forge_verify_otp') {
+      if (!p.invxId || !p.otp) return respond({ success: false, message: 'Missing fields.' });
+      var reqOpId = String(p.invxId).trim().toUpperCase();
+      var reqOtp = String(p.otp).trim();
+      var rows = sheet.getDataRange().getValues();
+      for (var i = 1; i < rows.length; i++) {
+        var row = rows[i];
+        if (String(row[12] || '').trim().toUpperCase() === reqOpId) {
+          var storedOtp = String(row[24] || '').trim(); // Col Y
+          var storedTime = row[25]; // Col Z
+          
+          if (!storedOtp || storedOtp !== reqOtp) {
+            return respond({ success: false, message: 'Invalid login code.' });
+          }
+          if (new Date().getTime() - storedTime > 15 * 60 * 1000) {
+            return respond({ success: false, message: 'Login code expired. Please request a new one.' });
+          }
+          
+          var status = String(row[10] || '').trim();
+          if (status !== 'Approved' && status !== 'Confirmed') {
+            return respond({ success: false, message: 'Access Denied. Your application is not approved yet.' });
+          }
+          
+          var accessStatus = String(row[18] || '').trim(); // Column S
+          if (accessStatus.toLowerCase() !== 'granted') {
+            return respond({ success: false, message: 'Access Denied. Forge access has not been granted by Admin.' });
+          }
+          
+          sheet.getRange(i + 1, 25).setValue(''); // Clear OTP
+          sheet.getRange(i + 1, 26).setValue(''); // Clear Time
+          
+          // Tracking: Update Login Count (Col AA - 27) and Last Login Time (Col AB - 28)
+          var loginCount = parseInt(row[26]) || 0;
+          sheet.getRange(i + 1, 27).setValue(loginCount + 1);
+          sheet.getRange(i + 1, 28).setValue(new Date().toISOString());
+          
+          // Log movement
+          logOperativeAction(reqOpId, String(row[1] || ''), 'SYSTEM', 'Operative authenticated and logged into the dashboard.');
+          
+          var deviceStr = p.ua ? String(p.ua) : 'Unknown Device';
+          var screenStr = p.screen ? String(p.screen) : 'Unknown Screen';
+          var themeStr = p.theme ? String(p.theme) : 'Unknown Mode';
+
+          notifySuperAdmin(
+            'Operative Dashboard Login: ' + String(row[1] || ''),
+            'A member has successfully authenticated and logged into the Forge Dashboard.\n\n' +
+            'Name: ' + String(row[1] || '') + '\n' +
+            'Operative ID: ' + reqOpId + '\n' +
+            'Email: ' + String(row[2] || '') + '\n\n' +
+            '--- Session Telemetry ---\n' +
+            'Device: ' + deviceStr + '\n' +
+            'Resolution: ' + screenStr + '\n' +
+            'UI Mode: ' + themeStr
+          );
+          
+          return respond({
+            success: true,
+            message: 'Authentication successful.',
+            data: {
+              name: String(row[1] || ''),
+              operativeId: reqOpId,
+              forgeAccess: accessStatus,
+              xp: String(row[19] || '0'),
+              rank: String(row[20] || 'Apprentice'),
+              squad: String(row[21] || 'Unassigned'),
+              role: String(row[16] || '').trim(),
+              email: String(row[2] || '').trim()
+            }
+          });
+        }
+      }
+      return respond({ success: false, message: 'Operative ID not found.' });
+    }
+
+    
     // FORGE: Set Role
     if (action === 'forge_set_role') {
       var rows = sheet.getDataRange().getValues();

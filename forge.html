@@ -462,7 +462,12 @@
       btn.textContent = 'Sending...';
 
       try {
-        const res = await gasGet('forge_request_otp', { invxId: id });
+        const r = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_request_otp', invxId: id } })
+        });
+        const res = await r.json();
         
         if (res.success) {
            toast(res.message, 'success');
@@ -499,7 +504,13 @@
         const ua = navigator.userAgent;
         const screenRes = `${window.screen.width}x${window.screen.height}`;
         const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark Mode' : 'Light Mode';
-        const res = await gasGet('forge_verify_otp', { invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme });
+        
+        const r = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_verify_otp', invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme } })
+        });
+        const res = await r.json();
         
         if (res.success && res.data) {
            toast('Authentication successful.', 'success');
