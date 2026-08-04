@@ -1106,7 +1106,32 @@ function _saveToStorage(key, entry) {
   try { localStorage.setItem(CACHE_STORE + key, JSON.stringify(entry)); } catch(_) {}
 }
 
+// Actions that are fully handled by MongoDB proxy (NOT Google Apps Script)
+const MONGO_ACTIONS = new Set([
+  'admin_login', 'adminMembers', 'admin_get_member_detail', 'admin_get_tasks',
+  'admin_get_audit_logs', 'admin_get_events', 'admin_get_attendance',
+  'admin_get_feedback', 'admin_create_task', 'admin_edit_task', 'admin_delete_task',
+  'admin_review_task', 'admin_create_event', 'admin_edit_event', 'admin_delete_event',
+  'admin_upload_event_image', 'admin_log_attendance', 'admin_remove_attendance',
+  'admin_post_feed', 'admin_send_broadcast', 'admin_issue_certificates',
+  'admin_set_role', 'admin_grant_forge_access', 'admin_update_profile', 'admin_add_resource',
+  'admin_edit_resource', 'admin_delete_resource', 'forge_get_resources', 'forge_get_leaderboard',
+  'updateStatus', 'team', 'count', 'get_confirmed', 'status_check'
+]);
+
 async function _fetchFresh(action, params) {
+  // Route MongoDB-backed actions directly
+  if (MONGO_ACTIONS.has(action) || action.startsWith('admin_')) {
+    let url = `/api/proxy?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
+    for (const [k, v] of Object.entries(params)) {
+      url += `&${k}=${encodeURIComponent(v)}`;
+    }
+    const r = await fetch(url, { method: 'GET', cache: 'no-store' });
+    const text = await r.text();
+    try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
+  }
+
+  // Legacy GAS route for events, assets, docs, etc.
   const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
   const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
   let qString = `action=${action}&_t=${Date.now()}`;
@@ -1177,6 +1202,39 @@ async function apiWrite(op, payload) {
   payload.op = op;
   payload.adminKey = ADMIN_KEY;
   payload.adminId = adminSession ? adminSession.id : '';
+
+  // MongoDB-backed write ops go directly to /api/proxy as POST with action in payload
+  if (MONGO_ACTIONS.has(op) || op.startsWith('admin_') || op === 'updateStatus') {
+    payload.action = op;
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload })
+      });
+      const result = await res.json();
+      const cacheMap = {
+        updateStatus:             ['adminMembers'],
+        admin_grant_forge_access: ['adminMembers'],
+        admin_set_role:           ['adminMembers'],
+        admin_update_profile:     ['adminMembers', 'admin_get_member_detail'],
+        admin_create_task:        ['admin_get_tasks'],
+        admin_review_task:        ['admin_get_tasks'],
+        admin_edit_task:          ['admin_get_tasks'],
+        admin_delete_task:        ['admin_get_tasks'],
+        admin_create_event:       ['admin_get_events'],
+        admin_edit_event:         ['admin_get_events'],
+        admin_delete_event:       ['admin_get_events'],
+      };
+      (cacheMap[op] || []).forEach(a => invalidateCache(a));
+      return result;
+    } catch(e) {
+      console.error('API Write Error:', e);
+      throw e;
+    }
+  }
+
+  // Legacy GAS write ops (assets, docs, certs, event regs)
   const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus','markAttendance'].includes(op);
   const targetScript = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
   
@@ -1188,24 +1246,15 @@ async function apiWrite(op, payload) {
     });
     const result = await res.json();
 
-    // Invalidate related read caches after write
     const cacheMap = {
-      updateStatus:          ['adminMembers'],
-      admin_grant_forge_access: ['adminMembers'],
-      admin_set_role:        ['adminMembers'],
-      admin_update_profile:  ['adminMembers', 'admin_get_member_detail'],
-      admin_create_task:     ['admin_get_tasks'],
-      admin_review_task:     ['admin_get_tasks'],
-      admin_edit_task:       ['admin_get_tasks'],
-      admin_delete_task:     ['admin_get_tasks'],
-      addAsset:              ['assets'],
-      borrowAsset:           ['assets'],
-      returnAsset:           ['assets'],
-      docApprove:            ['docrequests'],
-      certApprove:           ['certreqs'],
-      addEvent:              ['events'],
-      editEvent:             ['events'],
-      deleteEvent:           ['events'],
+      addAsset:    ['assets'],
+      borrowAsset: ['assets'],
+      returnAsset: ['assets'],
+      docApprove:  ['docrequests'],
+      certApprove: ['certreqs'],
+      addEvent:    ['events'],
+      editEvent:   ['events'],
+      deleteEvent: ['events'],
     };
     (cacheMap[op] || []).forEach(a => invalidateCache(a));
 
@@ -2069,9 +2118,10 @@ function renderMembersHTML(members) {
   tbody.innerHTML = members.map(m => {
     const mData = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
     const isConfirmed = (m.status||'').trim().toLowerCase().includes('confirmed');
+    const emailSafe = encodeURIComponent(m.email || '');
     return `
     <tr>
-      <td><input type="checkbox" class="member-checkbox" value="${m.rowIndex}" onchange="updateBulkActions()"></td>
+      <td><input type="checkbox" class="member-checkbox" value="${escHtml(m.email)}" onchange="updateBulkActions()"></td>
       <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openProfileModal('${mData}')">${escHtml(m.operativeId || '—')}</strong></td>
       <td style="color:var(--text);cursor:pointer;" onclick="openProfileModal('${mData}')">${escHtml(m.name)}</td>
       <td style="font-size:13px;color:var(--text2);">${escHtml(m.email)}</td>
@@ -2079,8 +2129,8 @@ function renderMembersHTML(members) {
       <td>${statusBadge(m.status)}</td>
       <td>
         <div class="btn-actions">
-          ${!isConfirmed ? `<button class="btn-sm btn-approve" onclick="updateStatus(${m.rowIndex},'Confirmed')">✓ Approve</button>` : ''}
-          ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="updateStatus(${m.rowIndex},'Pending')">↩ Revoke</button>` : ''}
+          ${!isConfirmed ? `<button class="btn-sm btn-approve" onclick="updateStatus('${emailSafe}','Confirmed')">✓ Approve</button>` : ''}
+          ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="updateStatus('${emailSafe}','Pending')">↩ Revoke</button>` : ''}
           <button class="btn-sm" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);" onclick="openProfileModal('${mData}')">👤 View</button>
         </div>
       </td>
@@ -2120,8 +2170,8 @@ async function bulkUpdate(status) {
   
   try {
     const promises = Array.from(checkboxes).map(cb => {
-      const rowIndex = cb.value;
-      return apiWrite('updateStatus', { rowIndex, status });
+      const email = decodeURIComponent(cb.value);
+      return apiWrite('updateStatus', { email, status });
     });
     
     await Promise.all(promises);
@@ -2667,10 +2717,11 @@ function exportMembersCSV() {
   document.body.removeChild(link);
 }
 
-async function updateStatus(rowIndex, status) {
+async function updateStatus(emailEncoded, status) {
   try {
     showToast('Updating...', 'info');
-    await apiWrite('updateStatus', { rowIndex, status });
+    const email = decodeURIComponent(emailEncoded);
+    await apiWrite('updateStatus', { email, status });
     showToast('Status updated to: ' + status, 'success');
     await new Promise(r => setTimeout(r, 500));
     loadMembers();
