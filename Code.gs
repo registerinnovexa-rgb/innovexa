@@ -448,82 +448,120 @@ function doGet(e) {
       return respond({ success: true, data: rolesMap });
     }
 
-    // FORGE: Debug Row
+    // ADMIN: Get Members List (CacheService-backed for speed)
     if (action === 'adminMembers') {
-      var rows = sheet.getDataRange().getValues();
+      var forceRefresh = String(p.forceRefresh || '') === 'true';
+      var cache = CacheService.getScriptCache();
+      var CACHE_KEY = 'adminMembers_v2';
+      
+      // Serve from cache if available and not forced refresh
+      if (!forceRefresh) {
+        var cached = cache.get(CACHE_KEY);
+        if (cached) {
+          return ContentService
+            .createTextOutput(cached)
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      
+      // === CACHE MISS: Build fresh data ===
+      // Only read columns A-AB (28 cols) instead of entire sheet
+      var lastRow = sheet.getLastRow();
+      var lastCol = Math.min(sheet.getLastColumn(), 28);
+      var rows = lastRow > 1 ? sheet.getRange(1, 1, lastRow, lastCol).getValues() : [[]];
+      
       var members = [];
       for (var i = 1; i < rows.length; i++) {
         if (!rows[i][1] && !rows[i][2]) continue; // skip empty rows
         members.push({
           rowIndex: i + 1,
-          name: String(rows[i][1] || ''),
-          email: String(rows[i][2] || ''),
-          phone: String(rows[i][3] || ''),
-          year: String(rows[i][4] || ''),
-          branch: String(rows[i][5] || ''),
-          skillLevel: String(rows[i][6] || ''),
-          dob: String(rows[i][7] || ''),
-          interests: String(rows[i][8] || ''),
-          utr: String(rows[i][9] || ''),
-          status: String(rows[i][10] || 'Pending'),
-          amount: String(rows[i][11] || '599'),
-          operativeId: String(rows[i][12] || ''),
-          gender: String(rows[i][15] || ''),
-          forgeRole: String(rows[i][16] || ''),
-          linkedMentor: String(rows[i][17] || ''),
-          forgeAccess: String(rows[i][18] || '').trim(),
-          xp: String(rows[i][19] || '0'),
-          rank: String(rows[i][20] || 'Apprentice'),
-          squad: String(rows[i][21] || 'Unassigned'),
-          college: String(rows[i][22] || ''),
-          paymentUrl: String(rows[i][14] || ''),
-          loginCount: parseInt(rows[i][26]) || 0,
+          name:          String(rows[i][1]  || ''),
+          email:         String(rows[i][2]  || ''),
+          phone:         String(rows[i][3]  || ''),
+          year:          String(rows[i][4]  || ''),
+          branch:        String(rows[i][5]  || ''),
+          skillLevel:    String(rows[i][6]  || ''),
+          dob:           String(rows[i][7]  || ''),
+          interests:     String(rows[i][8]  || ''),
+          utr:           String(rows[i][9]  || ''),
+          status:        String(rows[i][10] || 'Pending'),
+          amount:        String(rows[i][11] || '599'),
+          operativeId:   String(rows[i][12] || ''),
+          paymentUrl:    String(rows[i][14] || ''),
+          gender:        String(rows[i][15] || ''),
+          forgeRole:     String(rows[i][16] || ''),
+          linkedMentor:  String(rows[i][17] || ''),
+          forgeAccess:   String(rows[i][18] || '').trim(),
+          xp:            String(rows[i][19] || '0'),
+          rank:          String(rows[i][20] || 'Apprentice'),
+          squad:         String(rows[i][21] || 'Unassigned'),
+          college:       String(rows[i][22] || ''),
+          loginCount:    parseInt(rows[i][26]) || 0,
           lastLoginTime: String(rows[i][27] || '')
         });
       }
       
-      // Calculate active bounties
-      var activeBounties = 0;
-      try {
-        var tasksSheet = getOrCreateSheet(ss, 'ForgeTasks', ['TaskID', 'Timestamp', 'Title', 'Description', 'XP', 'Difficulty', 'Status', 'AssignedTo', 'SubmitLink', 'Feedback']);
-        var tRows = tasksSheet.getDataRange().getValues();
-        for (var t = 1; t < tRows.length; t++) {
-          if (String(tRows[t][6] || '').trim() === 'Open') {
-            activeBounties++;
-          }
-        }
-      } catch(e) {}
-      
-      // Calculate total XP awarded
+      // Calculate totals in a single pass
       var totalXPAwarded = 0;
       for (var j = 0; j < members.length; j++) {
         totalXPAwarded += parseInt(members[j].xp) || 0;
       }
       
-      // Fetch recent activity feed (last 10 items)
+      // Active bounties count
+      var activeBounties = 0;
+      try {
+        var tasksSheet = ss.getSheetByName('ForgeTasks');
+        if (tasksSheet) {
+          var tLastRow = tasksSheet.getLastRow();
+          if (tLastRow > 1) {
+            var tStatusCol = tasksSheet.getRange(2, 7, tLastRow - 1, 1).getValues();
+            for (var t = 0; t < tStatusCol.length; t++) {
+              if (String(tStatusCol[t][0] || '').trim() === 'Open') activeBounties++;
+            }
+          }
+        }
+      } catch(e) {}
+      
+      // Recent activity feed (last 10)
       var recentActivity = [];
       try {
-        var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Content', 'OperativeId', 'Name']);
-        var fRows = feedSheet.getDataRange().getValues();
-        // Start from bottom, get up to 10
-        for (var f = fRows.length - 1; f >= 1 && recentActivity.length < 10; f--) {
-          recentActivity.push({
-            timestamp: fRows[f][0],
-            type: fRows[f][1],
-            content: fRows[f][2],
-            operativeId: fRows[f][3],
-            name: fRows[f][4]
-          });
+        var feedSheet = ss.getSheetByName('Forge_Feed');
+        if (feedSheet) {
+          var fLastRow = feedSheet.getLastRow();
+          if (fLastRow > 1) {
+            var fStart = Math.max(2, fLastRow - 29); // read at most 30 rows from bottom
+            var fRows = feedSheet.getRange(fStart, 1, fLastRow - fStart + 1, 5).getValues();
+            for (var f = fRows.length - 1; f >= 0 && recentActivity.length < 10; f--) {
+              recentActivity.push({
+                timestamp:   fRows[f][0],
+                type:        fRows[f][1],
+                content:     fRows[f][2],
+                operativeId: fRows[f][3],
+                name:        fRows[f][4]
+              });
+            }
+          }
         }
       } catch(e) {}
 
-      return respond({ 
+      var responseObj = { 
         success: true, 
         members: members,
         activeBounties: activeBounties,
         totalXPAwarded: totalXPAwarded,
         recentActivity: recentActivity
-      });
+      };
+      
+      // Store in cache for 90 seconds
+      try {
+        var responseStr = JSON.stringify(responseObj);
+        // CacheService max value is 100KB; only cache if small enough
+        if (responseStr.length < 95000) {
+          cache.put(CACHE_KEY, responseStr, 90);
+        }
+      } catch(e) {}
+
+      return respond(responseObj);
     }
 
     // ADMIN: Get Member Detail (Logs & Tasks)
@@ -1041,6 +1079,7 @@ function doPost(e) {
         var rowOpId = String(rows[i][12] || '').trim().toUpperCase();
         if (rowOpId === String(p.targetId).trim().toUpperCase()) {
           sheet.getRange(i + 1, 17).setValue(p.newRole.toLowerCase()); // Column Q
+          try { CacheService.getScriptCache().remove('adminMembers_v2'); } catch(e) {}
           return respond({ success: true, message: 'Role updated successfully to ' + p.newRole });
         }
       }
@@ -1055,6 +1094,7 @@ function doPost(e) {
       if (!sheet.getRange(payload.rowIndex, 21).getValue()) {
         sheet.getRange(payload.rowIndex, 21).setValue('Apprentice');
       }
+      try { CacheService.getScriptCache().remove('adminMembers_v2'); } catch(e) {}
       return respond({ success: true, message: 'Forge access updated to: ' + payload.accessStatus });
     }
 
@@ -1064,6 +1104,8 @@ function doPost(e) {
       if (!rowIdx || rowIdx < 2) return respond({ success: false, message: 'Invalid row index.' });
       var newStatus = String(payload.status || '').trim();
       sheet.getRange(rowIdx, 11).setValue(newStatus); // Col K = Status
+      // Bust members cache immediately so next load reflects the change
+      try { CacheService.getScriptCache().remove('adminMembers_v2'); } catch(e) {}
       // Send approval email when confirming
       try {
         var memberRow = sheet.getRange(rowIdx, 1, 1, 22).getValues()[0];
@@ -1113,6 +1155,7 @@ function doPost(e) {
         (payload.squad ? 'Squad: ' + payload.squad + '\n' : '')
       );
       
+      try { CacheService.getScriptCache().remove('adminMembers_v2'); } catch(e) {}
       return respond({ success: true, message: 'Profile updated successfully.' });
     }
 
@@ -1680,6 +1723,7 @@ function doPost(e) {
                       'Amount: ' + (payload.amount || '599') + '\n\n' +
                       'Review Registration: https://innovexareg.vercel.app/admin.html';
       notifySuperAdmin(adminSubject, adminBody);
+      try { CacheService.getScriptCache().remove('adminMembers_v2'); } catch(e) {}
 
       return respond({ success: true, message: 'Registered!', data: { operativeId: operativeId } });
     }
