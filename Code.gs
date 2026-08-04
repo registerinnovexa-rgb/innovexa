@@ -67,6 +67,25 @@ function doGet(e) {
         var matchId    = p.id    && rowId    === String(p.id).trim().toUpperCase();
 
         if (matchEmail || matchUtr || matchPhone || matchId) {
+          // Notify admin that member checked their status
+          try {
+            notifySuperAdmin(
+              '[STATUS CHECK] ' + String(row[1] || 'Unknown') + ' (' + String(row[12] || '') + ')',
+              'A member has checked their application status.\n\n' +
+              'Name: ' + String(row[1] || '') + '\n' +
+              'Operative ID: ' + String(row[12] || '') + '\n' +
+              'Email: ' + String(row[2] || '') + '\n' +
+              'Phone: ' + String(row[3] || '') + '\n' +
+              'College: ' + String(row[22] || '') + '\n' +
+              'Branch & Year: ' + String(row[5] || '') + ' - ' + String(row[4] || '') + '\n' +
+              'Current Status: ' + String(row[10] || 'Pending') + '\n' +
+              'Forge Access: ' + String(row[18] || 'Not Granted') + '\n' +
+              'Rank: ' + String(row[20] || 'Apprentice') + '\n' +
+              'Squad: ' + String(row[21] || 'Unassigned') + '\n' +
+              'XP: ' + String(row[19] || '0') + '\n\n' +
+              'Time: ' + new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            );
+          } catch(e) {}
           return respond({
             success: true,
             found:   true,
@@ -873,6 +892,15 @@ function doPost(e) {
       sosSheet.appendRow([timestamp, payload.operativeId, payload.name, payload.title, payload.description, 'open', '', '']);
       var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Message', 'OperativeId', 'Name']);
       feedSheet.appendRow([timestamp, 'SOS', payload.name + ' fired an SOS Flare: ' + payload.title, payload.operativeId, payload.name]);
+      notifySuperAdmin(
+        '[SOS FLARE] ' + payload.name + ' (' + payload.operativeId + ') needs help!',
+        'An operative has fired an SOS Flare on the Forge.\n\n' +
+        'Operative: ' + payload.name + ' (' + payload.operativeId + ')\n' +
+        'SOS Title: ' + payload.title + '\n' +
+        'Description: ' + payload.description + '\n\n' +
+        'Time: ' + timestamp + '\n' +
+        'Review in Admin Panel: https://innovexareg.vercel.app/admin.html'
+      );
       return respond({ success: true, message: 'SOS posted.' });
     }
 
@@ -885,9 +913,18 @@ function doPost(e) {
       
       var sosRow = sosSheet.getRange(payload.rowIndex, 1, 1, 8).getValues()[0];
       var requesterName = sosRow[2];
+      var sosTitle = sosRow[3];
       
       var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Message', 'OperativeId', 'Name']);
       feedSheet.appendRow([timestamp, 'SOS_RESOLVED', payload.helperName + ' resolved ' + requesterName + "'s SOS Flare", payload.helperOperativeId, payload.helperName]);
+      notifySuperAdmin(
+        '[SOS RESOLVED] ' + payload.helperName + ' helped ' + requesterName,
+        'An SOS Flare has been resolved.\n\n' +
+        'Requester: ' + requesterName + '\n' +
+        'SOS Title: ' + (sosTitle || 'N/A') + '\n' +
+        'Resolved By: ' + payload.helperName + ' (' + payload.helperOperativeId + ')\n\n' +
+        'Time: ' + timestamp
+      );
       return respond({ success: true, message: 'SOS resolved.' });
     }
 
@@ -907,10 +944,20 @@ function doPost(e) {
       bountySheet.getRange(payload.rowIndex, 8).setValue(payload.operativeId);
       bountySheet.getRange(payload.rowIndex, 9).setValue(payload.name);
       
-      var title = bountySheet.getRange(payload.rowIndex, 4).getValue();
+      var bountyRow = bountySheet.getRange(payload.rowIndex, 1, 1, 9).getValues()[0];
+      var title = bountyRow[3];
+      var xp = bountyRow[5];
       
       var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Message', 'OperativeId', 'Name']);
       feedSheet.appendRow([timestamp, 'BOUNTY_CLAIMED', 'Operative ' + payload.name + ' claimed bounty: ' + title, payload.operativeId, payload.name]);
+      notifySuperAdmin(
+        '[BOUNTY CLAIMED] ' + payload.name + ' claimed a task',
+        'An operative has claimed a bounty task.\n\n' +
+        'Operative: ' + payload.name + ' (' + payload.operativeId + ')\n' +
+        'Bounty: ' + title + '\n' +
+        'XP Reward: ' + xp + ' XP\n\n' +
+        'Time: ' + timestamp
+      );
       return respond({ success: true, message: 'Bounty claimed.' });
     }
 
@@ -918,10 +965,22 @@ function doPost(e) {
     if (action === 'forge_complete_bounty') {
       var bountySheet = getOrCreateSheet(ss, 'Forge_Bounties', ['Timestamp', 'PostedBy', 'PostedByName', 'Title', 'Description', 'XP', 'Status', 'ClaimedBy', 'ClaimedByName']);
       bountySheet.getRange(payload.rowIndex, 7).setValue('completed');
-      var title = bountySheet.getRange(payload.rowIndex, 4).getValue();
+      var bountyComplRow = bountySheet.getRange(payload.rowIndex, 1, 1, 9).getValues()[0];
+      var title = bountyComplRow[3];
+      var xp = bountyComplRow[5];
+      var claimedByName = bountyComplRow[8];
+      var claimedById = bountyComplRow[7];
       
       var feedSheet = getOrCreateSheet(ss, 'Forge_Feed', ['Timestamp', 'Type', 'Message', 'OperativeId', 'Name']);
-      feedSheet.appendRow([timestamp, 'BOUNTY_COMPLETED', 'Bounty completed: ' + title, '', '']);
+      feedSheet.appendRow([timestamp, 'BOUNTY_COMPLETED', 'Bounty completed: ' + title, claimedById, claimedByName]);
+      notifySuperAdmin(
+        '[BOUNTY COMPLETED] ' + (claimedByName || 'Operative') + ' completed a task',
+        'A bounty task has been marked completed.\n\n' +
+        'Completed By: ' + (claimedByName || 'N/A') + ' (' + (claimedById || 'N/A') + ')\n' +
+        'Bounty: ' + title + '\n' +
+        'XP Awarded: ' + xp + ' XP\n\n' +
+        'Time: ' + timestamp
+      );
       return respond({ success: true, message: 'Bounty completed.' });
     }
 
@@ -934,8 +993,23 @@ function doPost(e) {
           tasksSheet.getRange(i + 1, 7).setValue('Under Review');
           tasksSheet.getRange(i + 1, 9).setValue(payload.submitLink || '');
           if (rows[i][7] === 'Open') {
-            tasksSheet.getRange(i + 1, 8).setValue(payload.invxId); // Assign to the user if it was open
+            tasksSheet.getRange(i + 1, 8).setValue(payload.invxId);
           }
+          var taskTitle = rows[i][2];
+          var taskXp = rows[i][4];
+          var taskDiff = rows[i][5];
+          var assignedTo = rows[i][7] || payload.invxId;
+          notifySuperAdmin(
+            '[TASK SUBMITTED] ' + (payload.invxId || assignedTo) + ' submitted for review',
+            'An operative has submitted a task for review.\n\n' +
+            'Operative ID: ' + (payload.invxId || assignedTo) + '\n' +
+            'Task: ' + taskTitle + '\n' +
+            'Difficulty: ' + taskDiff + '\n' +
+            'XP Reward: ' + taskXp + ' XP\n' +
+            'Submission Link: ' + (payload.submitLink || 'N/A') + '\n\n' +
+            'Time: ' + timestamp + '\n' +
+            'Review in Admin Panel: https://innovexareg.vercel.app/admin.html'
+          );
           return respond({ success: true, message: 'Task submitted for review.' });
         }
       }
