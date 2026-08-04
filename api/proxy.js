@@ -18,6 +18,25 @@ export default async function handler(req, res) {
     payload = req.body.payload || req.body || {};
   } else if (req.method === 'GET') {
     payload = req.query || {};
+    
+    // Extract from proxy url format
+    let targetUrl = req.query.url || req.query._gasUrl || '';
+    if (targetUrl) {
+      try {
+        const urlObj = new URL(targetUrl);
+        urlObj.searchParams.forEach((value, key) => {
+          payload[key] = value;
+        });
+      } catch(e) {
+        // Handle case where targetUrl is just a path or invalid URL
+        try {
+           const dummy = new URL('http://localhost' + (targetUrl.startsWith('/') ? '' : '/') + targetUrl);
+           dummy.searchParams.forEach((value, key) => {
+             payload[key] = value;
+           });
+        } catch(err) {}
+      }
+    }
   }
 
   const action = payload.action || payload.op || '';
