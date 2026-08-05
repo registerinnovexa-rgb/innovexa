@@ -1667,18 +1667,22 @@ function renderAuditLogs(logs) {
   let html = '';
   for (const log of logs) {
     const dt = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Unknown';
+    // Backend stores type as 'type' (not 'actionType') and content as 'content' (not 'description')
+    const logType = log.type || log.actionType || '';
+    const logDesc = log.content || log.description || '';
     let typeColor = 'var(--text)';
-    if (log.actionType === 'SYSTEM') typeColor = 'var(--blue)';
-    if (log.actionType === 'USER_ACTION') typeColor = 'var(--green)';
-    if (log.actionType === 'WARNING') typeColor = 'var(--red)';
+    if (logType === 'SYSTEM' || logType === 'BROADCAST') typeColor = 'var(--blue)';
+    if (logType === 'USER_ACTION' || logType === 'TASK_SUBMITTED') typeColor = 'var(--green)';
+    if (logType === 'WARNING') typeColor = 'var(--red)';
+    if (logType === 'TASK_COMPLETED') typeColor = '#10b981';
     
     html += `
       <tr>
         <td style="font-size:12px;color:var(--text3);">${dt}</td>
         <td style="font-family:var(--font-m); color:var(--accent2);">${escHtml(log.operativeId)}</td>
         <td>${escHtml(log.name)}</td>
-        <td style="color:${typeColor}; font-weight:bold; font-size:11px;">${escHtml(log.actionType)}</td>
-        <td style="font-size:13px;">${escHtml(log.description)}</td>
+        <td style="color:${typeColor}; font-weight:bold; font-size:11px;">${escHtml(logType)}</td>
+        <td style="font-size:13px;">${escHtml(logDesc)}</td>
       </tr>
     `;
   }
@@ -1764,18 +1768,19 @@ async function populateAttendanceEvents() {
   if (!cachedEvents || cachedEvents.length === 0) {
     try {
       const data = await apiGet('events');
-      cachedEvents = data.events || [];
+      cachedEvents = data.events || data.data || [];
     } catch(e) { console.error(e); }
   }
 
   sel.innerHTML = '<option value="">Select Event</option>';
-  const now = new Date();
   cachedEvents.forEach(e => {
     // Show all events (live, upcoming, or recent)
     const opt = document.createElement('option');
-    opt.value = e.name;
+    // Use eventId as the value (for attendance lookup); title for display
+    opt.value = e.eventId || e.title || '';
     const status = e.status || '';
-    opt.textContent = e.name + (status ? ` [${status}]` : '');
+    const label = e.title || e.name || 'Untitled Event';
+    opt.textContent = label + (status ? ` [${status}]` : '');
     sel.appendChild(opt);
   });
   
@@ -1816,7 +1821,7 @@ function stopScanner() {
 let _lastScannedId = '';
 let _lastScanTime = 0;
 
-async function onScanSuccess(decodedText, eventName) {
+async function onScanSuccess(decodedText, eventId) {
   const res = document.getElementById('scan-result');
 
   // Parse Innovexa QR format: "INNOVEXA:INVX-XX" or plain "INVX-XX"
@@ -1836,7 +1841,7 @@ async function onScanSuccess(decodedText, eventName) {
   res.textContent = `Verifying: ${operativeId}...`;
 
   try {
-    const data = await apiWrite('markAttendance', { eventName, operativeId: operativeId });
+    const data = await apiWrite('markAttendance', { eventId, operativeId: operativeId });
     if (data.success) {
       res.style.background = 'var(--green-bg)';
       res.style.color = 'var(--green)';
@@ -2422,13 +2427,18 @@ async function loadMemberDetailView() {
       // Render Logs
       const logsBody = document.getElementById('detailLogsBody');
       if (res.logs && res.logs.length > 0) {
-        logsBody.innerHTML = res.logs.map(l => `
+        logsBody.innerHTML = res.logs.map(l => {
+          // Backend stores type as 'type' and content as 'content'
+          const lType = l.type || l.actionType || '';
+          const lDesc = l.content || l.description || '';
+          return `
           <tr>
             <td style="color:var(--text3);">${new Date(l.timestamp).toLocaleString()}</td>
-            <td><strong>${escHtml(l.actionType)}</strong></td>
-            <td><span style="opacity:0.8;">${escHtml(l.description)}</span></td>
+            <td><strong>${escHtml(lType)}</strong></td>
+            <td><span style="opacity:0.8;">${escHtml(lDesc)}</span></td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
       } else {
         logsBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);">No activity logs found.</td></tr>';
       }

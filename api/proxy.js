@@ -433,10 +433,18 @@ export default async function handler(req, res) {
 
     // ADMIN: Set Role
     if (action === 'admin_set_role') {
-      const { email, role } = payload;
-      if (!email || !role) return res.status(200).json({ success: false, message: 'Missing fields.' });
+      // Accept both old (email/role) and new (targetId/newRole) field names
+      const email = payload.email;
+      const role = payload.role || payload.newRole;
+      const targetId = payload.targetId;
+      if ((!email && !targetId) || !role) return res.status(200).json({ success: false, message: 'Missing fields.' });
       
-      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      let member;
+      if (targetId) {
+        member = await Member.findOne({ operativeId: targetId.trim().toUpperCase() });
+      } else {
+        member = await Member.findOne({ email: email.trim().toLowerCase() });
+      }
       if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
       
       member.forgeRole = role;
@@ -453,10 +461,20 @@ export default async function handler(req, res) {
 
     // ADMIN: Grant Forge Access
     if (action === 'admin_grant_forge_access') {
-      const { email, access } = payload;
-      if (!email || !access) return res.status(200).json({ success: false, message: 'Missing fields.' });
+      // Accept email/access (old) or operativeId/rowIndex + accessStatus (new)
+      const email = payload.email;
+      const operativeId = payload.operativeId || payload.rowIndex;
+      const access = payload.access || payload.accessStatus;
+      if ((!email && !operativeId) || !access) return res.status(200).json({ success: false, message: 'Missing fields.' });
       
-      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      let member;
+      if (operativeId && !email) {
+        member = await Member.findOne({ operativeId: String(operativeId).trim().toUpperCase() });
+        // rowIndex might be a numeric row — fall back to finding by position if not found by ID
+        if (!member) member = await Member.findOne({ email: email });
+      } else {
+        member = await Member.findOne({ email: email.trim().toLowerCase() });
+      }
       if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
       
       member.forgeAccess = access;
@@ -473,10 +491,18 @@ export default async function handler(req, res) {
 
     // ADMIN: Update Profile
     if (action === 'admin_update_profile') {
-      const { email, phone, college, skillLevel, interests, paymentProof } = payload;
-      if (!email) return res.status(200).json({ success: false, message: 'Missing email.' });
+      const { email, phone, college, skillLevel, interests, paymentProof, squad, rank, xp, forgeAccess } = payload;
+      // Accept lookup by email OR by operativeId (rowIndex may be operativeId from UI)
+      const lookupEmail = email ? email.trim().toLowerCase() : null;
+      const lookupOpId = payload.operativeId || payload.rowIndex;
+      if (!lookupEmail && !lookupOpId) return res.status(200).json({ success: false, message: 'Missing identifier (email or operativeId).' });
       
-      const member = await Member.findOne({ email: email.trim().toLowerCase() });
+      let member;
+      if (lookupEmail) {
+        member = await Member.findOne({ email: lookupEmail });
+      } else {
+        member = await Member.findOne({ operativeId: String(lookupOpId).trim().toUpperCase() });
+      }
       if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
       
       if (phone) member.phone = phone;
@@ -484,11 +510,15 @@ export default async function handler(req, res) {
       if (skillLevel) member.skillLevel = skillLevel;
       if (interests) member.interests = interests;
       if (paymentProof) member.paymentProofUrl = paymentProof;
+      if (squad !== undefined) member.squad = squad;
+      if (rank !== undefined) member.rank = rank;
+      if (xp !== undefined) member.xp = parseInt(xp) || member.xp;
+      if (forgeAccess !== undefined) member.forgeAccess = forgeAccess;
       await member.save();
       
       const log = new ActionLog({
         timestamp: new Date(), type: 'PROFILE_UPDATED',
-        content: `Profile updated by Admin`,
+        content: `Profile updated by Admin (squad/rank/xp/access)`,
         operativeId: member.operativeId, name: member.name
       });
       await log.save();
@@ -798,8 +828,13 @@ export default async function handler(req, res) {
     }
     if (action === 'forge_recall_task') {
        const { taskId } = payload;
-       await Task.deleteOne({ taskId });
-       return res.status(200).json({ success: true, message: 'Task recalled' });
+       // Recall = revert to Open status (not delete) so admin can reassign
+       const t = await Task.findOne({ taskId });
+       if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+       t.status = 'Open';
+       t.submitLink = '';
+       await t.save();
+       return res.status(200).json({ success: true, message: 'Task recalled. Moved back to Open.' });
     }
 
     // EVENTS & ATTENDANCE
@@ -917,9 +952,11 @@ export default async function handler(req, res) {
     
     // Broadcast & Feed
     if (action === 'admin_post_feed') {
-       const { message } = payload;
+       // Accept both 'message' and 'content' field names
+       const message = payload.message || payload.content;
+       if (!message) return res.status(200).json({ success: false, message: 'Content is required.' });
        const log = new ActionLog({
-         timestamp: new Date(), type: 'SYSTEM',
+         timestamp: new Date(), type: 'BROADCAST',
          content: message, operativeId: 'ADMIN', name: 'System Admin'
        });
        await log.save();
@@ -1051,15 +1088,26 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, regs });
     }
     if (action === 'admin_log_attendance' || action === 'markAttendance') {
-      const { eventId, operativeId } = payload;
-      const existing = await Attendance.findOne({ eventId, operativeId });
+      const operativeId = payload.operativeId;
+      // Accept eventId directly OR eventName (from QR scanner) — look up event by title
+      let eventId = payload.eventId;
+      if (!eventId && payload.eventName) {
+        const ev = await Event.findOne({ title: payload.eventName }).lean();
+        if (ev) eventId = ev.eventId;
+        else eventId = payload.eventName; // fall back to using name as key
+      }
+      if (!eventId || !operativeId) return res.status(200).json({ success: false, message: 'Missing eventId or operativeId.' });
+      // Verify the operative exists
+      const memberCheck = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() }).lean();
+      if (!memberCheck) return res.status(200).json({ success: false, message: `Operative ${operativeId} not found in system.` });
+      const existing = await Attendance.findOne({ eventId, operativeId: operativeId.trim().toUpperCase() });
       if (existing) {
         existing.status = 'Attended';
         await existing.save();
       } else {
-        await Attendance.create({ eventId, operativeId, status: 'Attended', timestamp: new Date() });
+        await Attendance.create({ eventId, operativeId: operativeId.trim().toUpperCase(), status: 'Attended', timestamp: new Date() });
       }
-      return res.status(200).json({ success: true, message: 'Attendance marked.' });
+      return res.status(200).json({ success: true, message: `✅ ${memberCheck.name} marked as attended.` });
     }
     if (action === 'admin_remove_attendance' || action === 'updateRegStatus') {
       const { eventId, operativeId, status } = payload;
