@@ -581,7 +581,7 @@ export default async function handler(req, res) {
           stats: {
             activeTasks: activeTasksCount,
             completedTasks: completedTasksCount,
-            totalLogs: logs.length
+            totalLogs: logs.filter(l => l.type === 'LOGIN' || l.action === 'login').length
           }
         }
       });
