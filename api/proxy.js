@@ -17,6 +17,51 @@ function createTransporter() {
 }
 const transporter = createTransporter();
 
+// ── Admin Notification Helper ────────────────────────────────────────────────
+// Sends a quick email to admin for every tracked member action.
+async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  if (!adminEmail || !process.env.EMAIL_USER) return; // skip if not configured
+  const icons = {
+    LOGIN: '🔓', TASK_SUBMITTED: '📤', TASK_RECALLED: '↩️', TASK_COMPLETED: '✅',
+    SOS_CREATED: '🆘', BOUNTY_CLAIMED: '🎯', BOUNTY_COMPLETED: '🏆',
+    PROFILE_UPDATED: '✏️', REGISTRATION: '🆕', STATUS_CHANGE: '🔄', DEFAULT: '📋'
+  };
+  const icon = icons[type] || icons.DEFAULT;
+  const urgentBanner = urgent
+    ? `<div style="background:#ef4444;color:#fff;padding:8px 16px;border-radius:6px;font-weight:700;margin-bottom:16px;">🚨 URGENT ACTION REQUIRED</div>`
+    : '';
+  try {
+    await transporter.sendMail({
+      from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: `${icon} [${type}] ${name} (${operativeId})`,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;background:#0f0f0f;color:#fff;border-radius:10px;">
+          ${urgentBanner}
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <span style="font-size:32px;">${icon}</span>
+            <div>
+              <div style="font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:2px;">Member Activity</div>
+              <div style="font-size:18px;font-weight:700;color:#fff;">${type.replace(/_/g,' ')}</div>
+            </div>
+          </div>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;width:40%;">Operative</td><td style="padding:6px 0;color:#a78bfa;font-weight:700;font-family:monospace;">${operativeId}</td></tr>
+            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Name</td><td style="padding:6px 0;color:#fff;">${name}</td></tr>
+            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Time</td><td style="padding:6px 0;color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
+            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Detail</td><td style="padding:6px 0;color:#e2e8f0;font-size:13px;">${detail || 'N/A'}</td></tr>
+          </table>
+          <a href="https://innovexa.vercel.app/admin.html" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;">Open Admin Dashboard →</a>
+          <p style="color:#3f3f46;font-size:10px;margin-top:16px;">Innovexa Hub Auto-Alert</p>
+        </div>
+      `
+    });
+  } catch(e) {
+    console.error('notifyAdmin failed:', e.message);
+  }
+}
+
 export default async function handler(req, res) {
   // Allow all origins
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -183,6 +228,23 @@ export default async function handler(req, res) {
       member.loginCount = (member.loginCount || 0) + 1;
       member.lastLoginTime = new Date().toISOString();
       await member.save();
+
+      // Save login activity log
+      await new ActionLog({
+        timestamp: new Date(),
+        type: 'LOGIN',
+        content: `Operative ${member.name} logged into Innovexa Forge.`,
+        operativeId: member.operativeId,
+        name: member.name
+      }).save();
+
+      // Notify admin of login
+      notifyAdmin({
+        type: 'LOGIN',
+        operativeId: member.operativeId,
+        name: member.name,
+        detail: `${member.name} logged into the Forge dashboard. Total logins: ${member.loginCount}.`
+      });
       
       return res.status(200).json({
         success: true,
@@ -393,10 +455,19 @@ export default async function handler(req, res) {
           name: member.name
         });
         await log.save();
+
+        // Notify admin immediately
+        notifyAdmin({
+          type: 'TASK_SUBMITTED',
+          operativeId: member.operativeId,
+          name: member.name,
+          detail: `"${task.title}" submitted for review. Proof: ${link}`
+        });
       }
       
       return res.status(200).json({ success: true, message: 'Task submitted for review.' });
     }
+
 
     // FORGE: Leaderboard
     if (action === 'forge_get_leaderboard') {
@@ -787,6 +858,15 @@ export default async function handler(req, res) {
       });
       await log.save();
 
+      // SOS = urgent admin notification
+      notifyAdmin({
+        type: 'SOS_CREATED',
+        operativeId: member.operativeId,
+        name: member.name,
+        detail: `SOS Title: "${title}". Description: ${desc}`,
+        urgent: true
+      });
+
       return res.status(200).json({ success: true, message: 'SOS Broadcasted.' });
     }
 
@@ -854,9 +934,6 @@ export default async function handler(req, res) {
     }
     if (action === 'forge_claim_bounty') {
       const { rowIndex, operativeId, name } = payload;
-      // Note: In Code.gs it used rowIndex, but here we can just use bountyId. 
-      // If frontend still sends rowIndex, we might have to adapt it. 
-      // For now, if frontend sends bountyId in rowIndex field:
       const bounty = await Bounty.findOne({ bountyId: rowIndex });
       if (bounty) {
         bounty.status = 'claimed';
@@ -870,6 +947,13 @@ export default async function handler(req, res) {
           operativeId, name
         });
         await log.save();
+
+        notifyAdmin({
+          type: 'BOUNTY_CLAIMED',
+          operativeId,
+          name,
+          detail: `"${bounty.title}" bounty claimed (+${bounty.xp || 0} XP)`
+        });
       }
       return res.status(200).json({ success: true, message: 'Bounty claimed.' });
     }
@@ -889,6 +973,13 @@ export default async function handler(req, res) {
              operativeId: member.operativeId, name: member.name
            });
            await log.save();
+
+           notifyAdmin({
+             type: 'BOUNTY_COMPLETED',
+             operativeId: member.operativeId,
+             name: member.name,
+             detail: `"${bounty.title}" bounty completed and verified.`
+           });
         }
       }
       return res.status(200).json({ success: true, message: 'Bounty completed.' });
@@ -912,13 +1003,33 @@ export default async function handler(req, res) {
        return res.status(200).json({ success: true, message: 'Task updated' });
     }
     if (action === 'forge_recall_task') {
-       const { taskId } = payload;
-       // Recall = revert to Open status (not delete) so admin can reassign
+       const { taskId, invxId } = payload;
        const t = await Task.findOne({ taskId });
        if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+       const prevStatus = t.status;
        t.status = 'Open';
        t.submitLink = '';
        await t.save();
+
+       // Log the recall
+       const operativeId = invxId ? invxId.trim().toUpperCase() : t.assignedTo;
+       const recallerMember = operativeId ? await Member.findOne({ operativeId }).lean() : null;
+       const recallerName = recallerMember ? recallerMember.name : operativeId || 'Unknown';
+       await new ActionLog({
+         timestamp: new Date(),
+         type: 'TASK_RECALLED',
+         content: `Task "${t.title}" recalled from ${prevStatus} → Open by ${recallerName}.`,
+         operativeId: operativeId || 'SYSTEM',
+         name: recallerName
+       }).save();
+
+       notifyAdmin({
+         type: 'TASK_RECALLED',
+         operativeId: operativeId || 'SYSTEM',
+         name: recallerName,
+         detail: `"${t.title}" was recalled (was: ${prevStatus}). Moved back to Open pool.`
+       });
+
        return res.status(200).json({ success: true, message: 'Task recalled. Moved back to Open.' });
     }
 

@@ -1671,17 +1671,30 @@ function renderAuditLogs(logs) {
     const logType = log.type || log.actionType || '';
     const logDesc = log.content || log.description || '';
     let typeColor = 'var(--text)';
-    if (logType === 'SYSTEM' || logType === 'BROADCAST') typeColor = 'var(--blue)';
-    if (logType === 'USER_ACTION' || logType === 'TASK_SUBMITTED') typeColor = 'var(--green)';
-    if (logType === 'WARNING') typeColor = 'var(--red)';
-    if (logType === 'TASK_COMPLETED') typeColor = '#10b981';
+    let typeBadge = logType;
+    if (logType === 'SYSTEM' || logType === 'BROADCAST') { typeColor = 'var(--blue)'; }
+    else if (logType === 'USER_ACTION') { typeColor = 'var(--green)'; }
+    else if (logType === 'WARNING') { typeColor = 'var(--red)'; }
+    else if (logType === 'TASK_SUBMITTED') { typeColor = '#10b981'; typeBadge = '📤 TASK SUBMITTED'; }
+    else if (logType === 'TASK_COMPLETED') { typeColor = '#10b981'; typeBadge = '✅ TASK COMPLETED'; }
+    else if (logType === 'TASK_RECALLED') { typeColor = '#f97316'; typeBadge = '↩️ TASK RECALLED'; }
+    else if (logType === 'LOGIN') { typeColor = '#60a5fa'; typeBadge = '🔓 LOGIN'; }
+    else if (logType === 'REGISTRATION') { typeColor = '#a855f7'; typeBadge = '🆕 REGISTRATION'; }
+    else if (logType === 'STATUS_UPDATED') { typeColor = '#f59e0b'; typeBadge = '🔄 STATUS CHANGE'; }
+    else if (logType === 'ROLE_UPDATED') { typeColor = '#f59e0b'; typeBadge = '⚙️ ROLE UPDATED'; }
+    else if (logType === 'SOS_CREATED') { typeColor = '#ef4444'; typeBadge = '🆘 SOS'; }
+    else if (logType === 'SOS_RESOLVED') { typeColor = '#10b981'; typeBadge = '✔️ SOS RESOLVED'; }
+    else if (logType === 'BOUNTY_CLAIMED') { typeColor = '#fbbf24'; typeBadge = '🎯 BOUNTY CLAIMED'; }
+    else if (logType === 'BOUNTY_COMPLETED') { typeColor = '#fbbf24'; typeBadge = '🏆 BOUNTY DONE'; }
+    else if (logType === 'BOUNTY_POSTED') { typeColor = '#a78bfa'; typeBadge = '📋 BOUNTY POSTED'; }
+    else if (logType === 'STATUS_CHECK') { typeColor = '#71717a'; typeBadge = '👁 STATUS CHECK'; }
     
     html += `
       <tr>
         <td style="font-size:12px;color:var(--text3);">${dt}</td>
-        <td style="font-family:var(--font-m); color:var(--accent2);">${escHtml(log.operativeId)}</td>
-        <td>${escHtml(log.name)}</td>
-        <td style="color:${typeColor}; font-weight:bold; font-size:11px;">${escHtml(logType)}</td>
+        <td style="font-family:var(--font-m); color:var(--accent2);">${escHtml(log.operativeId || '-')}</td>
+        <td>${escHtml(log.name || '-')}</td>
+        <td style="color:${typeColor}; font-weight:bold; font-size:11px; white-space:nowrap;">${typeBadge}</td>
         <td style="font-size:13px;">${escHtml(logDesc)}</td>
       </tr>
     `;
@@ -1691,10 +1704,11 @@ function renderAuditLogs(logs) {
 
 function filterLogs() {
   const query = document.getElementById('logSearchInput').value.toLowerCase();
-  const filtered = allAuditLogs.filter(L => 
+  const filtered = allAuditLogs.filter(L =>
     String(L.operativeId || '').toLowerCase().includes(query) ||
     String(L.name || '').toLowerCase().includes(query) ||
-    String(L.description || '').toLowerCase().includes(query)
+    String(L.content || L.description || '').toLowerCase().includes(query) ||
+    String(L.type || L.actionType || '').toLowerCase().includes(query)
   );
   renderAuditLogs(filtered);
 }
