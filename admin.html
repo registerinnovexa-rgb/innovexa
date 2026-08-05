@@ -225,8 +225,8 @@
     .modal-overlay.open { display:flex; }
     .modal-box {
       background:var(--bg); border:1px solid var(--border); border-radius:24px;
-      width:100%; max-width:560px; max-height:85vh; overflow-y:auto; padding:32px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      width:100%; max-width:780px; max-height:90vh; overflow-y:auto; padding:0;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7);
     }
     .modal-box h2 { font-size:20px; font-weight:700; margin-bottom:24px; font-family: var(--font-d); }
     .modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:24px; }
@@ -2269,80 +2269,157 @@ async function sendBroadcast(bccList) {
 
 function openProfileModal(encodedData) {
   const m = JSON.parse(decodeURIComponent(encodedData));
-  const forgeRole = m.forgeRole || '';
-  const linkedMentor = m.linkedMentor || '';
-  const forgeRoleBadge = forgeRole === 'Mentor'
-    ? `<span style="background:rgba(16,163,74,0.15);color:#10a34a;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">ARCHITECT</span>`
-    : forgeRole === 'Member'
-    ? `<span style="background:rgba(167,139,250,0.15);color:#a78bfa;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">APPRENTICE</span>`
-    : `<span style="background:rgba(100,100,100,0.15);color:#888;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">UNASSIGNED</span>`;
+
+  // Fix linked mentor — strip JSON vector arrays, show clean ID or "None"
+  let mentorDisplay = m.linkedMentor || '';
+  if (mentorDisplay.startsWith('[') || mentorDisplay.startsWith('{')) mentorDisplay = 'None';
+  if (!mentorDisplay.trim()) mentorDisplay = 'None';
+
+  // Fix DOB — format nicely
+  let dobDisplay = 'N/A';
+  if (m.dob) {
+    const d = new Date(m.dob);
+    if (!isNaN(d.getTime())) {
+      dobDisplay = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    } else {
+      dobDisplay = m.dob;
+    }
+  }
+
+  // Avatar initials
+  const initials = (m.name || '?').split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+
+  // Status + Role badge colours
+  const forgeRole = m.forgeRole || 'Unassigned';
+  const roleBadgeColor = forgeRole === 'Mentor' ? '#10a34a' : forgeRole === 'Member' ? '#a78bfa' : '#888';
+  const roleBadgeBg = forgeRole === 'Mentor' ? 'rgba(16,163,74,0.15)' : forgeRole === 'Member' ? 'rgba(167,139,250,0.15)' : 'rgba(100,100,100,0.1)';
+
+  const sLabel = (label) => `<span style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px;">${label}</span>`;
+  const sVal   = (val, color='var(--text)') => `<span style="font-size:14px;font-weight:600;color:${color};">${escHtml(val || '—')}</span>`;
+  const card   = (label, val, color) => `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">${sLabel(label)}${sVal(val, color)}</div>`;
 
   const html = `
-    <div style="display:flex; gap:20px; align-items:flex-start; margin-bottom:20px;">
-      <div>
-        <h3 style="font-size:20px; margin-bottom:4px; color:var(--accent2);">${escHtml(m.operativeId)}</h3>
-        <h2 style="font-size:24px; margin-bottom:8px;">${escHtml(m.name)}</h2>
-        <div style="display:flex; gap:8px; align-items:center;">
-          ${statusBadge(m.status)}
-          ${forgeRoleBadge}
+    <!-- ── Profile Header ── -->
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.25) 0%,rgba(16,185,129,0.1) 100%);border-bottom:1px solid var(--border);padding:28px 32px;border-radius:24px 24px 0 0;">
+      <div style="display:flex;gap:20px;align-items:center;">
+        <!-- Avatar -->
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(124,58,237,0.4);">${initials}</div>
+        <!-- Name + badges -->
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:monospace;font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:2px;margin-bottom:4px;">${escHtml(m.operativeId || 'NO-ID')}</div>
+          <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(m.name || 'Unknown')}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${statusBadge(m.status)}
+            <span style="background:${roleBadgeBg};color:${roleBadgeColor};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">${escHtml(forgeRole.toUpperCase())}</span>
+          </div>
+        </div>
+        <!-- Quick actions -->
+        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+          <button style="background:#25D366;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onclick="window.open('https://wa.me/91${escHtml(m.phone || '').replace(/[^0-9]/g, '')}?text=Hi+${encodeURIComponent(m.name || '')}%2C+this+is+Innovexa+Core+Team.')">💬 WhatsApp</button>
+          <button style="background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;" onclick="generateIDCard('${encodedData}')">🪪 ID Card</button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;">
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:var(--accent2);">${escHtml(String(m.xp || 0))}</div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">XP Points</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:14px;font-weight:800;color:#fbbf24;">${escHtml(m.rank || 'Apprentice')}</div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Rank</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:14px;font-weight:800;color:#10b981;">${escHtml(m.squad || '—')}</div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Squad</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:14px;font-weight:800;color:#60a5fa;">${escHtml(m.forgeAccess || 'Pending')}</div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Forge Access</div>
         </div>
       </div>
     </div>
-    
-    <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-      <button class="btn-sm" style="background:#25D366; color:#fff;" onclick="window.open('https://wa.me/91${escHtml(m.phone).replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(m.name).replace(/'/g, '%27')},%20this%20is%20the%20Innovexa%20Core%20Team%20regarding%20your%20membership.')">💬 Chat on WhatsApp</button>
-      <button class="btn-sm" style="background:var(--accent); color:#fff;" onclick="generateIDCard('${encodedData}')">🪪 Generate ID Card</button>
-    </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
-      <div class="admin-card" style="padding:15px; margin:0; grid-column: span 2;"><span style="font-size:11px;color:var(--text3);">University / College</span><br><strong>${escHtml(m.college || 'N/A')}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Email</span><br><strong>${escHtml(m.email)}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Phone</span><br><strong>${escHtml(m.phone)}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Branch & Year</span><br><strong>${escHtml(m.branch)} - ${escHtml(m.year)}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Skill Level</span><br><strong>${escHtml(m.skillLevel)}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0; grid-column: span 2;"><span style="font-size:11px;color:var(--text3);">Interests</span><br><strong>${escHtml(m.interests)}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Gender</span><br><strong>${escHtml(m.gender || 'N/A')}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Date of Birth</span><br><strong>${escHtml(m.dob)}</strong></div>
-      
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Squad</span><br>
-        <input type="text" id="profSquad" value="${escHtml(m.squad || '')}" placeholder="e.g. Alpha" style="width:100%; margin-top:5px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+    <!-- ── Body ── -->
+    <div style="padding:24px 32px 28px;">
+
+      <!-- Contact -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">📡 Contact Info</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        ${card('Email', m.email)}
+        ${card('Phone', m.phone)}
       </div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Rank & XP</span><br>
-        <div style="display:flex; gap:5px; margin-top:5px;">
-          <input type="text" id="profRank" value="${escHtml(m.rank || 'Apprentice')}" style="flex:1; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
-          <input type="number" id="profXP" value="${escHtml(m.xp || '0')}" style="width:60px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+
+      <!-- Academic -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">🎓 Academic Info</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;grid-column:span 2;">${sLabel('University / College')}${sVal(m.college)}</div>
+        ${card('Branch', m.branch)}
+        ${card('Year', m.year)}
+        ${card('Skill Level', m.skillLevel)}
+        ${card('Date of Birth', dobDisplay)}
+        ${card('Gender', m.gender)}
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;grid-column:span 2;">${sLabel('Interests')}${sVal(m.interests)}</div>
+      </div>
+
+      <!-- Forge Profile (editable) -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">⚙️ Forge Profile (Editable)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          ${sLabel('Squad')}
+          <input type="text" id="profSquad" value="${escHtml(m.squad || '')}" placeholder="e.g. Alpha" style="width:100%;margin-top:4px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;font-size:13px;font-family:var(--font-b);">
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          ${sLabel('Rank / XP')}
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            <input type="text" id="profRank" value="${escHtml(m.rank || 'Apprentice')}" style="flex:1;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;font-size:13px;font-family:var(--font-b);">
+            <input type="number" id="profXP" value="${escHtml(String(m.xp || 0))}" style="width:70px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--accent2);border-radius:7px;font-size:13px;font-family:var(--font-b);font-weight:700;">
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          ${sLabel('Forge Access')}
+          <select id="profForgeAccess" style="width:100%;margin-top:4px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:7px;font-size:13px;font-family:var(--font-b);">
+            <option value="Pending" ${m.forgeAccess === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
+            <option value="Granted" ${m.forgeAccess === 'Granted' ? 'selected' : ''}>✅ Granted</option>
+            <option value="Revoked" ${m.forgeAccess === 'Revoked' ? 'selected' : ''}>🚫 Revoked</option>
+          </select>
+        </div>
+        ${card('Linked Mentor', mentorDisplay, mentorDisplay !== 'None' ? 'var(--accent2)' : 'var(--text3)')}
+      </div>
+
+      <!-- Payment -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">💳 Payment Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          ${sLabel('Amount Paid')}
+          <span style="font-size:18px;font-weight:800;color:#10b981;">₹${escHtml(String(m.amount || 'No cost'))}</span>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          ${sLabel('UTR / Reference Number')}
+          <div style="font-family:monospace;font-size:13px;font-weight:700;color:#34d399;word-break:break-all;">${escHtml(m.utr || 'N/A')}</div>
+          ${m.paymentUrl ? `<button style="margin-top:8px;padding:5px 12px;font-size:11px;font-weight:700;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;cursor:pointer;" onclick="window.open('${escHtml(m.paymentUrl)}')">🖼️ View Receipt</button>` : ''}
         </div>
       </div>
-      
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Forge Access</span><br>
-        <select id="profForgeAccess" style="width:100%; margin-top:5px; padding:5px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
-          <option value="Pending" ${m.forgeAccess === 'Pending' ? 'selected' : ''}>Pending</option>
-          <option value="Granted" ${m.forgeAccess === 'Granted' ? 'selected' : ''}>Granted</option>
-          <option value="Revoked" ${m.forgeAccess === 'Revoked' ? 'selected' : ''}>Revoked</option>
-        </select>
-      </div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Linked Mentor</span><br><strong>${escHtml(m.linkedMentor || 'None')}</strong></div>
-      
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">Payment Amount</span><br><strong>₹${escHtml(m.amount || '599')}</strong></div>
-      <div class="admin-card" style="padding:15px; margin:0;"><span style="font-size:11px;color:var(--text3);">UTR Number</span><br>
-        <strong style="font-family:monospace; color:var(--green);">${escHtml(m.utr)}</strong>
-        ${m.paymentUrl ? `<br><button class="btn-sm" style="margin-top:8px; background:var(--bg3); border:1px solid var(--border);" onclick="window.open('${escHtml(m.paymentUrl)}')">🖼️ View Screenshot</button>` : ''}
-      </div>
     </div>
-    
-
   `;
-  
-  document.getElementById('modalTitle').textContent = 'Member Profile';
+
+  document.getElementById('modalTitle').textContent = '';
   document.getElementById('modalFields').innerHTML = html;
-  
+
+  // Resize modal box for profile
+  document.getElementById('modalBox').style.maxWidth = '780px';
+  document.getElementById('modalBox').style.padding = '0';
+
   const saveBtn = document.getElementById('modalSave');
   saveBtn.style.display = 'block';
+  saveBtn.innerText = '💾 Save Changes';
   saveBtn.onclick = () => adminUpdateProfile(m.rowIndex);
-  
+
   document.getElementById('modal').classList.add('open');
   document.getElementById('modal').style.display = '';
 }
+
 
 async function adminUpdateProfile(rowIndex) {
   const squad = document.getElementById('profSquad').value;
@@ -3010,6 +3087,9 @@ function openModal(type, prefill) {
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
   document.getElementById('modal').style.display = '';
+  // Reset any custom sizing set by openProfileModal
+  const box = document.getElementById('modalBox');
+  if (box) { box.style.maxWidth = ''; box.style.padding = ''; }
   currentModal = null;
   editingIndex = null;
 }
