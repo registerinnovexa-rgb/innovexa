@@ -20,8 +20,9 @@ const transporter = createTransporter();
 // ── Admin Notification Helper ────────────────────────────────────────────────
 // Sends a quick email to admin for every tracked member action.
 async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-  if (!adminEmail || !process.env.EMAIL_USER) return; // skip if not configured
+  // Always send to admin inbox — hardcoded fallback ensures delivery even if ADMIN_EMAIL env missing
+  const adminEmail = process.env.ADMIN_EMAIL || 'updates.innovexa@zohomail.in';
+  if (!process.env.EMAIL_USER) { console.warn('notifyAdmin: EMAIL_USER not set, skipping'); return; }
   const icons = {
     LOGIN: '🔓', TASK_SUBMITTED: '📤', TASK_RECALLED: '↩️', TASK_COMPLETED: '✅',
     SOS_CREATED: '🆘', BOUNTY_CLAIMED: '🎯', BOUNTY_COMPLETED: '🏆',
@@ -1111,11 +1112,11 @@ export default async function handler(req, res) {
        const { taskId, status, feedback } = payload;
        const t = await Task.findOne({ taskId });
        if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
-       
+
        t.status = status;
        t.feedback = feedback || '';
        await t.save();
-       
+
        // Award XP if completed and assigned to a specific member
        if (status === 'Completed' && t.assignedTo && t.assignedTo !== 'Open') {
          const xpToAward = parseInt(t.xp) || 0;
@@ -1134,15 +1135,83 @@ export default async function handler(req, res) {
            else if (member.xp >= 150) rank = 'Operative';
            member.rank = rank;
            await member.save();
-           
+
            const log = new ActionLog({
              timestamp: new Date(), type: 'TASK_COMPLETED',
              content: `Task approved: ${t.title} (+${xpToAward} XP)`,
              operativeId: member.operativeId, name: member.name
            });
            await log.save();
+
+           // Email the member — task approved
+           if (member.email && process.env.EMAIL_USER) {
+             try {
+               await transporter.sendMail({
+                 from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+                 to: member.email,
+                 subject: `✅ Task Approved: ${t.title} (+${xpToAward} XP)`,
+                 html: `
+                   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:10px;">
+                     <div style="font-size:36px;text-align:center;margin-bottom:12px;">🏆</div>
+                     <h2 style="text-align:center;color:#10b981;margin-bottom:4px;">Task Approved!</h2>
+                     <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">Your submission has been reviewed by the admin.</p>
+                     <div style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:16px;">
+                       <table style="width:100%;border-collapse:collapse;">
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Task</td><td style="color:#fff;font-weight:700;">${t.title}</td></tr>
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Status</td><td style="color:#10b981;font-weight:700;">✅ Approved</td></tr>
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">XP Earned</td><td style="color:#a78bfa;font-weight:800;font-size:16px;">+${xpToAward} XP</td></tr>
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">New Rank</td><td style="color:#fbbf24;font-weight:700;">${rank}</td></tr>
+                         ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Feedback</td><td style="color:#e2e8f0;font-size:13px;">${feedback}</td></tr>` : ''}
+                       </table>
+                     </div>
+                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
+                     <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
+                   </div>`
+               });
+             } catch(e) { console.error('Member approval email failed:', e.message); }
+           }
          }
        }
+
+       // If rejected — notify member and log
+       if ((status === 'Open' || status === 'In Progress') && t.assignedTo && t.assignedTo !== 'Open') {
+         const member = await Member.findOne({ operativeId: t.assignedTo });
+         if (member) {
+           const log = new ActionLog({
+             timestamp: new Date(), type: 'TASK_RECALLED',
+             content: `Task rejected & reassigned: ${t.title}`,
+             operativeId: member.operativeId, name: member.name
+           });
+           await log.save();
+
+           // Email the member — task rejected
+           if (member.email && process.env.EMAIL_USER) {
+             try {
+               await transporter.sendMail({
+                 from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+                 to: member.email,
+                 subject: `❌ Task Needs Revision: ${t.title}`,
+                 html: `
+                   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:10px;">
+                     <div style="font-size:36px;text-align:center;margin-bottom:12px;">🔁</div>
+                     <h2 style="text-align:center;color:#ef4444;margin-bottom:4px;">Revision Required</h2>
+                     <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">Your submission needs some changes before it can be approved.</p>
+                     <div style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:16px;">
+                       <table style="width:100%;border-collapse:collapse;">
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Task</td><td style="color:#fff;font-weight:700;">${t.title}</td></tr>
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Status</td><td style="color:#ef4444;font-weight:700;">❌ Sent Back</td></tr>
+                         ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Admin Feedback</td><td style="color:#fbbf24;font-size:13px;">${feedback}</td></tr>` : ''}
+                       </table>
+                     </div>
+                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
+                     <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
+                   </div>`
+               });
+             } catch(e) { console.error('Member rejection email failed:', e.message); }
+           }
+         }
+       }
+
        return res.status(200).json({ success: true, message: 'Task reviewed' });
     }
     
