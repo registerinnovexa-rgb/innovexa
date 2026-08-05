@@ -140,7 +140,7 @@ export default async function handler(req, res) {
         });
         await log.save();
 
-        notifyAdmin({
+        await notifyAdmin({
           type: 'STATUS_CHECK',
           operativeId: member.operativeId,
           name: member.name,
@@ -247,7 +247,7 @@ export default async function handler(req, res) {
       }).save();
 
       // Notify admin of login
-      notifyAdmin({
+      await notifyAdmin({
         type: 'LOGIN',
         operativeId: member.operativeId,
         name: member.name,
@@ -397,7 +397,7 @@ export default async function handler(req, res) {
         
         let finalRole = role || (isPresident ? 'president' : 'admin');
         
-        notifyAdmin({
+        await notifyAdmin({
           type: 'LOGIN',
           operativeId: member.operativeId,
           name: member.name,
@@ -472,7 +472,7 @@ export default async function handler(req, res) {
         await log.save();
 
         // Notify admin immediately
-        notifyAdmin({
+        await notifyAdmin({
           type: 'TASK_SUBMITTED',
           operativeId: member.operativeId,
           name: member.name,
@@ -874,7 +874,7 @@ export default async function handler(req, res) {
       await log.save();
 
       // SOS = urgent admin notification
-      notifyAdmin({
+      await notifyAdmin({
         type: 'SOS_CREATED',
         operativeId: member.operativeId,
         name: member.name,
@@ -963,7 +963,7 @@ export default async function handler(req, res) {
         });
         await log.save();
 
-        notifyAdmin({
+        await notifyAdmin({
           type: 'BOUNTY_CLAIMED',
           operativeId,
           name,
@@ -989,7 +989,7 @@ export default async function handler(req, res) {
            });
            await log.save();
 
-           notifyAdmin({
+           await notifyAdmin({
              type: 'BOUNTY_COMPLETED',
              operativeId: member.operativeId,
              name: member.name,
@@ -1038,7 +1038,7 @@ export default async function handler(req, res) {
          name: recallerName
        }).save();
 
-       notifyAdmin({
+       await notifyAdmin({
          type: 'TASK_RECALLED',
          operativeId: operativeId || 'SYSTEM',
          name: recallerName,
@@ -1103,7 +1103,7 @@ export default async function handler(req, res) {
       });
       await log.save();
       
-      notifyAdmin({
+      await notifyAdmin({
         type: 'TASK_CREATED',
         operativeId: 'ADMIN',
         name: 'System Admin',
@@ -1124,7 +1124,7 @@ export default async function handler(req, res) {
        if (status !== undefined) t.status = status;
        await t.save();
        
-       notifyAdmin({
+       await notifyAdmin({
          type: 'TASK_UPDATED',
          operativeId: 'ADMIN',
          name: 'System Admin',
@@ -1137,7 +1137,7 @@ export default async function handler(req, res) {
        const { taskId } = payload;
        const t = await Task.findOne({ taskId });
        if (t) {
-         notifyAdmin({
+         await notifyAdmin({
            type: 'TASK_DELETED',
            operativeId: 'ADMIN',
            name: 'System Admin',
