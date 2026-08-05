@@ -27,6 +27,7 @@ const MemberSchema = new mongoose.Schema({
   feedback: String,
   otp: String,
   otpTime: Number,
+  otpAttempts: { type: Number, default: 0 },
   loginCount: { type: Number, default: 0 },
   lastLoginTime: String,
   faceDescriptor: String,
@@ -175,3 +176,15 @@ const CertReqSchema = new mongoose.Schema({
 });
 
 export const CertReq = mongoose.models.CertReq || mongoose.model('CertReq', CertReqSchema);
+
+const PlatformSettingsSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  registrationOpen: { type: Boolean, default: true },
+  maintenanceMode: { type: Boolean, default: false },
+  adminEmail: { type: String, default: 'updates.innovexa@zohomail.in' },
+  otpRateLimitSeconds: { type: Number, default: 60 },
+  otpMaxAttempts: { type: Number, default: 5 },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+export const PlatformSettings = mongoose.models.PlatformSettings || mongoose.model('PlatformSettings', PlatformSettingsSchema);

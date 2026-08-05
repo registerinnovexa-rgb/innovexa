@@ -432,10 +432,79 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
       Manage Admins
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('sysSettings')" id="navSysSettings">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      System Settings
+    </button>
   </div>
 
   <!-- Main Content -->
   <div class="main-content">
+
+    <!-- ── SYSTEM SETTINGS TAB ── -->
+    <div class="tab-content" id="tabSysSettings">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">System Settings</h2>
+        <button class="btn-add" onclick="saveSettings()" id="btnSaveSettings">Save All Changes</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+        <!-- Platform Toggles -->
+        <div class="admin-card" style="grid-column:1/-1;">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;">Platform Controls</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);">
+              <div>
+                <div style="font-size:14px;font-weight:600;">Registration</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:4px;">Allow new members to register publicly</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="settingRegOpen" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+                <span id="settingRegLabel" style="font-size:12px;font-weight:700;text-transform:uppercase;">ON</span>
+              </label>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid var(--border);">
+              <div>
+                <div style="font-size:14px;font-weight:600;">Maintenance Mode</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:4px;">Block all non-admin access to the Forge</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" id="settingMaintenance" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;">
+                <span id="settingMaintLabel" style="font-size:12px;font-weight:700;text-transform:uppercase;">OFF</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Email Config -->
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Admin Notification Email</h3>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">All system alerts are routed to this address.</p>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Admin Email</label>
+            <input type="email" id="settingAdminEmail" placeholder="admin@example.com" />
+          </div>
+        </div>
+
+        <!-- OTP Security -->
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">OTP Security</h3>
+          <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">Control how the Forge OTP login behaves.</p>
+          <div class="form-group">
+            <label>Rate Limit (seconds between requests)</label>
+            <input type="number" id="settingOtpRate" min="10" max="300" placeholder="60" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Max Failed Attempts before lockout</label>
+            <input type="number" id="settingOtpMax" min="1" max="10" placeholder="5" />
+          </div>
+        </div>
+
+      </div>
+
+      <div id="settingsStatus" style="margin-top:20px;font-size:13px;font-weight:600;min-height:20px;"></div>
+    </div>
 
     <!-- ── OVERVIEW TAB ── -->
     <div class="tab-content active" id="tabOverview">
@@ -1630,7 +1699,64 @@ function switchAdminTab(tab) {
   if (tab === 'events') loadEvents();
   if (tab === 'surveillance') loadAuditLogs();
   if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
+  if (tab === 'sysSettings') loadSettings();
 }
+
+// ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
+async function loadSettings() {
+  const statusEl = document.getElementById('settingsStatus');
+  statusEl.textContent = 'Loading settings...';
+  try {
+    const res = await apiPost('admin_get_settings', {});
+    if (!res.success) throw new Error(res.message);
+    const s = res.data;
+    const regChk = document.getElementById('settingRegOpen');
+    const maintChk = document.getElementById('settingMaintenance');
+    regChk.checked = s.registrationOpen !== false;
+    maintChk.checked = s.maintenanceMode === true;
+    document.getElementById('settingRegLabel').textContent = regChk.checked ? 'ON' : 'OFF';
+    document.getElementById('settingMaintLabel').textContent = maintChk.checked ? 'ON' : 'OFF';
+    document.getElementById('settingAdminEmail').value = s.adminEmail || '';
+    document.getElementById('settingOtpRate').value = s.otpRateLimitSeconds || 60;
+    document.getElementById('settingOtpMax').value = s.otpMaxAttempts || 5;
+    // Live label update on toggle
+    regChk.onchange = () => document.getElementById('settingRegLabel').textContent = regChk.checked ? 'ON' : 'OFF';
+    maintChk.onchange = () => document.getElementById('settingMaintLabel').textContent = maintChk.checked ? 'ON' : 'OFF';
+    statusEl.textContent = '';
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Failed to load settings: ' + e.message;
+  }
+}
+
+async function saveSettings() {
+  const btn = document.getElementById('btnSaveSettings');
+  const statusEl = document.getElementById('settingsStatus');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  statusEl.textContent = '';
+  try {
+    const res = await apiPost('admin_save_settings', {
+      registrationOpen: document.getElementById('settingRegOpen').checked,
+      maintenanceMode: document.getElementById('settingMaintenance').checked,
+      adminEmail: document.getElementById('settingAdminEmail').value,
+      otpRateLimitSeconds: document.getElementById('settingOtpRate').value,
+      otpMaxAttempts: document.getElementById('settingOtpMax').value,
+    });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Settings saved successfully.';
+    showToast('Settings saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+    showToast('Failed to save settings.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save All Changes';
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 let allAuditLogs = [];
 

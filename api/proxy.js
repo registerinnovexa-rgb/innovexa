@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -221,10 +221,19 @@ export default async function handler(req, res) {
       const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Operative ID not found.' });
       if (!member.email) return res.status(200).json({ success: false, message: 'No email associated with this ID.' });
-      
+
+      // OTP Rate Limiting: check if a recent OTP was already sent
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      const rateLimitSeconds = cfg ? cfg.otpRateLimitSeconds : 60;
+      if (member.otpTime && (Date.now() - member.otpTime < rateLimitSeconds * 1000)) {
+        const wait = Math.ceil((rateLimitSeconds * 1000 - (Date.now() - member.otpTime)) / 1000);
+        return res.status(200).json({ success: false, message: `Please wait ${wait}s before requesting a new code.` });
+      }
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       member.otp = otp;
       member.otpTime = Date.now();
+      member.otpAttempts = 0; // reset attempts on new OTP
       await member.save();
       
       try {
@@ -285,16 +294,32 @@ export default async function handler(req, res) {
       
       const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Operative ID not found.' });
-      
-      if (!member.otp || member.otp !== otp) {
-        return res.status(200).json({ success: false, message: 'Invalid or expired login code.' });
+
+      // Max attempt lockout
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      const maxAttempts = cfg ? cfg.otpMaxAttempts : 5;
+      if ((member.otpAttempts || 0) >= maxAttempts) {
+        return res.status(200).json({ success: false, message: `Too many failed attempts. Request a new code.` });
       }
-      if (Date.now() - member.otpTime > 15 * 60 * 1000) {
-        return res.status(200).json({ success: false, message: 'Login code expired.' });
+
+      // Expiry check
+      if (!member.otp || Date.now() - member.otpTime > 15 * 60 * 1000) {
+        member.otp = '';
+        await member.save();
+        return res.status(200).json({ success: false, message: 'Login code expired. Please request a new one.' });
+      }
+
+      // Wrong OTP
+      if (member.otp !== otp) {
+        member.otpAttempts = (member.otpAttempts || 0) + 1;
+        await member.save();
+        const remaining = maxAttempts - member.otpAttempts;
+        return res.status(200).json({ success: false, message: `Invalid code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
       }
       
       // Clear OTP and log login
       member.otp = '';
+      member.otpAttempts = 0;
       member.loginCount = (member.loginCount || 0) + 1;
       member.lastLoginTime = new Date().toISOString();
       await member.save();
@@ -335,6 +360,30 @@ export default async function handler(req, res) {
       });
     }
     
+    // ADMIN: Get Platform Settings
+    if (action === 'admin_get_settings') {
+      let settings = await PlatformSettings.findOne({ key: 'global' });
+      if (!settings) settings = await PlatformSettings.create({ key: 'global' });
+      return res.status(200).json({ success: true, data: settings });
+    }
+
+    // ADMIN: Save Platform Settings
+    if (action === 'admin_save_settings') {
+      const { registrationOpen, maintenanceMode, adminEmail, otpRateLimitSeconds, otpMaxAttempts } = payload;
+      const update = { updatedAt: new Date() };
+      if (registrationOpen !== undefined) update.registrationOpen = registrationOpen === 'true' || registrationOpen === true;
+      if (maintenanceMode !== undefined) update.maintenanceMode = maintenanceMode === 'true' || maintenanceMode === true;
+      if (adminEmail) update.adminEmail = adminEmail.trim();
+      if (otpRateLimitSeconds) update.otpRateLimitSeconds = parseInt(otpRateLimitSeconds);
+      if (otpMaxAttempts) update.otpMaxAttempts = parseInt(otpMaxAttempts);
+      const settings = await PlatformSettings.findOneAndUpdate(
+        { key: 'global' },
+        { $set: update },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: settings, message: 'Settings saved.' });
+    }
+
     // PUBLIC: Registration
     if (action === 'register_member') {
         const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr } = payload;
