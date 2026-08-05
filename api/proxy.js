@@ -140,6 +140,13 @@ export default async function handler(req, res) {
         });
         await log.save();
 
+        notifyAdmin({
+          type: 'STATUS_CHECK',
+          operativeId: member.operativeId,
+          name: member.name,
+          detail: `${member.name} checked their application status.`
+        });
+
         return res.status(200).json({
           success: true,
           found: true,
@@ -389,6 +396,13 @@ export default async function handler(req, res) {
         }
         
         let finalRole = role || (isPresident ? 'president' : 'admin');
+        
+        notifyAdmin({
+          type: 'LOGIN',
+          operativeId: member.operativeId,
+          name: member.name,
+          detail: `Admin login successful. Role: ${finalRole}`
+        });
         
         return res.status(200).json({
           success: true,
@@ -1088,6 +1102,14 @@ export default async function handler(req, res) {
         operativeId: 'ADMIN', name: 'System Admin'
       });
       await log.save();
+      
+      notifyAdmin({
+        type: 'TASK_CREATED',
+        operativeId: 'ADMIN',
+        name: 'System Admin',
+        detail: `New task deployed: "${title}" (+${xp} XP). Assigned to: ${assignedTo || 'Open'}`
+      });
+
       return res.status(200).json({ success: true, message: 'Bounty deployed!' });
     }
     if (action === 'admin_edit_task') {
@@ -1101,10 +1123,27 @@ export default async function handler(req, res) {
        if (assignedTo !== undefined) t.assignedTo = assignedTo;
        if (status !== undefined) t.status = status;
        await t.save();
+       
+       notifyAdmin({
+         type: 'TASK_UPDATED',
+         operativeId: 'ADMIN',
+         name: 'System Admin',
+         detail: `Task "${t.title}" was updated. Assigned to: ${t.assignedTo}, Status: ${t.status}`
+       });
+       
        return res.status(200).json({ success: true, message: 'Task updated' });
     }
     if (action === 'admin_delete_task') {
        const { taskId } = payload;
+       const t = await Task.findOne({ taskId });
+       if (t) {
+         notifyAdmin({
+           type: 'TASK_DELETED',
+           operativeId: 'ADMIN',
+           name: 'System Admin',
+           detail: `Task "${t.title}" was permanently deleted.`
+         });
+       }
        await Task.deleteOne({ taskId });
        return res.status(200).json({ success: true, message: 'Task deleted' });
     }
