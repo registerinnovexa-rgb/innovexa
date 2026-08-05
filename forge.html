@@ -75,13 +75,17 @@
       
       <!-- Step 2: Verify Code -->
       <div id="loginStep2" style="display:none;">
+        <div class="otp-hint">
+          <div class="otp-hint-icon">✉️</div>
+          <div>We've sent a 6-digit access code to your registered email address.</div>
+        </div>
         <div class="form-group">
           <label class="form-label">Login Code (OTP)</label>
           <input type="text" id="loginOtp" class="form-input" placeholder="6-digit code" />
         </div>
-        <button id="loginBtn2" class="btn-primary" style="width:100%; margin-top:12px; padding:14px;" onclick="handleVerifyLoginCode()">Authenticate</button>
-        <div style="text-align:center; margin-top:12px;">
-          <a href="#" onclick="resetLoginView(); return false;" style="color:var(--text3); font-size:13px; text-decoration:underline;">Start Over</a>
+        <button id="loginBtn2" class="btn-primary" style="margin-top:12px;" onclick="handleVerifyLoginCode()">Authenticate</button>
+        <div style="text-align:center; margin-top:20px;">
+          <a href="#" onclick="resetLoginView(); return false;" class="back-link" style="margin-top:0;">Start Over</a>
         </div>
       </div>
 
@@ -133,40 +137,40 @@
           <p class="section-desc">Your restricted operative dashboard.</p>
 
           <div class="glass-card">
-            <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Operative Status</h3>
-            <div style="display:flex; flex-wrap:wrap; gap:20px;">
-              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Operative Rank</div>
-                <div style="font-weight:600; color:var(--text-1);" id="prof-rank">Apprentice</div>
+            <h3 style="font-family:var(--font-d); font-size:18px; font-weight:700; color:#0f172a; margin-bottom:20px;">Operative Status</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:16px;">
+              <div class="stat-mini">
+                <div class="stat-label">Operative Rank</div>
+                <div class="stat-value" id="prof-rank">Apprentice</div>
               </div>
-              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Experience Points (XP)</div>
-                <div style="font-weight:600; color:var(--accent2);"><span id="prof-xp">0</span> XP</div>
+              <div class="stat-mini">
+                <div class="stat-label">Experience Points</div>
+                <div class="stat-value accent"><span id="prof-xp">0</span> XP</div>
               </div>
-              <div style="flex:1; min-width:200px; padding:16px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid rgba(0,0,0,0.05);">
-                <div style="font-family:var(--font-m); font-size:11px; color:var(--text-3); margin-bottom:4px; text-transform:uppercase;">Squad</div>
-                <div style="font-weight:600; color:var(--text-1);" id="prof-squad">Unassigned</div>
+              <div class="stat-mini">
+                <div class="stat-label">Squad Assignment</div>
+                <div class="stat-value" id="prof-squad">Unassigned</div>
               </div>
             </div>
             
-            <div style="margin-top:32px;">
-              <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Forge Sessions</h3>
+            <div style="margin-top:36px;">
+              <h3 style="font-family:var(--font-d); font-size:18px; font-weight:700; color:#0f172a; margin-bottom:16px;">Forge Sessions</h3>
               <div id="forgeSessionsContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
-                <p style="color:var(--text-3); font-size:13px;">Decrypting session logs...</p>
+                <p style="color:#94a3b8; font-size:14px;">Decrypting session logs...</p>
               </div>
             </div>
             
-            <div style="margin-top:32px;">
-              <h3 style="font-family:var(--font-d); font-size:18px; margin-bottom:16px;">Global Announcements</h3>
+            <div style="margin-top:36px;">
+              <h3 style="font-family:var(--font-d); font-size:18px; font-weight:700; color:#0f172a; margin-bottom:16px;">Global Announcements</h3>
               <div id="forgeFeedContainer" style="display:flex; flex-direction:column; gap:12px;">
-                <p style="color:var(--text-3); font-size:13px;">Scanning frequencies...</p>
+                <p style="color:#94a3b8; font-size:14px;">Scanning frequencies...</p>
               </div>
             </div>
             
-            <div style="margin-top:32px; padding:24px; background:rgba(17,17,16,0.9); border-radius:16px; color:#fff;">
-              <h4 style="font-family:var(--font-d); font-size:16px; margin-bottom:8px;">Need Assistance?</h4>
-              <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.5;">Reach out to the Core Team on the official WhatsApp group for any queries or guidance.</p>
-              <button class="btn-dark" style="background:#fff; color:#111;" onclick="window.open('https://chat.whatsapp.com/E160VovtX55L94mF6VzC5K', '_blank')">Open WhatsApp</button>
+            <div style="margin-top:36px; padding:28px; background:linear-gradient(135deg, #f8fafc, #f1f5f9); border:1px solid #e2e8f0; border-radius:20px;">
+              <h4 style="font-family:var(--font-d); font-size:18px; color:#0f172a; margin-bottom:10px; font-weight:700;">Need Assistance?</h4>
+              <p style="font-size:14px; color:#64748b; margin-bottom:24px; line-height:1.6;">Reach out to the Core Team on the official WhatsApp group for any queries, mission guidance, or technical support.</p>
+              <button class="btn-primary" style="width:auto; padding:12px 28px;" onclick="window.open('https://chat.whatsapp.com/E160VovtX55L94mF6VzC5K', '_blank')">Open Comms Link</button>
             </div>
           </div>
         </div>
@@ -210,15 +214,15 @@
             <button class="btn-dark" onclick="loadLeaderboard()">↻ Refresh</button>
           </div>
           <div id="leaderboardLoading" class="empty-state" style="display:none;">Loading rankings...</div>
-          <div class="glass-card">
+          <div class="glass-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
-              <table style="width:100%; border-collapse:collapse; text-align:left;">
+              <table class="lb-table">
                 <thead>
-                  <tr style="border-bottom:1px solid var(--border);">
-                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Rank #</th>
-                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Operative</th>
-                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">Class Rank</th>
-                    <th style="padding:12px; color:var(--text-3); font-size:12px; text-transform:uppercase;">XP</th>
+                  <tr>
+                    <th>Rank #</th>
+                    <th>Operative</th>
+                    <th>Class Rank</th>
+                    <th>XP</th>
                   </tr>
                 </thead>
                 <tbody id="leaderboardBody">
@@ -674,18 +678,18 @@
         if (res.success && res.sessions && res.sessions.length > 0) {
           container.innerHTML = res.sessions.map(ev => {
              let statusBadge = '';
-             if (ev.status === 'UPCOMING') statusBadge = '<span style="background:var(--accent); color:#111; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">UPCOMING</span>';
-             else if (ev.status === 'COMPLETED') statusBadge = '<span style="background:#333; color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">COMPLETED</span>';
-             else statusBadge = `<span style="background:#333; color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;">${escHtml(ev.status)}</span>`;
+             if (ev.status === 'UPCOMING') statusBadge = '<span style="background:linear-gradient(135deg, #7c3aed, #4f46e5); color:#fff; padding:4px 10px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:0.05em;">UPCOMING</span>';
+             else if (ev.status === 'COMPLETED') statusBadge = '<span style="background:#e2e8f0; color:#475569; padding:4px 10px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:0.05em;">COMPLETED</span>';
+             else statusBadge = `<span style="background:#1e293b; color:#fff; padding:4px 10px; border-radius:100px; font-size:9px; font-weight:700; letter-spacing:0.05em;">${escHtml(ev.status)}</span>`;
 
              return `
-               <div style="padding:16px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.05); border-radius:12px; display:flex; flex-direction:column;">
+               <div style="padding:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:18px; display:flex; flex-direction:column; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(124,58,237,0.2)';this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='translateY(0)';">
                  <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
                    ${statusBadge}
-                   <span style="color:var(--text-3); font-size:11px; font-family:var(--font-m);">${ev.date || 'TBA'}</span>
+                   <span style="color:#94a3b8; font-size:11px; font-family:var(--font-m); font-weight:600;">${ev.date || 'TBA'}</span>
                  </div>
-                 <h4 style="font-size:16px; font-weight:600; margin-bottom:8px; color:var(--text-1); font-family:var(--font-d);">${escHtml(ev.title)}</h4>
-                 <p style="font-size:13px; color:var(--text-3); line-height:1.5; margin-bottom:0;">${escHtml(ev.description)}</p>
+                 <h4 style="font-size:16px; font-weight:700; margin-bottom:8px; color:#0f172a; font-family:var(--font-d);">${escHtml(ev.title)}</h4>
+                 <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:0;">${escHtml(ev.description)}</p>
                </div>
              `;
           }).join('');
@@ -730,37 +734,37 @@
           if (isActive) {
             actionHtml = `
               <div style="margin-top:16px;">
-                <input type="text" id="submitLink_${t.taskId}" class="form-input" placeholder="Paste proof link (GitHub, Drive, etc.)" style="margin-bottom:8px;">
-                <button class="btn-dark" onclick="submitMission('${t.taskId}')">Submit for Review</button>
+                <input type="text" id="submitLink_${t.taskId}" class="form-input" placeholder="Paste proof link (GitHub, Drive, etc.)" style="margin-bottom:10px;">
+                <button class="btn-primary" onclick="submitMission('${t.taskId}')">Submit for Review</button>
               </div>
             `;
           } else {
-            actionHtml = `<div style="margin-top:16px; font-weight:600; color:var(--accent2);">${t.status}</div>`;
-            if (t.feedback) actionHtml += `<div style="margin-top:8px; font-size:13px; color:var(--text-3);">Admin Feedback: ${escHtml(t.feedback)}</div>`;
+            actionHtml = `<div style="margin-top:16px; font-weight:700; color:#7c3aed;">${t.status}</div>`;
+            if (t.feedback) actionHtml += `<div style="margin-top:8px; font-size:13px; color:#64748b; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"><strong>Admin Feedback:</strong> ${escHtml(t.feedback)}</div>`;
             
             if (t.status === 'Under Review') {
                 actionHtml += `
-                <div style="margin-top:12px; padding:12px; background:rgba(0,0,0,0.03); border-radius:8px; border:1px solid var(--border);">
-                  <label style="font-size:11px; color:var(--text-3); text-transform:uppercase; margin-bottom:4px; display:block;">Update Submission</label>
-                  <input type="text" id="editLink_${t.taskId}" class="form-input" value="${escHtml(t.submitLink)}" style="margin-bottom:8px;">
-                  <div style="display:flex; gap:8px;">
-                      <button class="btn-dark" style="flex:1; padding:8px 12px; font-size:12px;" onclick="editMission('${t.taskId}')">Update Link</button>
-                      <button class="btn-dark" style="flex:1; padding:8px 12px; font-size:12px; background:#ef4444;" onclick="recallMission('${t.taskId}')">Recall Submission</button>
+                <div style="margin-top:16px; padding:16px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+                  <label style="font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase; margin-bottom:6px; display:block; letter-spacing:0.05em;">Update Submission</label>
+                  <input type="text" id="editLink_${t.taskId}" class="form-input" value="${escHtml(t.submitLink)}" style="margin-bottom:10px;">
+                  <div style="display:flex; gap:10px;">
+                      <button class="btn-primary" style="flex:1; padding:10px 14px; font-size:13px;" onclick="editMission('${t.taskId}')">Update Link</button>
+                      <button class="btn-primary" style="flex:1; padding:10px 14px; font-size:13px; background:#ef4444; box-shadow:none;" onclick="recallMission('${t.taskId}')">Recall Submission</button>
                   </div>
                 </div>
                 `;
             } else if (t.status === 'Completed' || t.status === 'Approved') {
-                actionHtml += `<div style="margin-top:8px; font-size:12px; color:var(--text-3);">Submitted Link: <a href="${escHtml(t.submitLink)}" target="_blank" style="color:var(--accent2); text-decoration:underline;">View ↗</a></div>`;
+                actionHtml += `<div style="margin-top:8px; font-size:13px; color:#94a3b8;">Submitted Link: <a href="${escHtml(t.submitLink)}" target="_blank" style="color:#7c3aed; text-decoration:underline; font-weight:600;">View ↗</a></div>`;
             }
           }
 
           const card = `
-            <div class="glass-card" style="margin-bottom:16px; border-left:4px solid var(--accent2);">
-              <div style="display:flex; justify-content:space-between;">
-                <h3 style="font-family:var(--font-d); font-size:18px;">${escHtml(t.title)}</h3>
+            <div class="mission-card" style="${isActive ? 'border-left:4px solid #7c3aed;' : ''}">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <h3 style="font-family:var(--font-d); font-size:18px; font-weight:700; color:#0f172a; margin:0;">${escHtml(t.title)}</h3>
                 <span class="prof-badge">${escHtml(t.difficulty)} | ${t.xp} XP</span>
               </div>
-              <p style="color:var(--text-2); font-size:14px; margin-top:8px;">${parseMarkdown(t.description)}</p>
+              <p style="color:#64748b; font-size:14px; margin-top:0; line-height:1.6;">${parseMarkdown(t.description)}</p>
               ${actionHtml}
             </div>
           `;
@@ -873,25 +877,26 @@
         }
 
         (data.leaderboard || data.data || []).forEach((user, index) => {
+          let rankClass = '';
           let rankIcon = `#${index + 1}`;
-          if (index === 0) rankIcon = '🥇 1st';
-          if (index === 1) rankIcon = '🥈 2nd';
-          if (index === 2) rankIcon = '🥉 3rd';
+          if (index === 0) { rankIcon = '🥇 1st'; rankClass = 'lb-rank-1'; }
+          if (index === 1) { rankIcon = '🥈 2nd'; rankClass = 'lb-rank-2'; }
+          if (index === 2) { rankIcon = '🥉 3rd'; rankClass = 'lb-rank-3'; }
           
           let rowStyle = '';
           if (user.operativeId === session.operativeId) {
-            rowStyle = 'background:rgba(0,0,0,0.03); font-weight:600;';
+            rowStyle = 'background:#f1f5f9;';
           }
 
           tbody.innerHTML += `
-            <tr style="${rowStyle} border-bottom:1px solid var(--border);">
-              <td style="padding:16px;">${rankIcon}</td>
-              <td style="padding:16px;">
-                <div style="color:var(--text-1);">${escHtml(user.name)}</div>
-                <div style="font-size:11px; color:var(--text-3); font-family:var(--font-m);">${user.operativeId}</div>
+            <tr class="${rankClass}" style="${rowStyle}">
+              <td>${rankIcon}</td>
+              <td>
+                <div style="font-weight:700;">${escHtml(user.name)}</div>
+                <div style="font-size:11px; color:#94a3b8; font-family:var(--font-m);">${user.operativeId}</div>
               </td>
-              <td style="padding:16px;"><span class="prof-badge">${user.rank}</span></td>
-              <td style="padding:16px; color:var(--accent2); font-weight:600;">${user.xp} XP</td>
+              <td><span class="prof-badge">${user.rank}</span></td>
+              <td style="color:#7c3aed; font-weight:700;">${user.xp} XP</td>
             </tr>
           `;
         });
