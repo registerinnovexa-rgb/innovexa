@@ -23,39 +23,78 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
   // Always send to admin inbox — hardcoded fallback ensures delivery even if ADMIN_EMAIL env missing
   const adminEmail = process.env.ADMIN_EMAIL || 'updates.innovexa@zohomail.in';
   if (!process.env.EMAIL_USER) { console.warn('notifyAdmin: EMAIL_USER not set, skipping'); return; }
-  const icons = {
-    LOGIN: '🔓', TASK_SUBMITTED: '📤', TASK_RECALLED: '↩️', TASK_COMPLETED: '✅',
-    SOS_CREATED: '🆘', BOUNTY_CLAIMED: '🎯', BOUNTY_COMPLETED: '🏆',
-    PROFILE_UPDATED: '✏️', REGISTRATION: '🆕', STATUS_CHANGE: '🔄', DEFAULT: '📋'
+  const typeConfig = {
+    LOGIN:            { icon: '🔐', color: '#6366f1', label: 'Member Login' },
+    TASK_SUBMITTED:   { icon: '📤', color: '#f59e0b', label: 'Task Submitted' },
+    TASK_RECALLED:    { icon: '↩️', color: '#64748b', label: 'Task Recalled' },
+    TASK_COMPLETED:   { icon: '✅', color: '#10b981', label: 'Task Completed' },
+    TASK_CREATED:     { icon: '🆕', color: '#8b5cf6', label: 'Task Created' },
+    TASK_UPDATED:     { icon: '✏️', color: '#3b82f6', label: 'Task Updated' },
+    TASK_DELETED:     { icon: '🗑️', color: '#ef4444', label: 'Task Deleted' },
+    SOS_CREATED:      { icon: '🆘', color: '#ef4444', label: 'SOS Alert' },
+    BOUNTY_CLAIMED:   { icon: '🎯', color: '#f59e0b', label: 'Bounty Claimed' },
+    BOUNTY_COMPLETED: { icon: '🏆', color: '#10b981', label: 'Bounty Completed' },
+    PROFILE_UPDATED:  { icon: '✏️', color: '#3b82f6', label: 'Profile Updated' },
+    REGISTRATION:     { icon: '🆕', color: '#8b5cf6', label: 'New Registration' },
+    STATUS_CHECK:     { icon: '🔍', color: '#06b6d4', label: 'Status Check' },
+    STATUS_CHANGE:    { icon: '🔄', color: '#f59e0b', label: 'Status Changed' },
   };
-  const icon = icons[type] || icons.DEFAULT;
-  const urgentBanner = urgent
-    ? `<div style="background:#ef4444;color:#fff;padding:8px 16px;border-radius:6px;font-weight:700;margin-bottom:16px;">🚨 URGENT ACTION REQUIRED</div>`
-    : '';
+  const cfg = typeConfig[type] || { icon: '📋', color: '#6b7280', label: type.replace(/_/g,' ') };
+  const urgentBar = urgent ? `<div style="background:#ef4444;color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;margin-bottom:20px;letter-spacing:.5px;">🚨 URGENT — Immediate Action Required</div>` : '';
   try {
     await transporter.sendMail({
       from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
       to: adminEmail,
-      subject: `${icon} [${type}] ${name} (${operativeId})`,
+      subject: `${cfg.icon} [${cfg.label}] ${name} · ${operativeId}`,
       html: `
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;background:#0f0f0f;color:#fff;border-radius:10px;">
-          ${urgentBanner}
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-            <span style="font-size:32px;">${icon}</span>
-            <div>
-              <div style="font-size:11px;color:#71717a;text-transform:uppercase;letter-spacing:2px;">Member Activity</div>
-              <div style="font-size:18px;font-weight:700;color:#fff;">${type.replace(/_/g,' ')}</div>
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+        <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+          <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,${cfg.color} 0%,${cfg.color}cc 100%);padding:28px 32px;">
+              ${urgentBar}
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">${cfg.icon}</div>
+                <div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px;font-weight:600;">${urgent ? '🚨 Urgent ' : ''}Admin Alert</div>
+                  <div style="font-size:20px;font-weight:700;color:#fff;margin-top:2px;">${cfg.label}</div>
+                </div>
+              </div>
+            </div>
+            <!-- Body -->
+            <div style="padding:28px 32px;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;width:36%;">Operative ID</td>
+                  <td style="padding:12px 0;font-size:14px;font-weight:700;color:${cfg.color};font-family:monospace;">${operativeId}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Member Name</td>
+                  <td style="padding:12px 0;font-size:14px;font-weight:600;color:#1e293b;">${name}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Date & Time</td>
+                  <td style="padding:12px 0;font-size:13px;color:#64748b;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;vertical-align:top;">Detail</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;line-height:1.6;">${detail || 'No additional detail'}</td>
+                </tr>
+              </table>
+            </div>
+            <!-- CTA -->
+            <div style="padding:0 32px 28px;">
+              <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
+            </div>
+            <!-- Footer -->
+            <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub Auto-Alert System · All actions are logged</p>
             </div>
           </div>
-          <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;width:40%;">Operative</td><td style="padding:6px 0;color:#a78bfa;font-weight:700;font-family:monospace;">${operativeId}</td></tr>
-            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Name</td><td style="padding:6px 0;color:#fff;">${name}</td></tr>
-            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Time</td><td style="padding:6px 0;color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
-            <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Detail</td><td style="padding:6px 0;color:#e2e8f0;font-size:13px;">${detail || 'N/A'}</td></tr>
-          </table>
-          <a href="https://innovexa.vercel.app/admin.html" style="display:inline-block;margin-top:16px;padding:10px 20px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:6px;font-size:13px;font-weight:600;">Open Admin Dashboard →</a>
-          <p style="color:#3f3f46;font-size:10px;margin-top:16px;">Innovexa Hub Auto-Alert</p>
-        </div>
+        </body>
+        </html>
       `
     });
   } catch(e) {
@@ -192,18 +231,41 @@ export default async function handler(req, res) {
         await transporter.sendMail({
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: member.email,
-          subject: 'Innovexa Hub — Dashboard Login Code',
+          subject: `🔐 Your Innovexa Login Code: ${otp}`,
           html: `
-            <div style="font-family:sans-serif; max-width:480px; margin:0 auto; padding:24px; background:#0f0f0f; color:#fff; border-radius:12px;">
-              <h2 style="color:#7c3aed; margin-bottom:8px;">🔐 Login Code</h2>
-              <p style="color:#a1a1aa;">Your one-time login code for the Innovexa Forge dashboard is:</p>
-              <div style="background:#1a1a2e; border:1px solid #7c3aed; border-radius:8px; padding:20px; text-align:center; margin:20px 0;">
-                <span style="font-size:36px; font-weight:700; letter-spacing:8px; color:#a78bfa; font-family:monospace;">${otp}</span>
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+            <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+              <div style="max-width:480px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+                <!-- Header -->
+                <div style="background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 100%);padding:32px;text-align:center;">
+                  <div style="width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔐</div>
+                  <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Secure Login Code</h1>
+                  <p style="margin:8px 0 0;color:rgba(255,255,255,.75);font-size:14px;">Innovexa Forge Dashboard</p>
+                </div>
+                <!-- OTP Block -->
+                <div style="padding:32px;text-align:center;">
+                  <p style="color:#64748b;font-size:15px;margin:0 0 24px;">Hi <strong style="color:#1e293b;">${member.name}</strong>, use the code below to access your Forge dashboard.</p>
+                  <div style="background:#f8fafc;border:2px dashed #c4b5fd;border-radius:14px;padding:28px 24px;margin-bottom:20px;">
+                    <div style="font-size:44px;font-weight:800;letter-spacing:12px;color:#7c3aed;font-family:'Courier New',monospace;">${otp}</div>
+                    <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Copy the code above and paste it into the login screen</p>
+                  </div>
+                  <div style="display:inline-block;background:#ede9fe;color:#7c3aed;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;">⏱ Expires in 15 minutes</div>
+                </div>
+                <!-- Details -->
+                <div style="padding:0 32px 24px;">
+                  <div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:4px;padding:12px 16px;">
+                    <p style="margin:0;font-size:13px;color:#92400e;">⚠️ <strong>Do not share this code</strong> with anyone. Innovexa team will never ask for this.</p>
+                  </div>
+                </div>
+                <!-- Footer -->
+                <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                  <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you didn't request this, ignore this email.</p>
+                </div>
               </div>
-              <p style="color:#71717a; font-size:13px;">⏱ Valid for 15 minutes. Do not share this with anyone.</p>
-              <hr style="border-color:#27272a; margin:20px 0;">
-              <p style="color:#52525b; font-size:11px;">— Innovexa Hub Core Team</p>
-            </div>
+            </body>
+            </html>
           `
         });
         console.log(`OTP sent to ${member.email}`);
@@ -321,40 +383,13 @@ export default async function handler(req, res) {
         
         await newMember.save();
 
-        // Notify admin about new registration
-        const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-        if (adminEmail) {
-          try {
-            await transporter.sendMail({
-              from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
-              to: adminEmail,
-              subject: `🆕 New Registration: ${fullName}`,
-              html: `
-                <div style="font-family:sans-serif; max-width:520px; margin:0 auto; padding:24px; background:#0f0f0f; color:#fff; border-radius:12px;">
-                  <h2 style="color:#7c3aed; margin-bottom:4px;">🆕 New Member Registration</h2>
-                  <p style="color:#71717a; font-size:13px; margin-top:0;">A new operative just signed up for Innovexa Hub.</p>
-                  <table style="width:100%; border-collapse:collapse; margin-top:16px;">
-                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Name</td><td style="padding:8px; color:#fff; font-weight:600;">${fullName}</td></tr>
-                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">Email</td><td style="padding:8px; color:#7c3aed;">${email}</td></tr>
-                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Phone</td><td style="padding:8px; color:#fff;">${phone || 'N/A'}</td></tr>
-                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">College</td><td style="padding:8px; color:#fff;">${college || 'N/A'}</td></tr>
-                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Branch / Year</td><td style="padding:8px; color:#fff;">${branch || 'N/A'} — ${year || 'N/A'}</td></tr>
-                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">UTR</td><td style="padding:8px; color:#10b981; font-family:monospace;">${utr || 'Not provided'}</td></tr>
-                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Operative ID</td><td style="padding:8px; color:#a78bfa; font-weight:700; font-family:monospace;">${genId}</td></tr>
-                  </table>
-                  <div style="margin-top:20px; padding:12px; background:#1a1a2e; border-radius:8px; border-left:4px solid #7c3aed;">
-                    <p style="margin:0; font-size:12px; color:#71717a;">Review and approve this registration in your <a href="https://innovexa.vercel.app/admin.html" style="color:#7c3aed;">Admin Dashboard</a>.</p>
-                  </div>
-                  <hr style="border-color:#27272a; margin:20px 0;">
-                  <p style="color:#52525b; font-size:11px;">— Innovexa Hub Auto-Notifier</p>
-                </div>
-              `
-            });
-            console.log(`Admin notified about new registration: ${fullName}`);
-          } catch (emailErr) {
-            console.error('Admin notification email failed:', emailErr.message);
-          }
-        }
+        // Notify admin about new registration via notifyAdmin
+        await notifyAdmin({
+          type: 'REGISTRATION',
+          operativeId: genId,
+          name: fullName,
+          detail: `New member registered. Email: ${email} | College: ${college || 'N/A'} | Branch: ${branch || 'N/A'}, ${year || 'N/A'} Year | UTR: ${utr || 'Not provided'}`
+        });
 
         return res.status(200).json({ 
           success: true, 
@@ -570,31 +605,95 @@ export default async function handler(req, res) {
       });
       await log.save();
 
-      // Send approval welcome email when status becomes Confirmed
+      // Notify admin about status change
+      await notifyAdmin({
+        type: 'STATUS_CHANGE',
+        operativeId: member.operativeId,
+        name: member.name,
+        detail: `Member status changed to: ${status}`,
+        urgent: (status === 'Revoked' || status === 'Rejected')
+      });
+
+      // Send approval welcome email when status becomes Confirmed or Approved
       if ((status === 'Confirmed' || status === 'Approved') && member.email) {
         try {
           await transporter.sendMail({
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
-            subject: `🎉 Welcome to Innovexa Hub, ${member.name}!`,
+            subject: `🎉 Congratulations! Your Innovexa Membership is Approved`,
             html: `
-              <div style="font-family:sans-serif; max-width:520px; margin:0 auto; padding:28px; background:#0f0f0f; color:#fff; border-radius:12px;">
-                <h1 style="color:#7c3aed; font-size:24px; margin-bottom:4px;">🎉 You're In!</h1>
-                <p style="color:#a1a1aa; margin-top:0;">Welcome to Innovexa Hub, ${member.name}. Your membership has been confirmed.</p>
-                <div style="background:#1a1a2e; border:1px solid #7c3aed; border-radius:10px; padding:20px; margin:20px 0; text-align:center;">
-                  <p style="margin:0; color:#71717a; font-size:12px; text-transform:uppercase; letter-spacing:2px;">Your Operative ID</p>
-                  <p style="margin:8px 0 0; font-size:28px; font-weight:700; color:#a78bfa; font-family:monospace; letter-spacing:4px;">${member.operativeId}</p>
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+              <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+                  <!-- Header -->
+                  <div style="background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 100%);padding:36px 32px;text-align:center;">
+                    <div style="font-size:52px;margin-bottom:12px;">🎉</div>
+                    <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;">You're officially in!</h1>
+                    <p style="margin:10px 0 0;color:rgba(255,255,255,.8);font-size:15px;">Welcome to Innovexa Hub, ${member.name}</p>
+                  </div>
+                  <!-- Operative ID Card -->
+                  <div style="padding:32px;">
+                    <p style="color:#475569;font-size:15px;margin:0 0 24px;text-align:center;">Your membership has been <strong style="color:#10b981;">approved</strong>. Here's your unique Operative ID:</p>
+                    <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:2px solid #c4b5fd;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px;">
+                      <div style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">Your Operative ID</div>
+                      <div style="font-size:36px;font-weight:800;color:#5b21b6;font-family:'Courier New',monospace;letter-spacing:6px;">${member.operativeId}</div>
+                      <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
+                    </div>
+                    <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
+                    <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
+                  </div>
+                  <!-- Footer -->
+                  <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                    <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you have any issues, contact your admin.</p>
+                  </div>
                 </div>
-                <p style="color:#a1a1aa; font-size:14px;">Use this ID to log into the <strong>Innovexa Forge</strong> dashboard — your mission control for exclusive resources, bounties, and the leaderboard.</p>
-                <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block; margin-top:12px; padding:12px 24px; background:#7c3aed; color:#fff; text-decoration:none; border-radius:8px; font-weight:600;">Access the Forge →</a>
-                <hr style="border-color:#27272a; margin:24px 0;">
-                <p style="color:#52525b; font-size:11px;">— Innovexa Hub Core Team</p>
-              </div>
+              </body>
+              </html>
             `
           });
           console.log(`Approval email sent to ${member.email}`);
         } catch (emailErr) {
           console.error('Approval email failed:', emailErr.message);
+        }
+      }
+
+      // Send revoke/reject notification email to member
+      if ((status === 'Revoked' || status === 'Rejected') && member.email) {
+        try {
+          await transporter.sendMail({
+            from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+            to: member.email,
+            subject: `⚠️ Important: Your Innovexa Membership Status Update`,
+            html: `
+              <!DOCTYPE html>
+              <html>
+              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+              <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+                <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+                  <!-- Header -->
+                  <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:36px 32px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+                    <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Membership Status Updated</h1>
+                  </div>
+                  <div style="padding:32px;">
+                    <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 20px;">Hi <strong>${member.name}</strong>, your Innovexa Hub membership status has been updated to <strong style="color:#dc2626;">${status}</strong>.</p>
+                    <div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;padding:14px 18px;margin-bottom:24px;">
+                      <p style="margin:0;font-size:13px;color:#7f1d1d;">If you believe this is an error or would like to appeal, please contact the Innovexa admin team directly.</p>
+                    </div>
+                    <a href="https://innovexa.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#64748b;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
+                  </div>
+                  <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                    <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · This is an automated notification.</p>
+                  </div>
+                </div>
+              </body>
+              </html>
+            `
+          });
+        } catch (emailErr) {
+          console.error('Revoke email failed:', emailErr.message);
         }
       }
 
