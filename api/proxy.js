@@ -1244,6 +1244,40 @@ export default async function handler(req, res) {
        return res.status(200).json({ success: true, message: `Sent email to ${emails.length} operatives` });
     }
 
+    if (action === 'admin_test_email') {
+       const adminEmail = process.env.ADMIN_EMAIL || 'updates.innovexa@zohomail.in';
+       if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+         return res.status(200).json({ success: false, message: 'EMAIL_USER or EMAIL_PASS environment variable is missing on Vercel.' });
+       }
+       try {
+         await transporter.sendMail({
+           from: `"Innovexa Hub Admin" <${process.env.EMAIL_USER}>`,
+           to: adminEmail,
+           subject: '🧪 [TEST EMAIL] Innovexa Admin Notification System Check',
+           html: `
+             <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:12px;border:1px solid #27272a;">
+               <div style="font-size:40px;text-align:center;margin-bottom:12px;">🧪</div>
+               <h2 style="text-align:center;color:#a78bfa;margin-bottom:4px;">Admin Email System Check</h2>
+               <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">This is a test notification confirming that the Innovexa Hub mail delivery system is functioning properly.</p>
+               <div style="background:#18181b;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #3f3f46;">
+                 <table style="width:100%;border-collapse:collapse;">
+                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;width:35%;">Status</td><td style="color:#10b981;font-weight:700;">✅ Operational</td></tr>
+                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Recipient</td><td style="color:#a78bfa;font-weight:700;">${adminEmail}</td></tr>
+                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sender</td><td style="color:#e2e8f0;font-size:13px;">${process.env.EMAIL_USER}</td></tr>
+                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sent At</td><td style="color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
+                 </table>
+               </div>
+               <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#7c3aed;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
+               <p style="color:#52525b;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub Auto-Notification Engine</p>
+             </div>`
+         });
+         return res.status(200).json({ success: true, message: `Test email sent successfully to ${adminEmail}` });
+       } catch (err) {
+         console.error('Test email failed:', err);
+         return res.status(200).json({ success: false, message: `Failed to send email: ${err.message}` });
+       }
+    }
+
     // FALLBACK
     
     // -------------------------------------------------------------
