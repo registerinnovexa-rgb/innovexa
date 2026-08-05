@@ -313,11 +313,12 @@ export default async function handler(req, res) {
 
     // FORGE: Submit Task
     if (action === 'forge_submit_task') {
-      const { invxId, taskId, link } = payload;
+      const { invxId, taskId } = payload;
+      const link = payload.submitLink || payload.link;
       if (!invxId || !taskId || !link) return res.status(200).json({ success: false, message: 'Missing fields.' });
       
       const task = await Task.findOne({ taskId, assignedTo: invxId.trim().toUpperCase() });
-      if (!task) return res.status(200).json({ success: false, message: 'Task not found.' });
+      if (!task) return res.status(200).json({ success: false, message: 'Task not found or not assigned to you.' });
       if (task.status === 'Completed' || task.status === 'Submitted') {
         return res.status(200).json({ success: false, message: 'Task is already submitted/completed.' });
       }
@@ -781,6 +782,7 @@ export default async function handler(req, res) {
     // FORGE: Tasks (Edit/Recall)
     if (action === 'forge_edit_task') {
        const { taskId, title, description, xp, difficulty, feedback, status } = payload;
+       const submitLink = payload.submitLink || payload.link;
        const t = await Task.findOne({ taskId });
        if (t) {
          if (title) t.title = title;
@@ -789,6 +791,7 @@ export default async function handler(req, res) {
          if (difficulty) t.difficulty = difficulty;
          if (feedback) t.feedback = feedback;
          if (status) t.status = status;
+         if (submitLink) t.submitLink = submitLink;
          await t.save();
        }
        return res.status(200).json({ success: true, message: 'Task updated' });
