@@ -2428,39 +2428,59 @@ async function loadMemberDetailView() {
     
     if (res.success) {
       content.style.display = 'block';
-      
-      // Update Stats
-      document.getElementById('detailStatLogins').textContent = res.stats.totalLogs || 0; // Using total logs as a proxy for activity
-      document.getElementById('detailStatActiveTasks').textContent = res.stats.activeTasks || 0;
-      document.getElementById('detailStatCompletedTasks').textContent = res.stats.completedTasks || 0;
-      
-      // Calculate total XP from tasks (or use member profile XP)
-      const memberProfXP = member ? member.xp : 0;
-      document.getElementById('detailStatXP').textContent = memberProfXP || 0;
 
-      // Render Logs
+      // Backend wraps all data inside res.data
+      const d = res.data || {};
+      const stats = d.stats || {};
+      const logs  = d.logs  || [];
+      const tasks = d.tasks || [];
+      const prof  = d.member || member || {};
+
+      // ── Stats bar ────────────────────────────────────────────
+      document.getElementById('detailStatLogins').textContent = stats.totalLogs || 0;
+      document.getElementById('detailStatActiveTasks').textContent = stats.activeTasks || 0;
+      document.getElementById('detailStatCompletedTasks').textContent = stats.completedTasks || 0;
+      document.getElementById('detailStatXP').textContent = prof.xp || (member ? member.xp : 0) || 0;
+
+      // ── Profile info (populate detail fields if they exist) ───
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+      setEl('detailEmail',   prof.email);
+      setEl('detailPhone',   prof.phone);
+      setEl('detailCollege', prof.college);
+      setEl('detailBranch',  prof.branch);
+      setEl('detailYear',    prof.year);
+      setEl('detailStatus',  prof.status);
+      setEl('detailSquad',   prof.squad);
+      setEl('detailRank',    prof.rank);
+      setEl('detailRole',    prof.forgeRole);
+      setEl('detailOpId',    prof.operativeId);
+
+      // ── Activity Logs ─────────────────────────────────────────
       const logsBody = document.getElementById('detailLogsBody');
-      if (res.logs && res.logs.length > 0) {
-        logsBody.innerHTML = res.logs.map(l => {
-          // Backend stores type as 'type' and content as 'content'
+      if (logs.length > 0) {
+        logsBody.innerHTML = logs.map(l => {
           const lType = l.type || l.actionType || '';
           const lDesc = l.content || l.description || '';
+          const icons = { LOGIN:'🔓', TASK_SUBMITTED:'📤', TASK_RECALLED:'↩️', TASK_COMPLETED:'✅',
+            SOS_CREATED:'🆘', BOUNTY_CLAIMED:'🎯', BOUNTY_COMPLETED:'🏆',
+            STATUS_UPDATED:'🔄', ROLE_UPDATED:'⚙️', STATUS_CHECK:'👁' };
+          const icon = icons[lType] || '📋';
           return `
           <tr>
-            <td style="color:var(--text3);">${new Date(l.timestamp).toLocaleString()}</td>
-            <td><strong>${escHtml(lType)}</strong></td>
-            <td><span style="opacity:0.8;">${escHtml(lDesc)}</span></td>
+            <td style="color:var(--text3); font-size:12px; white-space:nowrap;">${new Date(l.timestamp).toLocaleString()}</td>
+            <td style="font-weight:600; white-space:nowrap;">${icon} ${escHtml(lType)}</td>
+            <td style="opacity:0.8; font-size:13px;">${escHtml(lDesc)}</td>
           </tr>
         `;
         }).join('');
       } else {
-        logsBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);">No activity logs found.</td></tr>';
+        logsBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:16px;">No activity logs found.</td></tr>';
       }
 
-      // Render Tasks
+      // ── Tasks ─────────────────────────────────────────────────
       const tasksBody = document.getElementById('detailTasksBody');
-      if (res.tasks && res.tasks.length > 0) {
-        tasksBody.innerHTML = res.tasks.map(t => {
+      if (tasks.length > 0) {
+        tasksBody.innerHTML = tasks.map(t => {
           let statusColor = t.status === 'Completed' ? 'var(--green)' : (t.status === 'Submitted' ? 'var(--blue)' : 'var(--accent)');
           return `
           <tr>
@@ -2471,21 +2491,22 @@ async function loadMemberDetailView() {
         `;
         }).join('');
       } else {
-        tasksBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);">No tasks assigned or submitted.</td></tr>';
+        tasksBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:16px;">No tasks assigned or submitted.</td></tr>';
       }
 
     } else {
-      console.error("Backend error:", res);
+      console.error('Backend error:', res);
       showToast(res.message || 'Failed to load member details', 'error');
       closeMemberDetailView();
     }
   } catch(e) {
-    console.error("Fetch error:", e);
+    console.error('Fetch error:', e);
     loading.style.display = 'none';
     showToast('Error loading details: ' + e.message, 'error');
     closeMemberDetailView();
   }
 }
+
 
 function closeMemberDetailView() {
   document.getElementById('memberDetailSelect').value = '';
