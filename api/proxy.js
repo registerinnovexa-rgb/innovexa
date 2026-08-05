@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction, GamificationConfig, CertTemplate, CustomStyle, BroadcastMessage } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -695,6 +695,90 @@ export default async function handler(req, res) {
         { new: true }
       );
       return res.status(200).json({ success: true, data: evt, message: 'Event settings updated.' });
+    }
+
+    // ADMIN: Real-Time Comms Broadcast (Feature #8)
+    if (action === 'admin_send_broadcast') {
+      const { content, priority, targetRanks } = payload;
+      if (!content) return res.status(200).json({ success: false, message: 'Content required.' });
+      const msg = await BroadcastMessage.create({
+        messageId: 'BRD-' + Date.now(),
+        content,
+        priority: priority || 'normal',
+        targetRanks: targetRanks || []
+      });
+      // In a real system, you would trigger WebSocket emissions here.
+      // For now, it's stored and can be polled by Forge clients.
+      return res.status(200).json({ success: true, data: msg, message: 'Broadcast deployed.' });
+    }
+    
+    if (action === 'admin_get_broadcasts') {
+      const msgs = await BroadcastMessage.find({}).sort({ createdAt: -1 }).limit(20).lean();
+      return res.status(200).json({ success: true, data: msgs });
+    }
+
+    // ADMIN: Dynamic Gamification Engine (Feature #9)
+    if (action === 'admin_get_gamification_config') {
+      let cfg = await GamificationConfig.findOne({ key: 'global' });
+      if (!cfg) {
+        cfg = await GamificationConfig.create({ key: 'global', xpMultiplier: 1.0, taskBaseXP: 100, loginXP: 10 });
+      }
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_gamification_config') {
+      const { xpMultiplier, taskBaseXP, loginXP } = payload;
+      const cfg = await GamificationConfig.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { xpMultiplier: parseFloat(xpMultiplier)||1, taskBaseXP: parseInt(taskBaseXP)||100, loginXP: parseInt(loginXP)||10, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'Gamification rules updated.' });
+    }
+
+    // ADMIN: Auto-Certificate Generator (Feature #18)
+    if (action === 'admin_get_cert_templates') {
+      const tpls = await CertTemplate.find({}).lean();
+      return res.status(200).json({ success: true, data: tpls });
+    }
+
+    if (action === 'admin_save_cert_template') {
+      const { templateId, name, backgroundUrl, fields } = payload;
+      let tpl;
+      if (templateId) {
+        tpl = await CertTemplate.findOneAndUpdate({ templateId }, { $set: { name, backgroundUrl, fields, updatedAt: new Date() } }, { new: true });
+      } else {
+        tpl = await CertTemplate.create({ templateId: 'CERT-' + Date.now(), name, backgroundUrl, fields });
+      }
+      return res.status(200).json({ success: true, data: tpl, message: 'Template saved.' });
+    }
+
+    // ADMIN: Forge Custom CSS Editor (Feature #19)
+    if (action === 'admin_get_custom_css') {
+      let cfg = await CustomStyle.findOne({ key: 'forge' });
+      if (!cfg) cfg = await CustomStyle.create({ key: 'forge', cssRules: '/* Add custom CSS here */' });
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_custom_css') {
+      const { cssRules } = payload;
+      const cfg = await CustomStyle.findOneAndUpdate(
+        { key: 'forge' },
+        { $set: { cssRules, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'Custom CSS saved and deployed to Forge.' });
+    }
+
+    // ADMIN: Global Search (Feature #21)
+    if (action === 'admin_global_search') {
+      const { query } = payload;
+      if (!query || query.length < 2) return res.status(200).json({ success: true, data: { members: [], tasks: [], bounties: [] } });
+      const rx = new RegExp(query, 'i');
+      const members = await Member.find({ $or: [{ name: rx }, { operativeId: rx }, { email: rx }] }).limit(10).lean();
+      const tasks = await Task.find({ $or: [{ title: rx }, { description: rx }] }).limit(10).lean();
+      const bounties = await Bounty.find({ $or: [{ title: rx }, { description: rx }] }).limit(10).lean();
+      return res.status(200).json({ success: true, data: { members, tasks, bounties } });
     }
 
     // ADMIN: Get Platform Settings
