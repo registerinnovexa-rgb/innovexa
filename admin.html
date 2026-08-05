@@ -12,21 +12,21 @@
   <style>
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      --bg: #f3f4f6; 
+      --bg: #ffffff; 
       --bg2: #ffffff; 
-      --bg3: #e5e7eb;
-      --border: #d1d5db; 
-      --border2: #9ca3af;
-      --text: #111827; 
-      --text2: #374151; 
-      --text3: #6b7280;
-      --accent: #1e3a8a; 
-      --accent2: #1e40af;
-      --green: #10b981; --green-bg: #d1fae5;
-      --red: #ef4444; --red-bg: #fee2e2;
-      --yellow: #f59e0b; --yellow-bg: #fef3c7;
-      --blue: #3b82f6; --blue-bg: #dbeafe;
-      --radius: 8px; --radius-sm: 4px;
+      --bg3: #f3f4f6;
+      --border: #000000; 
+      --border2: #cccccc;
+      --text: #000000; 
+      --text2: #333333; 
+      --text3: #666666;
+      --accent: #000000; 
+      --accent2: #333333;
+      --green: #000000; --green-bg: transparent;
+      --red: #000000; --red-bg: transparent;
+      --yellow: #000000; --yellow-bg: transparent;
+      --blue: #000000; --blue-bg: transparent;
+      --radius: 0px; --radius-sm: 0px;
       --font-d: 'Inter', sans-serif;
       --font-b: 'Inter', sans-serif;
     }
@@ -49,7 +49,7 @@
     .login-card {
       background: var(--bg2); border:1px solid var(--border); border-radius: var(--radius);
       padding: 40px; width: 100%; max-width: 420px; 
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: none;
     }
     .login-card h1 { font-size:24px; font-weight:700; margin-bottom:6px; letter-spacing: -0.5px; }
     .login-card p { font-size:14px; color:var(--text3); margin-bottom:32px; }
@@ -124,7 +124,7 @@
     .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:32px; }
     .stat-card {
       background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
-      padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      padding:24px; box-shadow:none;
     }
     .stat-label { font-size:13px; font-weight:600; color:var(--text3); margin-bottom:12px; text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-value { font-size:32px; font-weight:700; line-height:1; }
@@ -149,7 +149,7 @@
     
     .table-wrap {
       background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
-      overflow:auto; max-height:65vh; box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      overflow:auto; max-height:65vh; box-shadow:none;
     }
     .table-wrap::-webkit-scrollbar { width:6px; height:6px; }
     .table-wrap::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
@@ -163,13 +163,13 @@
     .data-table tbody tr:hover { background:rgba(255,255,255,0.03); }
     
     .status-badge {
-      display:inline-block; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing: 0.5px;
+      display:inline-block; padding:4px 10px; border:1px solid var(--border); border-radius:var(--radius); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing: 0.5px;
     }
-    .status-pending { background:var(--yellow-bg); color:var(--yellow); }
-    .status-confirmed { background:var(--green-bg); color:var(--green); }
-    .status-rejected { background:var(--red-bg); color:var(--red); }
-    .status-open { background:var(--blue-bg); color:var(--blue); }
-    .status-review { background:var(--accent); color:#fff; }
+    .status-pending { color:var(--text); }
+    .status-confirmed { color:var(--text); }
+    .status-rejected { color:var(--text); }
+    .status-open { color:var(--text); }
+    .status-review { background:var(--text); color:#fff; }
 
     /* ── Action Buttons ── */
     .btn-sm {
@@ -190,7 +190,7 @@
     .card-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
     .admin-card {
       background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
-      padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      padding:24px; box-shadow:none;
     }
     .admin-card h3 { font-size:16px; font-weight:700; margin-bottom:8px; font-family: var(--font-d); }
     .admin-card p { font-size:14px; color:var(--text2); margin-bottom:16px; line-height:1.6; }
@@ -206,7 +206,7 @@
     .modal-box {
       background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
       width:100%; max-width:780px; max-height:90vh; overflow-y:auto; padding:0;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: none;
     }
     .modal-box h2 { font-size:20px; font-weight:700; margin-bottom:24px; font-family: var(--font-d); }
     .modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:24px; }
