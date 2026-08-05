@@ -460,6 +460,22 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
       Announcements
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('rolePerms')" id="navRolePerms">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      Role Permissions
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('webhooks')" id="navWebhooks">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+      Webhooks
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('accessControl')" id="navAccessControl">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      Access Control
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('factions')" id="navFactions">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Factions
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -688,6 +704,68 @@
         <div id="announcementsLoading" style="text-align:center;padding:40px;color:var(--text3);">Loading announcements...</div>
         <div id="announcementsList" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
+    </div>
+
+    <!-- ── ROLE PERMISSIONS TAB ── -->
+    <div class="tab-content" id="tabRolePerms">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Role Permissions</h2>
+        <button class="btn-add" onclick="saveRolePermissions()">Save Permissions</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Check/uncheck abilities for each rank. Changes take effect immediately for all Forge logins.</p>
+        <div id="rolePermsTable" style="overflow-x:auto;"></div>
+      </div>
+      <div id="rolePermsStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── WEBHOOKS TAB ── -->
+    <div class="tab-content" id="tabWebhooks">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Webhook Manager</h2>
+      </div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Configure HTTP POST endpoints that fire on platform events. Use for Slack, Discord, Zapier, or any automation tool.</p>
+      <div id="webhooksList" style="display:flex;flex-direction:column;gap:16px;"></div>
+    </div>
+
+    <!-- ── ACCESS CONTROL TAB ── -->
+    <div class="tab-content" id="tabAccessControl">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Access Control</h2>
+        <button class="btn-add" onclick="saveAccessControl()">Save Rules</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Restrict Forge sections by minimum rank. Enable the toggle to enforce each rule.</p>
+        <div id="accessControlList" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+      <div id="accessControlStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── FACTIONS TAB ── -->
+    <div class="tab-content" id="tabFactions">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Factions</h2>
+        <button class="btn-add" onclick="openFactionEditor()">+ Create Faction</button>
+      </div>
+      <!-- Faction Editor -->
+      <div id="factionEditorPanel" style="display:none;" class="admin-card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;" id="factionEditorTitle">New Faction</h3>
+        <input type="hidden" id="factionEditingId" />
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group"><label>Faction Name</label><input type="text" id="factionName" placeholder="e.g. Alpha Squad" /></div>
+          <div class="form-group"><label>Color (hex)</label><input type="color" id="factionColor" value="#a78bfa" style="width:100%;height:42px;border:1px solid var(--border);cursor:pointer;"/></div>
+          <div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea id="factionDesc" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Leader Operative ID</label><input type="text" id="factionLeaderId" placeholder="e.g. INVX-00001" /></div>
+          <div class="form-group"><label>Leader Name</label><input type="text" id="factionLeaderName" placeholder="Leader full name" /></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn-add" onclick="saveFaction()">Save Faction</button>
+          <button class="btn-export" onclick="closeFactionEditor()">Cancel</button>
+        </div>
+      </div>
+      <!-- Factions List -->
+      <div id="factionsLoading" style="text-align:center;padding:40px;color:var(--text3);">Loading factions...</div>
+      <div id="factionsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;"></div>
     </div>
 
     <!-- ── OVERVIEW TAB ── -->
@@ -1893,6 +1971,10 @@ function switchAdminTab(tab) {
   if (tab === 'dictionary') loadDictionary();
   if (tab === 'reportBuilder') initReportBuilder();
   if (tab === 'cms') loadAnnouncements();
+  if (tab === 'rolePerms') loadRolePermissions();
+  if (tab === 'webhooks') loadWebhooks();
+  if (tab === 'accessControl') loadAccessControl();
+  if (tab === 'factions') loadFactions();
 }
 
 // ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
@@ -2441,6 +2523,279 @@ async function deleteAnnouncement(announcementId) {
   }
 }
 // ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 2 — ROLE PERMISSIONS, WEBHOOKS, ACCESS CONTROL, FACTIONS
+// ══════════════════════════════════════════════════════════════════════════════
+
+const PERM_ROLES = ['Apprentice','Scout','Operative','Vanguard','Commander','Warlord'];
+const PERM_ABILITIES = [
+  { key: 'canAccessForge',     label: 'Access Forge Portal' },
+  { key: 'canReviewTasks',     label: 'Review Task Submissions' },
+  { key: 'canCreateBounties',  label: 'Create Bounties' },
+  { key: 'canManageEvents',    label: 'Manage Events' },
+  { key: 'canViewAuditLogs',   label: 'View Audit Logs' },
+];
+let _rolePermsData = {};
+
+async function loadRolePermissions() {
+  const el = document.getElementById('rolePermsTable');
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Loading...</div>';
+  try {
+    const res = await apiPost('admin_get_role_permissions', {});
+    if (!res.success) throw new Error(res.message);
+    _rolePermsData = res.data.permissions || {};
+    renderRolePermsTable();
+  } catch(e) { el.innerHTML = `<div style="color:var(--red);padding:20px;">${e.message}</div>`; }
+}
+
+function renderRolePermsTable() {
+  const el = document.getElementById('rolePermsTable');
+  const headerRow = `<tr><th style="text-align:left;padding:10px 14px;font-size:12px;color:var(--text3);">Ability</th>${PERM_ROLES.map(r=>`<th style="text-align:center;padding:10px;font-size:12px;font-weight:700;">${r}</th>`).join('')}</tr>`;
+  const bodyRows = PERM_ABILITIES.map(a => {
+    const cells = PERM_ROLES.map(r => {
+      const checked = (_rolePermsData[r] || {})[a.key] ? 'checked' : '';
+      return `<td style="text-align:center;padding:10px;"><input type="checkbox" ${checked} onchange="_rolePermsData['${r}'] = _rolePermsData['${r}'] || {}; _rolePermsData['${r}']['${a.key}'] = this.checked;" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"></td>`;
+    }).join('');
+    return `<tr style="border-top:1px solid var(--border);"><td style="padding:10px 14px;font-size:13px;font-weight:500;">${escHtml(a.label)}</td>${cells}</tr>`;
+  }).join('');
+  el.innerHTML = `<table class="data-table" style="width:100%;min-width:600px;"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
+}
+
+async function saveRolePermissions() {
+  const statusEl = document.getElementById('rolePermsStatus');
+  statusEl.textContent = 'Saving...';
+  try {
+    const res = await apiPost('admin_save_role_permissions', { permissions: _rolePermsData });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Permissions saved.';
+    showToast('Role permissions saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ── WEBHOOKS ──────────────────────────────────────────────────────────────────
+const WEBHOOK_EVENTS = [
+  { key: 'NEW_MEMBER',    label: 'New Member Registered', icon: '👤' },
+  { key: 'LOGIN',         label: 'Member Login',          icon: '🔓' },
+  { key: 'TASK_COMPLETE', label: 'Task Completed',        icon: '✅' },
+  { key: 'STATUS_CHANGE', label: 'Member Status Changed', icon: '🔄' },
+  { key: 'SOS',           label: 'SOS Alert Raised',      icon: '🆘' },
+];
+let _webhooks = {};
+
+async function loadWebhooks() {
+  const el = document.getElementById('webhooksList');
+  el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading webhooks...</div>';
+  try {
+    const res = await apiPost('admin_get_webhooks', {});
+    if (!res.success) throw new Error(res.message);
+    _webhooks = {};
+    (res.data || []).forEach(h => { _webhooks[h.event] = h; });
+    renderWebhooks();
+  } catch(e) { el.innerHTML = `<div style="color:var(--red);">${e.message}</div>`; }
+}
+
+function renderWebhooks() {
+  const el = document.getElementById('webhooksList');
+  el.innerHTML = WEBHOOK_EVENTS.map(ev => {
+    const h = _webhooks[ev.key] || {};
+    return `
+      <div class="admin-card" style="margin:0;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;margin-bottom:4px;">${ev.icon} ${escHtml(ev.label)}</div>
+            <div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:10px;">${ev.key}</div>
+            <input id="wh_url_${ev.key}" type="url" value="${escHtml(h.url||'')}" placeholder="https://hooks.slack.com/services/..."
+              style="width:100%;max-width:500px;padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="wh_en_${ev.key}" ${h.enabled!==false?'checked':''} style="width:15px;height:15px;accent-color:var(--accent);">
+              Enabled
+            </label>
+            <button class="btn-sm" onclick="saveWebhook('${ev.key}')" style="background:var(--accent);color:#fff;">Save</button>
+            <button class="btn-sm" onclick="testWebhook('${ev.key}')">Test</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveWebhook(event) {
+  const url = document.getElementById('wh_url_' + event).value.trim();
+  const enabled = document.getElementById('wh_en_' + event).checked;
+  try {
+    const res = await apiPost('admin_save_webhook', { event, url, enabled });
+    if (!res.success) throw new Error(res.message);
+    _webhooks[event] = res.data;
+    showToast('Webhook saved!', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function testWebhook(event) {
+  showToast('Sending test payload...', 'success');
+  try {
+    const res = await apiPost('admin_test_webhook', { event });
+    showToast(res.message || (res.success ? 'Test sent!' : 'Test failed'), res.success ? 'success' : 'error');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ── ACCESS CONTROL ────────────────────────────────────────────────────────────
+let _accessRules = [];
+
+async function loadAccessControl() {
+  const el = document.getElementById('accessControlList');
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading...</div>';
+  try {
+    const res = await apiPost('admin_get_access_control', {});
+    if (!res.success) throw new Error(res.message);
+    _accessRules = res.data.rules || [];
+    renderAccessControl();
+  } catch(e) { el.innerHTML = `<div style="color:var(--red);">${e.message}</div>`; }
+}
+
+function renderAccessControl() {
+  const el = document.getElementById('accessControlList');
+  const RANKS = ['Apprentice','Scout','Operative','Vanguard','Commander','Warlord'];
+  el.innerHTML = _accessRules.map((r, i) => `
+    <div style="display:grid;grid-template-columns:180px 1fr 160px 80px;gap:12px;align-items:center;padding:12px;background:var(--bg3);">
+      <span style="font-size:13px;font-weight:600;text-transform:capitalize;">${escHtml(r.path)}</span>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;">
+        Min rank:
+        <select onchange="_accessRules[${i}].minRank=this.value" style="padding:6px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;">
+          ${RANKS.map(rk=>`<option${r.minRank===rk?' selected':''}>${rk}</option>`).join('')}
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+        <input type="checkbox" ${r.enabled?'checked':''} onchange="_accessRules[${i}].enabled=this.checked" style="width:15px;height:15px;accent-color:var(--accent);">
+        Enforce
+      </label>
+      <span style="font-size:11px;padding:3px 8px;font-weight:700;${r.enabled?'color:var(--green);background:rgba(74,222,128,0.1);':'color:var(--text3);background:rgba(255,255,255,0.05);'}">${r.enabled?'ACTIVE':'OFF'}</span>
+    </div>
+  `).join('');
+}
+
+async function saveAccessControl() {
+  const statusEl = document.getElementById('accessControlStatus');
+  statusEl.textContent = 'Saving...';
+  try {
+    const res = await apiPost('admin_save_access_control', { rules: _accessRules });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Access rules saved.';
+    showToast('Access control saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ── FACTIONS ──────────────────────────────────────────────────────────────────
+let _editingFactionId = null;
+
+async function loadFactions() {
+  const loadEl = document.getElementById('factionsLoading');
+  const listEl = document.getElementById('factionsList');
+  loadEl.style.display = 'block';
+  listEl.innerHTML = '';
+  try {
+    const res = await apiPost('admin_get_factions', {});
+    loadEl.style.display = 'none';
+    if (!res.success) throw new Error(res.message);
+    const items = res.data || [];
+    if (!items.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">No factions yet. Create the first one.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(f => `
+      <div class="admin-card" style="margin:0;border-top:3px solid ${escHtml(f.color||'#a78bfa')};">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${escHtml(f.name)}</div>
+            <div style="font-size:12px;color:var(--text3);">Leader: ${escHtml(f.leaderName||'Unassigned')} (${escHtml(f.leaderId||'—')})</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-sm" onclick="editFaction(${JSON.stringify(f).replace(/"/g,'&quot;')})">Edit</button>
+            <button class="btn-sm" style="background:rgba(239,68,68,0.1);color:var(--red);" onclick="deleteFaction('${f.factionId}')">Delete</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">${escHtml(f.description||'')}</div>
+        <div style="font-size:12px;color:var(--text3);">👥 ${(f.memberIds||[]).length} members &nbsp;·&nbsp; ID: ${escHtml(f.factionId)}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    loadEl.style.display = 'none';
+    listEl.innerHTML = `<div style="color:var(--red);padding:20px;">${e.message}</div>`;
+  }
+}
+
+function openFactionEditor() {
+  _editingFactionId = null;
+  document.getElementById('factionEditorTitle').textContent = 'New Faction';
+  document.getElementById('factionName').value = '';
+  document.getElementById('factionDesc').value = '';
+  document.getElementById('factionColor').value = '#a78bfa';
+  document.getElementById('factionLeaderId').value = '';
+  document.getElementById('factionLeaderName').value = '';
+  document.getElementById('factionEditorPanel').style.display = 'block';
+}
+
+function editFaction(f) {
+  _editingFactionId = f.factionId;
+  document.getElementById('factionEditorTitle').textContent = 'Edit Faction';
+  document.getElementById('factionName').value = f.name || '';
+  document.getElementById('factionDesc').value = f.description || '';
+  document.getElementById('factionColor').value = f.color || '#a78bfa';
+  document.getElementById('factionLeaderId').value = f.leaderId || '';
+  document.getElementById('factionLeaderName').value = f.leaderName || '';
+  document.getElementById('factionEditorPanel').style.display = 'block';
+  document.getElementById('factionEditorPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeFactionEditor() {
+  document.getElementById('factionEditorPanel').style.display = 'none';
+  _editingFactionId = null;
+}
+
+async function saveFaction() {
+  const name = document.getElementById('factionName').value.trim();
+  if (!name) { showToast('Faction name required.', 'error'); return; }
+  const payload = {
+    name,
+    description: document.getElementById('factionDesc').value,
+    color: document.getElementById('factionColor').value,
+    leaderId: document.getElementById('factionLeaderId').value.trim().toUpperCase(),
+    leaderName: document.getElementById('factionLeaderName').value.trim(),
+  };
+  try {
+    let res;
+    if (_editingFactionId) {
+      res = await apiPost('admin_update_faction', { ...payload, factionId: _editingFactionId });
+    } else {
+      res = await apiPost('admin_create_faction', payload);
+    }
+    if (!res.success) throw new Error(res.message);
+    showToast(_editingFactionId ? 'Faction updated!' : 'Faction created!', 'success');
+    closeFactionEditor();
+    loadFactions();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteFaction(factionId) {
+  if (!confirm('Delete this faction? Members will be unassigned. Cannot be undone.')) return;
+  try {
+    const res = await apiPost('admin_delete_faction', { factionId });
+    if (!res.success) throw new Error(res.message);
+    showToast('Faction deleted.', 'success');
+    loadFactions();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+// ══════════════════════════════════════════════════════════════════════════════ END PHASE 2
 
 let allAuditLogs = [];
 

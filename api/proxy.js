@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -540,6 +540,161 @@ export default async function handler(req, res) {
       const { announcementId } = payload;
       await Announcement.findOneAndDelete({ announcementId });
       return res.status(200).json({ success: true, message: 'Announcement deleted.' });
+    }
+
+    // ADMIN: Role Permissions Engine (Feature #6)
+    if (action === 'admin_get_role_permissions') {
+      let cfg = await RolePermissions.findOne({ key: 'global' });
+      if (!cfg) {
+        cfg = await RolePermissions.create({
+          key: 'global',
+          permissions: {
+            Vanguard:  { canReviewTasks: true,  canCreateBounties: true,  canManageEvents: false, canViewAuditLogs: false, canAccessForge: true  },
+            Commander: { canReviewTasks: true,  canCreateBounties: true,  canManageEvents: true,  canViewAuditLogs: true,  canAccessForge: true  },
+            Operative: { canReviewTasks: false, canCreateBounties: false, canManageEvents: false, canViewAuditLogs: false, canAccessForge: true  },
+            Scout:     { canReviewTasks: false, canCreateBounties: false, canManageEvents: false, canViewAuditLogs: false, canAccessForge: true  },
+            Apprentice:{ canReviewTasks: false, canCreateBounties: false, canManageEvents: false, canViewAuditLogs: false, canAccessForge: true  },
+            Warlord:   { canReviewTasks: true,  canCreateBounties: true,  canManageEvents: true,  canViewAuditLogs: true,  canAccessForge: true  },
+          }
+        });
+      }
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_role_permissions') {
+      const { permissions } = payload;
+      const cfg = await RolePermissions.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { permissions, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'Permissions saved.' });
+    }
+
+    // ADMIN: Webhook Manager (Feature #11)
+    if (action === 'admin_get_webhooks') {
+      const hooks = await WebhookConfig.find({}).lean();
+      return res.status(200).json({ success: true, data: hooks });
+    }
+
+    if (action === 'admin_save_webhook') {
+      const { event, url, enabled } = payload;
+      if (!event) return res.status(200).json({ success: false, message: 'Missing event type.' });
+      const hook = await WebhookConfig.findOneAndUpdate(
+        { event },
+        { $set: { url: url || '', enabled: enabled !== false, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: hook, message: 'Webhook saved.' });
+    }
+
+    if (action === 'admin_test_webhook') {
+      const { event } = payload;
+      const hook = await WebhookConfig.findOne({ event });
+      if (!hook || !hook.url) return res.status(200).json({ success: false, message: 'No URL configured for this event.' });
+      try {
+        const { default: fetch } = await import('node-fetch');
+        await fetch(hook.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event, test: true, timestamp: new Date().toISOString() }),
+          signal: AbortSignal.timeout(5000)
+        });
+        return res.status(200).json({ success: true, message: 'Test payload sent.' });
+      } catch(e) {
+        return res.status(200).json({ success: false, message: 'Webhook delivery failed: ' + e.message });
+      }
+    }
+
+    // ADMIN: Access Control (Feature #13)
+    if (action === 'admin_get_access_control') {
+      let cfg = await AccessControl.findOne({ key: 'global' });
+      if (!cfg) {
+        cfg = await AccessControl.create({ key: 'global', rules: [
+          { path: 'sos', minRank: 'Apprentice', enabled: false },
+          { path: 'bounty', minRank: 'Scout', enabled: false },
+          { path: 'resources', minRank: 'Apprentice', enabled: false },
+          { path: 'tasks', minRank: 'Apprentice', enabled: false },
+          { path: 'leaderboard', minRank: 'Apprentice', enabled: false },
+        ]});
+      }
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_access_control') {
+      const { rules } = payload;
+      const cfg = await AccessControl.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { rules, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'Access rules saved.' });
+    }
+
+    // ADMIN: Audit Log Time-Machine (Feature #20) — store snapshot before edits and allow revert
+    if (action === 'admin_get_member_snapshots') {
+      const { operativeId } = payload;
+      const logs = await ActionLog.find({ operativeId, type: 'PROFILE_UPDATED' }).sort({ timestamp: -1 }).limit(20).lean();
+      return res.status(200).json({ success: true, data: logs });
+    }
+
+    // ADMIN: Factions (Feature #24)
+    if (action === 'admin_get_factions') {
+      const factions = await Faction.find({}).lean();
+      return res.status(200).json({ success: true, data: factions });
+    }
+
+    if (action === 'admin_create_faction') {
+      const { name, description, leaderId, leaderName, color } = payload;
+      if (!name) return res.status(200).json({ success: false, message: 'Faction name required.' });
+      const rand = Math.floor(10000 + Math.random() * 90000);
+      const faction = await Faction.create({
+        factionId: 'FCT-' + rand,
+        name, description: description || '', leaderId: leaderId || '', leaderName: leaderName || '',
+        memberIds: leaderId ? [leaderId] : [],
+        color: color || '#a78bfa',
+        createdAt: new Date()
+      });
+      if (leaderId) await Member.findOneAndUpdate({ operativeId: leaderId }, { $set: { factionId: faction.factionId } });
+      return res.status(200).json({ success: true, data: faction, message: 'Faction created.' });
+    }
+
+    if (action === 'admin_update_faction') {
+      const { factionId, name, description, color, leaderId, leaderName } = payload;
+      const update = { name, description, color, leaderId, leaderName };
+      const faction = await Faction.findOneAndUpdate({ factionId }, { $set: update }, { new: true });
+      return res.status(200).json({ success: true, data: faction, message: 'Faction updated.' });
+    }
+
+    if (action === 'admin_delete_faction') {
+      const { factionId } = payload;
+      await Faction.findOneAndDelete({ factionId });
+      await Member.updateMany({ factionId }, { $unset: { factionId: '' } });
+      return res.status(200).json({ success: true, message: 'Faction deleted.' });
+    }
+
+    if (action === 'admin_assign_faction_member') {
+      const { factionId, operativeId, remove } = payload;
+      if (remove) {
+        await Faction.findOneAndUpdate({ factionId }, { $pull: { memberIds: operativeId } });
+        await Member.findOneAndUpdate({ operativeId }, { $unset: { factionId: '' } });
+      } else {
+        await Faction.findOneAndUpdate({ factionId }, { $addToSet: { memberIds: operativeId } });
+        await Member.findOneAndUpdate({ operativeId }, { $set: { factionId } });
+      }
+      return res.status(200).json({ success: true, message: remove ? 'Member removed from faction.' : 'Member assigned to faction.' });
+    }
+
+    // ADMIN: Advanced Event Customization (Feature #4) — add capacity + waitlist to events
+    if (action === 'admin_update_event_settings') {
+      const { eventId, capacity, waitlistEnabled, customQuestions } = payload;
+      if (!eventId) return res.status(200).json({ success: false, message: 'Missing eventId.' });
+      const evt = await Event.findOneAndUpdate(
+        { eventId },
+        { $set: { capacity: parseInt(capacity) || 0, waitlistEnabled: !!waitlistEnabled, customQuestions: customQuestions || [] } },
+        { new: true }
+      );
+      return res.status(200).json({ success: true, data: evt, message: 'Event settings updated.' });
     }
 
     // ADMIN: Get Platform Settings

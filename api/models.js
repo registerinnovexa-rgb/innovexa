@@ -237,3 +237,45 @@ const RankConfigSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 export const RankConfig = mongoose.models.RankConfig || mongoose.model('RankConfig', RankConfigSchema);
+
+// Role Permissions Engine
+const RolePermissionsSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  permissions: mongoose.Schema.Types.Mixed, // { Vanguard: { canReviewTasks: true, canCreateBounties: false, ... } }
+  updatedAt: { type: Date, default: Date.now }
+});
+export const RolePermissions = mongoose.models.RolePermissions || mongoose.model('RolePermissions', RolePermissionsSchema);
+
+// Webhook Config
+const WebhookConfigSchema = new mongoose.Schema({
+  event: { type: String, unique: true }, // 'NEW_MEMBER', 'LOGIN', 'TASK_COMPLETE', 'STATUS_CHANGE', 'SOS'
+  url: String,
+  enabled: { type: Boolean, default: true },
+  updatedAt: { type: Date, default: Date.now }
+});
+export const WebhookConfig = mongoose.models.WebhookConfig || mongoose.model('WebhookConfig', WebhookConfigSchema);
+
+// Access Control (route guards)
+const AccessControlSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  rules: [{
+    path: String,      // e.g. 'sos', 'bounty', 'resources'
+    minRank: String,   // e.g. 'Vanguard'
+    enabled: Boolean
+  }],
+  updatedAt: { type: Date, default: Date.now }
+});
+export const AccessControl = mongoose.models.AccessControl || mongoose.model('AccessControl', AccessControlSchema);
+
+// Faction
+const FactionSchema = new mongoose.Schema({
+  factionId: { type: String, unique: true },
+  name: String,
+  description: String,
+  leaderId: String,
+  leaderName: String,
+  memberIds: [String],
+  color: { type: String, default: '#a78bfa' },
+  createdAt: { type: Date, default: Date.now }
+});
+export const Faction = mongoose.models.Faction || mongoose.model('Faction', FactionSchema);
