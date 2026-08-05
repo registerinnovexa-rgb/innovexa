@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -360,6 +360,188 @@ export default async function handler(req, res) {
       });
     }
     
+    // ADMIN: Edit Member Profile (Feature #1)
+    if (action === 'admin_edit_member') {
+      const { operativeId, name, email, phone, college, branch, year, xp, rank, squad, forgeRole, status } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      const before = { name: member.name, email: member.email, phone: member.phone, college: member.college, branch: member.branch, year: member.year, xp: member.xp, rank: member.rank, squad: member.squad, forgeRole: member.forgeRole, status: member.status };
+      if (name !== undefined) member.name = name.trim();
+      if (email !== undefined) member.email = email.trim().toLowerCase();
+      if (phone !== undefined) member.phone = phone.trim();
+      if (college !== undefined) member.college = college.trim();
+      if (branch !== undefined) member.branch = branch.trim();
+      if (year !== undefined) member.year = year.trim();
+      if (xp !== undefined) member.xp = parseInt(xp);
+      if (rank !== undefined) member.rank = rank.trim();
+      if (squad !== undefined) member.squad = squad.trim();
+      if (forgeRole !== undefined) member.forgeRole = forgeRole.trim();
+      if (status !== undefined) member.status = status.trim();
+      await member.save();
+      await new ActionLog({ timestamp: new Date(), type: 'PROFILE_UPDATED', content: `Admin edited profile. Changes: ${JSON.stringify(before)} → saved.`, operativeId: member.operativeId, name: member.name }).save();
+      return res.status(200).json({ success: true, message: 'Member profile updated.', data: member });
+    }
+
+    // ADMIN: Reset Member Operative ID (Feature #1 - Security Reset)
+    if (action === 'admin_reset_member_id') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      let newId = '';
+      let isUnique = false;
+      while (!isUnique) {
+        const rand = Math.floor(10000 + Math.random() * 90000).toString();
+        newId = 'INVX-' + rand;
+        const check = await Member.findOne({ operativeId: newId });
+        if (!check) isUnique = true;
+      }
+      const oldId = member.operativeId;
+      member.operativeId = newId;
+      member.otp = '';
+      member.otpAttempts = 0;
+      await member.save();
+      await new ActionLog({ timestamp: new Date(), type: 'PROFILE_UPDATED', content: `Admin reset Operative ID from ${oldId} to ${newId}.`, operativeId: newId, name: member.name }).save();
+      return res.status(200).json({ success: true, message: `ID reset from ${oldId} to ${newId}.`, newId });
+    }
+
+    // ADMIN: Get Rank Config (Feature #2)
+    if (action === 'admin_get_rank_config') {
+      let cfg = await RankConfig.findOne({ key: 'global' });
+      if (!cfg) {
+        cfg = await RankConfig.create({ key: 'global', ranks: [
+          { name: 'Apprentice', minXP: 0, maxXP: 199 },
+          { name: 'Scout', minXP: 200, maxXP: 499 },
+          { name: 'Operative', minXP: 500, maxXP: 999 },
+          { name: 'Vanguard', minXP: 1000, maxXP: 2499 },
+          { name: 'Commander', minXP: 2500, maxXP: 4999 },
+          { name: 'Warlord', minXP: 5000, maxXP: 999999 }
+        ]});
+      }
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_rank_config') {
+      const { ranks } = payload;
+      if (!ranks || !Array.isArray(ranks)) return res.status(200).json({ success: false, message: 'Invalid ranks array.' });
+      const cfg = await RankConfig.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { ranks, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'Rank config saved.' });
+    }
+
+    // ADMIN: Email Templates (Feature #5)
+    if (action === 'admin_get_email_templates') {
+      const templates = await EmailTemplate.find({}).lean();
+      return res.status(200).json({ success: true, data: templates });
+    }
+
+    if (action === 'admin_save_email_template') {
+      const { key, subject, html } = payload;
+      if (!key) return res.status(200).json({ success: false, message: 'Missing template key.' });
+      const tpl = await EmailTemplate.findOneAndUpdate(
+        { key },
+        { $set: { subject, html, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: tpl, message: 'Template saved.' });
+    }
+
+    // ADMIN: Taxonomies — colleges, branches, event categories (Feature #7)
+    if (action === 'admin_get_taxonomies') {
+      const { category } = payload;
+      const query = category ? { category } : {};
+      const items = await Taxonomy.find(query).sort({ order: 1, value: 1 }).lean();
+      return res.status(200).json({ success: true, data: items });
+    }
+
+    if (action === 'admin_add_taxonomy') {
+      const { category, value } = payload;
+      if (!category || !value) return res.status(200).json({ success: false, message: 'Missing category or value.' });
+      const existing = await Taxonomy.findOne({ category, value: value.trim() });
+      if (existing) return res.status(200).json({ success: false, message: 'Value already exists.' });
+      const item = await Taxonomy.create({ category, value: value.trim() });
+      return res.status(200).json({ success: true, data: item, message: 'Taxonomy value added.' });
+    }
+
+    if (action === 'admin_delete_taxonomy') {
+      const { id } = payload;
+      if (!id) return res.status(200).json({ success: false, message: 'Missing id.' });
+      await Taxonomy.findByIdAndDelete(id);
+      return res.status(200).json({ success: true, message: 'Taxonomy value deleted.' });
+    }
+
+    // ADMIN: Dictionary / String Overrides (Feature #12)
+    if (action === 'admin_get_dictionary') {
+      const items = await Dictionary.find({}).lean();
+      return res.status(200).json({ success: true, data: items });
+    }
+
+    if (action === 'admin_save_dictionary') {
+      const { entries } = payload; // array of { key, value }
+      if (!entries || !Array.isArray(entries)) return res.status(200).json({ success: false, message: 'Invalid entries.' });
+      for (const e of entries) {
+        await Dictionary.findOneAndUpdate({ key: e.key }, { $set: { value: e.value } }, { upsert: true });
+      }
+      return res.status(200).json({ success: true, message: 'Dictionary saved.' });
+    }
+
+    // ADMIN: Custom Report Builder / Export (Feature #14)
+    if (action === 'admin_export_report') {
+      const { columns, statusFilter, dateFrom, dateTo } = payload;
+      const query = {};
+      if (statusFilter && statusFilter !== 'all') query.status = statusFilter;
+      if (dateFrom || dateTo) {
+        query.createdAt = {};
+        if (dateFrom) query.createdAt.$gte = new Date(dateFrom);
+        if (dateTo) query.createdAt.$lte = new Date(dateTo);
+      }
+      const allMembers = await Member.find(query).lean();
+      const allowedCols = ['operativeId','name','email','phone','college','branch','year','status','xp','rank','squad','forgeRole','loginCount','lastLoginTime'];
+      const cols = (columns && Array.isArray(columns)) ? columns.filter(c => allowedCols.includes(c)) : allowedCols;
+      const rows = allMembers.map(m => cols.map(c => (m[c] !== undefined && m[c] !== null) ? String(m[c]).replace(/,/g, ';') : '').join(','));
+      const csv = [cols.join(','), ...rows].join('\n');
+      return res.status(200).json({ success: true, data: csv, count: allMembers.length });
+    }
+
+    // ADMIN: Announcements / CMS (Feature #15)
+    if (action === 'admin_get_announcements') {
+      const items = await Announcement.find({}).sort({ pinned: -1, createdAt: -1 }).lean();
+      return res.status(200).json({ success: true, data: items });
+    }
+
+    if (action === 'admin_create_announcement') {
+      const { title, body, published, pinned, author } = payload;
+      if (!title) return res.status(200).json({ success: false, message: 'Title is required.' });
+      const rand = Math.floor(10000 + Math.random() * 90000);
+      const item = await Announcement.create({
+        announcementId: 'ANN-' + rand,
+        title, body: body || '', published: !!published, pinned: !!pinned, author: author || 'Admin',
+        createdAt: new Date(), updatedAt: new Date()
+      });
+      return res.status(200).json({ success: true, data: item, message: 'Announcement created.' });
+    }
+
+    if (action === 'admin_update_announcement') {
+      const { announcementId, title, body, published, pinned } = payload;
+      if (!announcementId) return res.status(200).json({ success: false, message: 'Missing announcementId.' });
+      const item = await Announcement.findOneAndUpdate(
+        { announcementId },
+        { $set: { title, body, published: !!published, pinned: !!pinned, updatedAt: new Date() } },
+        { new: true }
+      );
+      return res.status(200).json({ success: true, data: item, message: 'Announcement updated.' });
+    }
+
+    if (action === 'admin_delete_announcement') {
+      const { announcementId } = payload;
+      await Announcement.findOneAndDelete({ announcementId });
+      return res.status(200).json({ success: true, message: 'Announcement deleted.' });
+    }
+
     // ADMIN: Get Platform Settings
     if (action === 'admin_get_settings') {
       let settings = await PlatformSettings.findOne({ key: 'global' });

@@ -188,3 +188,52 @@ const PlatformSettingsSchema = new mongoose.Schema({
 });
 
 export const PlatformSettings = mongoose.models.PlatformSettings || mongoose.model('PlatformSettings', PlatformSettingsSchema);
+
+// Email Templates
+const EmailTemplateSchema = new mongoose.Schema({
+  key: { type: String, unique: true }, // 'otp', 'welcome', 'approved'
+  subject: String,
+  html: String,
+  updatedAt: { type: Date, default: Date.now }
+});
+export const EmailTemplate = mongoose.models.EmailTemplate || mongoose.model('EmailTemplate', EmailTemplateSchema);
+
+// Taxonomy (editable dropdowns)
+const TaxonomySchema = new mongoose.Schema({
+  category: String, // 'college', 'branch', 'eventCategory'
+  value: String,
+  order: { type: Number, default: 0 }
+});
+export const Taxonomy = mongoose.models.Taxonomy || mongoose.model('Taxonomy', TaxonomySchema);
+
+// Global Dictionary (string overrides)
+const DictionarySchema = new mongoose.Schema({
+  key: { type: String, unique: true }, // e.g. 'operative', 'forge'
+  value: String // e.g. 'Student', 'Dashboard'
+});
+export const Dictionary = mongoose.models.Dictionary || mongoose.model('Dictionary', DictionarySchema);
+
+// Announcements / CMS posts
+const AnnouncementSchema = new mongoose.Schema({
+  announcementId: { type: String, unique: true },
+  title: String,
+  body: String, // Markdown
+  published: { type: Boolean, default: false },
+  pinned: { type: Boolean, default: false },
+  author: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+export const Announcement = mongoose.models.Announcement || mongoose.model('Announcement', AnnouncementSchema);
+
+// Rank Config
+const RankConfigSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  ranks: [{
+    name: String,
+    minXP: Number,
+    maxXP: Number
+  }],
+  updatedAt: { type: Date, default: Date.now }
+});
+export const RankConfig = mongoose.models.RankConfig || mongoose.model('RankConfig', RankConfigSchema);

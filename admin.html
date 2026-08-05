@@ -436,6 +436,30 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       System Settings
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('rankConfig')" id="navRankConfig">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      Rank Config
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('emailTemplates')" id="navEmailTemplates">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Email Templates
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('taxonomies')" id="navTaxonomies">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+      Taxonomies
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('dictionary')" id="navDictionary">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Dictionary
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('reportBuilder')" id="navReportBuilder">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Report Builder
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('cms')" id="navCms">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+      Announcements
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -504,6 +528,166 @@
       </div>
 
       <div id="settingsStatus" style="margin-top:20px;font-size:13px;font-weight:600;min-height:20px;"></div>
+    </div>
+
+    <!-- ── RANK CONFIG TAB ── -->
+    <div class="tab-content" id="tabRankConfig">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Rank Configuration</h2>
+        <button class="btn-add" onclick="saveRankConfig()">Save Rank Config</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Define rank names and the XP thresholds required to reach each tier. Changes apply to all members instantly.</p>
+        <div id="rankConfigList" style="display:flex;flex-direction:column;gap:12px;"></div>
+        <button class="btn-export" style="margin-top:16px;" onclick="addRankRow()">+ Add Rank Tier</button>
+      </div>
+      <div id="rankConfigStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── EMAIL TEMPLATES TAB ── -->
+    <div class="tab-content" id="tabEmailTemplates">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Email Templates</h2>
+        <button class="btn-add" onclick="saveEmailTemplate()">Save Template</button>
+      </div>
+      <div class="admin-card" style="margin-bottom:20px;">
+        <div class="form-group">
+          <label>Select Template</label>
+          <select id="tplKey" onchange="loadEmailTemplate()" style="width:100%;padding:12px 16px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:14px;">
+            <option value="otp">OTP / Login Code Email</option>
+            <option value="welcome">Welcome Email (on Registration)</option>
+            <option value="approved">Approval Email (on Status Change)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subject Line</label>
+          <input type="text" id="tplSubject" placeholder="e.g. 🔐 Your Innovexa Login Code: {{otp}}" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>HTML Body — use <code>{{name}}</code>, <code>{{otp}}</code>, <code>{{invxId}}</code>, <code>{{status}}</code></label>
+          <textarea id="tplHtml" rows="14" style="width:100%;padding:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:monospace;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div id="tplStatus" style="font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── TAXONOMIES TAB ── -->
+    <div class="tab-content" id="tabTaxonomies">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Taxonomy Manager</h2>
+      </div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Manage the dropdown options that appear on the registration form and event pages. Changes sync to the public site instantly.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Colleges</h3>
+          <div id="taxonomyCollegeList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="newCollege" placeholder="Add college..." style="flex:1;padding:8px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;"/>
+            <button class="btn-add" style="padding:8px 12px;font-size:12px;" onclick="addTaxonomy('college','newCollege')">Add</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Branches</h3>
+          <div id="taxonomyBranchList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="newBranch" placeholder="Add branch..." style="flex:1;padding:8px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;"/>
+            <button class="btn-add" style="padding:8px 12px;font-size:12px;" onclick="addTaxonomy('branch','newBranch')">Add</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Event Categories</h3>
+          <div id="taxonomyEventCategoryList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="newEventCategory" placeholder="Add category..." style="flex:1;padding:8px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;"/>
+            <button class="btn-add" style="padding:8px 12px;font-size:12px;" onclick="addTaxonomy('eventCategory','newEventCategory')">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DICTIONARY TAB ── -->
+    <div class="tab-content" id="tabDictionary">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Global Dictionary</h2>
+        <button class="btn-add" onclick="saveDictionary()">Save Dictionary</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Override core platform terms globally. Changes apply across the entire UI without any code deployments.</p>
+        <table class="data-table" style="width:100%;">
+          <thead><tr><th>Original Term</th><th>Your Custom Term</th></tr></thead>
+          <tbody id="dictionaryBody"></tbody>
+        </table>
+      </div>
+      <div id="dictStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── REPORT BUILDER TAB ── -->
+    <div class="tab-content" id="tabReportBuilder">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Custom Report Builder</h2>
+        <button class="btn-add" onclick="buildReport()">Generate &amp; Download CSV</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Select Columns</h3>
+          <div id="reportColumnsList" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+        </div>
+        <div class="admin-card">
+          <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">Filters</h3>
+          <div class="form-group">
+            <label>Member Status</label>
+            <select id="reportStatusFilter" style="width:100%;padding:10px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">
+              <option value="all">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Revoked">Revoked</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date From</label>
+            <input type="date" id="reportDateFrom" style="width:100%;padding:10px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Date To</label>
+            <input type="date" id="reportDateTo" style="width:100%;padding:10px 12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);" />
+          </div>
+        </div>
+      </div>
+      <div id="reportStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+    </div>
+
+    <!-- ── CMS / ANNOUNCEMENTS TAB ── -->
+    <div class="tab-content" id="tabCms">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Announcements</h2>
+        <button class="btn-add" onclick="openAnnouncementEditor()">+ New Announcement</button>
+      </div>
+      <div id="announcementEditorPanel" style="display:none;" class="admin-card" style="margin-bottom:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;" id="annEditorTitle">New Announcement</h3>
+        <input type="hidden" id="annEditingId" />
+        <div class="form-group"><label>Title</label><input type="text" id="annTitle" placeholder="Announcement title..." /></div>
+        <div class="form-group">
+          <label>Body (Markdown supported)</label>
+          <textarea id="annBody" rows="8" placeholder="Write your announcement here. **Bold**, *italic*, - lists all supported." style="width:100%;padding:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:14px;font-family:monospace;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="annPublished" style="width:16px;height:16px;"> Publish immediately
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+            <input type="checkbox" id="annPinned" style="width:16px;height:16px;"> Pin to top
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-add" onclick="saveAnnouncement()">Save Announcement</button>
+          <button class="btn-export" onclick="closeAnnouncementEditor()">Cancel</button>
+        </div>
+      </div>
+      <div id="announcementsListPanel">
+        <div id="announcementsLoading" style="text-align:center;padding:40px;color:var(--text3);">Loading announcements...</div>
+        <div id="announcementsList" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
     </div>
 
     <!-- ── OVERVIEW TAB ── -->
@@ -768,7 +952,10 @@
       <div id="memberDetailPanel" style="display:none; margin-top:20px; background:var(--bg2); padding:20px; border-radius:12px; border:1px solid var(--border);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h3 style="font-size:20px; margin:0;" id="detailMemberName">Member Details</h3>
-          <button class="btn-sm" style="background:var(--bg3); border:1px solid var(--border);" onclick="closeMemberDetailView()">✕ Close View</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-add" id="btnEditDossier" style="display:none;" onclick="enableDossierEdit(window._currentDossierOpId, window._currentDossierProf)">✏️ Edit Profile</button>
+            <button class="btn-sm" style="background:var(--bg3); border:1px solid var(--border);" onclick="closeMemberDetailView()">&#x2715; Close View</button>
+          </div>
         </div>
         
         <div id="detailLoading" class="loading" style="display:none;"><div class="spinner"></div> Fetching full dossier...</div>
@@ -1700,6 +1887,12 @@ function switchAdminTab(tab) {
   if (tab === 'surveillance') loadAuditLogs();
   if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
   if (tab === 'sysSettings') loadSettings();
+  if (tab === 'rankConfig') loadRankConfig();
+  if (tab === 'emailTemplates') loadEmailTemplates();
+  if (tab === 'taxonomies') loadTaxonomies();
+  if (tab === 'dictionary') loadDictionary();
+  if (tab === 'reportBuilder') initReportBuilder();
+  if (tab === 'cms') loadAnnouncements();
 }
 
 // ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
@@ -1757,6 +1950,497 @@ async function saveSettings() {
   }
 }
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #1 — DEEP MEMBER DOSSIER EDITING
+// ══════════════════════════════════════════════════════════════════════════════
+let _dossierOpId = null;
+
+function enableDossierEdit(opId, prof) {
+  _dossierOpId = opId;
+  const content = document.getElementById('detailContent');
+  // Build editable form inside a card injected above the logs grid
+  let existing = document.getElementById('dossierEditCard');
+  if (existing) existing.remove();
+  const card = document.createElement('div');
+  card.id = 'dossierEditCard';
+  card.className = 'admin-card';
+  card.style.cssText = 'margin-bottom:20px;';
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">✏️ Edit Profile — ${escHtml(opId)}</h3>
+      <button class="btn-sm" style="background:var(--bg3);" onclick="document.getElementById('dossierEditCard').remove()">Cancel</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="form-group" style="margin-bottom:0;"><label>Full Name</label><input id="dedit_name" value="${escHtml(prof.name||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Email</label><input id="dedit_email" type="email" value="${escHtml(prof.email||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Phone</label><input id="dedit_phone" value="${escHtml(prof.phone||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>College</label><input id="dedit_college" value="${escHtml(prof.college||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Branch</label><input id="dedit_branch" value="${escHtml(prof.branch||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Year</label><input id="dedit_year" value="${escHtml(prof.year||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>XP</label><input id="dedit_xp" type="number" value="${prof.xp||0}"></div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Rank</label>
+        <select id="dedit_rank" style="width:100%;padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">
+          ${['Apprentice','Scout','Operative','Vanguard','Commander','Warlord'].map(r=>`<option${prof.rank===r?' selected':''}>${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Status</label>
+        <select id="dedit_status" style="width:100%;padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);">
+          ${['Pending','Confirmed','Rejected','Revoked'].map(s=>`<option${prof.status===s?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;"><label>Squad</label><input id="dedit_squad" value="${escHtml(prof.squad||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;"><label>Forge Role</label><input id="dedit_forgeRole" value="${escHtml(prof.forgeRole||'')}"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn-primary" onclick="saveDossierEdit()">Save Changes</button>
+      <button class="btn-sm" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.3);" onclick="resetMemberOperativeId('${escHtml(opId)}')">🔄 Force Reset Operative ID</button>
+    </div>
+    <div id="dossierEditStatus" style="margin-top:10px;font-size:12px;font-weight:600;"></div>
+  `;
+  content.insertBefore(card, content.firstChild);
+}
+
+async function saveDossierEdit() {
+  const statusEl = document.getElementById('dossierEditStatus');
+  statusEl.textContent = 'Saving...';
+  try {
+    const res = await apiPost('admin_edit_member', {
+      operativeId: _dossierOpId,
+      name: document.getElementById('dedit_name').value,
+      email: document.getElementById('dedit_email').value,
+      phone: document.getElementById('dedit_phone').value,
+      college: document.getElementById('dedit_college').value,
+      branch: document.getElementById('dedit_branch').value,
+      year: document.getElementById('dedit_year').value,
+      xp: document.getElementById('dedit_xp').value,
+      rank: document.getElementById('dedit_rank').value,
+      status: document.getElementById('dedit_status').value,
+      squad: document.getElementById('dedit_squad').value,
+      forgeRole: document.getElementById('dedit_forgeRole').value,
+    });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Profile updated successfully.';
+    showToast('Profile updated!', 'success');
+    // Refresh dossier
+    setTimeout(() => loadMemberDetailView(_dossierOpId), 1200);
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function resetMemberOperativeId(opId) {
+  if (!confirm(`Reset Operative ID for ${opId}? The member will need to log in with the new ID. This cannot be undone.`)) return;
+  try {
+    const res = await apiPost('admin_reset_member_id', { operativeId: opId });
+    if (!res.success) throw new Error(res.message);
+    showToast(`ID reset! New ID: ${res.newId}`, 'success');
+    closeMemberDetailView();
+    loadMembers();
+  } catch(e) {
+    showToast('Reset failed: ' + e.message, 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #2 — DYNAMIC RANK CONFIG
+// ══════════════════════════════════════════════════════════════════════════════
+let _rankConfigData = [];
+
+async function loadRankConfig() {
+  const list = document.getElementById('rankConfigList');
+  list.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading rank tiers...</div>';
+  try {
+    const res = await apiPost('admin_get_rank_config', {});
+    if (!res.success) throw new Error(res.message);
+    _rankConfigData = res.data.ranks || [];
+    renderRankConfig();
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--red);font-size:13px;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderRankConfig() {
+  const list = document.getElementById('rankConfigList');
+  list.innerHTML = _rankConfigData.map((r, i) => `
+    <div style="display:grid;grid-template-columns:1fr 120px 120px 40px;gap:10px;align-items:center;padding:10px;background:var(--bg3);">
+      <input value="${escHtml(r.name)}" placeholder="Rank name" onchange="_rankConfigData[${i}].name=this.value"
+        style="padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;">
+      <input type="number" value="${r.minXP}" placeholder="Min XP" onchange="_rankConfigData[${i}].minXP=parseInt(this.value)"
+        style="padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;">
+      <input type="number" value="${r.maxXP}" placeholder="Max XP" onchange="_rankConfigData[${i}].maxXP=parseInt(this.value)"
+        style="padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;">
+      <button onclick="_rankConfigData.splice(${i},1);renderRankConfig()" style="padding:6px;background:rgba(239,68,68,0.1);color:var(--red);border:none;cursor:pointer;font-size:16px;">✕</button>
+    </div>
+  `).join('');
+}
+
+function addRankRow() {
+  _rankConfigData.push({ name: 'New Rank', minXP: 0, maxXP: 999 });
+  renderRankConfig();
+}
+
+async function saveRankConfig() {
+  const statusEl = document.getElementById('rankConfigStatus');
+  statusEl.textContent = 'Saving...';
+  try {
+    const res = await apiPost('admin_save_rank_config', { ranks: _rankConfigData });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Rank configuration saved.';
+    showToast('Rank config saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #5 — EMAIL TEMPLATE EDITOR
+// ══════════════════════════════════════════════════════════════════════════════
+let _emailTemplates = {};
+
+async function loadEmailTemplates() {
+  try {
+    const res = await apiPost('admin_get_email_templates', {});
+    if (!res.success) throw new Error(res.message);
+    _emailTemplates = {};
+    (res.data || []).forEach(t => { _emailTemplates[t.key] = t; });
+    loadEmailTemplate();
+  } catch(e) {
+    document.getElementById('tplStatus').textContent = 'Load error: ' + e.message;
+  }
+}
+
+function loadEmailTemplate() {
+  const key = document.getElementById('tplKey').value;
+  const tpl = _emailTemplates[key];
+  if (tpl) {
+    document.getElementById('tplSubject').value = tpl.subject || '';
+    document.getElementById('tplHtml').value = tpl.html || '';
+  } else {
+    // Default seed templates
+    const defaults = {
+      otp: { subject: '🔐 Your Innovexa Login Code: {{otp}}', html: '<h2>Hello {{name}},</h2><p>Your login code is: <strong>{{otp}}</strong></p><p>This code expires in 15 minutes.</p>' },
+      welcome: { subject: '🚀 Welcome to Innovexa, {{name}}!', html: '<h2>Welcome {{name}}!</h2><p>You have successfully registered. Your Operative ID is <strong>{{invxId}}</strong>.</p>' },
+      approved: { subject: '✅ Your Innovexa Membership Status: {{status}}', html: '<h2>Hello {{name}},</h2><p>Your membership status has been updated to: <strong>{{status}}</strong>.</p>' }
+    };
+    const d = defaults[key] || { subject: '', html: '' };
+    document.getElementById('tplSubject').value = d.subject;
+    document.getElementById('tplHtml').value = d.html;
+  }
+}
+
+async function saveEmailTemplate() {
+  const statusEl = document.getElementById('tplStatus');
+  statusEl.textContent = 'Saving...';
+  const key = document.getElementById('tplKey').value;
+  const subject = document.getElementById('tplSubject').value;
+  const html = document.getElementById('tplHtml').value;
+  try {
+    const res = await apiPost('admin_save_email_template', { key, subject, html });
+    if (!res.success) throw new Error(res.message);
+    _emailTemplates[key] = res.data;
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Template saved.';
+    showToast('Email template saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #7 — DYNAMIC TAXONOMIES
+// ══════════════════════════════════════════════════════════════════════════════
+let _taxonomies = {};
+
+async function loadTaxonomies() {
+  try {
+    const res = await apiPost('admin_get_taxonomies', {});
+    if (!res.success) throw new Error(res.message);
+    _taxonomies = {};
+    (res.data || []).forEach(t => {
+      if (!_taxonomies[t.category]) _taxonomies[t.category] = [];
+      _taxonomies[t.category].push(t);
+    });
+    renderTaxonomyList('college', 'taxonomyCollegeList');
+    renderTaxonomyList('branch', 'taxonomyBranchList');
+    renderTaxonomyList('eventCategory', 'taxonomyEventCategoryList');
+  } catch(e) {
+    console.error('Taxonomy load error:', e);
+  }
+}
+
+function renderTaxonomyList(category, elId) {
+  const el = document.getElementById(elId);
+  const items = _taxonomies[category] || [];
+  if (!items.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);">No entries yet.</div>';
+    return;
+  }
+  el.innerHTML = items.map(t => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg3);">
+      <span style="font-size:13px;">${escHtml(t.value)}</span>
+      <button onclick="deleteTaxonomy('${t._id}','${category}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;line-height:1;">✕</button>
+    </div>
+  `).join('');
+}
+
+async function addTaxonomy(category, inputId) {
+  const input = document.getElementById(inputId);
+  const value = input.value.trim();
+  if (!value) return;
+  try {
+    const res = await apiPost('admin_add_taxonomy', { category, value });
+    if (!res.success) { showToast(res.message, 'error'); return; }
+    if (!_taxonomies[category]) _taxonomies[category] = [];
+    _taxonomies[category].push(res.data);
+    const listId = category === 'college' ? 'taxonomyCollegeList' : category === 'branch' ? 'taxonomyBranchList' : 'taxonomyEventCategoryList';
+    renderTaxonomyList(category, listId);
+    input.value = '';
+    showToast('Added!', 'success');
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function deleteTaxonomy(id, category) {
+  try {
+    const res = await apiPost('admin_delete_taxonomy', { id });
+    if (!res.success) { showToast(res.message, 'error'); return; }
+    if (_taxonomies[category]) _taxonomies[category] = _taxonomies[category].filter(t => t._id !== id);
+    const listId = category === 'college' ? 'taxonomyCollegeList' : category === 'branch' ? 'taxonomyBranchList' : 'taxonomyEventCategoryList';
+    renderTaxonomyList(category, listId);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #12 — GLOBAL DICTIONARY
+// ══════════════════════════════════════════════════════════════════════════════
+const DICT_TERMS = [
+  { key: 'operative', label: 'Operative' },
+  { key: 'forge', label: 'Forge (member portal name)' },
+  { key: 'innovexa', label: 'Innovexa (org name)' },
+  { key: 'squad', label: 'Squad' },
+  { key: 'bounty', label: 'Bounty' },
+  { key: 'xp', label: 'XP (experience points name)' },
+  { key: 'vanguard', label: 'Vanguard (senior role)' },
+  { key: 'apprentice', label: 'Apprentice (entry rank)' },
+];
+let _dictData = {};
+
+async function loadDictionary() {
+  const tbody = document.getElementById('dictionaryBody');
+  tbody.innerHTML = '<tr><td colspan="2" style="padding:20px;text-align:center;color:var(--text3);">Loading...</td></tr>';
+  try {
+    const res = await apiPost('admin_get_dictionary', {});
+    if (!res.success) throw new Error(res.message);
+    _dictData = {};
+    (res.data || []).forEach(d => { _dictData[d.key] = d.value; });
+    tbody.innerHTML = DICT_TERMS.map(t => `
+      <tr>
+        <td style="font-size:13px;font-weight:600;">${escHtml(t.label)}</td>
+        <td><input id="dict_${t.key}" value="${escHtml(_dictData[t.key] || '')}" placeholder="${escHtml(t.label)} (leave blank = default)"
+          style="width:100%;padding:8px 10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;"></td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="2" style="color:var(--red);padding:16px;">${e.message}</td></tr>`;
+  }
+}
+
+async function saveDictionary() {
+  const statusEl = document.getElementById('dictStatus');
+  statusEl.textContent = 'Saving...';
+  const entries = DICT_TERMS.map(t => ({ key: t.key, value: document.getElementById('dict_' + t.key).value.trim() })).filter(e => e.value);
+  try {
+    const res = await apiPost('admin_save_dictionary', { entries });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = '✓ Dictionary saved.';
+    showToast('Dictionary saved!', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #14 — CUSTOM REPORT BUILDER
+// ══════════════════════════════════════════════════════════════════════════════
+const REPORT_COLUMNS = [
+  { key: 'operativeId', label: 'Operative ID' },
+  { key: 'name', label: 'Full Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'college', label: 'College' },
+  { key: 'branch', label: 'Branch' },
+  { key: 'year', label: 'Year' },
+  { key: 'status', label: 'Status' },
+  { key: 'xp', label: 'XP' },
+  { key: 'rank', label: 'Rank' },
+  { key: 'squad', label: 'Squad' },
+  { key: 'forgeRole', label: 'Forge Role' },
+  { key: 'loginCount', label: 'Login Count' },
+  { key: 'lastLoginTime', label: 'Last Login' },
+];
+
+function initReportBuilder() {
+  const el = document.getElementById('reportColumnsList');
+  if (el.childElementCount > 0) return; // already initialized
+  el.innerHTML = REPORT_COLUMNS.map(c => `
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 10px;background:var(--bg3);font-size:13px;">
+      <input type="checkbox" id="rcol_${c.key}" checked style="accent-color:var(--accent);width:15px;height:15px;">
+      ${escHtml(c.label)}
+    </label>
+  `).join('');
+}
+
+async function buildReport() {
+  const statusEl = document.getElementById('reportStatus');
+  statusEl.textContent = 'Building report...';
+  statusEl.style.color = 'var(--text2)';
+  const columns = REPORT_COLUMNS.filter(c => document.getElementById('rcol_' + c.key)?.checked).map(c => c.key);
+  if (!columns.length) { statusEl.style.color='var(--red)'; statusEl.textContent='Select at least one column.'; return; }
+  try {
+    const res = await apiPost('admin_export_report', {
+      columns,
+      statusFilter: document.getElementById('reportStatusFilter').value,
+      dateFrom: document.getElementById('reportDateFrom').value,
+      dateTo: document.getElementById('reportDateTo').value,
+    });
+    if (!res.success) throw new Error(res.message);
+    // Download the CSV
+    const blob = new Blob([res.data], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `innovexa_report_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    statusEl.style.color = 'var(--green)';
+    statusEl.textContent = `✓ Report downloaded — ${res.count} records.`;
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FEATURE #15 — CMS / ANNOUNCEMENTS
+// ══════════════════════════════════════════════════════════════════════════════
+let _editingAnnId = null;
+
+async function loadAnnouncements() {
+  const loadEl = document.getElementById('announcementsLoading');
+  const listEl = document.getElementById('announcementsList');
+  loadEl.style.display = 'block';
+  listEl.innerHTML = '';
+  try {
+    const res = await apiPost('admin_get_announcements', {});
+    loadEl.style.display = 'none';
+    if (!res.success) throw new Error(res.message);
+    const items = res.data || [];
+    if (!items.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">No announcements yet. Click \'+ New Announcement\' to create one.</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(a => `
+      <div class="admin-card" style="margin:0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            ${a.pinned ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(167,139,250,0.15);color:var(--accent);">📌 PINNED</span>' : ''}
+            ${a.published ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(74,222,128,0.1);color:var(--green);">● LIVE</span>' : '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(255,255,255,0.05);color:var(--text3);">DRAFT</span>'}
+            <h3 style="font-size:15px;font-weight:700;margin:0;">${escHtml(a.title)}</h3>
+          </div>
+          <p style="font-size:13px;color:var(--text2);margin:0 0 6px;white-space:pre-wrap;max-height:60px;overflow:hidden;">${escHtml((a.body||'').slice(0,200))}${(a.body||'').length>200?'…':''}</p>
+          <span style="font-size:11px;color:var(--text3);">By ${escHtml(a.author||'Admin')} · ${new Date(a.createdAt).toLocaleDateString()}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn-sm" onclick="editAnnouncement(${JSON.stringify(a).replace(/"/g,'&quot;')})">Edit</button>
+          <button class="btn-sm" style="background:rgba(239,68,68,0.1);color:var(--red);" onclick="deleteAnnouncement('${a.announcementId}')">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    loadEl.style.display = 'none';
+    listEl.innerHTML = `<div style="color:var(--red);padding:20px;">Error: ${e.message}</div>`;
+  }
+}
+
+function openAnnouncementEditor() {
+  _editingAnnId = null;
+  document.getElementById('annEditingId').value = '';
+  document.getElementById('annEditorTitle').textContent = 'New Announcement';
+  document.getElementById('annTitle').value = '';
+  document.getElementById('annBody').value = '';
+  document.getElementById('annPublished').checked = false;
+  document.getElementById('annPinned').checked = false;
+  document.getElementById('announcementEditorPanel').style.display = 'block';
+  document.getElementById('announcementEditorPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function editAnnouncement(a) {
+  _editingAnnId = a.announcementId;
+  document.getElementById('annEditorTitle').textContent = 'Edit Announcement';
+  document.getElementById('annTitle').value = a.title || '';
+  document.getElementById('annBody').value = a.body || '';
+  document.getElementById('annPublished').checked = !!a.published;
+  document.getElementById('annPinned').checked = !!a.pinned;
+  document.getElementById('announcementEditorPanel').style.display = 'block';
+  document.getElementById('announcementEditorPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeAnnouncementEditor() {
+  document.getElementById('announcementEditorPanel').style.display = 'none';
+  _editingAnnId = null;
+}
+
+async function saveAnnouncement() {
+  const title = document.getElementById('annTitle').value.trim();
+  if (!title) { showToast('Title is required.', 'error'); return; }
+  const payload = {
+    title,
+    body: document.getElementById('annBody').value,
+    published: document.getElementById('annPublished').checked,
+    pinned: document.getElementById('annPinned').checked,
+    author: window._adminName || 'Admin',
+  };
+  try {
+    let res;
+    if (_editingAnnId) {
+      res = await apiPost('admin_update_announcement', { ...payload, announcementId: _editingAnnId });
+    } else {
+      res = await apiPost('admin_create_announcement', payload);
+    }
+    if (!res.success) throw new Error(res.message);
+    showToast(_editingAnnId ? 'Announcement updated!' : 'Announcement created!', 'success');
+    closeAnnouncementEditor();
+    loadAnnouncements();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function deleteAnnouncement(announcementId) {
+  if (!confirm('Delete this announcement? This cannot be undone.')) return;
+  try {
+    const res = await apiPost('admin_delete_announcement', { announcementId });
+    if (!res.success) throw new Error(res.message);
+    showToast('Announcement deleted.', 'success');
+    loadAnnouncements();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+// ══════════════════════════════════════════════════════════════════════════════
 
 let allAuditLogs = [];
 
@@ -2633,6 +3317,12 @@ async function loadMemberDetailView() {
       const tasks = d.tasks || [];
       const prof  = d.member || member || {};
 
+      // Expose for dossier edit button
+      window._currentDossierOpId = opId;
+      window._currentDossierProf = prof;
+      const editBtn = document.getElementById('btnEditDossier');
+      if (editBtn) editBtn.style.display = 'inline-flex';
+
       // ── Stats bar ────────────────────────────────────────────
       document.getElementById('detailStatLogins').textContent = stats.totalLogs || 0;
       document.getElementById('detailStatActiveTasks').textContent = stats.activeTasks || 0;
@@ -2709,7 +3399,13 @@ function closeMemberDetailView() {
   document.getElementById('memberDetailSelect').value = '';
   document.getElementById('memberDetailPanel').style.display = 'none';
   document.getElementById('membersTable').style.display = 'block';
-  
+  // Hide edit button and clear globals
+  const editBtn = document.getElementById('btnEditDossier');
+  if (editBtn) editBtn.style.display = 'none';
+  const editCard = document.getElementById('dossierEditCard');
+  if (editCard) editCard.remove();
+  window._currentDossierOpId = null;
+  window._currentDossierProf = null;
   // Restore pagination if needed
   if (currentFilteredMembers.length > itemsPerPage) {
     document.getElementById('paginationControls').style.display = 'flex';
