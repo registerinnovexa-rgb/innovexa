@@ -450,9 +450,8 @@
 
   <script>
   // ═══════════════════════════════════════════════════════════
-  //  CONFIG — update SCRIPT_URL if you redeploy Apps Script
+  //  CONFIG
   // ═══════════════════════════════════════════════════════════
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
 
   const FB_CONFIG = {
     apiKey:            "AIzaSyAufdQ8b5wktFuRFvtDERnjanJ-9b-sv3U",
@@ -529,7 +528,7 @@
     btn.textContent = 'Verifying…'; btn.disabled = true;
 
     try {
-      const url = `${SCRIPT_URL}?email=${encodeURIComponent(email)}`;
+      const url = `/api/proxy?action=status_check&email=${encodeURIComponent(email)}`;
       const res  = await fetch(url, { method:'GET', redirect:'follow' });
       const data = await res.json();
 

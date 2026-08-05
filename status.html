@@ -251,7 +251,7 @@
       const r = await fetch('/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUrl: window.SCRIPT_URL, payload: { action: 'status_check', email: email } })
+        body: JSON.stringify({ payload: { action: 'status_check', email: email } })
       });
       const res = await r.json();
       renderStatus(res, email);
@@ -355,7 +355,7 @@
       const r = await fetch('/api/proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUrl: window.SCRIPT_URL, payload: { action: 'status_check', [type]: value } })
+        body: JSON.stringify({ payload: { action: 'status_check', [type]: value } })
       });
       const res = await r.json();
       renderStatus(res, value);

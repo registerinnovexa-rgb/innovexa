@@ -114,7 +114,9 @@ const EventSchema = new mongoose.Schema({
   date: String,
   location: String,
   description: String,
-  status: { type: String, default: 'Upcoming' }
+  status: { type: String, default: 'Upcoming' },
+  coverUrl: String,
+  imageUrls: [String]
 });
 
 export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
@@ -137,3 +139,39 @@ const FeedbackSchema = new mongoose.Schema({
 });
 
 export const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', FeedbackSchema);
+
+const AssetSchema = new mongoose.Schema({
+  assetId: { type: String, unique: true },
+  name: String,
+  type: String,
+  serial: String,
+  status: { type: String, default: 'Available' },
+  borrowedBy: String,
+  borrowDate: Date,
+  timestamp: Date
+});
+
+export const Asset = mongoose.models.Asset || mongoose.model('Asset', AssetSchema);
+
+const DocRequestSchema = new mongoose.Schema({
+  requestId: { type: String, unique: true },
+  operativeId: String,
+  name: String,
+  docType: String,
+  purpose: String,
+  status: { type: String, default: 'Pending' },
+  timestamp: Date
+});
+
+export const DocRequest = mongoose.models.DocRequest || mongoose.model('DocRequest', DocRequestSchema);
+
+const CertReqSchema = new mongoose.Schema({
+  requestId: { type: String, unique: true },
+  operativeId: String,
+  name: String,
+  eventType: String,
+  status: { type: String, default: 'Pending' },
+  timestamp: Date
+});
+
+export const CertReq = mongoose.models.CertReq || mongoose.model('CertReq', CertReqSchema);

@@ -1015,8 +1015,6 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
-const EVENT_REG_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwG3aQM6UW0yyXz6zaHttAG1s1fouR3bWkQKoW4umt2sDJvE12Ay7yORExvkSDPq6Y/exec';
 const ADMIN_KEY = 'INNOVEXA_SECURE_KEY_2025';
 
 let adminSession = null;
@@ -1106,40 +1104,12 @@ function _saveToStorage(key, entry) {
   try { localStorage.setItem(CACHE_STORE + key, JSON.stringify(entry)); } catch(_) {}
 }
 
-// Actions that are fully handled by MongoDB proxy (NOT Google Apps Script)
-const MONGO_ACTIONS = new Set([
-  'admin_login', 'adminMembers', 'admin_get_member_detail', 'admin_get_tasks',
-  'admin_get_audit_logs', 'admin_get_events', 'admin_get_attendance',
-  'admin_get_feedback', 'admin_create_task', 'admin_edit_task', 'admin_delete_task',
-  'admin_review_task', 'admin_create_event', 'admin_edit_event', 'admin_delete_event',
-  'admin_upload_event_image', 'admin_log_attendance', 'admin_remove_attendance',
-  'admin_post_feed', 'admin_send_broadcast', 'admin_issue_certificates',
-  'admin_set_role', 'admin_grant_forge_access', 'admin_update_profile', 'admin_add_resource',
-  'admin_edit_resource', 'admin_delete_resource', 'forge_get_resources', 'forge_get_leaderboard',
-  'updateStatus', 'team', 'count', 'get_confirmed', 'status_check'
-]);
-
 async function _fetchFresh(action, params) {
-  // Route MongoDB-backed actions directly
-  if (MONGO_ACTIONS.has(action) || action.startsWith('admin_')) {
-    let url = `/api/proxy?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
-    for (const [k, v] of Object.entries(params)) {
-      url += `&${k}=${encodeURIComponent(v)}`;
-    }
-    const r = await fetch(url, { method: 'GET', cache: 'no-store' });
-    const text = await r.text();
-    try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
-  }
-
-  // Legacy GAS route for events, assets, docs, etc.
-  const isEventOp = action.startsWith('events') || action.startsWith('getEventRegs');
-  const baseUrl = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  let qString = `action=${action}&_t=${Date.now()}`;
+  let url = `/api/proxy?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
   for (const [k, v] of Object.entries(params)) {
-    qString += `&${k}=${encodeURIComponent(v)}`;
+    url += `&${k}=${encodeURIComponent(v)}`;
   }
-  const gasUrl = encodeURIComponent(`${baseUrl}?${qString}`);
-  const r = await fetch(`/api/proxy?_gasUrl=${gasUrl}`, { method: 'GET', cache: 'no-store' });
+  const r = await fetch(url, { method: 'GET', cache: 'no-store' });
   const text = await r.text();
   try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response: ' + text.slice(0, 100)); }
 }
@@ -1203,63 +1173,41 @@ async function apiWrite(op, payload) {
   payload.adminKey = ADMIN_KEY;
   payload.adminId = adminSession ? adminSession.id : '';
 
-  // MongoDB-backed write ops go directly to /api/proxy as POST with action in payload
-  if (MONGO_ACTIONS.has(op) || op.startsWith('admin_') || op === 'updateStatus') {
-    payload.action = op;
-    try {
-      const res = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ payload })
-      });
-      const result = await res.json();
-      const cacheMap = {
-        updateStatus:             ['adminMembers'],
-        admin_grant_forge_access: ['adminMembers'],
-        admin_set_role:           ['adminMembers'],
-        admin_update_profile:     ['adminMembers', 'admin_get_member_detail'],
-        admin_create_task:        ['admin_get_tasks'],
-        admin_review_task:        ['admin_get_tasks'],
-        admin_edit_task:          ['admin_get_tasks'],
-        admin_delete_task:        ['admin_get_tasks'],
-        admin_create_event:       ['admin_get_events'],
-        admin_edit_event:         ['admin_get_events'],
-        admin_delete_event:       ['admin_get_events'],
-      };
-      (cacheMap[op] || []).forEach(a => invalidateCache(a));
-      return result;
-    } catch(e) {
-      console.error('API Write Error:', e);
-      throw e;
-    }
-  }
-
-  // Legacy GAS write ops (assets, docs, certs, event regs)
-  const isEventOp = ['addEvent','editEvent','deleteEvent','getEventRegs','updateRegStatus','markAttendance'].includes(op);
-  const targetScript = isEventOp ? EVENT_REG_SCRIPT_URL : SCRIPT_URL;
-  
+  // All write ops go directly to /api/proxy as POST with action in payload
+  payload.action = op;
   try {
     const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: targetScript, payload: payload })
+      body: JSON.stringify({ payload })
     });
     const result = await res.json();
-
+    
+    // Invalidate caches
     const cacheMap = {
-      addAsset:    ['assets'],
-      borrowAsset: ['assets'],
-      returnAsset: ['assets'],
-      docApprove:  ['docrequests'],
-      certApprove: ['certreqs'],
-      addEvent:    ['events'],
-      editEvent:   ['events'],
-      deleteEvent: ['events'],
+      updateStatus:             ['adminMembers'],
+      admin_grant_forge_access: ['adminMembers'],
+      admin_set_role:           ['adminMembers'],
+      admin_update_profile:     ['adminMembers', 'admin_get_member_detail'],
+      admin_create_task:        ['admin_get_tasks'],
+      admin_review_task:        ['admin_get_tasks'],
+      admin_edit_task:          ['admin_get_tasks'],
+      admin_delete_task:        ['admin_get_tasks'],
+      admin_create_event:       ['admin_get_events'],
+      admin_edit_event:         ['admin_get_events'],
+      admin_delete_event:       ['admin_get_events'],
+      addAsset:                 ['assets'],
+      borrowAsset:              ['assets'],
+      returnAsset:              ['assets'],
+      docApprove:               ['docrequests'],
+      certApprove:              ['certreqs'],
+      addEvent:                 ['events'],
+      editEvent:                ['events'],
+      deleteEvent:              ['events'],
     };
     (cacheMap[op] || []).forEach(a => invalidateCache(a));
-
     return result;
-  } catch (e) {
+  } catch(e) {
     console.error('API Write Error:', e);
     throw e;
   }
@@ -3885,7 +3833,6 @@ async function loadEvents() {
 }
 
 // ══ MULTI-IMAGE UPLOAD FOR EVENTS ══════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
 let evUploadedUrls = []; // tracks all uploaded image URLs
 
 function handleEvImgDrop(event) {
@@ -3933,7 +3880,7 @@ async function uploadEvImg(file) {
     const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: GAS_URL, payload })
+      body: JSON.stringify({ payload })
     }).then(r => r.json());
 
     const thumbEl = document.getElementById(thumbId);

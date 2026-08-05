@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq } from './models.js';
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
@@ -940,6 +940,142 @@ export default async function handler(req, res) {
     }
 
     // FALLBACK
+    
+    // -------------------------------------------------------------
+    // ASSETS
+    // -------------------------------------------------------------
+    if (action === 'assets') {
+      const assets = await Asset.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: assets });
+    }
+    if (action === 'addAsset') {
+      const { name, type, serial } = payload;
+      const assetId = 'AST-' + Math.floor(1000 + Math.random() * 9000);
+      const newAsset = new Asset({
+        assetId, name, type, serial, status: 'Available', timestamp: new Date()
+      });
+      await newAsset.save();
+      return res.status(200).json({ success: true, message: 'Asset added.' });
+    }
+    if (action === 'borrowAsset') {
+      const { rowIndex, user } = payload;
+      // Note: rowIndex here is passed from UI, but we can treat it as assetId if we fix the UI, 
+      // or we just find by assetId. In admin.html, it passes rowIndex, which was the row number.
+      // We will need to fix the UI to pass assetId instead of rowIndex.
+      // Let's assume the UI will be updated to pass assetId.
+      const { assetId } = payload;
+      const asset = await Asset.findOne({ assetId: assetId || rowIndex });
+      if (!asset) return res.status(200).json({ success: false, message: 'Asset not found.' });
+      asset.status = 'Borrowed';
+      asset.borrowedBy = user;
+      asset.borrowDate = new Date();
+      await asset.save();
+      return res.status(200).json({ success: true, message: 'Asset borrowed.' });
+    }
+    if (action === 'returnAsset') {
+      const { rowIndex, assetId } = payload;
+      const asset = await Asset.findOne({ assetId: assetId || rowIndex });
+      if (!asset) return res.status(200).json({ success: false, message: 'Asset not found.' });
+      asset.status = 'Available';
+      asset.borrowedBy = '';
+      asset.borrowDate = null;
+      await asset.save();
+      return res.status(200).json({ success: true, message: 'Asset returned.' });
+    }
+
+    // -------------------------------------------------------------
+    // DOCS & CERTS
+    // -------------------------------------------------------------
+    if (action === 'docrequests') {
+      const docs = await DocRequest.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: docs });
+    }
+    if (action === 'docApprove') {
+      const { requestId, status } = payload;
+      const reqDoc = await DocRequest.findOne({ requestId });
+      if (reqDoc) {
+        reqDoc.status = status;
+        await reqDoc.save();
+      }
+      return res.status(200).json({ success: true, message: 'Status updated.' });
+    }
+    if (action === 'certreqs') {
+      const certs = await CertReq.find({}).sort({ timestamp: -1 }).lean();
+      return res.status(200).json({ success: true, data: certs });
+    }
+    if (action === 'certApprove') {
+      const { requestId, status } = payload;
+      const reqCert = await CertReq.findOne({ requestId });
+      if (reqCert) {
+        reqCert.status = status;
+        await reqCert.save();
+      }
+      return res.status(200).json({ success: true, message: 'Status updated.' });
+    }
+
+    // -------------------------------------------------------------
+    // EVENTS (Creation & Management)
+    // -------------------------------------------------------------
+    if (action === 'admin_create_event' || action === 'addEvent') {
+      const { title, date, eventType, description, coverUrl, imageUrls } = payload;
+      const eventId = 'EVT-' + Math.floor(1000 + Math.random() * 9000);
+      const newEvent = new Event({
+        eventId, title, date, location: eventType || 'HQ', description, timestamp: new Date(), coverUrl, imageUrls: imageUrls || []
+      });
+      await newEvent.save();
+      return res.status(200).json({ success: true, message: 'Event created.' });
+    }
+    if (action === 'admin_edit_event' || action === 'editEvent') {
+      const { eventId, title, date, description, status } = payload;
+      const ev = await Event.findOne({ eventId });
+      if (!ev) return res.status(200).json({ success: false, message: 'Event not found.' });
+      if (title) ev.title = title;
+      if (date) ev.date = date;
+      if (description) ev.description = description;
+      if (status) ev.status = status;
+      await ev.save();
+      return res.status(200).json({ success: true, message: 'Event updated.' });
+    }
+    if (action === 'admin_delete_event' || action === 'deleteEvent') {
+      const { eventId } = payload;
+      await Event.deleteOne({ eventId });
+      await Attendance.deleteMany({ eventId });
+      return res.status(200).json({ success: true, message: 'Event deleted.' });
+    }
+    if (action === 'admin_get_attendance' || action === 'getEventRegs') {
+      const { eventId } = payload;
+      const regs = await Attendance.find({ eventId }).lean();
+      return res.status(200).json({ success: true, regs });
+    }
+    if (action === 'admin_log_attendance' || action === 'markAttendance') {
+      const { eventId, operativeId } = payload;
+      const existing = await Attendance.findOne({ eventId, operativeId });
+      if (existing) {
+        existing.status = 'Attended';
+        await existing.save();
+      } else {
+        await Attendance.create({ eventId, operativeId, status: 'Attended', timestamp: new Date() });
+      }
+      return res.status(200).json({ success: true, message: 'Attendance marked.' });
+    }
+    if (action === 'admin_remove_attendance' || action === 'updateRegStatus') {
+      const { eventId, operativeId, status } = payload;
+      const existing = await Attendance.findOne({ eventId, operativeId });
+      if (existing) {
+        existing.status = status;
+        await existing.save();
+      }
+      return res.status(200).json({ success: true, message: 'Status updated.' });
+    }
+
+    if (action === 'admin_upload_event_image') {
+      const { imageData, mimeType, fileName } = payload;
+      if (!imageData || !mimeType) return res.status(200).json({ success: false, message: 'Missing image data' });
+      // We store the image directly as a base64 string since MongoDB can handle up to 16MB
+      const dataUrl = `data:${mimeType};base64,${imageData}`;
+      return res.status(200).json({ success: true, url: dataUrl });
+    }
+
     return res.status(200).json({ success: false, message: 'Unknown or unmigrated action: ' + action });
     
   } catch (err) {

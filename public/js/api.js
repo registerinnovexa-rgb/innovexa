@@ -1,10 +1,8 @@
 /**
- * Innovexa Hub — Shared API Helper
+ * Innovexa Hub — Shared API Helper (MongoDB Direct)
  * Stale-While-Revalidate cache: returns localStorage data instantly,
  * then refreshes in background. Tab switches and reloads feel instant.
  */
-
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
 
 // ── Cache layer ──────────────────────────────────────────────────
 const _gc    = {};          // in-memory cache { url: { data, ts } }
@@ -19,33 +17,22 @@ function _gLoad(k) {
 function _gSave(k, e) {
   try { localStorage.setItem(G_NS+k, JSON.stringify(e)); } catch(_) {}
 }
-async function _gFetch(gasUrl) {
-  let proxyUrl;
-  if (gasUrl && gasUrl.includes('?')) {
-    const qIndex = gasUrl.indexOf('?');
-    proxyUrl = '/api/proxy' + gasUrl.substring(qIndex);
-  } else {
-    proxyUrl = '/api/proxy?url=' + encodeURIComponent(gasUrl);
-  }
+async function _gFetch(url) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
-    const r = await fetch(proxyUrl, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
+    const r = await fetch(url, { method: 'GET', signal: ctrl.signal, cache: 'no-store' });
     clearTimeout(timer);
     return await r.json();
   } catch (err) {
     clearTimeout(timer);
-    // Fallback: direct fetch
-    try {
-      const r2 = await fetch(gasUrl, { method: 'GET', redirect: 'follow' });
-      return await r2.json();
-    } catch(e) { throw err; }
+    throw err;
   }
 }
 
-// ── GET via server-side proxy with SWR cache ─────────────────────
-async function gasGet(gasUrl, { forceRefresh = false } = {}) {
-  const key = gasUrl.replace(/[&?]_t=\d+/g, ''); // strip timestamp for stable key
+// ── GET via proxy with SWR cache ─────────────────────
+async function gasGet(url, { forceRefresh = false } = {}) {
+  const key = url.replace(/[&?]_t=\d+/g, ''); // strip timestamp for stable key
   const now = Date.now();
 
   // 1. Memory cache — instant
@@ -59,7 +46,7 @@ async function gasGet(gasUrl, { forceRefresh = false } = {}) {
     _gc[key] = stored;
     // Refresh in background silently
     if (!_gInfl[key]) {
-      _gInfl[key] = _gFetch(gasUrl).then(data => {
+      _gInfl[key] = _gFetch(url).then(data => {
         const e = { data, ts: Date.now() };
         _gc[key] = e; _gSave(key, e); delete _gInfl[key];
       }).catch(() => { delete _gInfl[key]; });
@@ -70,7 +57,7 @@ async function gasGet(gasUrl, { forceRefresh = false } = {}) {
   // 3. Deduplicate concurrent requests for same URL
   if (_gInfl[key]) return _gInfl[key];
 
-  _gInfl[key] = _gFetch(gasUrl).then(data => {
+  _gInfl[key] = _gFetch(url).then(data => {
     const e = { data, ts: Date.now() };
     _gc[key] = e; _gSave(key, e); delete _gInfl[key]; return data;
   }).catch(err => { delete _gInfl[key]; throw err; });
@@ -88,30 +75,22 @@ function invalidateGasCache(urlPattern) {
   } catch(_) {}
 }
 
-// ── POST direct or proxy ────────────────────────────────────────
+// ── POST direct ────────────────────────────────────────
 async function gasPost(url, payload) {
   const ctrl  = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 40000);
   try {
-    const r2 = await fetch('/api/proxy', {
+    const r2 = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targetUrl: url, payload }),
+      body: JSON.stringify({ payload }),
       signal: ctrl.signal
     });
     clearTimeout(timer);
     return await r2.json();
   } catch (err) {
     clearTimeout(timer);
-    try {
-      await fetch(url, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload),
-      });
-      return { success: true, message: 'Submitted successfully (no-cors)' };
-    } catch (e) { throw err; }
+    throw err;
   }
 }
 
@@ -119,7 +98,6 @@ async function gasPost(url, payload) {
 window.gasGet = gasGet;
 window.gasPost = gasPost;
 window.invalidateGasCache = invalidateGasCache;
-window.SCRIPT_URL = SCRIPT_URL;
 
 // ── Toast ────────────────────────────────────────────────────────
 function showToast(message, type = 'info') {

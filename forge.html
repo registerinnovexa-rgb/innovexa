@@ -259,7 +259,7 @@
     // ══════════════════════════════════════════
     //  GLOBALS & CONSTANTS
     // ══════════════════════════════════════════
-    const MAIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4Hlin3j3YGZxIwOqyK4TBkqpcvkuvlQQ588d01OJGysIAUc--L2yknL9i58Qx4g4LyQ/exec';
+
     
     let session = null;
     let cachedResources = [];
@@ -297,8 +297,8 @@
 
     async function _gasFetch(action, extraParams = {}) {
       const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
-      const gasUrl = MAIN_SCRIPT_URL + '?' + params.toString();
-      const r = await fetch(`/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
+      const url = '/api/proxy?' + params.toString();
+      const r = await fetch(url, { method: 'GET', cache: 'no-store' });
       const text = await r.text();
       try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
     }
@@ -349,8 +349,8 @@
     }
 
     async function apiGetMain(action) {
-      const gasUrl = MAIN_SCRIPT_URL + '?action=' + action + '&_t=' + Date.now();
-      const r = await fetch(`/api/proxy?_gasUrl=${encodeURIComponent(gasUrl)}`, { method: 'GET', cache: 'no-store' });
+      const url = '/api/proxy?action=' + action + '&_t=' + Date.now();
+      const r = await fetch(url, { method: 'GET', cache: 'no-store' });
       return await r.json();
     }
 
@@ -465,7 +465,7 @@
         const r = await fetch('/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_request_otp', invxId: id } })
+          body: JSON.stringify({ payload: { action: 'forge_request_otp', invxId: id } })
         });
         const res = await r.json();
         
@@ -508,7 +508,7 @@
         const r = await fetch('/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_verify_otp', invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme } })
+          body: JSON.stringify({ payload: { action: 'forge_verify_otp', invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme } })
         });
         const res = await r.json();
         
@@ -793,7 +793,7 @@
       try {
         const r = await fetch('/api/proxy', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_edit_task', taskId, submitLink } })
+          body: JSON.stringify({ payload: { action: 'forge_edit_task', taskId, submitLink } })
         });
         const res = await r.json();
         if (res.success) { 
@@ -812,7 +812,7 @@
       try {
         const r = await fetch('/api/proxy', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_recall_task', taskId } })
+          body: JSON.stringify({ payload: { action: 'forge_recall_task', taskId } })
         });
         const res = await r.json();
         if (res.success) { 
@@ -841,7 +841,7 @@
         fetch('/api/proxy', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetUrl: MAIN_SCRIPT_URL, payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })
+          body: JSON.stringify({ payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })
         }).then(r => r.json()).then(res => {
           if (!res || !res.success) throw new Error('Backend rejection');
         }).catch(e => {
