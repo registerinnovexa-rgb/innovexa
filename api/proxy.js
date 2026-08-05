@@ -2,6 +2,21 @@ import { connectToDatabase } from './db.js';
 import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq } from './models.js';
 import nodemailer from 'nodemailer';
 
+// ── Global Zoho Mail Transporter ─────────────────────────────────────────────
+// Uses Zoho SMTP. Set EMAIL_USER=updates.innovexa@zohomail.in and EMAIL_PASS in env.
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: 'smtp.zoho.in',
+    port: 465,
+    secure: true, // SSL
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+}
+const transporter = createTransporter();
+
 export default async function handler(req, res) {
   // Allow all origins
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -121,23 +136,27 @@ export default async function handler(req, res) {
       await member.save();
       
       try {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
-        });
-
         await transporter.sendMail({
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: member.email,
           subject: 'Innovexa Hub — Dashboard Login Code',
-          text: `Your dashboard login code is: ${otp}\n\nThis code is valid for 15 minutes.\n\n— Innovexa Hub\n(Sent via ${process.env.EMAIL_USER})`
+          html: `
+            <div style="font-family:sans-serif; max-width:480px; margin:0 auto; padding:24px; background:#0f0f0f; color:#fff; border-radius:12px;">
+              <h2 style="color:#7c3aed; margin-bottom:8px;">🔐 Login Code</h2>
+              <p style="color:#a1a1aa;">Your one-time login code for the Innovexa Forge dashboard is:</p>
+              <div style="background:#1a1a2e; border:1px solid #7c3aed; border-radius:8px; padding:20px; text-align:center; margin:20px 0;">
+                <span style="font-size:36px; font-weight:700; letter-spacing:8px; color:#a78bfa; font-family:monospace;">${otp}</span>
+              </div>
+              <p style="color:#71717a; font-size:13px;">⏱ Valid for 15 minutes. Do not share this with anyone.</p>
+              <hr style="border-color:#27272a; margin:20px 0;">
+              <p style="color:#52525b; font-size:11px;">— Innovexa Hub Core Team</p>
+            </div>
+          `
         });
-        console.log(`Sent OTP to ${member.email}`);
+        console.log(`OTP sent to ${member.email}`);
       } catch (err) {
-        console.error('Failed to send OTP email:', err);
+        console.error('Failed to send OTP email:', err.message);
+        // Still return success — OTP is saved in DB so admin can look it up
       }
       
       const maskedEmail = member.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + gp3.replace(/./g, '*'));
@@ -231,6 +250,42 @@ export default async function handler(req, res) {
         });
         
         await newMember.save();
+
+        // Notify admin about new registration
+        const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+        if (adminEmail) {
+          try {
+            await transporter.sendMail({
+              from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+              to: adminEmail,
+              subject: `🆕 New Registration: ${fullName}`,
+              html: `
+                <div style="font-family:sans-serif; max-width:520px; margin:0 auto; padding:24px; background:#0f0f0f; color:#fff; border-radius:12px;">
+                  <h2 style="color:#7c3aed; margin-bottom:4px;">🆕 New Member Registration</h2>
+                  <p style="color:#71717a; font-size:13px; margin-top:0;">A new operative just signed up for Innovexa Hub.</p>
+                  <table style="width:100%; border-collapse:collapse; margin-top:16px;">
+                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Name</td><td style="padding:8px; color:#fff; font-weight:600;">${fullName}</td></tr>
+                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">Email</td><td style="padding:8px; color:#7c3aed;">${email}</td></tr>
+                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Phone</td><td style="padding:8px; color:#fff;">${phone || 'N/A'}</td></tr>
+                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">College</td><td style="padding:8px; color:#fff;">${college || 'N/A'}</td></tr>
+                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Branch / Year</td><td style="padding:8px; color:#fff;">${branch || 'N/A'} — ${year || 'N/A'}</td></tr>
+                    <tr style="background:#1a1a2e;"><td style="padding:8px; color:#a1a1aa; font-size:13px;">UTR</td><td style="padding:8px; color:#10b981; font-family:monospace;">${utr || 'Not provided'}</td></tr>
+                    <tr><td style="padding:8px; color:#a1a1aa; font-size:13px;">Operative ID</td><td style="padding:8px; color:#a78bfa; font-weight:700; font-family:monospace;">${genId}</td></tr>
+                  </table>
+                  <div style="margin-top:20px; padding:12px; background:#1a1a2e; border-radius:8px; border-left:4px solid #7c3aed;">
+                    <p style="margin:0; font-size:12px; color:#71717a;">Review and approve this registration in your <a href="https://innovexa.vercel.app/admin.html" style="color:#7c3aed;">Admin Dashboard</a>.</p>
+                  </div>
+                  <hr style="border-color:#27272a; margin:20px 0;">
+                  <p style="color:#52525b; font-size:11px;">— Innovexa Hub Auto-Notifier</p>
+                </div>
+              `
+            });
+            console.log(`Admin notified about new registration: ${fullName}`);
+          } catch (emailErr) {
+            console.error('Admin notification email failed:', emailErr.message);
+          }
+        }
+
         return res.status(200).json({ 
           success: true, 
           message: 'Registration successful.', 
@@ -428,8 +483,38 @@ export default async function handler(req, res) {
         operativeId: member.operativeId, name: member.name
       });
       await log.save();
+
+      // Send approval welcome email when status becomes Confirmed
+      if ((status === 'Confirmed' || status === 'Approved') && member.email) {
+        try {
+          await transporter.sendMail({
+            from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+            to: member.email,
+            subject: `🎉 Welcome to Innovexa Hub, ${member.name}!`,
+            html: `
+              <div style="font-family:sans-serif; max-width:520px; margin:0 auto; padding:28px; background:#0f0f0f; color:#fff; border-radius:12px;">
+                <h1 style="color:#7c3aed; font-size:24px; margin-bottom:4px;">🎉 You're In!</h1>
+                <p style="color:#a1a1aa; margin-top:0;">Welcome to Innovexa Hub, ${member.name}. Your membership has been confirmed.</p>
+                <div style="background:#1a1a2e; border:1px solid #7c3aed; border-radius:10px; padding:20px; margin:20px 0; text-align:center;">
+                  <p style="margin:0; color:#71717a; font-size:12px; text-transform:uppercase; letter-spacing:2px;">Your Operative ID</p>
+                  <p style="margin:8px 0 0; font-size:28px; font-weight:700; color:#a78bfa; font-family:monospace; letter-spacing:4px;">${member.operativeId}</p>
+                </div>
+                <p style="color:#a1a1aa; font-size:14px;">Use this ID to log into the <strong>Innovexa Forge</strong> dashboard — your mission control for exclusive resources, bounties, and the leaderboard.</p>
+                <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block; margin-top:12px; padding:12px 24px; background:#7c3aed; color:#fff; text-decoration:none; border-radius:8px; font-weight:600;">Access the Forge →</a>
+                <hr style="border-color:#27272a; margin:24px 0;">
+                <p style="color:#52525b; font-size:11px;">— Innovexa Hub Core Team</p>
+              </div>
+            `
+          });
+          console.log(`Approval email sent to ${member.email}`);
+        } catch (emailErr) {
+          console.error('Approval email failed:', emailErr.message);
+        }
+      }
+
       return res.status(200).json({ success: true, message: 'Status updated to ' + status });
     }
+
 
     // ADMIN: Set Role
     if (action === 'admin_set_role') {
