@@ -22,10 +22,10 @@
       --text3: #666666;
       --accent: #000000; 
       --accent2: #333333;
-      --green: #000000; --green-bg: transparent;
-      --red: #000000; --red-bg: transparent;
-      --yellow: #000000; --yellow-bg: transparent;
-      --blue: #000000; --blue-bg: transparent;
+      --green: #16a34a; --green-bg: #dcfce7;
+      --red: #dc2626; --red-bg: #fee2e2;
+      --yellow: #ca8a04; --yellow-bg: #fef9c3;
+      --blue: #2563eb; --blue-bg: #dbeafe;
       --radius: 0px; --radius-sm: 0px;
       --font-d: 'Inter', sans-serif;
       --font-b: 'Inter', sans-serif;
@@ -163,13 +163,17 @@
     .data-table tbody tr:hover { background:rgba(255,255,255,0.03); }
     
     .status-badge {
-      display:inline-block; padding:4px 10px; border:1px solid var(--border); border-radius:var(--radius); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing: 0.5px;
+      display:inline-block; padding:4px 10px; border-radius:var(--radius); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing: 0.5px;
     }
-    .status-pending { color:var(--text); }
-    .status-confirmed { color:var(--text); }
-    .status-rejected { color:var(--text); }
-    .status-open { color:var(--text); }
-    .status-review { background:var(--text); color:#fff; }
+    .status-pending  { background: #fef9c3; color: #854d0e; border: 1px solid #ca8a04; }
+    .status-confirmed { background: #dcfce7; color: #166534; border: 1px solid #16a34a; }
+    .status-rejected  { background: #fee2e2; color: #991b1b; border: 1px solid #dc2626; }
+    .status-open     { background: #dbeafe; color: #1e40af; border: 1px solid #2563eb; }
+    .status-review   { background: #000; color: #fff; border: 1px solid #000; }
+
+    .badge-confirmed { display:inline-block; padding:3px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#dcfce7; color:#166534; border:1px solid #16a34a; }
+    .badge-rejected  { display:inline-block; padding:3px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fee2e2; color:#991b1b; border:1px solid #dc2626; }
+    .badge-pending   { display:inline-block; padding:3px 8px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fef9c3; color:#854d0e; border:1px solid #ca8a04; }
 
     /* ── Action Buttons ── */
     .btn-sm {
@@ -224,14 +228,14 @@
 
     /* ── Toast ── */
     .toast {
-      position:fixed; bottom:24px; right:24px; padding:14px 24px; border-radius:12px;
+      position:fixed; bottom:24px; right:24px; padding:14px 24px; border-radius:0;
       font-size:14px; font-weight:500; z-index:999; transform:translateY(100px); opacity:0;
-      transition:all .4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events:none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition:all .4s cubic-bezier(0.16, 1, 0.3, 1); pointer-events:none; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
     .toast.show { transform:translateY(0); opacity:1; }
-    .toast.success { background:var(--green); color:#111; }
-    .toast.error { background:var(--red); color:#fff; }
-    .toast.info { background:var(--blue); color:#fff; }
+    .toast.success { background:#166534; color:#fff; }
+    .toast.error   { background:#991b1b; color:#fff; }
+    .toast.info    { background:#000; color:#fff; }
 
     /* ── Hamburger ── */
     .hamburger { display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:4px; }
@@ -2036,7 +2040,7 @@ function renderForgeAccess() {
     const isGranted = (String(m.forgeAccess || '').trim() === 'Granted');
     const actionBtn = isGranted 
       ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Revoked')">Revoke</button>`
-      : `<button class="btn-sm" style="background:var(--green); color:#111;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
+      : `<button class="btn-sm" style="background:var(--green); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
     
     html += `
       <tr>
