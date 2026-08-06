@@ -74,15 +74,21 @@ const SosSchema = new mongoose.Schema({
 export const Sos = mongoose.models.Sos || mongoose.model('Sos', SosSchema);
 
 const SessionSchema = new mongoose.Schema({
-  timestamp: Date,
   sessionId: { type: String, unique: true },
+  timestamp: Date,
   title: String,
-  description: String,
   date: String,
-  link: String
+  location: String,
+  description: String,
+  link: String,
+  status: { type: String, default: 'Upcoming' },
+  coverUrl: String,
+  imageUrls: [String],
+  allowedOperatives: [String] // targeted sessions
 });
 
 export const Session = mongoose.models.Session || mongoose.model('Session', SessionSchema);
+
 
 const BountySchema = new mongoose.Schema({
   bountyId: { type: String, unique: true },
@@ -108,22 +114,10 @@ const ResourceSchema = new mongoose.Schema({
 
 export const Resource = mongoose.models.Resource || mongoose.model('Resource', ResourceSchema);
 
-const EventSchema = new mongoose.Schema({
-  eventId: { type: String, unique: true },
-  timestamp: Date,
-  title: String,
-  date: String,
-  location: String,
-  description: String,
-  status: { type: String, default: 'Upcoming' },
-  coverUrl: String,
-  imageUrls: [String]
-});
-
-export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
+// EventSchema removed in favor of SessionSchema
 
 const AttendanceSchema = new mongoose.Schema({
-  eventId: String,
+  sessionId: String,
   operativeId: String,
   status: { type: String, default: 'Registered' },
   timestamp: Date
@@ -275,7 +269,7 @@ const FactionSchema = new mongoose.Schema({
   leaderId: String,
   leaderName: String,
   memberIds: [String],
-  color: { type: String, default: '#a78bfa' },
+  color: { type: String, default: '#abd233' },
   createdAt: { type: Date, default: Date.now }
 });
 export const Faction = mongoose.models.Faction || mongoose.model('Faction', FactionSchema);

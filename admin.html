@@ -113,7 +113,7 @@
     }
     .sidebar-btn svg { width:20px; height:20px; opacity:0.7; transition:opacity .2s; }
     .sidebar-btn:hover { background:var(--bg3); color:var(--text); }
-    .sidebar-btn.active { background: rgba(167,139,250,0.1); color:var(--accent); font-weight:600; }
+    .sidebar-btn.active { background: rgba(171,210,51,0.1); color:var(--accent); font-weight:600; }
     .sidebar-btn.active svg { opacity:1; stroke:var(--accent); }
 
     .main-content { margin-left:260px; margin-top:64px; padding:32px 40px; min-height:calc(100vh - 64px); }
@@ -324,7 +324,7 @@
       position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px;
       background-color: var(--text3); transition: .3s; border-radius: 50%;
     }
-    input:checked + .slider { background-color: rgba(167,139,250,0.2); border-color: var(--accent); }
+    input:checked + .slider { background-color: rgba(171,210,51,0.2); border-color: var(--accent); }
     input:checked + .slider:before { transform: translateX(20px); background-color: var(--accent); }
 
     .drawer-overlay {
@@ -416,9 +416,9 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       Forge Ops
     </button>
-    <button class="sidebar-btn" onclick="switchAdminTab('events')" id="navEvents">
+    <button class="sidebar-btn" onclick="switchAdminTab('sessions')" id="navSessions">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-      Events & Ops
+      Sessions & Ops
     </button>
     <button class="sidebar-btn" onclick="switchAdminTab('comms')" id="navComms">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -785,7 +785,7 @@
         <input type="hidden" id="factionEditingId" />
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="form-group"><label>Faction Name</label><input type="text" id="factionName" placeholder="e.g. Alpha Squad" /></div>
-          <div class="form-group"><label>Color (hex)</label><input type="color" id="factionColor" value="#a78bfa" style="width:100%;height:42px;border:1px solid var(--border);cursor:pointer;"/></div>
+          <div class="form-group"><label>Color (hex)</label><input type="color" id="factionColor" value="#abd233" style="width:100%;height:42px;border:1px solid var(--border);cursor:pointer;"/></div>
           <div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea id="factionDesc" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);resize:vertical;"></textarea></div>
           <div class="form-group"><label>Leader Operative ID</label><input type="text" id="factionLeaderId" placeholder="e.g. INVX-00001" /></div>
           <div class="form-group"><label>Leader Name</label><input type="text" id="factionLeaderName" placeholder="Leader full name" /></div>
@@ -1023,7 +1023,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">Forge Operatives</div>
-          <div class="stat-value" id="statEvents" style="color:var(--green)">—</div>
+          <div class="stat-value" id="statSessions" style="color:var(--green)">—</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Confirmed Members</div>
@@ -1317,25 +1317,25 @@
     </div>
     
     <!-- ── EVENTS TAB ── -->
-    <div class="tab-content" id="tabEvents">
+    <div class="tab-content" id="tabSessions">
       <div class="section-header">
         <h2 style="font-size:24px;font-weight:800">Events & Operations</h2>
-        <button class="btn-add" onclick="openCreateEventModal()">+ Create Event</button>
+        <button class="btn-add" onclick="openCreateSessionModal()">+ Create Session</button>
       </div>
       <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
               <th>Cover</th>
-              <th>Event Title</th>
+              <th>Session Title</th>
               <th>Date</th>
               <th>Type</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="eventsListTbody">
-            <tr><td colspan="6" style="text-align:center;padding:40px;">Loading events...</td></tr>
+          <tbody id="sessionsListTbody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;">Loading sessions...</td></tr>
           </tbody>
         </table>
       </div>
@@ -1413,17 +1413,24 @@
 
 <!-- ════════ MODAL ════════ -->
 
-  <!-- Event Create Modal -->
-  <div class="modal-overlay" id="modalCreateEvent">
+  <!-- Session Create Modal -->
+  <div class="modal-overlay" id="modalCreateSession">
     <div class="modal-box">
-      <h2 style="color:var(--accent2)">Schedule Event</h2>
+      <h2 style="color:var(--accent2)">Schedule Session</h2>
       <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Event Title</label>
+        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Session Title</label>
         <input type="text" id="evTitle" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Date</label>
         <input type="date" id="evDate" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Target Audience (Optional)</label>
+        <div id="evTargetingContainer" style="max-height:150px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;">
+          <div style="color:var(--text3);font-size:12px;text-align:center;">Loading operatives...</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Select specific operatives to make this a private session. Leave all unchecked for public.</div>
       </div>
       <div class="form-group" style="margin-bottom:16px;">
         <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Type</label>
@@ -1460,21 +1467,21 @@
         <input type="hidden" id="evCover" value="">
       </div>
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeEventModal()">Cancel</button>
-        <button class="btn-save" onclick="submitCreateEvent(this)">Initialize Event</button>
+        <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
+        <button class="btn-save" onclick="submitCreateSession(this)">Initialize Event</button>
       </div>
     </div>
   </div>
 
   <!-- Event Dashboard Modal -->
-  <div class="modal-overlay" id="modalEventDash">
+  <div class="modal-overlay" id="modalSessionDash">
     <div class="modal-box" style="max-width:700px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
-          <h2 id="dashEvTitle" style="color:var(--accent); margin-bottom:4px;">Event Title</h2>
+          <h2 id="dashEvTitle" style="color:var(--accent); margin-bottom:4px;">Session Title</h2>
           <p id="dashEvDate" style="font-size:14px; color:var(--text3); margin-bottom:16px;">Date</p>
         </div>
-        <button class="btn-cancel" onclick="closeEventModal()">✕ Close</button>
+        <button class="btn-cancel" onclick="closeSessionModal()">✕ Close</button>
       </div>
       
       <div style="display:flex; gap:12px; margin-bottom:12px;">
@@ -1526,7 +1533,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:20px;">
         <div>
           <h2 style="font-size:20px; font-family:var(--font-b);">Operation Telemetry (NPS)</h2>
-          <div style="font-size:13px; color:var(--text3);" id="fbEvTitle">Event Title</div>
+          <div style="font-size:13px; color:var(--text3);" id="fbEvTitle">Session Title</div>
         </div>
         <button class="btn-cancel" onclick="document.getElementById('modalFeedback').classList.remove('open')" style="background:transparent; border:none; padding:8px;">✕</button>
       </div>
@@ -1760,9 +1767,9 @@ async function apiWrite(op, payload) {
       admin_review_task:        ['admin_get_tasks'],
       admin_edit_task:          ['admin_get_tasks'],
       admin_delete_task:        ['admin_get_tasks'],
-      admin_create_event:       ['admin_get_events'],
-      admin_edit_event:         ['admin_get_events'],
-      admin_delete_event:       ['admin_get_events'],
+      admin_create_session:       ['admin_get_sessions'],
+      admin_edit_session:         ['admin_get_sessions'],
+      admin_delete_session:       ['admin_get_sessions'],
       addAsset:                 ['assets'],
       borrowAsset:              ['assets'],
       returnAsset:              ['assets'],
@@ -1770,7 +1777,7 @@ async function apiWrite(op, payload) {
       certApprove:              ['certreqs'],
       addEvent:                 ['events'],
       editEvent:                ['events'],
-      deleteEvent:              ['events'],
+      deleteSession:              ['events'],
     };
     (cacheMap[op] || []).forEach(a => invalidateCache(a));
     return result;
@@ -2214,7 +2221,7 @@ function switchAdminTab(tab) {
   if (tab === 'overview') loadOverview();
   if (tab === 'members') loadMembers();
   if (tab === 'forgeOps') switchForgeSubTab('access');
-  if (tab === 'events') loadEvents();
+  if (tab === 'events') loadSessions();
   if (tab === 'surveillance') loadAuditLogs();
   if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
   if (tab === 'sysSettings') loadSettings();
@@ -2698,7 +2705,7 @@ async function loadAnnouncements() {
       <div class="admin-card" style="margin:0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            ${a.pinned ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(167,139,250,0.15);color:var(--accent);">📌 PINNED</span>' : ''}
+            ${a.pinned ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(171,210,51,0.15);color:var(--accent);">📌 PINNED</span>' : ''}
             ${a.published ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(74,222,128,0.1);color:var(--green);">● LIVE</span>' : '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(255,255,255,0.05);color:var(--text3);">DRAFT</span>'}
             <h3 style="font-size:15px;font-weight:700;margin:0;">${escHtml(a.title)}</h3>
           </div>
@@ -2973,7 +2980,7 @@ async function loadFactions() {
       return;
     }
     listEl.innerHTML = items.map(f => `
-      <div class="admin-card" style="margin:0;border-top:3px solid ${escHtml(f.color||'#a78bfa')};">
+      <div class="admin-card" style="margin:0;border-top:3px solid ${escHtml(f.color||'#abd233')};">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
           <div>
             <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${escHtml(f.name)}</div>
@@ -2999,7 +3006,7 @@ function openFactionEditor() {
   document.getElementById('factionEditorTitle').textContent = 'New Faction';
   document.getElementById('factionName').value = '';
   document.getElementById('factionDesc').value = '';
-  document.getElementById('factionColor').value = '#a78bfa';
+  document.getElementById('factionColor').value = '#abd233';
   document.getElementById('factionLeaderId').value = '';
   document.getElementById('factionLeaderName').value = '';
   document.getElementById('factionEditorPanel').style.display = 'block';
@@ -3010,7 +3017,7 @@ function editFaction(f) {
   document.getElementById('factionEditorTitle').textContent = 'Edit Faction';
   document.getElementById('factionName').value = f.name || '';
   document.getElementById('factionDesc').value = f.description || '';
-  document.getElementById('factionColor').value = f.color || '#a78bfa';
+  document.getElementById('factionColor').value = f.color || '#abd233';
   document.getElementById('factionLeaderId').value = f.leaderId || '';
   document.getElementById('factionLeaderName').value = f.leaderName || '';
   document.getElementById('factionEditorPanel').style.display = 'block';
@@ -3458,7 +3465,7 @@ function renderAuditLogs(logs) {
     else if (logType === 'SOS_RESOLVED') { typeColor = '#10b981'; typeBadge = '✔️ SOS RESOLVED'; }
     else if (logType === 'BOUNTY_CLAIMED') { typeColor = '#fbbf24'; typeBadge = '🎯 BOUNTY CLAIMED'; }
     else if (logType === 'BOUNTY_COMPLETED') { typeColor = '#fbbf24'; typeBadge = '🏆 BOUNTY DONE'; }
-    else if (logType === 'BOUNTY_POSTED') { typeColor = '#a78bfa'; typeBadge = '📋 BOUNTY POSTED'; }
+    else if (logType === 'BOUNTY_POSTED') { typeColor = '#abd233'; typeBadge = '📋 BOUNTY POSTED'; }
     else if (logType === 'STATUS_CHECK') { typeColor = '#71717a'; typeBadge = '👁 STATUS CHECK'; }
     
     html += `
@@ -3548,7 +3555,7 @@ let html5QrCode = null;
 
 async function populateAttendanceEvents() {
   const sel = document.getElementById('attendance-event-select');
-  sel.innerHTML = '<option value="">Loading events...</option>';
+  sel.innerHTML = '<option value="">Loading sessions...</option>';
   
   // Fetch events if not cached
   if (!cachedEvents || cachedEvents.length === 0) {
@@ -3562,8 +3569,8 @@ async function populateAttendanceEvents() {
   cachedEvents.forEach(e => {
     // Show all events (live, upcoming, or recent)
     const opt = document.createElement('option');
-    // Use eventId as the value (for attendance lookup); title for display
-    opt.value = e.eventId || e.title || '';
+    // Use sessionId as the value (for attendance lookup); title for display
+    opt.value = e.sessionId || e.title || '';
     const status = e.status || '';
     const label = e.title || e.name || 'Untitled Event';
     opt.textContent = label + (status ? ` [${status}]` : '');
@@ -3607,7 +3614,7 @@ function stopScanner() {
 let _lastScannedId = '';
 let _lastScanTime = 0;
 
-async function onScanSuccess(decodedText, eventId) {
+async function onScanSuccess(decodedText, sessionId) {
   const res = document.getElementById('scan-result');
 
   // Parse Innovexa QR format: "INNOVEXA:INVX-XX" or plain "INVX-XX"
@@ -3627,7 +3634,7 @@ async function onScanSuccess(decodedText, eventId) {
   res.textContent = `Verifying: ${operativeId}...`;
 
   try {
-    const data = await apiWrite('markAttendance', { eventId, operativeId: operativeId });
+    const data = await apiWrite('markAttendance', { sessionId, operativeId: operativeId });
     if (data.success) {
       res.style.background = 'var(--green-bg)';
       res.style.color = 'var(--green)';
@@ -3729,7 +3736,7 @@ async function loadOverview() {
     document.getElementById('statPending').textContent = pending;
     const forgeCount = members.filter(m => (m.forgeAccess||'').trim() === 'Granted').length;
     const confirmedCount = members.filter(m => (m.status||'').trim().toLowerCase().includes('confirmed')).length;
-    document.getElementById('statEvents').textContent = forgeCount;
+    document.getElementById('statSessions').textContent = forgeCount;
     document.getElementById('statResources').textContent = confirmedCount;
     
     // New stats
@@ -4063,8 +4070,8 @@ function openProfileModal(encodedData) {
 
   // Status + Role badge colours
   const forgeRole = m.forgeRole || 'Unassigned';
-  const roleBadgeColor = forgeRole === 'Mentor' ? '#10a34a' : forgeRole === 'Member' ? '#a78bfa' : '#888';
-  const roleBadgeBg = forgeRole === 'Mentor' ? 'rgba(16,163,74,0.15)' : forgeRole === 'Member' ? 'rgba(167,139,250,0.15)' : 'rgba(100,100,100,0.1)';
+  const roleBadgeColor = forgeRole === 'Mentor' ? '#10a34a' : forgeRole === 'Member' ? '#abd233' : '#888';
+  const roleBadgeBg = forgeRole === 'Mentor' ? 'rgba(16,163,74,0.15)' : forgeRole === 'Member' ? 'rgba(171,210,51,0.15)' : 'rgba(100,100,100,0.1)';
 
   const sLabel = (label) => `<span style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px;">${label}</span>`;
   const sVal   = (val, color='var(--text)') => `<span style="font-size:14px;font-weight:600;color:${color};">${escHtml(val || '—')}</span>`;
@@ -4072,10 +4079,10 @@ function openProfileModal(encodedData) {
 
   const html = `
     <!-- ── Profile Header ── -->
-    <div style="background:linear-gradient(135deg,rgba(124,58,237,0.25) 0%,rgba(16,185,129,0.1) 100%);border-bottom:1px solid var(--border);padding:28px 32px;border-radius:24px 24px 0 0;">
+    <div style="background:linear-gradient(135deg,rgba(171,210,51,0.25) 0%,rgba(16,185,129,0.1) 100%);border-bottom:1px solid var(--border);padding:28px 32px;border-radius:24px 24px 0 0;">
       <div style="display:flex;gap:20px;align-items:center;">
         <!-- Avatar -->
-        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(124,58,237,0.4);">${initials}</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#abd233,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(171,210,51,0.4);">${initials}</div>
         <!-- Name + badges -->
         <div style="flex:1;min-width:0;">
           <div style="font-family:monospace;font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:2px;margin-bottom:4px;">${escHtml(m.operativeId || 'NO-ID')}</div>
@@ -4616,7 +4623,7 @@ function renderEventCards() {
       <div class="btn-actions">
         ${ev.requiresReg === 'yes' ? `<button class="btn-sm" style="background:rgba(255,107,0,0.1);color:#ff6b00;border:1px solid rgba(255,107,0,0.2)" onclick="viewEventRegs('${escHtml(ev.name)}')">📋 Registrations</button>` : ''}
         <button class="btn-sm btn-edit" onclick="editEvent(${i})">✎ Edit</button>
-        <button class="btn-sm btn-delete" onclick="deleteEvent(${ev.rowIndex})">✕ Delete</button>
+        <button class="btn-sm btn-delete" onclick="deleteSession(${ev.rowIndex})">✕ Delete</button>
       </div>
     </div>
   `).join('');
@@ -4628,15 +4635,15 @@ function editEvent(i) {
   openModal('event', prefill);
 }
 
-async function viewEventRegs(eventName) {
+async function viewEventRegs(sessionName) {
   const grid = document.getElementById('eventsGrid');
   grid.innerHTML = '<div class="loading-state" style="display:flex"><div class="spinner"></div><p>Loading registrations...</p></div>';
   try {
-    const data = await apiWrite('getEventRegs', { eventName });
+    const data = await apiWrite('admin_get_attendance', { sessionName });
     const regs = data.registrations || [];
     let html = `<div style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
-      <button class="btn-sm" onclick="loadEvents()" style="background:var(--bg);border:1px solid var(--border);color:var(--text)">← Back</button>
-      <h3 style="color:var(--text);margin:0">Registrations: ${escHtml(eventName)} (${regs.length})</h3>
+      <button class="btn-sm" onclick="loadSessions()" style="background:var(--bg);border:1px solid var(--border);color:var(--text)">← Back</button>
+      <h3 style="color:var(--text);margin:0">Registrations: ${escHtml(sessionName)} (${regs.length})</h3>
     </div>`;
     if (regs.length === 0) {
       html += '<p style="color:var(--text-muted);text-align:center;padding:40px">No registrations yet.</p>';
@@ -4655,38 +4662,38 @@ async function viewEventRegs(eventName) {
           <td style="font-family:monospace;font-size:11px">${escHtml(r.utr||'-')}</td>
           <td>${statusBadge(r.status)}</td>
           <td><div class="btn-actions">
-            ${isPending ? `<button class="btn-sm btn-approve" onclick="confirmReg('${escHtml(eventName)}',${r.rowIndex},'${escHtml(r.email)}','${escHtml(r.name)}')">✓</button>` : ''}
-            ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="rejectReg('${escHtml(eventName)}',${r.rowIndex})">↩</button>` : ''}
+            ${isPending ? `<button class="btn-sm btn-approve" onclick="confirmReg('${escHtml(sessionName)}',${r.rowIndex},'${escHtml(r.email)}','${escHtml(r.name)}')">✓</button>` : ''}
+            ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="rejectReg('${escHtml(sessionName)}',${r.rowIndex})">↩</button>` : ''}
           </div></td>
         </tr>`;
       });
       html += '</tbody></table></div>';
     }
     grid.innerHTML = html;
-  } catch(e) { showToast('Failed to load registrations', 'error'); loadEvents(); }
+  } catch(e) { showToast('Failed to load registrations', 'error'); loadSessions(); }
 }
 
-async function confirmReg(eventName, rowIndex, email, name) {
+async function confirmReg(sessionName, rowIndex, email, name) {
   try {
-    const data = await apiWrite('updateRegStatus', { eventName, rowIndex, status: 'Confirmed', email, registrantName: name });
-    if (data.success) { showToast('✅ Confirmed & email sent!'); viewEventRegs(eventName); }
+    const data = await apiWrite('updateRegStatus', { sessionName, rowIndex, status: 'Confirmed', email, registrantName: name });
+    if (data.success) { showToast('✅ Confirmed & email sent!'); viewEventRegs(sessionName); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
 }
 
-async function rejectReg(eventName, rowIndex) {
+async function rejectReg(sessionName, rowIndex) {
   try {
-    const data = await apiWrite('updateRegStatus', { eventName, rowIndex, status: 'Pending' });
-    if (data.success) { showToast('Reverted to Pending'); viewEventRegs(eventName); }
+    const data = await apiWrite('updateRegStatus', { sessionName, rowIndex, status: 'Pending' });
+    if (data.success) { showToast('Reverted to Pending'); viewEventRegs(sessionName); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
 }
 
-async function deleteEvent(rowIndex) {
+async function deleteSession(rowIndex) {
   if (!confirm('Delete this event?')) return;
   try {
-    const data = await apiWrite('deleteEvent', { rowIndex });
-    if (data.success) { showToast('Event deleted'); loadEvents(); loadOverview(); }
+    const data = await apiWrite('deleteSession', { rowIndex });
+    if (data.success) { showToast('Event deleted'); loadSessions(); loadOverview(); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
 }
@@ -4880,7 +4887,7 @@ function closeModal() {
 
 async function saveModal() {
   const config = modalConfigs[currentModal];
-  const opMap = { event: editingIndex ? 'admin_edit_event' : 'admin_create_event', resource: editingIndex ? 'admin_edit_resource' : 'admin_add_resource', team: editingIndex ? 'editTeam' : 'addTeam' };
+  const opMap = { event: editingIndex ? 'admin_edit_session' : 'admin_create_session', resource: editingIndex ? 'admin_edit_resource' : 'admin_add_resource', team: editingIndex ? 'editTeam' : 'addTeam' };
   const op = opMap[currentModal];
   const payload = {};
   if (editingIndex) payload.rowIndex = editingIndex;
@@ -4903,7 +4910,7 @@ async function saveModal() {
     if (data.success) {
       showToast(data.message);
       closeModal();
-      if (savedModal === 'event') loadEvents();
+      if (savedModal === 'event') loadSessions();
       if (savedModal === 'resource') loadResources();
       if (savedModal === 'team') loadTeam();
       loadOverview();
@@ -5503,7 +5510,7 @@ async function loadCertRequests() {
         : '<span style="color:var(--text3);font-size:11px">—</span>';
       return `<tr>
         <td style="color:var(--text)"><strong>${escHtml(r.memberName)}</strong><br><span style="font-size:11px;color:var(--text3)">${escHtml(r.memberEmail)}</span></td>
-        <td>${escHtml(r.eventName)}</td>
+        <td>${escHtml(r.sessionName)}</td>
         <td>${escHtml(r.eventDate)}</td>
         <td style="font-size:11px;color:var(--text3)">${escHtml(r.timestamp)}</td>
         <td>${badge}</td>
@@ -5691,18 +5698,18 @@ let activeEventTitle = '';
 let currentAttendance = [];
 let html5QrcodeScanner = null;
 
-function closeEventModal() {
-  document.getElementById('modalCreateEvent').classList.remove('open');
-  document.getElementById('modalEventDash').classList.remove('open');
+function closeSessionModal() {
+  document.getElementById('modalCreateSession').classList.remove('open');
+  document.getElementById('modalSessionDash').classList.remove('open');
   stopScanner();
 }
 
-async function loadEvents() {
-  const tbody = document.getElementById('eventsListTbody');
+async function loadSessions() {
+  const tbody = document.getElementById('sessionsListTbody');
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
   
   try {
-    const res = await apiGet('admin_get_events'); // Using existing apiGet
+    const res = await apiGet('admin_get_sessions'); // Using existing apiGet
     if (!res.success) throw new Error(res.message);
     
     currentEvents = res.events || [];
@@ -5717,7 +5724,7 @@ async function loadEvents() {
       const imgCell = e.coverUrl
         ? `<img src="${escHtml(e.coverUrl)}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'">`
         : `<div style="width:64px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">🖼️</div>`;
-      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(139,92,246,0.15);color:#a78bfa;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
+      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(171,210,51,0.15);color:#abd233;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
       tbody.innerHTML += `
         <tr>
           <td>${imgCell}</td>
@@ -5727,10 +5734,10 @@ async function loadEvents() {
           <td><span class="status-badge status-confirmed">${escHtml(e.status)}</span></td>
           <td>
             <div class="btn-actions">
-              <button class="btn-sm btn-edit" onclick="openEventDash('${e.eventId}')">Dashboard</button>
-              <button class="btn-sm btn-outline" style="border-color:var(--border2); color:var(--text2);" onclick="openEditEventModal('${e.eventId}')">Edit</button>
-              <button class="btn-sm" style="background:var(--bg3); color:var(--text);" onclick="viewFeedback('${e.eventId}', '${escHtml(e.title)}')">Feedback</button>
-              <button class="btn-sm btn-reject" onclick="deleteEvent('${e.eventId}')">Delete</button>
+              <button class="btn-sm btn-edit" onclick="openSessionDash('${e.sessionId}')">Dashboard</button>
+              <button class="btn-sm btn-outline" style="border-color:var(--border2); color:var(--text2);" onclick="openEditEventModal('${e.sessionId}')">Edit</button>
+              <button class="btn-sm" style="background:var(--bg3); color:var(--text);" onclick="viewFeedback('${e.sessionId}', '${escHtml(e.title)}')">Feedback</button>
+              <button class="btn-sm btn-reject" onclick="deleteSession('${e.sessionId}')">Delete</button>
             </div>
           </td>
         </tr>
@@ -5850,45 +5857,71 @@ function resetEvImgUploader(existingUrls = []) {
 
 let editingEventId = null;
 
-function openCreateEventModal() {
+function populateSessionTargeting(selectedOps = []) {
+  const container = document.getElementById('evTargetingContainer');
+  if (!currentMembers || currentMembers.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:12px;">No operatives available</div>';
+    return;
+  }
+  container.innerHTML = currentMembers.map(m => {
+    const isChecked = selectedOps.includes(m.operativeId) ? 'checked' : '';
+    return `
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;padding:4px;border-radius:4px;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <input type="checkbox" class="session-target-cb" value="${escHtml(m.operativeId)}" ${isChecked}>
+        <span>${escHtml(m.name)} <span style="color:var(--text3);font-size:11px;">(${escHtml(m.operativeId)})</span></span>
+      </label>
+    `;
+  }).join('');
+}
+
+function openCreateSessionModal() {
   editingEventId = null;
   document.getElementById('evTitle').value = '';
   document.getElementById('evDate').value = '';
-  document.getElementById('evType').value = 'Event';
+  document.getElementById('evType').value = 'Session';
   if (mdeEventDesc) mdeEventDesc.value('');
   resetEvImgUploader([]);
-  document.querySelector('#modalCreateEvent h2').textContent = 'Initialize New Event';
-  document.querySelector('#modalCreateEvent .btn-save').textContent = 'Initialize Event';
-  document.getElementById('modalCreateEvent').classList.add('open');
+  populateSessionTargeting([]);
+  document.querySelector('#modalCreateSession h2').textContent = 'Initialize New Session';
+  document.querySelector('#modalCreateSession .btn-save').textContent = 'Initialize Session';
+  document.getElementById('modalCreateSession').classList.add('open');
   if (mdeEventDesc) setTimeout(() => mdeEventDesc.codemirror.refresh(), 100);
 }
 
 function openEditEventModal(id) {
-  const ev = currentEvents.find(e => e.eventId === id);
+  // We keep the name openEditEventModal if it's called elsewhere, or we rename it to openEditSessionModal
+  // Note: the previous patch might have missed some currentEvents renames.
+  const ev = (window.currentEvents || window.currentSessions || []).find(e => (e.sessionId || e.eventId) === id);
   if (!ev) return;
   editingEventId = id;
   document.getElementById('evTitle').value = ev.title || '';
   document.getElementById('evDate').value = (ev.date || '').split('T')[0];
-  document.getElementById('evType').value = ev.eventType || 'Event';
+  document.getElementById('evType').value = ev.eventType || 'Session';
   if (mdeEventDesc) mdeEventDesc.value(ev.description || '');
   // Load existing images
   let existingImgs = [];
   try { existingImgs = JSON.parse(ev.imageUrls || '[]'); } catch(e) { existingImgs = ev.coverUrl ? [ev.coverUrl] : []; }
   if (!existingImgs.length && ev.coverUrl) existingImgs = [ev.coverUrl];
   resetEvImgUploader(existingImgs);
-  document.querySelector('#modalCreateEvent h2').textContent = 'Edit Event';
-  document.querySelector('#modalCreateEvent .btn-save').textContent = 'Save Changes';
-  document.getElementById('modalCreateEvent').classList.add('open');
+  
+  populateSessionTargeting(ev.allowedOperatives || []);
+  
+  document.querySelector('#modalCreateSession h2').textContent = 'Edit Session';
+  document.querySelector('#modalCreateSession .btn-save').textContent = 'Save Changes';
+  document.getElementById('modalCreateSession').classList.add('open');
   if (mdeEventDesc) setTimeout(() => mdeEventDesc.codemirror.refresh(), 100);
 }
+window.openEditSessionModal = openEditEventModal; // Alias
 
-async function submitCreateEvent(btn) {
+async function submitCreateSession(btn) {
   const title = document.getElementById('evTitle').value;
   const date = document.getElementById('evDate').value;
   const eventType = document.getElementById('evType').value;
   const desc = mdeEventDesc ? mdeEventDesc.value() : document.getElementById('evDesc').value;
   const coverUrl = document.getElementById('evCover').value;
   const imageUrls = JSON.parse(document.getElementById('evImageUrls').value || '[]');
+  const allowedOperatives = Array.from(document.querySelectorAll('.session-target-cb:checked')).map(cb => cb.value);
+  
   if(!title || !date) return showToast('Title and Date are required.', 'error');
   
   btn.disabled = true; 
@@ -5896,15 +5929,15 @@ async function submitCreateEvent(btn) {
   try {
     let res;
     if (editingEventId) {
-      res = await apiWrite('admin_edit_event', { eventId: editingEventId, title, date, eventType, description: desc, coverUrl, imageUrls });
+      res = await apiWrite('admin_edit_session', { sessionId: editingEventId, title, date, eventType, description: desc, coverUrl, imageUrls, allowedOperatives });
     } else {
-      res = await apiWrite('admin_create_event', { title, date, eventType, description: desc, coverUrl, imageUrls });
+      res = await apiWrite('admin_create_session', { title, date, eventType, description: desc, coverUrl, imageUrls, allowedOperatives });
     }
     
     if(res.success) {
-      showToast(editingEventId ? 'Event Updated.' : 'Event Initialized.', 'success');
-      closeEventModal();
-      loadEvents();
+      showToast(editingEventId ? 'Session Updated.' : 'Session Initialized.', 'success');
+      closeSessionModal();
+      loadSessions();
     } else {
       showToast(res.message, 'error');
     }
@@ -5912,30 +5945,30 @@ async function submitCreateEvent(btn) {
     showToast(e.message, 'error');
   }
   btn.disabled = false; 
-  btn.textContent = editingEventId ? 'Save Changes' : 'Initialize Event';
+  btn.textContent = editingEventId ? 'Save Changes' : 'Initialize Session';
 }
 
-async function deleteEvent(id) {
+async function deleteSession(id) {
   if(!confirm('Delete this event permanently?')) return;
   showToast('Deleting...');
-  const res = await apiWrite('admin_delete_event', { eventId: id });
+  const res = await apiWrite('admin_delete_session', { sessionId: id });
   if(res.success) {
     showToast('Event deleted.', 'success');
-    loadEvents();
+    loadSessions();
   } else {
     showToast(res.message, 'error');
   }
 }
 
-async function openEventDash(id) {
+async function openSessionDash(id) {
   activeEventId = id;
-  const ev = currentEvents.find(e => e.eventId === id);
+  const ev = currentEvents.find(e => e.sessionId === id);
   if(!ev) return;
   activeEventTitle = ev.title;
   
   document.getElementById('dashEvTitle').textContent = ev.title;
   document.getElementById('dashEvDate').textContent = ev.date;
-  document.getElementById('modalEventDash').classList.add('open');
+  document.getElementById('modalSessionDash').classList.add('open');
   
   loadAttendance();
 }
@@ -5945,7 +5978,7 @@ async function loadAttendance() {
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Fetching roster...</td></tr>';
   
   try {
-    const res = await apiGet('admin_get_attendance&eventId=' + activeEventId);
+    const res = await apiGet('admin_get_attendance&sessionId=' + activeEventId);
     if(res.success) {
       currentAttendance = res.attendance || [];
       if(currentAttendance.length === 0) {
@@ -5972,10 +6005,10 @@ function toggleAllAttendance(source) {
   checkboxes.forEach(cb => cb.checked = source.checked);
 }
 
-async function removeAttendance(eventId, operativeId) {
+async function removeAttendance(sessionId, operativeId) {
   if(!confirm(`Are you sure you want to remove attendance for ${operativeId}?`)) return;
   try {
-    const res = await apiWrite('admin_remove_attendance', { eventId, operativeId });
+    const res = await apiWrite('admin_remove_attendance', { sessionId, operativeId });
     if(res.success) {
       showToast('Attendance removed', 'success');
       loadAttendance();
@@ -6041,7 +6074,7 @@ async function onScanSuccess(decodedText, decodedResult) {
   showToast(`Logging ${opId}...`);
   
   try {
-    const res = await apiWrite('admin_log_attendance', { eventId: activeEventId, operativeId: opId });
+    const res = await apiWrite('admin_log_attendance', { sessionId: activeEventId, operativeId: opId });
     if(res.success) {
       showToast(`ACCESS GRANTED: ${res.data.name}`, 'success');
       loadAttendance(); // refresh roster
@@ -6075,7 +6108,7 @@ function exportAttendanceCSV() {
 }
 
 function copyWhatsAppInvite() {
-  const ev = currentEvents.find(e => e.eventId === activeEventId);
+  const ev = currentEvents.find(e => e.sessionId === activeEventId);
   if(!ev) return showToast("Event not found.", "error");
   
   const text = `*New Event: ${ev.title}* 🚀\n\n📅 *Date:* ${new Date(ev.date).toLocaleDateString('en-IN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}\n\n*Details:*\n${ev.description}\n\nDon't forget your Operative ID Card for attendance scanning! See you there. ⚡`;
@@ -6106,7 +6139,7 @@ async function generateCertificates() {
 
   try {
     const res = await apiWrite('admin_issue_certificates', {
-      eventId: activeEventId,
+      sessionId: activeEventId,
       templateId: templateId.trim(),
       operatives: selectedOps
     });
@@ -6124,7 +6157,7 @@ async function generateCertificates() {
   btn.disabled = false;
 }
 
-async function viewFeedback(eventId, title) {
+async function viewFeedback(sessionId, title) {
   document.getElementById('fbEvTitle').textContent = title;
   document.getElementById('modalFeedback').classList.add('open');
   
@@ -6134,7 +6167,7 @@ async function viewFeedback(eventId, title) {
   document.getElementById('fbCount').textContent = '0';
   
   try {
-    const res = await apiGet('admin_get_feedback&eventId=' + eventId);
+    const res = await apiGet('admin_get_feedback&sessionId=' + sessionId);
     if(res.success && res.feedback) {
       const fb = res.feedback;
       document.getElementById('fbCount').textContent = fb.length;
