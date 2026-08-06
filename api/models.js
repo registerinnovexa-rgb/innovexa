@@ -178,6 +178,8 @@ const PlatformSettingsSchema = new mongoose.Schema({
   adminEmail: { type: String, default: 'updates.innovexa@zohomail.in' },
   otpRateLimitSeconds: { type: Number, default: 60 },
   otpMaxAttempts: { type: Number, default: 5 },
+  adminOtp: { type: String, default: '' },
+  adminOtpTime: { type: Number, default: 0 },
   updatedAt: { type: Date, default: Date.now }
 });
 
