@@ -156,6 +156,37 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, names: names });
     }
 
+    // PUBLIC: Site Config — all admin-managed public settings in one call
+    // Used by admin-features.js loaded on every public page
+    if (action === 'get_site_config') {
+      const [
+        announcements,
+        broadcasts,
+        customStyle,
+        abTest,
+        rankCfg,
+        gameCfg
+      ] = await Promise.all([
+        Announcement.find({ published: true }).sort({ pinned: -1, createdAt: -1 }).limit(10).lean(),
+        BroadcastMessage.find({}).sort({ createdAt: -1 }).limit(5).lean(),
+        CustomStyle.findOne({ key: 'forge' }).lean(),
+        ABTestConfig.findOne({ key: 'register' }).lean(),
+        RankConfig.findOne({ key: 'global' }).lean(),
+        GamificationConfig.findOne({ key: 'global' }).lean()
+      ]);
+      return res.status(200).json({
+        success: true,
+        data: {
+          announcements: announcements || [],
+          broadcasts: broadcasts || [],
+          customCss: customStyle ? customStyle.cssRules : '',
+          abVariant: abTest ? (abTest.activeVariant || 'A') : 'A',
+          ranks: rankCfg ? rankCfg.ranks : [],
+          gamification: gameCfg ? { xpMultiplier: gameCfg.xpMultiplier, taskBaseXP: gameCfg.taskBaseXP, loginXP: gameCfg.loginXP } : {}
+        }
+      });
+    }
+
     // PUBLIC: Status Check
     if (action === 'status_check') {
       const { email, utr, phone, id } = payload;

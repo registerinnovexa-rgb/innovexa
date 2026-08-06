@@ -921,5 +921,32 @@
   const closeBtn = document.getElementById('mobile-close-btn');
   if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
 </script>
+<script src="/js/admin-features.js"></script>
+<script>
+// Hooks called by admin-features.js when site config loads
+window.applyRankConfig = function(ranks) {
+  // Update any visible rank badge using live XP
+  var user = null;
+  try { user = JSON.parse(localStorage.getItem('forge_user') || 'null'); } catch(_){}
+  if (!user) return;
+  var xp = parseInt(user.xp) || 0;
+  var matched = ranks.filter(function(r){ return xp >= r.minXP && xp <= r.maxXP; });
+  if (!matched.length) return;
+  var rank = matched[0].name;
+  var rankEl = document.getElementById('user-rank-display');
+  if (rankEl) rankEl.textContent = rank;
+  // Update stored user rank
+  try { user.rank = rank; localStorage.setItem('forge_user', JSON.stringify(user)); } catch(_){}
+};
+window.applyGamificationConfig = function(cfg) {
+  // Store multiplier for any XP reward displays
+  window.INNX_XP_MULTIPLIER = cfg.xpMultiplier || 1;
+  window.INNX_TASK_BASE_XP  = cfg.taskBaseXP   || 100;
+  window.INNX_LOGIN_XP      = cfg.loginXP      || 10;
+  // Update any visible XP multiplier display
+  var el = document.getElementById('xp-multiplier-display');
+  if (el) el.textContent = 'x' + (cfg.xpMultiplier || 1).toFixed(1);
+};
+</script>
 </body>
 </html>
