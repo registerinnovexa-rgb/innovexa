@@ -28,14 +28,14 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
     TASK_SUBMITTED:   { icon: '📤', color: '#f59e0b', label: 'Task Submitted' },
     TASK_RECALLED:    { icon: '↩️', color: '#64748b', label: 'Task Recalled' },
     TASK_COMPLETED:   { icon: '✅', color: '#10b981', label: 'Task Completed' },
-    TASK_CREATED:     { icon: '🆕', color: '#abd233', label: 'Task Created' },
+    TASK_CREATED:     { icon: '🆕', color: '#000000', label: 'Task Created' },
     TASK_UPDATED:     { icon: '✏️', color: '#3b82f6', label: 'Task Updated' },
     TASK_DELETED:     { icon: '🗑️', color: '#ef4444', label: 'Task Deleted' },
     SOS_CREATED:      { icon: '🆘', color: '#ef4444', label: 'SOS Alert' },
     BOUNTY_CLAIMED:   { icon: '🎯', color: '#f59e0b', label: 'Bounty Claimed' },
     BOUNTY_COMPLETED: { icon: '🏆', color: '#10b981', label: 'Bounty Completed' },
     PROFILE_UPDATED:  { icon: '✏️', color: '#3b82f6', label: 'Profile Updated' },
-    REGISTRATION:     { icon: '🆕', color: '#abd233', label: 'New Registration' },
+    REGISTRATION:     { icon: '🆕', color: '#000000', label: 'New Registration' },
     STATUS_CHECK:     { icon: '🔍', color: '#06b6d4', label: 'Status Check' },
     STATUS_CHANGE:    { icon: '🔄', color: '#f59e0b', label: 'Status Changed' },
   };
@@ -115,7 +115,7 @@ async function notifyUser(email, subject, htmlContent) {
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
         <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
           <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:0px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-            <div style="background:var(--accent,#abd233);padding:24px 32px;">
+            <div style="background:var(--accent,#000000);padding:24px 32px;">
               <h2 style="margin:0;font-size:20px;color:#000;">${subject}</h2>
             </div>
             <div style="padding:32px;">
@@ -311,7 +311,7 @@ export default async function handler(req, res) {
             <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
               <div style="max-width:480px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                 <!-- Header -->
-                <div style="background:#abd233;padding:32px;text-align:center;">
+                <div style="background:#000000;padding:32px;text-align:center;">
                   <div style="width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔐</div>
                   <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Secure Login Code</h1>
                   <p style="margin:8px 0 0;color:rgba(255,255,255,.75);font-size:14px;">Innovexa Forge Dashboard</p>
@@ -320,10 +320,10 @@ export default async function handler(req, res) {
                 <div style="padding:32px;text-align:center;">
                   <p style="color:#64748b;font-size:15px;margin:0 0 24px;">Hi <strong style="color:#1e293b;">${member.name}</strong>, use the code below to access your Forge dashboard.</p>
                   <div style="background:#f8fafc;border:2px dashed #c4b5fd;border-radius:14px;padding:28px 24px;margin-bottom:20px;">
-                    <div style="font-size:44px;font-weight:800;letter-spacing:12px;color:#abd233;font-family:'Courier New',monospace;">${otp}</div>
+                    <div style="font-size:44px;font-weight:800;letter-spacing:12px;color:#000000;font-family:'Courier New',monospace;">${otp}</div>
                     <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Copy the code above and paste it into the login screen</p>
                   </div>
-                  <div style="display:inline-block;background:#ede9fe;color:#abd233;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;">⏱ Expires in 15 minutes</div>
+                  <div style="display:inline-block;background:#ede9fe;color:#000000;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;">⏱ Expires in 15 minutes</div>
                 </div>
                 <!-- Details -->
                 <div style="padding:0 32px 24px;">
@@ -456,7 +456,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#abd233;color:#000;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -732,7 +732,7 @@ export default async function handler(req, res) {
         factionId: 'FCT-' + rand,
         name, description: description || '', leaderId: leaderId || '', leaderName: leaderName || '',
         memberIds: leaderId ? [leaderId] : [],
-        color: color || '#abd233',
+        color: color || '#000000',
         createdAt: new Date()
       });
       if (leaderId) await Member.findOneAndUpdate({ operativeId: leaderId }, { $set: { factionId: faction.factionId } });
@@ -1082,7 +1082,7 @@ export default async function handler(req, res) {
               <h2 style="color:#0f172a;margin-bottom:16px;">Admin Access Code</h2>
               <p style="color:#334155;margin-bottom:24px;">An attempt to access the Admin Console was made by <strong>${memberData.name} (${memberData.operativeId})</strong>.</p>
               <div style="background:#fff;padding:24px;border:1px dashed #cbd5e1;border-radius:8px;text-align:center;">
-                <div style="font-size:36px;font-weight:700;letter-spacing:8px;color:#abd233;">${otp}</div>
+                <div style="font-size:36px;font-weight:700;letter-spacing:8px;color:#000000;">${otp}</div>
               </div>
               <p style="color:#94a3b8;font-size:12px;margin-top:16px;">This code expires in 15 minutes.</p>
             </div>
@@ -1337,7 +1337,7 @@ export default async function handler(req, res) {
               <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
                 <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                   <!-- Header -->
-                  <div style="background:#abd233;padding:36px 32px;text-align:center;">
+                  <div style="background:#000000;padding:36px 32px;text-align:center;">
                     <div style="font-size:52px;margin-bottom:12px;">🎉</div>
                     <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;">You're officially in!</h1>
                     <p style="margin:10px 0 0;color:rgba(255,255,255,.8);font-size:15px;">Welcome to Innovexa Hub, ${member.name}</p>
@@ -1346,12 +1346,12 @@ export default async function handler(req, res) {
                   <div style="padding:32px;">
                     <p style="color:#475569;font-size:15px;margin:0 0 24px;text-align:center;">Your membership has been <strong style="color:#10b981;">approved</strong>. Here's your unique Operative ID:</p>
                     <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:2px solid #c4b5fd;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px;">
-                      <div style="font-size:11px;font-weight:700;color:#abd233;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">Your Operative ID</div>
+                      <div style="font-size:11px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">Your Operative ID</div>
                       <div style="font-size:36px;font-weight:800;color:#5b21b6;font-family:'Courier New',monospace;letter-spacing:6px;">${member.operativeId}</div>
                       <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
                     </div>
                     <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
-                    <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#abd233;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
+                    <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
                   </div>
                   <!-- Footer -->
                   <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
@@ -1439,7 +1439,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Role Updated', `
         <p>Your role in the Innovexa Hub has been updated by an administrator.</p>
         <p>New Role: <strong>${role}</strong></p>
-        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#abd233;color:#000;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Role updated to ' + role });
@@ -1476,7 +1476,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Access Updated', `
         <p>Your access level in the Innovexa Hub has been updated by an administrator.</p>
         <p>Forge Access: <strong>${access}</strong></p>
-        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#abd233;color:#000;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Access updated to ' + access });
@@ -1527,7 +1527,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#abd233;color:#000;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -2044,12 +2044,12 @@ export default async function handler(req, res) {
                        <table style="width:100%;border-collapse:collapse;">
                          <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Task</td><td style="color:#fff;font-weight:700;">${t.title}</td></tr>
                          <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Status</td><td style="color:#10b981;font-weight:700;">✅ Approved</td></tr>
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">XP Earned</td><td style="color:#abd233;font-weight:800;font-size:16px;">+${xpToAward} XP</td></tr>
+                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">XP Earned</td><td style="color:#000000;font-weight:800;font-size:16px;">+${xpToAward} XP</td></tr>
                          <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">New Rank</td><td style="color:#fbbf24;font-weight:700;">${rank}</td></tr>
                          ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Feedback</td><td style="color:#e2e8f0;font-size:13px;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#abd233;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
+                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
                      <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
                    </div>`
                });
@@ -2088,7 +2088,7 @@ export default async function handler(req, res) {
                          ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Admin Feedback</td><td style="color:#fbbf24;font-size:13px;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#abd233;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
+                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
                      <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
                    </div>`
                });
@@ -2142,17 +2142,17 @@ export default async function handler(req, res) {
            html: `
              <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:12px;border:1px solid #27272a;">
                <div style="font-size:40px;text-align:center;margin-bottom:12px;">🧪</div>
-               <h2 style="text-align:center;color:#abd233;margin-bottom:4px;">Admin Email System Check</h2>
+               <h2 style="text-align:center;color:#000000;margin-bottom:4px;">Admin Email System Check</h2>
                <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">This is a test notification confirming that the Innovexa Hub mail delivery system is functioning properly.</p>
                <div style="background:#18181b;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #3f3f46;">
                  <table style="width:100%;border-collapse:collapse;">
                    <tr><td style="padding:6px 0;color:#71717a;font-size:12px;width:35%;">Status</td><td style="color:#10b981;font-weight:700;">✅ Operational</td></tr>
-                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Recipient</td><td style="color:#abd233;font-weight:700;">${adminEmail}</td></tr>
+                   <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Recipient</td><td style="color:#000000;font-weight:700;">${adminEmail}</td></tr>
                    <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sender</td><td style="color:#e2e8f0;font-size:13px;">${process.env.EMAIL_USER}</td></tr>
                    <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sent At</td><td style="color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
                  </table>
                </div>
-               <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#abd233;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
+               <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
                <p style="color:#52525b;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub Auto-Notification Engine</p>
              </div>`
          });

@@ -352,7 +352,7 @@ body {
 .badge-green  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2); color: #34d399; }
 .badge-yellow { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
 .badge-red    { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.2);  color: #f87171; }
-.badge-purple { background: rgba(171,210,51,0.12); border: 1px solid rgba(171,210,51,0.2); color: #abd233; }
+.badge-purple { background: rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.2); color: #000000; }
 .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
 /* ── Toast ──────────────────────────────────────────────── */

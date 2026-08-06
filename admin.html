@@ -113,7 +113,7 @@
     }
     .sidebar-btn svg { width:20px; height:20px; opacity:0.7; transition:opacity .2s; }
     .sidebar-btn:hover { background:var(--bg3); color:var(--text); }
-    .sidebar-btn.active { background: rgba(171,210,51,0.1); color:var(--accent); font-weight:600; }
+    .sidebar-btn.active { background: rgba(0,0,0,0.06); color:var(--accent); font-weight:600; }
     .sidebar-btn.active svg { opacity:1; stroke:var(--accent); }
 
     .main-content { margin-left:260px; margin-top:64px; padding:32px 40px; min-height:calc(100vh - 64px); }
@@ -324,7 +324,7 @@
       position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 3px;
       background-color: var(--text3); transition: .3s; border-radius: 50%;
     }
-    input:checked + .slider { background-color: rgba(171,210,51,0.2); border-color: var(--accent); }
+    input:checked + .slider { background-color: rgba(0,0,0,0.2); border-color: var(--accent); }
     input:checked + .slider:before { transform: translateX(20px); background-color: var(--accent); }
 
     .drawer-overlay {
@@ -801,7 +801,7 @@
         <input type="hidden" id="factionEditingId" />
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div class="form-group"><label>Faction Name</label><input type="text" id="factionName" placeholder="e.g. Alpha Squad" /></div>
-          <div class="form-group"><label>Color (hex)</label><input type="color" id="factionColor" value="#abd233" style="width:100%;height:42px;border:1px solid var(--border);cursor:pointer;"/></div>
+          <div class="form-group"><label>Color (hex)</label><input type="color" id="factionColor" value="#000000" style="width:100%;height:42px;border:1px solid var(--border);cursor:pointer;"/></div>
           <div class="form-group" style="grid-column:1/-1;"><label>Description</label><textarea id="factionDesc" rows="2" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text);resize:vertical;"></textarea></div>
           <div class="form-group"><label>Leader Operative ID</label><input type="text" id="factionLeaderId" placeholder="e.g. INVX-00001" /></div>
           <div class="form-group"><label>Leader Name</label><input type="text" id="factionLeaderName" placeholder="Leader full name" /></div>
@@ -2778,7 +2778,7 @@ async function loadAnnouncements() {
       <div class="admin-card" style="margin:0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            ${a.pinned ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(171,210,51,0.15);color:var(--accent);">📌 PINNED</span>' : ''}
+            ${a.pinned ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(0,0,0,0.08);color:var(--accent);">📌 PINNED</span>' : ''}
             ${a.published ? '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(74,222,128,0.1);color:var(--green);">● LIVE</span>' : '<span style="font-size:10px;font-weight:700;padding:2px 6px;background:rgba(255,255,255,0.05);color:var(--text3);">DRAFT</span>'}
             <h3 style="font-size:15px;font-weight:700;margin:0;">${escHtml(a.title)}</h3>
           </div>
@@ -3053,7 +3053,7 @@ async function loadFactions() {
       return;
     }
     listEl.innerHTML = items.map(f => `
-      <div class="admin-card" style="margin:0;border-top:3px solid ${escHtml(f.color||'#abd233')};">
+      <div class="admin-card" style="margin:0;border-top:3px solid ${escHtml(f.color||'#000000')};">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
           <div>
             <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${escHtml(f.name)}</div>
@@ -3079,7 +3079,7 @@ function openFactionEditor() {
   document.getElementById('factionEditorTitle').textContent = 'New Faction';
   document.getElementById('factionName').value = '';
   document.getElementById('factionDesc').value = '';
-  document.getElementById('factionColor').value = '#abd233';
+  document.getElementById('factionColor').value = '#000000';
   document.getElementById('factionLeaderId').value = '';
   document.getElementById('factionLeaderName').value = '';
   document.getElementById('factionEditorPanel').style.display = 'block';
@@ -3090,7 +3090,7 @@ function editFaction(f) {
   document.getElementById('factionEditorTitle').textContent = 'Edit Faction';
   document.getElementById('factionName').value = f.name || '';
   document.getElementById('factionDesc').value = f.description || '';
-  document.getElementById('factionColor').value = f.color || '#abd233';
+  document.getElementById('factionColor').value = f.color || '#000000';
   document.getElementById('factionLeaderId').value = f.leaderId || '';
   document.getElementById('factionLeaderName').value = f.leaderName || '';
   document.getElementById('factionEditorPanel').style.display = 'block';
@@ -3538,7 +3538,7 @@ function renderAuditLogs(logs) {
     else if (logType === 'SOS_RESOLVED') { typeColor = '#10b981'; typeBadge = '✔️ SOS RESOLVED'; }
     else if (logType === 'BOUNTY_CLAIMED') { typeColor = '#fbbf24'; typeBadge = '🎯 BOUNTY CLAIMED'; }
     else if (logType === 'BOUNTY_COMPLETED') { typeColor = '#fbbf24'; typeBadge = '🏆 BOUNTY DONE'; }
-    else if (logType === 'BOUNTY_POSTED') { typeColor = '#abd233'; typeBadge = '📋 BOUNTY POSTED'; }
+    else if (logType === 'BOUNTY_POSTED') { typeColor = '#000000'; typeBadge = '📋 BOUNTY POSTED'; }
     else if (logType === 'STATUS_CHECK') { typeColor = '#71717a'; typeBadge = '👁 STATUS CHECK'; }
     
     html += `
@@ -4143,8 +4143,8 @@ function openProfileModal(encodedData) {
 
   // Status + Role badge colours
   const forgeRole = m.forgeRole || 'Unassigned';
-  const roleBadgeColor = forgeRole === 'Mentor' ? '#10a34a' : forgeRole === 'Member' ? '#abd233' : '#888';
-  const roleBadgeBg = forgeRole === 'Mentor' ? 'rgba(16,163,74,0.15)' : forgeRole === 'Member' ? 'rgba(171,210,51,0.15)' : 'rgba(100,100,100,0.1)';
+  const roleBadgeColor = forgeRole === 'Mentor' ? '#10a34a' : forgeRole === 'Member' ? '#000000' : '#888';
+  const roleBadgeBg = forgeRole === 'Mentor' ? 'rgba(16,163,74,0.15)' : forgeRole === 'Member' ? 'rgba(0,0,0,0.08)' : 'rgba(100,100,100,0.1)';
 
   const sLabel = (label) => `<span style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:4px;">${label}</span>`;
   const sVal   = (val, color='var(--text)') => `<span style="font-size:14px;font-weight:600;color:${color};">${escHtml(val || '—')}</span>`;
@@ -4152,10 +4152,10 @@ function openProfileModal(encodedData) {
 
   const html = `
     <!-- ── Profile Header ── -->
-    <div style="background:linear-gradient(135deg,rgba(171,210,51,0.25) 0%,rgba(16,185,129,0.1) 100%);border-bottom:1px solid var(--border);padding:28px 32px;border-radius:24px 24px 0 0;">
+    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.25) 0%,rgba(16,185,129,0.1) 100%);border-bottom:1px solid var(--border);padding:28px 32px;border-radius:24px 24px 0 0;">
       <div style="display:flex;gap:20px;align-items:center;">
         <!-- Avatar -->
-        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#abd233,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(171,210,51,0.4);">${initials}</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#000000,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,0.4);">${initials}</div>
         <!-- Name + badges -->
         <div style="flex:1;min-width:0;">
           <div style="font-family:monospace;font-size:12px;color:var(--accent2);font-weight:700;letter-spacing:2px;margin-bottom:4px;">${escHtml(m.operativeId || 'NO-ID')}</div>
@@ -5797,7 +5797,7 @@ async function loadSessions() {
       const imgCell = e.coverUrl
         ? `<img src="${escHtml(e.coverUrl)}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'">`
         : `<div style="width:64px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">🖼️</div>`;
-      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(171,210,51,0.15);color:#abd233;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
+      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(0,0,0,0.08);color:#000000;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
       tbody.innerHTML += `
         <tr>
           <td>${imgCell}</td>
