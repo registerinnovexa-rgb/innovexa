@@ -1718,6 +1718,21 @@ function invalidateCache(action, params = {}) {
   delete _apiCache[key];
   try { localStorage.removeItem(CACHE_STORE + key); } catch(_) {}
 }
+
+async function apiPost(action, payload = {}) {
+  const token = sessionStorage.getItem('adminToken') || 'ADM-DEV';
+  const res = await fetch('/api/proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, payload, token })
+  });
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    throw new Error('Invalid JSON response: ' + text.slice(0, 100));
+  }
+}
 // ────────────────────────────────────────────────────────────────────────────
 
 
