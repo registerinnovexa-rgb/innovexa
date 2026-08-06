@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction, GamificationConfig, CertTemplate, CustomStyle, BroadcastMessage } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Event, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction, GamificationConfig, CertTemplate, CustomStyle, BroadcastMessage, AIConfig, ABTestConfig, AdminPresence } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -779,6 +779,75 @@ export default async function handler(req, res) {
       const tasks = await Task.find({ $or: [{ title: rx }, { description: rx }] }).limit(10).lean();
       const bounties = await Bounty.find({ $or: [{ title: rx }, { description: rx }] }).limit(10).lean();
       return res.status(200).json({ success: true, data: { members, tasks, bounties } });
+    }
+
+    // ADMIN: AI Integration (Feature #16)
+    if (action === 'admin_get_ai_config') {
+      let cfg = await AIConfig.findOne({ key: 'global' });
+      if (!cfg) cfg = await AIConfig.create({ key: 'global' });
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_ai_config') {
+      const { geminiApiKey } = payload;
+      const cfg = await AIConfig.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { geminiApiKey, updatedAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'AI Config saved.' });
+    }
+
+    // ADMIN: A/B Testing Engine (Feature #17)
+    if (action === 'admin_get_ab_test') {
+      let cfg = await ABTestConfig.findOne({ key: 'register' });
+      if (!cfg) cfg = await ABTestConfig.create({ key: 'register' });
+      return res.status(200).json({ success: true, data: cfg });
+    }
+
+    if (action === 'admin_save_ab_test') {
+      const { activeVariant } = payload;
+      const cfg = await ABTestConfig.findOneAndUpdate(
+        { key: 'register' },
+        { $set: { activeVariant, updatedAt: new Date() } },
+        { new: true }
+      );
+      return res.status(200).json({ success: true, data: cfg, message: 'A/B Variant saved.' });
+    }
+
+    // ADMIN: Visual Query & Cohort Builder (Feature #22)
+    if (action === 'admin_query_cohort') {
+      const { minXp, maxRank, status } = payload;
+      const query = {};
+      if (minXp) query.xp = { $gte: parseInt(minXp) };
+      if (maxRank) query.rank = maxRank; // Simplified exact match for now
+      if (status) query.status = status;
+      const members = await Member.find(query).limit(50).lean();
+      return res.status(200).json({ success: true, data: members });
+    }
+
+    // ADMIN: Skill Trees & Talent Mapping (Feature #23)
+    if (action === 'admin_get_skill_trees') {
+      // Aggregate tasks completed by category
+      const skills = await Task.aggregate([
+        { $match: { status: 'Approved' } },
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+      ]);
+      return res.status(200).json({ success: true, data: skills });
+    }
+
+    // ADMIN: Multiplayer Admin Collaboration (Feature #25)
+    if (action === 'admin_ping_presence') {
+      const { adminId, name } = payload;
+      await AdminPresence.findOneAndUpdate(
+        { adminId },
+        { $set: { name, lastPing: new Date() } },
+        { upsert: true }
+      );
+      // Get all active admins (pinged in last 5 mins)
+      const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const activeAdmins = await AdminPresence.find({ lastPing: { $gte: fiveMinsAgo } }).lean();
+      return res.status(200).json({ success: true, data: activeAdmins });
     }
 
     // ADMIN: Get Platform Settings

@@ -492,6 +492,22 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
       Custom CSS
     </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('aiTools')" id="navAiTools">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      AI Tools
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('abTesting')" id="navAbTesting">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      A/B Testing
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('cohortBuilder')" id="navCohortBuilder">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Cohort Builder
+    </button>
+    <button class="sidebar-btn" onclick="switchAdminTab('skillTrees')" id="navSkillTrees">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Skill Trees
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -878,6 +894,95 @@
       </div>
     </div>
 
+    <!-- ── AI TOOLS TAB ── -->
+    <div class="tab-content" id="tabAiTools">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">AI Integration Engine</h2>
+        <button class="btn-add" onclick="saveAiConfig()">Save Keys</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Connect Gemini AI to automate bounty generation and feedback summarization.</p>
+        <div class="form-group">
+          <label>Gemini API Key</label>
+          <input type="password" id="ai_geminiKey" placeholder="AIzaSy..." />
+        </div>
+        <div id="aiStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+        
+        <div style="margin-top:30px; border-top:1px solid var(--border); padding-top:20px;">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">AI Assistant Tools</h3>
+          <div style="display:flex;gap:12px;">
+            <button class="btn-sm" style="background:var(--accent);color:#fff;" onclick="alert('Feature coming soon: Auto-Generate Bounty')">✨ Auto-Generate Bounty</button>
+            <button class="btn-sm" style="background:var(--accent);color:#fff;" onclick="alert('Feature coming soon: Summarize Member Feedback')">✨ Summarize Feedback</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── A/B TESTING TAB ── -->
+    <div class="tab-content" id="tabAbTesting">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">A/B Testing Engine</h2>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Control the active variant for the registration page.</p>
+        <div style="display:flex; gap:20px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+            <input type="radio" name="abVariant" id="variantA" value="A" onchange="saveAbTest('A')" style="width:16px;height:16px;accent-color:var(--accent);">
+            Variant A (Standard)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;">
+            <input type="radio" name="abVariant" id="variantB" value="B" onchange="saveAbTest('B')" style="width:16px;height:16px;accent-color:var(--accent);">
+            Variant B (Experimental)
+          </label>
+        </div>
+        <div id="abStatus" style="margin-top:16px;font-size:13px;font-weight:600;"></div>
+      </div>
+    </div>
+
+    <!-- ── COHORT BUILDER TAB ── -->
+    <div class="tab-content" id="tabCohortBuilder">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Visual Query & Cohort Builder</h2>
+      </div>
+      <div class="admin-card" style="margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
+          <div class="form-group" style="margin:0;">
+            <label>Min XP</label>
+            <input type="number" id="cohortMinXp" placeholder="e.g. 500" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Rank Filter</label>
+            <select id="cohortRank">
+              <option value="">Any</option>
+              <option value="Vanguard">Vanguard</option>
+              <option value="Commander">Commander</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Status</label>
+            <select id="cohortStatus">
+              <option value="">Any</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <button class="btn-add" onclick="executeCohortQuery()">Query</button>
+        </div>
+      </div>
+      <div id="cohortResults" style="font-size:13px;color:var(--text3);"></div>
+    </div>
+
+    <!-- ── SKILL TREES TAB ── -->
+    <div class="tab-content" id="tabSkillTrees">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <h2 style="font-size:24px;font-weight:800;">Skill Trees & Talent Mapping</h2>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Organization-wide skill distribution based on completed tasks.</p>
+        <div id="skillHeatmap" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </div>
+
     <!-- ── OVERVIEW TAB ── -->
     <div class="tab-content active" id="tabOverview">
       <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; padding-bottom:15px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:16px;">
@@ -896,7 +1001,13 @@
           </button>
         </div>
 
-        <div style="display:flex; align-items:center; gap:15px;"></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+          <!-- Admin Presence Indicator -->
+          <div id="adminPresenceContainer" style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text3); border:1px solid var(--border); padding:6px 12px; border-radius:20px; background:var(--bg2);">
+            <div style="width:8px; height:8px; border-radius:50%; background:var(--green);"></div>
+            <span id="activeAdminsCount">1 Admin Online</span>
+          </div>
+        </div>
       </header>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <h2 style="font-size:24px;font-weight:800;">Dashboard</h2>
@@ -2105,8 +2216,11 @@ function switchAdminTab(tab) {
   if (tab === 'factions') loadFactions();
   if (tab === 'broadcasts') loadBroadcasts();
   if (tab === 'gamification') loadGamificationConfig();
-  if (tab === 'certs') loadCertTemplates();
   if (tab === 'customCss') loadCustomCss();
+  if (tab === 'aiTools') loadAiConfig();
+  if (tab === 'abTesting') loadAbTest();
+  if (tab === 'cohortBuilder') clearCohortBuilder();
+  if (tab === 'skillTrees') loadSkillTrees();
 }
 
 // ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
@@ -3137,6 +3251,150 @@ async function executeGlobalSearch() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════ END PHASE 3
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — AI TOOLS, A/B TESTING, COHORT BUILDER, SKILL TREES, COLLAB
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── AI TOOLS (Feature #16) ────────────────────────────────────────────────────
+async function loadAiConfig() {
+  const st = document.getElementById('aiStatus');
+  st.textContent = 'Loading...';
+  try {
+    const res = await apiPost('admin_get_ai_config', {});
+    if (!res.success) throw new Error(res.message);
+    document.getElementById('ai_geminiKey').value = (res.data || {}).geminiApiKey || '';
+    st.textContent = '';
+  } catch(e) { st.textContent = 'Error: ' + e.message; st.style.color = 'var(--red)'; }
+}
+
+async function saveAiConfig() {
+  const st = document.getElementById('aiStatus');
+  st.textContent = 'Saving...';
+  try {
+    const payload = { geminiApiKey: document.getElementById('ai_geminiKey').value.trim() };
+    const res = await apiPost('admin_save_ai_config', payload);
+    if (!res.success) throw new Error(res.message);
+    st.textContent = '✓ AI Config saved.';
+    st.style.color = 'var(--green)';
+    showToast('AI Keys saved', 'success');
+  } catch(e) { st.textContent = 'Error: ' + e.message; st.style.color = 'var(--red)'; }
+}
+
+// ── A/B TESTING (Feature #17) ─────────────────────────────────────────────────
+async function loadAbTest() {
+  const st = document.getElementById('abStatus');
+  st.textContent = 'Loading...';
+  try {
+    const res = await apiPost('admin_get_ab_test', {});
+    if (!res.success) throw new Error(res.message);
+    const v = (res.data || {}).activeVariant || 'A';
+    document.getElementById('variantA').checked = (v === 'A');
+    document.getElementById('variantB').checked = (v === 'B');
+    st.textContent = `Counts: Variant A (${res.data.variantACount || 0}), Variant B (${res.data.variantBCount || 0})`;
+  } catch(e) { st.textContent = 'Error: ' + e.message; st.style.color = 'var(--red)'; }
+}
+
+async function saveAbTest(variant) {
+  const st = document.getElementById('abStatus');
+  st.textContent = 'Saving...';
+  try {
+    const res = await apiPost('admin_save_ab_test', { activeVariant: variant });
+    if (!res.success) throw new Error(res.message);
+    st.textContent = '✓ Active variant updated to ' + variant;
+    st.style.color = 'var(--green)';
+    showToast('A/B Testing updated', 'success');
+  } catch(e) { st.textContent = 'Error: ' + e.message; st.style.color = 'var(--red)'; }
+}
+
+// ── COHORT BUILDER (Feature #22) ──────────────────────────────────────────────
+function clearCohortBuilder() {
+  document.getElementById('cohortMinXp').value = '';
+  document.getElementById('cohortRank').value = '';
+  document.getElementById('cohortStatus').value = '';
+  document.getElementById('cohortResults').innerHTML = '';
+}
+
+async function executeCohortQuery() {
+  const resEl = document.getElementById('cohortResults');
+  resEl.innerHTML = 'Querying database...';
+  try {
+    const payload = {
+      minXp: document.getElementById('cohortMinXp').value,
+      maxRank: document.getElementById('cohortRank').value,
+      status: document.getElementById('cohortStatus').value
+    };
+    const res = await apiPost('admin_query_cohort', payload);
+    if (!res.success) throw new Error(res.message);
+    const members = res.data || [];
+    if (!members.length) {
+      resEl.innerHTML = 'No members match this cohort query.';
+      return;
+    }
+    let html = `<div style="margin-bottom:12px;font-weight:600;color:var(--text);">${members.length} member(s) match:</div>`;
+    html += members.map(m => `
+      <div style="background:var(--bg3);padding:10px;margin-bottom:8px;border-left:3px solid var(--accent);">
+        <div style="font-weight:700;font-size:14px;color:var(--text);">${escHtml(m.name)} <span style="font-weight:400;color:var(--text3);font-size:12px;">(${m.operativeId})</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Rank: ${m.rank} | XP: ${m.xp} | Status: ${m.status}</div>
+      </div>
+    `).join('');
+    resEl.innerHTML = html;
+  } catch(e) { resEl.innerHTML = `<span style="color:var(--red);">Error: ${e.message}</span>`; }
+}
+
+// ── SKILL TREES (Feature #23) ─────────────────────────────────────────────────
+async function loadSkillTrees() {
+  const el = document.getElementById('skillHeatmap');
+  el.innerHTML = '<div style="color:var(--text3);">Aggregating skills...</div>';
+  try {
+    const res = await apiPost('admin_get_skill_trees', {});
+    if (!res.success) throw new Error(res.message);
+    const skills = res.data || [];
+    if (!skills.length) {
+      el.innerHTML = '<div style="color:var(--text3);font-size:13px;">No approved tasks yet to map skills.</div>';
+      return;
+    }
+    const maxCount = Math.max(...skills.map(s => s.count));
+    el.innerHTML = skills.map(s => {
+      const pct = (s.count / maxCount) * 100;
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;font-weight:600;">
+            <span style="text-transform:capitalize;">${s._id || 'Uncategorized'}</span>
+            <span>${s.count} Tasks</span>
+          </div>
+          <div style="width:100%;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:var(--accent);"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) { el.innerHTML = `<span style="color:var(--red);">Error: ${e.message}</span>`; }
+}
+
+// ── ADMIN COLLAB (Feature #25) ────────────────────────────────────────────────
+function startAdminPresencePing() {
+  const adminId = sessionStorage.getItem('adminToken') || 'ADM-' + Math.floor(Math.random()*10000);
+  const name = 'Admin';
+  
+  async function ping() {
+    try {
+      const res = await apiPost('admin_ping_presence', { adminId, name });
+      if (res.success && res.data) {
+        const count = res.data.length;
+        document.getElementById('activeAdminsCount').textContent = `${count} Admin${count !== 1 ? 's' : ''} Online`;
+      }
+    } catch(e) { /* ignore ping errors silently */ }
+  }
+  
+  ping();
+  setInterval(ping, 60000); // Ping every 60s
+}
+
+// Start pinging after 3 seconds
+setTimeout(startAdminPresencePing, 3000);
+
+// ══════════════════════════════════════════════════════════════════════════════ END PHASE 4
 
 let allAuditLogs = [];
 

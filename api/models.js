@@ -279,3 +279,73 @@ const FactionSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 export const Faction = mongoose.models.Faction || mongoose.model('Faction', FactionSchema);
+
+// Gamification Config
+const GamificationConfigSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  xpMultiplier: { type: Number, default: 1.0 },
+  taskBaseXP: { type: Number, default: 100 },
+  loginXP: { type: Number, default: 10 },
+  updatedAt: { type: Date, default: Date.now }
+});
+export const GamificationConfig = mongoose.models.GamificationConfig || mongoose.model('GamificationConfig', GamificationConfigSchema);
+
+// Certificate Template
+const CertTemplateSchema = new mongoose.Schema({
+  templateId: { type: String, unique: true },
+  name: String,
+  backgroundUrl: String,
+  fields: [{
+    key: String, // 'name', 'date', 'course'
+    x: Number,
+    y: Number,
+    fontSize: Number,
+    color: String
+  }],
+  updatedAt: { type: Date, default: Date.now }
+});
+export const CertTemplate = mongoose.models.CertTemplate || mongoose.model('CertTemplate', CertTemplateSchema);
+
+// Custom Style (Forge CSS)
+const CustomStyleSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'forge' },
+  cssRules: String,
+  updatedAt: { type: Date, default: Date.now }
+});
+export const CustomStyle = mongoose.models.CustomStyle || mongoose.model('CustomStyle', CustomStyleSchema);
+
+// Broadcast Message
+const BroadcastMessageSchema = new mongoose.Schema({
+  messageId: { type: String, unique: true },
+  content: String,
+  priority: { type: String, default: 'normal' }, // 'normal', 'high', 'urgent'
+  targetRanks: [String],
+  createdAt: { type: Date, default: Date.now }
+});
+export const BroadcastMessage = mongoose.models.BroadcastMessage || mongoose.model('BroadcastMessage', BroadcastMessageSchema);
+
+// AI Config
+const AIConfigSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'global' },
+  geminiApiKey: String,
+  updatedAt: { type: Date, default: Date.now }
+});
+export const AIConfig = mongoose.models.AIConfig || mongoose.model('AIConfig', AIConfigSchema);
+
+// AB Test Config
+const ABTestConfigSchema = new mongoose.Schema({
+  key: { type: String, unique: true, default: 'register' },
+  activeVariant: { type: String, default: 'A' }, // 'A' or 'B'
+  variantACount: { type: Number, default: 0 },
+  variantBCount: { type: Number, default: 0 },
+  updatedAt: { type: Date, default: Date.now }
+});
+export const ABTestConfig = mongoose.models.ABTestConfig || mongoose.model('ABTestConfig', ABTestConfigSchema);
+
+// Admin Presence
+const AdminPresenceSchema = new mongoose.Schema({
+  adminId: { type: String, unique: true },
+  name: String,
+  lastPing: { type: Date, default: Date.now }
+});
+export const AdminPresence = mongoose.models.AdminPresence || mongoose.model('AdminPresence', AdminPresenceSchema);
