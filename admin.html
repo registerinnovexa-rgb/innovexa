@@ -368,15 +368,31 @@
       </div>
     </div>
     
-    <div class="form-group" style="margin-bottom:12px;">
-      <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter username" />
+    <div id="loginInputs">
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="text" id="loginId" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter username" />
+      </div>
+      <div class="form-group" style="margin-bottom:24px;">
+        <input type="password" id="loginEmail" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter password" />
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%;">
+        Login
+      </button>
     </div>
-    <div class="form-group" style="margin-bottom:24px;">
-      <input type="password" id="loginEmail" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:15px; font-family:var(--font-b);" placeholder="Enter password" />
+    
+    <div id="otpInputs" style="display:none;">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:12px;text-align:center;">An OTP has been sent to innovexahub.bangalore@gmail.com</div>
+      <div class="form-group" style="margin-bottom:24px;">
+        <input type="text" id="loginOtp" style="width:100%; padding:12px 16px; background: var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--accent); font-size:18px; font-weight:bold; font-family:var(--font-b); text-align:center; letter-spacing:4px;" placeholder="000000" />
+      </div>
+      <button class="btn-primary" id="verifyOtpBtn" onclick="handleVerifyOtp()" style="width:100%;">
+        Verify & Login
+      </button>
+      <button class="btn-cancel" onclick="cancelOtpLogin()" style="width:100%;margin-top:10px;">
+        Cancel
+      </button>
     </div>
-    <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%;">
-      Login
-    </button>
+
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
@@ -1811,6 +1827,7 @@ async function handleLogin() {
   const pass = emailInput.value;
   
   if (!user || !pass) {
+    err.style.color = '#ef4444';
     err.textContent = 'Please enter both Username and Password.';
     return;
   }
@@ -1823,10 +1840,18 @@ async function handleLogin() {
     const res = await apiGet('admin_login', { invxId: user, email: pass });
     
     if (res.success) {
-      // Login successful
+      if (res.requireOtp) {
+        document.getElementById('loginInputs').style.display = 'none';
+        document.getElementById('otpInputs').style.display = 'block';
+        err.style.color = 'var(--accent)';
+        err.textContent = 'Verification OTP sent.';
+        return;
+      }
+      
+      // Direct login (e.g., if OTP gets bypassed or for local testing)
       adminSession = {
         id: res.data.operativeId,
-        email: user, // They logged in with this
+        email: user, 
         name: res.data.name,
         role: res.data.role
       };
@@ -1837,11 +1862,59 @@ async function handleLogin() {
     }
   } catch (e) {
     console.error(e);
+    err.style.color = '#ef4444';
     err.textContent = e.message || 'Authentication failed.';
   } finally {
     btn.disabled = false;
     btn.textContent = 'Login';
   }
+}
+
+async function handleVerifyOtp() {
+  const btn = document.getElementById('verifyOtpBtn');
+  const err = document.getElementById('loginError');
+  const otp = document.getElementById('loginOtp').value.trim();
+  const user = document.getElementById('loginId').value.trim();
+  const pass = document.getElementById('loginEmail').value;
+  
+  if (!otp) {
+    err.style.color = '#ef4444';
+    err.textContent = 'Please enter the OTP.';
+    return;
+  }
+  
+  err.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+  
+  try {
+    const res = await apiGet('admin_verify_otp', { invxId: user, email: pass, otp });
+    if (res.success) {
+      adminSession = {
+        id: res.data.operativeId,
+        email: user, 
+        name: res.data.name,
+        role: res.data.role
+      };
+      sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+      showDashboard();
+    } else {
+      throw new Error(res.message || 'Invalid OTP.');
+    }
+  } catch (e) {
+    err.style.color = '#ef4444';
+    err.textContent = e.message || 'Verification failed.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verify & Login';
+  }
+}
+
+function cancelOtpLogin() {
+  document.getElementById('otpInputs').style.display = 'none';
+  document.getElementById('loginInputs').style.display = 'block';
+  document.getElementById('loginOtp').value = '';
+  document.getElementById('loginError').textContent = '';
 }
 
 function showDashboard() {

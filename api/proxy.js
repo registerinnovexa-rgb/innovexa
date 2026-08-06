@@ -1023,53 +1023,142 @@ export default async function handler(req, res) {
       const { invxId, email } = payload;
       if (!invxId || !email) return res.status(200).json({ success: false, message: 'Missing credentials.' });
       
+      let isValidAdmin = false;
+      let memberData = null;
+
       // Master Override
       if (invxId.trim() === 'admin@innovexa' && email.trim() === 'adminpass') {
-        return res.status(200).json({
-          success: true,
-          data: {
-            name: 'Master Admin',
-            operativeId: 'INVX-MASTER',
-            role: 'president',
-            hasFaceRegistered: false
-          }
+        isValidAdmin = true;
+        memberData = {
+          name: 'Master Admin',
+          operativeId: 'INVX-MASTER',
+          role: 'president',
+          hasFaceRegistered: false
+        };
+      } else {
+        const member = await Member.findOne({ 
+          operativeId: invxId.trim().toUpperCase(),
+          email: email.trim().toLowerCase()
         });
-      }
-      
-      const member = await Member.findOne({ 
-        operativeId: invxId.trim().toUpperCase(),
-        email: email.trim().toLowerCase()
-      });
-      
-      if (member) {
-        let role = (member.forgeRole || '').trim().toLowerCase();
-        let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
-        let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
-        
-        if (!isAdmin) {
-          return res.status(200).json({ success: false, message: 'Access Denied. You do not have Admin privileges.' });
+        if (member) {
+          let role = (member.forgeRole || '').trim().toLowerCase();
+          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
+          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
+          
+          if (isAdmin) {
+            isValidAdmin = true;
+            let finalRole = role || (isPresident ? 'president' : 'admin');
+            memberData = {
+              name: member.name,
+              operativeId: member.operativeId,
+              role: finalRole,
+              hasFaceRegistered: !!member.faceDescriptor
+            };
+          } else {
+            return res.status(200).json({ success: false, message: 'Access Denied. You do not have Admin privileges.' });
+          }
         }
-        
-        let finalRole = role || (isPresident ? 'president' : 'admin');
-        
-        await notifyAdmin({
-          type: 'LOGIN',
-          operativeId: member.operativeId,
-          name: member.name,
-          detail: `Admin login successful. Role: ${finalRole}`
-        });
-        
-        return res.status(200).json({
-          success: true,
-          data: {
-            name: member.name,
-            operativeId: member.operativeId,
-            role: finalRole,
-            hasFaceRegistered: !!member.faceDescriptor
-          }
-        });
       }
-      return res.status(200).json({ success: false, message: 'Invalid Credentials.' });
+
+      if (!isValidAdmin) {
+        return res.status(200).json({ success: false, message: 'Invalid Credentials.' });
+      }
+
+      // Generate and send OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      await PlatformSettings.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { adminOtp: otp, adminOtpTime: Date.now() } },
+        { upsert: true }
+      );
+
+      try {
+        await transporter.sendMail({
+          from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+          to: 'innovexahub.bangalore@gmail.com',
+          subject: `🚨 Admin Login OTP: ${otp}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:32px;">
+              <h2 style="color:#0f172a;margin-bottom:16px;">Admin Access Code</h2>
+              <p style="color:#334155;margin-bottom:24px;">An attempt to access the Admin Console was made by <strong>${memberData.name} (${memberData.operativeId})</strong>.</p>
+              <div style="background:#fff;padding:24px;border:1px dashed #cbd5e1;border-radius:8px;text-align:center;">
+                <div style="font-size:36px;font-weight:700;letter-spacing:8px;color:#abd233;">${otp}</div>
+              </div>
+              <p style="color:#94a3b8;font-size:12px;margin-top:16px;">This code expires in 15 minutes.</p>
+            </div>
+          `
+        });
+      } catch (e) {
+        console.error('Failed to send Admin OTP email:', e);
+        return res.status(200).json({ success: false, message: 'Failed to send OTP to admin email. Please check server logs.' });
+      }
+
+      return res.status(200).json({ success: true, requireOtp: true, message: 'OTP sent to admin email.' });
+    }
+
+    if (action === 'admin_verify_otp') {
+      const { invxId, email, otp } = payload;
+      if (!invxId || !email || !otp) return res.status(200).json({ success: false, message: 'Missing credentials or OTP.' });
+
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      if (!cfg || !cfg.adminOtp || Date.now() - (cfg.adminOtpTime || 0) > 15 * 60 * 1000) {
+        return res.status(200).json({ success: false, message: 'OTP expired or not requested.' });
+      }
+
+      if (cfg.adminOtp !== otp.trim()) {
+        return res.status(200).json({ success: false, message: 'Invalid OTP.' });
+      }
+
+      // Valid OTP. Now re-validate credentials to prevent hijacking
+      let isValidAdmin = false;
+      let memberData = null;
+
+      if (invxId.trim() === 'admin@innovexa' && email.trim() === 'adminpass') {
+        isValidAdmin = true;
+        memberData = {
+          name: 'Master Admin',
+          operativeId: 'INVX-MASTER',
+          role: 'president',
+          hasFaceRegistered: false
+        };
+      } else {
+        const member = await Member.findOne({ 
+          operativeId: invxId.trim().toUpperCase(),
+          email: email.trim().toLowerCase()
+        });
+        if (member) {
+          let role = (member.forgeRole || '').trim().toLowerCase();
+          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
+          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
+          if (isAdmin) {
+            isValidAdmin = true;
+            let finalRole = role || (isPresident ? 'president' : 'admin');
+            memberData = {
+              name: member.name,
+              operativeId: member.operativeId,
+              role: finalRole,
+              hasFaceRegistered: !!member.faceDescriptor
+            };
+          }
+        }
+      }
+
+      if (!isValidAdmin) return res.status(200).json({ success: false, message: 'Invalid Credentials.' });
+
+      // Clear OTP
+      await PlatformSettings.findOneAndUpdate({ key: 'global' }, { $unset: { adminOtp: "", adminOtpTime: "" } });
+
+      await notifyAdmin({
+        type: 'LOGIN',
+        operativeId: memberData.operativeId,
+        name: memberData.name,
+        detail: `Admin login successful via OTP. Role: ${memberData.role}`
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: memberData
+      });
     }
 
     // FORGE: Get Mentors
