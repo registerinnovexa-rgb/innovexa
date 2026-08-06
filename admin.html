@@ -1720,11 +1720,10 @@ function invalidateCache(action, params = {}) {
 }
 
 async function apiPost(action, payload = {}) {
-  const token = sessionStorage.getItem('adminToken') || 'ADM-DEV';
   const res = await fetch('/api/proxy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, payload, token })
+    body: JSON.stringify({ ...payload, action })
   });
   const text = await res.text();
   try {
