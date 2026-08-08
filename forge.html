@@ -439,7 +439,8 @@
       document.getElementById('login-view').style.display = 'flex';
       document.getElementById('dashboard-view').style.display = 'none';
       document.getElementById('loginId').value = '';
-      document.getElementById('loginEmail').value = '';
+      const loginEmailEl = document.getElementById('loginEmail');
+      if (loginEmailEl) loginEmailEl.value = '';
     }
 
     function logout() {
@@ -930,16 +931,16 @@
 window.applyRankConfig = function(ranks) {
   // Update any visible rank badge using live XP
   var user = null;
-  try { user = JSON.parse(localStorage.getItem('forge_user') || 'null'); } catch(_){}
+  try { user = JSON.parse(localStorage.getItem('forge_session') || 'null'); } catch(_){}
   if (!user) return;
   var xp = parseInt(user.xp) || 0;
   var matched = ranks.filter(function(r){ return xp >= r.minXP && xp <= r.maxXP; });
   if (!matched.length) return;
   var rank = matched[0].name;
-  var rankEl = document.getElementById('user-rank-display');
+  var rankEl = document.getElementById('prof-rank');
   if (rankEl) rankEl.textContent = rank;
   // Update stored user rank
-  try { user.rank = rank; localStorage.setItem('forge_user', JSON.stringify(user)); } catch(_){}
+  try { user.rank = rank; localStorage.setItem('forge_session', JSON.stringify(user)); } catch(_){}
 };
 window.applyGamificationConfig = function(cfg) {
   // Store multiplier for any XP reward displays

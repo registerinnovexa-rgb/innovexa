@@ -1,6 +1,8 @@
 /**
  * Innovexa Shield - Client-Side Protection
- * Blocks right-click, dev tools shortcuts, and copy-pasting.
+ * Blocks right-click and dev tools shortcuts.
+ * NOTE: Copy/paste/cut are intentionally NOT blocked — users need to
+ * paste OTP codes, UTR numbers, and copy their Operative ID / UPI ID.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,15 +37,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if ((e.ctrlKey || e.metaKey) && (e.key === 'S' || e.key === 's')) {
       e.preventDefault();
     }
-  });
-
-  // Disable Copy-Pasting on body
-  document.addEventListener('copy', (e) => {
-    e.preventDefault();
-  });
-  
-  // Disable Cut
-  document.addEventListener('cut', (e) => {
-    e.preventDefault();
   });
 });

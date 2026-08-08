@@ -431,63 +431,6 @@
     });
   });
 
-  // File Upload Logic
-  let photoData = null;
-  let paymentData = null;
-  
-  function handleFile(input, dropArea, textEl, callback) {
-    if(!input || !dropArea) return;
-    dropArea.addEventListener('click', () => input.click());
-    dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('drag-over'); });
-    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('drag-over'));
-    dropArea.addEventListener('drop', e => {
-      e.preventDefault(); dropArea.classList.remove('drag-over');
-      if (e.dataTransfer.files.length) {
-        input.files = e.dataTransfer.files;
-        processFile(input.files[0]);
-      }
-    });
-    input.addEventListener('change', () => { if (input.files.length) processFile(input.files[0]); });
-
-    function processFile(file) {
-      if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
-      if (file.size > 5 * 1024 * 1024) {
-          alert('File is too large! Maximum size is 5MB.');
-          input.value = '';
-          textEl.textContent = 'Upload Failed (File > 5MB)';
-          textEl.style.color = '#ef4444';
-          return;
-      }
-      textEl.textContent = 'Compressing...';
-      
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 400; // Aggressive compression to fit Google Sheets cell limit
-          const scaleSize = MAX_WIDTH / img.width;
-          canvas.width = MAX_WIDTH;
-          canvas.height = img.height * scaleSize;
-          
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          // Compress to extremely low quality JPEG to stay under 50k chars
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
-          textEl.textContent = file.name + ' (Ready)';
-          callback(compressedBase64);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  handleFile(document.getElementById('photo'), document.getElementById('photo-drop'), document.getElementById('photoText'), res => photoData = res);
-  // FIX: Missing payment file handler!
-  handleFile(document.getElementById('payment-proof'), document.getElementById('payment-drop'), document.getElementById('payment-text'), res => paymentData = res);
-  
   // Copy to clipboard helper
   function copyToClipboard(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
