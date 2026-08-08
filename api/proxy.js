@@ -1230,7 +1230,7 @@ export default async function handler(req, res) {
 
     // FORGE: Leaderboard
     if (action === 'forge_get_leaderboard') {
-      const members = await Member.find({ status: { $in: ['Approved', 'Confirmed'] } })
+      const members = await Member.find({ status: { $in: ['Approved', 'Confirmed'] }, forgeAccess: 'Granted' })
         .sort({ xp: -1 })
         .limit(50)
         .lean();

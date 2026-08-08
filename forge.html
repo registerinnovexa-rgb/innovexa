@@ -880,7 +880,18 @@
           return;
         }
 
-        (data.leaderboard || data.data || []).forEach((user, index) => {
+        // Only show members with Forge Access granted
+        const grantedUsers = (data.leaderboard || data.data || []).filter(u => {
+          const access = String(u.forgeAccess || u.access || '').trim().toLowerCase();
+          return access === 'granted' || access === 'approved' || access === 'active';
+        });
+
+        if (grantedUsers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:16px;">No data available.</td></tr>';
+          return;
+        }
+
+        grantedUsers.forEach((user, index) => {
           let rankClass = '';
           let rankIcon = `#${index + 1}`;
           if (index === 0) { rankIcon = '🥇 1st'; rankClass = 'lb-rank-1'; }
