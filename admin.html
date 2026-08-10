@@ -5404,21 +5404,30 @@ function populateSessionTargeting(selectedOps = []) {
   }).join('');
 }
 
-function openCreateSessionModal() {
+async function openCreateSessionModal() {
   editingEventId = null;
   document.getElementById('evTitle').value = '';
   document.getElementById('evDate').value = '';
   document.getElementById('evType').value = 'Session';
   if (mdeEventDesc) mdeEventDesc.value('');
   resetEvImgUploader([]);
+  
+  if (!cachedMembers || cachedMembers.length === 0) {
+    document.getElementById('evTargetingContainer').innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;">Loading operatives...</div>';
+    try {
+      const data = await apiGet('adminMembers');
+      cachedMembers = data.members || [];
+    } catch(e) { console.error(e); }
+  }
   populateSessionTargeting([]);
+  
   document.querySelector('#modalCreateSession h2').textContent = 'Initialize New Session';
   document.querySelector('#modalCreateSession .btn-save').textContent = 'Initialize Session';
   document.getElementById('modalCreateSession').classList.add('open');
   if (mdeEventDesc) setTimeout(() => mdeEventDesc.codemirror.refresh(), 100);
 }
 
-function openEditEventModal(id) {
+async function openEditEventModal(id) {
   // We keep the name openEditEventModal if it's called elsewhere, or we rename it to openEditSessionModal
   // Note: the previous patch might have missed some currentEvents renames.
   const ev = (window.currentEvents || window.currentSessions || []).find(e => (e.sessionId || e.eventId) === id);
@@ -5433,6 +5442,14 @@ function openEditEventModal(id) {
   try { existingImgs = JSON.parse(ev.imageUrls || '[]'); } catch(e) { existingImgs = ev.coverUrl ? [ev.coverUrl] : []; }
   if (!existingImgs.length && ev.coverUrl) existingImgs = [ev.coverUrl];
   resetEvImgUploader(existingImgs);
+  
+  if (!cachedMembers || cachedMembers.length === 0) {
+    document.getElementById('evTargetingContainer').innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;">Loading operatives...</div>';
+    try {
+      const data = await apiGet('adminMembers');
+      cachedMembers = data.members || [];
+    } catch(e) { console.error(e); }
+  }
   
   populateSessionTargeting(ev.allowedOperatives || []);
   
