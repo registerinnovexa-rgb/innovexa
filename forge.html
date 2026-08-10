@@ -880,7 +880,7 @@
       loader.style.display = 'block';
 
       try {
-        const data = await gasGet('forge_get_leaderboard');
+        const data = await gasGet('forge_get_leaderboard', {}, { forceRefresh: true });
         loader.style.display = 'none';
 
         if (!data.success || !data.leaderboard && !data.data || (data.leaderboard || data.data || []).length === 0) {
