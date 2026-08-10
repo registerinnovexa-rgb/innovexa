@@ -1770,6 +1770,24 @@ export default async function handler(req, res) {
       const resources = await Resource.find({}).sort({ timestamp: -1 }).lean();
       return res.status(200).json({ success: true, resources: resources });
     }
+    if (action === 'admin_add_resource') {
+      const { title, category, url } = payload;
+      if (!title || !url) return res.status(200).json({ success: false, message: 'Title and URL are required.' });
+      const newResource = new Resource({
+        resourceId: 'RES-' + Date.now(),
+        timestamp: new Date(),
+        title, category: category || 'General', url,
+        addedBy: payload.adminId || 'admin'
+      });
+      await newResource.save();
+      return res.status(200).json({ success: true, message: 'Resource added.' });
+    }
+    if (action === 'admin_delete_resource') {
+      const { id } = payload;
+      if (!id) return res.status(200).json({ success: false, message: 'Resource ID required.' });
+      await Resource.deleteOne({ resourceId: id });
+      return res.status(200).json({ success: true, message: 'Resource deleted.' });
+    }
 
     // FORGE: Bounties
     if (action === 'forge_get_bounties') {

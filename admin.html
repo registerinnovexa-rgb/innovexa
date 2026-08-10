@@ -5143,9 +5143,9 @@ function renderForgeResourcesAdmin() {
   forgeCachedResources.forEach(r => {
     html += `<tr>
       <td>${escHtml(r.title)}</td>
-      <td>${escHtml(r.category)}</td>
-      <td><a href="${escHtml(r.link)}" target="_blank" style="color:var(--blue);">View Link</a></td>
-      <td><button class="btn-sm btn-reject" onclick="adminDeleteResource('${r.id}')">Delete</button></td>
+      <td>${escHtml(r.category || 'General')}</td>
+      <td><a href="${escHtml(r.url)}" target="_blank" style="color:var(--blue);">View Link</a></td>
+      <td><button class="btn-sm btn-reject" onclick="adminDeleteResource('${r.resourceId}')">Delete</button></td>
     </tr>`;
   });
   tbody.innerHTML = html;
@@ -5160,7 +5160,7 @@ async function adminAddResource() {
   
   try {
     showToast('Adding Resource...', 'info');
-    await apiWrite('admin_add_resource', { title, category, link });
+    await apiWrite('admin_add_resource', { title, category, url: link });
     showToast('Resource Added!', 'success');
     document.getElementById('resTitle').value = '';
     document.getElementById('resCategory').value = '';
@@ -5232,7 +5232,7 @@ async function loadSessions() {
     const res = await apiGet('admin_get_sessions'); // Using existing apiGet
     if (!res.success) throw new Error(res.message);
     
-    currentEvents = res.events || [];
+    currentEvents = res.sessions || res.events || res.data || [];
     tbody.innerHTML = '';
     
     if (currentEvents.length === 0) {
@@ -5379,12 +5379,13 @@ let editingEventId = null;
 
 function populateSessionTargeting(selectedOps = []) {
   const container = document.getElementById('evTargetingContainer');
-  if (!currentMembers || currentMembers.length === 0) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;">No operatives available</div>';
+  const members = cachedMembers || [];
+  if (members.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:12px;">No operatives loaded — open Members tab first.</div>';
     return;
   }
-  container.innerHTML = currentMembers.map(m => {
-    const isChecked = selectedOps.includes(m.operativeId) ? 'checked' : '';
+  container.innerHTML = members.map(m => {
+    const isChecked = (selectedOps || []).includes(m.operativeId) ? 'checked' : '';
     return `
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;padding:4px;border-radius:4px;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
         <input type="checkbox" class="session-target-cb" value="${escHtml(m.operativeId)}" ${isChecked}>
