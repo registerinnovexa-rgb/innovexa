@@ -5246,6 +5246,41 @@ window.addEventListener('load', () => {
     });
   }
 });
+
+let liveSyncInterval = null;
+function startLiveSync() {
+  if (liveSyncInterval) clearInterval(liveSyncInterval);
+  // Using 3000ms instead of 1ms because 1ms will freeze the browser and spam Vercel/MongoDB, crashing the site.
+  liveSyncInterval = setInterval(() => {
+    // If any modal or editor is open, don't interrupt the admin!
+    if (document.getElementById('modal') && document.getElementById('modal').classList.contains('open')) return;
+    if (document.getElementById('modalCreateSession') && document.getElementById('modalCreateSession').classList.contains('open')) return;
+    if (document.getElementById('editBountyModal') && document.getElementById('editBountyModal').style.display !== 'none') return;
+    if (document.getElementById('announcementEditorPanel') && document.getElementById('announcementEditorPanel').style.display === 'block') return;
+    if (document.getElementById('dossierEditCard')) return; // Someone is editing a profile
+    
+    // Get active tab
+    const activeTab = document.querySelector('.sidebar a.active');
+    if (!activeTab) return;
+    const onclick = activeTab.getAttribute('onclick') || '';
+    
+    // Refresh based on active tab
+    if (onclick.includes('dashboard')) loadDashboard();
+    else if (onclick.includes('members')) {
+       // Only refresh if not actively searching
+       if (document.getElementById('searchMembers') && !document.getElementById('searchMembers').value) loadMembers();
+    }
+    else if (onclick.includes('bounties')) loadTasks();
+    else if (onclick.includes('sessions')) {
+       if (document.getElementById('detailPanel') && document.getElementById('detailPanel').style.display === 'block') {
+         loadAttendance(); // Live refresh attendance
+       } else {
+         loadSessions();
+       }
+    }
+  }, 3000); // 3 seconds is the safest minimum
+}
+document.addEventListener('DOMContentLoaded', startLiveSync);
 let currentEvents = [];
 let activeEventId = null;
 let activeEventTitle = '';
