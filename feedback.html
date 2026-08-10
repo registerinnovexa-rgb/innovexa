@@ -148,6 +148,20 @@
 
   <script src="/js/api.js"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const sessionStr = localStorage.getItem('forge_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          if (session && session.operativeId) {
+            document.getElementById('opId').value = session.operativeId;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse forge_session from localStorage", e);
+      }
+    });
+
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
