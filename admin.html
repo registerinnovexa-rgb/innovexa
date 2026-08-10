@@ -979,6 +979,19 @@
         </div>
       </div>
 
+      <!-- Manual Attendance with OTP -->
+      <div style="background:var(--bg2); padding:16px; border:1px solid var(--border); border-radius:8px; margin-bottom:20px;">
+        <h4 style="margin-bottom:8px; font-size:14px; color:var(--text);">Manual Attendance Entry (OTP Required)</h4>
+        <div style="display:flex; gap:12px; margin-bottom:8px;">
+          <input type="text" id="manualOpId" placeholder="Operative ID (e.g. INVX-01)" style="flex:1; padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px; text-transform:uppercase;">
+          <button class="btn-outline" style="border-color:var(--border2); color:var(--text2);" onclick="requestManualOtp()">Send OTP</button>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <input type="text" id="manualOtp" placeholder="Enter 6-digit OTP" style="flex:1; padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+          <button class="btn-save" onclick="submitManualAttendance()">Verify & Add</button>
+        </div>
+      </div>
+
       <h3 style="font-size:16px; margin-bottom:12px; font-family:var(--font-b); color:var(--text2);">Live Attendance Roster</h3>
       <div class="table-wrap" style="max-height:300px;">
         <table class="data-table">
@@ -5565,6 +5578,42 @@ async function removeAttendance(sessionId, operativeId) {
   } catch(e) {
     showToast('Network error', 'error');
   }
+}
+
+async function requestManualOtp() {
+  const opId = document.getElementById('manualOpId').value.trim().toUpperCase();
+  if(!opId) return showToast('Enter Operative ID first', 'error');
+  try {
+    const res = await apiWrite('forge_request_otp', { invxId: opId });
+    if(res.success) {
+      showToast('OTP sent to member email', 'success');
+    } else {
+      showToast(res.message || 'Failed to send OTP', 'error');
+    }
+  } catch(e) { showToast('Error sending OTP', 'error'); }
+}
+
+async function submitManualAttendance() {
+  const opId = document.getElementById('manualOpId').value.trim().toUpperCase();
+  const otp = document.getElementById('manualOtp').value.trim();
+  if(!opId || !otp) return showToast('Enter Operative ID and OTP', 'error');
+  
+  try {
+    const res = await apiWrite('admin_manual_attendance_verify', {
+      sessionId: activeEventId,
+      operativeId: opId,
+      otp: otp
+    });
+    
+    if(res.success) {
+      showToast('Verified and added!', 'success');
+      document.getElementById('manualOpId').value = '';
+      document.getElementById('manualOtp').value = '';
+      loadAttendance();
+    } else {
+      showToast(res.message || 'Verification failed', 'error');
+    }
+  } catch(e) { showToast('Error verifying OTP', 'error'); }
 }
 
 // ── Scanner Logic ──

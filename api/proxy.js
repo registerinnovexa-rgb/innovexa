@@ -2326,6 +2326,32 @@ export default async function handler(req, res) {
       const regs = await Attendance.find({ sessionId: id }).lean();
       return res.status(200).json({ success: true, regs });
     }
+    if (action === 'admin_manual_attendance_verify') {
+      const { sessionId, operativeId, otp } = payload;
+      if (!sessionId || !operativeId || !otp) return res.status(400).json({ success: false, message: 'Missing parameters.' });
+      
+      const member = await Member.findOne({ operativeId: operativeId.toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+      
+      if (!member.otp || member.otp !== otp || Date.now() - (member.otpTime || 0) > 15 * 60 * 1000) {
+        return res.status(200).json({ success: false, message: 'Invalid or expired OTP.' });
+      }
+      
+      // Clear OTP
+      member.otp = '';
+      await member.save();
+      
+      // Mark attendance
+      const existing = await Attendance.findOne({ sessionId, operativeId: operativeId.toUpperCase() });
+      if (existing) {
+        existing.status = 'Attended';
+        await existing.save();
+      } else {
+        await Attendance.create({ eventId: sessionId, sessionId, operativeId: operativeId.toUpperCase(), status: 'Attended', timestamp: new Date() });
+      }
+      
+      return res.status(200).json({ success: true, message: 'Attendance marked via OTP verification.' });
+    }
     if (action === 'admin_log_attendance' || action === 'markAttendance') {
       const operativeId = payload.operativeId;
       // Accept sessionId directly OR eventName/sessionName
