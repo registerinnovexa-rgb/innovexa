@@ -983,7 +983,9 @@
       <div style="background:var(--bg2); padding:16px; border:1px solid var(--border); border-radius:8px; margin-bottom:20px;">
         <h4 style="margin-bottom:8px; font-size:14px; color:var(--text);">Manual Attendance Entry (OTP Required)</h4>
         <div style="display:flex; gap:12px; margin-bottom:8px;">
-          <input type="text" id="manualOpId" placeholder="Operative ID (e.g. INVX-01)" style="flex:1; padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px; text-transform:uppercase;">
+          <select id="manualOpId" style="flex:1; padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px;">
+            <option value="">Select Operative...</option>
+          </select>
           <button class="btn-outline" style="border-color:var(--border2); color:var(--text2);" onclick="requestManualOtp()">Send OTP</button>
         </div>
         <div style="display:flex; gap:12px;">
@@ -3373,17 +3375,28 @@ function renderPaginatedMembers() {
 
 function populateOperativeDatalist() {
   const datalist = document.getElementById('operativeList');
-  if (!datalist) return;
-  datalist.innerHTML = '<option value="Open">Open (Anyone)</option>';
+  const manualSel = document.getElementById('manualOpId');
+  if (datalist) datalist.innerHTML = '<option value="Open">Open (Anyone)</option>';
+  if (manualSel && manualSel.tagName.toLowerCase() === 'select') {
+    manualSel.innerHTML = '<option value="">Select Operative...</option>';
+  }
   
   if (cachedMembers && cachedMembers.length > 0) {
     const approved = cachedMembers.filter(m => m.status === 'Approved' || m.status === 'Confirmed');
     approved.forEach(m => {
       if (m.operativeId) {
-        const option = document.createElement('option');
-        option.value = m.operativeId;
-        option.textContent = `${m.name} (${m.operativeId})`;
-        datalist.appendChild(option);
+        if (datalist) {
+          const option = document.createElement('option');
+          option.value = m.operativeId;
+          option.textContent = `${m.name} (${m.operativeId})`;
+          datalist.appendChild(option);
+        }
+        if (manualSel && manualSel.tagName.toLowerCase() === 'select') {
+          const manualOption = document.createElement('option');
+          manualOption.value = m.operativeId;
+          manualOption.textContent = `${m.name} (${m.operativeId})`;
+          manualSel.appendChild(manualOption);
+        }
       }
     });
   }
