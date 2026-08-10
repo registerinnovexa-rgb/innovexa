@@ -3382,8 +3382,7 @@ function populateOperativeDatalist() {
   }
   
   if (cachedMembers && cachedMembers.length > 0) {
-    const approved = cachedMembers.filter(m => m.status === 'Approved' || m.status === 'Confirmed');
-    approved.forEach(m => {
+    cachedMembers.forEach(m => {
       if (m.operativeId) {
         if (datalist) {
           const option = document.createElement('option');
@@ -5557,15 +5556,19 @@ async function loadAttendance() {
       if(currentAttendance.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No operatives logged yet.</td></tr>';
       } else {
-        tbody.innerHTML = currentAttendance.map(a => `
+        tbody.innerHTML = currentAttendance.map(a => {
+          const member = cachedMembers.find(m => m.operativeId === a.operativeId) || {};
+          const name = member.name || 'Unknown';
+          return `
           <tr>
             <td style="text-align: center;"><input type="checkbox" class="att-checkbox" value="${a.operativeId}"></td>
             <td style="font-family:monospace;color:var(--accent);">${escHtml(a.operativeId)}</td>
-            <td><strong>${escHtml(a.operativeName)}</strong></td>
+            <td><strong>${escHtml(name)}</strong></td>
             <td style="font-size:12px;color:var(--text3);">${new Date(a.timestamp).toLocaleTimeString()}</td>
             <td><button class="btn-cancel" style="padding:4px 8px; font-size:12px; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="removeAttendance('${activeEventId}', '${escHtml(a.operativeId)}')">Remove</button></td>
           </tr>
-        `).join('');
+          `;
+        }).join('');
       }
     }
   } catch(e) {
