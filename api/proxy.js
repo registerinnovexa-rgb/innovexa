@@ -283,6 +283,7 @@ export default async function handler(req, res) {
       
       const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Operative ID not found.' });
+      if (member.forgeAccess !== 'Granted') return res.status(200).json({ success: false, message: 'Access Denied: You do not have Forge Access.' });
       if (!member.email) return res.status(200).json({ success: false, message: 'No email associated with this ID.' });
 
       // OTP Rate Limiting: check if a recent OTP was already sent

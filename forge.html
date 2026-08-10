@@ -403,12 +403,16 @@
         const raw = localStorage.getItem('forge_session');
         if (raw) {
           const stored = JSON.parse(raw);
-          // Check if session is less than 7 days old
+          // Check if session is less than 7 days old AND has Granted access
           if (stored.operativeId && stored.timestamp && (new Date().getTime() - stored.timestamp < 7 * 24 * 60 * 60 * 1000)) {
-            session = stored;
-            bootDashboard();
-            resetIdleTimer();
-            return;
+             if (stored.access === 'Granted') {
+                session = stored;
+                bootDashboard();
+                resetIdleTimer();
+                return;
+             } else {
+                localStorage.removeItem('forge_session');
+             }
           } else {
             // Expired or invalid session
             localStorage.removeItem('forge_session');
@@ -518,18 +522,22 @@
         const res = await r.json();
         
         if (res.success && res.data) {
-           toast('Authentication successful.', 'success');
-           
-           // Create session
-           session = {
-              timestamp: new Date().getTime(),
-              ...res.data
-           };
-           localStorage.setItem('forge_session', JSON.stringify(session));
-           
-           resetIdleTimer();
-           // Boot Dashboard
-           bootDashboard();
+           if (res.data.access !== 'Granted') {
+              err.textContent = 'Access Denied. You do not have Forge Access.';
+           } else {
+               toast('Authentication successful.', 'success');
+               
+               // Create session
+               session = {
+                  timestamp: new Date().getTime(),
+                  ...res.data
+               };
+               localStorage.setItem('forge_session', JSON.stringify(session));
+               
+               resetIdleTimer();
+               // Boot Dashboard
+               bootDashboard();
+           }
         } else {
            err.textContent = res.message || 'Authentication failed.';
         }
