@@ -5551,7 +5551,7 @@ async function loadAttendance() {
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Fetching roster...</td></tr>';
   
   try {
-    const res = await apiGet('admin_get_attendance&sessionId=' + activeEventId);
+    const res = await apiGet('admin_get_attendance', { sessionId: activeEventId });
     if(res.success) {
       currentAttendance = res.attendance || [];
       if(currentAttendance.length === 0) {
