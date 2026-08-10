@@ -5549,8 +5549,16 @@ async function loadAttendance() {
   const tbody = document.getElementById('attendanceTbody');
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Fetching roster...</td></tr>';
   
+  if (!cachedMembers || cachedMembers.length === 0) {
+    try {
+      const mRes = await apiGet('adminMembers');
+      cachedMembers = mRes.members || [];
+      populateOperativeDatalist();
+    } catch(e) { console.error('Failed to load members for roster', e); }
+  }
+
   try {
-    const res = await apiGet('admin_get_attendance', { sessionId: activeEventId });
+    const res = await apiGet('admin_get_attendance', { sessionId: activeEventId }, { forceRefresh: true });
     if(res.success) {
       currentAttendance = res.attendance || [];
       if(currentAttendance.length === 0) {
