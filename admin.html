@@ -878,58 +878,67 @@
 
   <!-- Session Create Modal -->
   <div class="modal-overlay" id="modalCreateSession">
-    <div class="modal-box">
-      <h2 style="color:var(--accent2)">Schedule Session</h2>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Session Title</label>
-        <input type="text" id="evTitle" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
-      </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Date</label>
-        <input type="date" id="evDate" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
-      </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Target Audience (Optional)</label>
-        <div id="evTargetingContainer" style="max-height:150px;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px;">
-          <div style="color:var(--text3);font-size:12px;text-align:center;">Loading operatives...</div>
+    <div class="modal-box" style="max-width:850px; padding: 32px;">
+      <h2 style="color:var(--accent2); margin-bottom: 24px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">Schedule Session</h2>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <!-- Left Column -->
+        <div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Session Title</label>
+            <input type="text" id="evTitle" style="width:100%; padding:12px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:4px; font-family:var(--font-m);">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom:20px;">
+            <div class="form-group">
+              <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Date</label>
+              <input type="date" id="evDate" style="width:100%; padding:12px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:4px; font-family:var(--font-m);">
+            </div>
+            <div class="form-group">
+              <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Type</label>
+              <select id="evType" style="width:100%; padding:12px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:4px; font-family:var(--font-m);">
+                <option value="Session">Forge Session</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom:20px;">
+            <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Event Images <span style="opacity:0.5; text-transform:none; font-weight:normal;">(upload multiple)</span></label>
+            <div id="evImgDropZone" style="border:1px dashed var(--border2); border-radius:4px; padding:24px; text-align:center; cursor:pointer; background:var(--bg2); transition: border-color 0.2s;"
+                 onclick="document.getElementById('evImgInput').click()"
+                 ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+                 ondragleave="this.style.borderColor='var(--border2)'"
+                 ondrop="handleEvImgDrop(event)">
+              <div style="font-size:24px; margin-bottom:8px;">🖼️</div>
+              <div style="font-size:13px; color:var(--text3);">Click or drag &amp; drop images</div>
+              <div style="font-size:11px; color:var(--text3); margin-top:4px; opacity:0.6;">JPG, PNG, GIF, WEBP</div>
+            </div>
+            <input type="file" id="evImgInput" multiple accept="image/*" style="display:none;" onchange="handleEvImgFiles(this.files)">
+            <div id="evImgPreviews" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;"></div>
+            <div id="evImgStatus" style="font-size:12px; color:var(--text3); margin-top:6px;"></div>
+            <input type="hidden" id="evImageUrls" value="[]">
+            <input type="hidden" id="evCover" value="">
+          </div>
         </div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px;">Select specific operatives to make this a private session. Leave all unchecked for public.</div>
-      </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Type</label>
-        <select id="evType" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;">
-          <option value="Session">Forge Session</option>
-        </select>
-      </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:6px;display:block;">Description</label>
-        <textarea id="evDesc" rows="3" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;"></textarea>
-      </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="font-size:12px;color:var(--text3);margin-bottom:8px;display:block;">Event Images <span style="opacity:0.5;">(upload multiple)</span></label>
 
-        <!-- Drop zone / file picker -->
-        <div id="evImgDropZone" style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--bg2);"
-             onclick="document.getElementById('evImgInput').click()"
-             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-             ondragleave="this.style.borderColor='var(--border)'"
-             ondrop="handleEvImgDrop(event)">
-          <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
-          <div style="font-size:13px;color:var(--text3);">Click or drag &amp; drop images here</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px;opacity:0.6;">JPG, PNG, GIF, WEBP — multiple allowed</div>
+        <!-- Right Column -->
+        <div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Target Audience (Optional)</label>
+            <div id="evTargetingContainer" style="max-height:220px; overflow-y:auto; background:var(--bg2); border:1px solid var(--border); border-radius:4px; padding:8px; display:flex; flex-direction:column; gap:4px; text-align:left;">
+              <div style="color:var(--text3); font-size:12px; padding: 4px;">Loading operatives...</div>
+            </div>
+            <div style="font-size:11px; color:var(--text3); margin-top:6px;">Select specific operatives to make this a private session. Leave all unchecked for public.</div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom:20px;">
+            <label style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text3); margin-bottom:8px; display:block;">Description</label>
+            <textarea id="evDesc" rows="4" style="width:100%; padding:12px; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:4px; font-family:var(--font-m);"></textarea>
+          </div>
         </div>
-        <input type="file" id="evImgInput" multiple accept="image/*" style="display:none;" onchange="handleEvImgFiles(this.files)">
-
-        <!-- Upload progress & thumbnails -->
-        <div id="evImgPreviews" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;"></div>
-        <div id="evImgStatus" style="font-size:12px;color:var(--text3);margin-top:6px;"></div>
-
-        <!-- Hidden: stores final uploaded URLs as JSON array -->
-        <input type="hidden" id="evImageUrls" value="[]">
-        <!-- Legacy single cover URL (kept for backward compat) -->
-        <input type="hidden" id="evCover" value="">
       </div>
-      <div class="modal-actions">
+      
+      <div class="modal-actions" style="margin-top:16px; border-top: 1px solid var(--border); padding-top: 24px;">
         <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
         <button class="btn-save" onclick="submitCreateSession(this)">Initialize Event</button>
       </div>
@@ -5387,9 +5396,9 @@ function populateSessionTargeting(selectedOps = []) {
   container.innerHTML = members.map(m => {
     const isChecked = (selectedOps || []).includes(m.operativeId) ? 'checked' : '';
     return `
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;padding:4px;border-radius:4px;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
-        <input type="checkbox" class="session-target-cb" value="${escHtml(m.operativeId)}" ${isChecked}>
-        <span>${escHtml(m.name)} <span style="color:var(--text3);font-size:11px;">(${escHtml(m.operativeId)})</span></span>
+      <label style="display:flex; justify-content:flex-start; align-items:center; gap:12px; font-size:13px; color:var(--text); cursor:pointer; padding:8px 12px; border-radius:4px; text-align:left; line-height:1;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <input type="checkbox" class="session-target-cb" value="${escHtml(m.operativeId)}" ${isChecked} style="margin:0;">
+        <span>${escHtml(m.name)} <span style="color:var(--text3);font-size:11px;margin-left:4px;">(${escHtml(m.operativeId)})</span></span>
       </label>
     `;
   }).join('');
