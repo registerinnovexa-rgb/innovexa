@@ -1763,7 +1763,7 @@ function switchAdminTab(tab) {
   if (tab === 'overview') loadOverview();
   if (tab === 'members') loadMembers();
   if (tab === 'forgeOps') switchForgeSubTab('access');
-  if (tab === 'events') loadSessions();
+  if (tab === 'sessions' || tab === 'events') loadSessions();
   if (tab === 'surveillance') loadAuditLogs();
   if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
   if (tab === 'sysSettings') loadSettings();
