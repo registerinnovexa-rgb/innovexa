@@ -126,6 +126,7 @@ const AttendanceSchema = new mongoose.Schema({
 export const Attendance = mongoose.models.Attendance || mongoose.model('Attendance', AttendanceSchema);
 
 const FeedbackSchema = new mongoose.Schema({
+  eventId: String,
   operativeId: String,
   name: String,
   comment: String,

@@ -1242,7 +1242,8 @@ export default async function handler(req, res) {
         xp: m.xp,
         rank: m.rank,
         role: m.forgeRole,
-        squad: m.squad
+        squad: m.squad,
+        forgeAccess: m.forgeAccess
       }));
       
       return res.status(200).json({ success: true, data: lb });
@@ -1943,6 +1944,22 @@ export default async function handler(req, res) {
       const query = eventId ? { eventId } : {};
       const fb = await Feedback.find(query).sort({ timestamp: -1 }).lean();
       return res.status(200).json({ success: true, data: fb, feedback: fb });
+    }
+    if (action === 'public_submit_feedback') {
+      const { eventId, operativeId, rating, comments } = payload;
+      if (!eventId || !operativeId || !rating) return res.status(400).json({ success: false, message: 'Missing fields' });
+      
+      const member = await Member.findOne({ operativeId: operativeId.toUpperCase() });
+      const newFb = new Feedback({
+        eventId,
+        operativeId: operativeId.toUpperCase(),
+        name: member ? member.name : 'Unknown',
+        comment: comments,
+        rating: Number(rating),
+        timestamp: new Date()
+      });
+      await newFb.save();
+      return res.status(200).json({ success: true });
     }
     
     // NEW ADMIN OPS (Tasks/Bounties from Admin Dashboard)

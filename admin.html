@@ -5714,7 +5714,7 @@ async function viewFeedback(sessionId, title) {
   document.getElementById('fbCount').textContent = '0';
   
   try {
-    const res = await apiGet('admin_get_feedback&sessionId=' + sessionId);
+    const res = await apiGet('admin_get_feedback&eventId=' + sessionId);
     if(res.success && res.feedback) {
       const fb = res.feedback;
       document.getElementById('fbCount').textContent = fb.length;

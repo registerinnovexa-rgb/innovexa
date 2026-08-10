@@ -167,7 +167,7 @@
       
       // Get Event ID from URL params
       const urlParams = new URLSearchParams(window.location.search);
-      const eventId = urlParams.get('eventId');
+      const eventId = urlParams.get('eventId') || urlParams.get('session');
       
       if(!eventId) {
         return showToast("Error: Missing Event ID in URL.", "error");
