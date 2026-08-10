@@ -5455,7 +5455,7 @@ async function openCreateSessionModal() {
 async function openEditEventModal(id) {
   // We keep the name openEditEventModal if it's called elsewhere, or we rename it to openEditSessionModal
   // Note: the previous patch might have missed some currentEvents renames.
-  const ev = (window.currentEvents || window.currentSessions || []).find(e => (e.sessionId || e.eventId) === id);
+  const ev = (typeof currentEvents !== 'undefined' ? currentEvents : []).find(e => (e.sessionId || e.eventId) === id);
   if (!ev) return;
   editingEventId = id;
   document.getElementById('evTitle').value = ev.title || '';

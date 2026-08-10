@@ -2303,14 +2303,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Session created.' });
     }
     if (action === 'admin_edit_session' || action === 'editSession') {
-      const { sessionId, title, date, description, status, allowedOperatives } = payload;
+      const { sessionId, title, date, description, status, allowedOperatives, eventType, coverUrl, imageUrls } = payload;
       const ev = await Session.findOne({ sessionId });
       if (!ev) return res.status(200).json({ success: false, message: 'Session not found.' });
-      if (title) ev.title = title;
-      if (date) ev.date = date;
-      if (description) ev.description = description;
-      if (status) ev.status = status;
+      if (title !== undefined) ev.title = title;
+      if (date !== undefined) ev.date = date;
+      if (description !== undefined) ev.description = description;
+      if (status !== undefined) ev.status = status;
       if (allowedOperatives !== undefined) ev.allowedOperatives = allowedOperatives;
+      if (eventType !== undefined) ev.eventType = eventType;
+      if (coverUrl !== undefined) ev.coverUrl = coverUrl;
+      if (imageUrls !== undefined) ev.imageUrls = imageUrls;
       await ev.save();
       return res.status(200).json({ success: true, message: 'Session updated.' });
     }
