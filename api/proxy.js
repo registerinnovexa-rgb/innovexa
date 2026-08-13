@@ -86,7 +86,7 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
             </div>
             <!-- CTA -->
             <div style="padding:0 32px 28px;">
-              <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
+              <a href="https://innovexareg.vercel.app/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
             </div>
             <!-- Footer -->
             <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
@@ -457,7 +457,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -1559,7 +1559,7 @@ export default async function handler(req, res) {
                       <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
                     </div>
                     <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
-                    <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
+                    <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
                   </div>
                   <!-- Footer -->
                   <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
@@ -1599,7 +1599,7 @@ export default async function handler(req, res) {
                     <div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;padding:14px 18px;margin-bottom:24px;">
                       <p style="margin:0;font-size:13px;color:#7f1d1d;">If you believe this is an error or would like to appeal, please contact the Innovexa admin team directly.</p>
                     </div>
-                    <a href="https://innovexa.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#64748b;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
+                    <a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#64748b;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
                   </div>
                   <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
                     <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · This is an automated notification.</p>
@@ -1647,7 +1647,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Role Updated', `
         <p>Your role in the Innovexa Hub has been updated by an administrator.</p>
         <p>New Role: <strong>${role}</strong></p>
-        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Role updated to ' + role });
@@ -1684,7 +1684,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Access Updated', `
         <p>Your access level in the Innovexa Hub has been updated by an administrator.</p>
         <p>Forge Access: <strong>${access}</strong></p>
-        <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Access updated to ' + access });
@@ -1735,7 +1735,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexa.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -2291,7 +2291,7 @@ export default async function handler(req, res) {
                          ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Feedback</td><td style="color:#e2e8f0;font-size:13px;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
+                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
                      <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
                    </div>`
                });
@@ -2330,7 +2330,7 @@ export default async function handler(req, res) {
                          ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Admin Feedback</td><td style="color:#fbbf24;font-size:13px;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexa.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
+                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
                      <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
                    </div>`
                });
@@ -2394,7 +2394,7 @@ export default async function handler(req, res) {
                    <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sent At</td><td style="color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
                  </table>
                </div>
-               <a href="https://innovexa.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
+               <a href="https://innovexareg.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
                <p style="color:#52525b;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub Auto-Notification Engine</p>
              </div>`
          });
