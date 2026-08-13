@@ -1452,7 +1452,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
         faceDescriptors.map(d => new Float32Array(Object.values(d)))
       )
     ];
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.38);
 
     status.textContent = 'Starting camera...';
     faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
