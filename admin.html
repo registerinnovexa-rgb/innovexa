@@ -3551,9 +3551,11 @@ async function loadOverview() {
 // ══════════════════════════════════════════════════════════════
 //  MEMBERS
 // ══════════════════════════════════════════════════════════════
-async function loadMembers() {
-  document.getElementById('membersLoading').style.display = 'flex';
-  document.getElementById('membersTable').style.display = 'none';
+async function loadMembers(isSilent = false) {
+  if (!isSilent) {
+    document.getElementById('membersLoading').style.display = 'flex';
+    document.getElementById('membersTable').style.display = 'none';
+  }
   try {
     const data = await apiGet('adminMembers');
     if (!data || !data.success) throw new Error((data && data.message) || 'Bad response from server');
@@ -5504,17 +5506,17 @@ function startLiveSync() {
     const onclick = activeTab.getAttribute('onclick') || '';
     
     // Refresh based on active tab
-    if (onclick.includes('dashboard')) loadDashboard();
+    if (onclick.includes('dashboard')) loadOverview();
     else if (onclick.includes('members')) {
        // Only refresh if not actively searching
-       if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers();
+       if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers(true);
     }
-    else if (onclick.includes('bounties')) loadTasks();
+    else if (onclick.includes('bounties')) loadForgeTasks();
     else if (onclick.includes('sessions')) {
        if (document.getElementById('detailPanel') && document.getElementById('detailPanel').style.display === 'block') {
-         loadAttendance(); // Live refresh attendance
+         loadAttendance(true); // Live refresh attendance
        } else {
-         loadSessions();
+         loadSessions(true);
        }
     }
   }, 3000); // 3 seconds is the safest minimum
@@ -5532,9 +5534,9 @@ function closeSessionModal() {
   stopScanner();
 }
 
-async function loadSessions() {
+async function loadSessions(isSilent = false) {
   const tbody = document.getElementById('sessionsListTbody');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
   
   try {
     const res = await apiGet('admin_get_sessions'); // Using existing apiGet
@@ -5819,9 +5821,9 @@ async function openSessionDash(id) {
   loadAttendance();
 }
 
-async function loadAttendance() {
+async function loadAttendance(isSilent = false) {
   const tbody = document.getElementById('attendanceTbody');
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Fetching roster...</td></tr>';
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;">Fetching roster...</td></tr>';
   
   if (!cachedMembers || cachedMembers.length === 0) {
     try {
