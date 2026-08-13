@@ -3044,7 +3044,7 @@ async function executeGlobalSearch() {
     // We'll show a toast and load the Member tab if members were found.
     showToast(msg, 'success');
     if (members.length > 0) {
-      document.getElementById('searchMembers').value = query;
+      document.getElementById('memberSearch').value = query;
       switchAdminTab('members');
       fetchMembers();
     }
@@ -5508,7 +5508,7 @@ function startLiveSync() {
     if (onclick.includes('dashboard')) loadDashboard();
     else if (onclick.includes('members')) {
        // Only refresh if not actively searching
-       if (document.getElementById('searchMembers') && !document.getElementById('searchMembers').value) loadMembers();
+       if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers();
     }
     else if (onclick.includes('bounties')) loadTasks();
     else if (onclick.includes('sessions')) {
