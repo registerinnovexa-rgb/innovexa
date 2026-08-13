@@ -1157,8 +1157,14 @@ export default async function handler(req, res) {
       if (!invxId || !faceToken) return res.status(200).json({ success: false, message: 'Missing token or credentials.' });
 
       const cfg = await PlatformSettings.findOne({ key: 'global' });
-      if (!cfg || cfg.adminFaceToken !== faceToken || cfg.adminFacePendingUser !== invxId.toUpperCase()) {
-        return res.status(200).json({ success: false, message: 'Invalid or expired face token.' });
+      if (!cfg) {
+        return res.status(200).json({ success: false, message: 'Invalid or expired face token (cfg missing).' });
+      }
+      if (cfg.adminFaceToken !== faceToken) {
+        return res.status(200).json({ success: false, message: 'Invalid or expired face token (mismatch).' });
+      }
+      if (cfg.adminFacePendingUser !== invxId.toUpperCase()) {
+        return res.status(200).json({ success: false, message: 'Invalid or expired face token (user mismatch).' });
       }
       if (Date.now() - (cfg.adminFaceTokenTime || 0) > 5 * 60 * 1000) {
         return res.status(200).json({ success: false, message: 'Face session expired.' });

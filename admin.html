@@ -1478,7 +1478,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
             status.style.color = '#10b981'; // green
             
             // Call backend
-            const res = await apiGet('admin_verify_face', { invxId, faceToken });
+            const res = await apiPost('admin_verify_face', { invxId, faceToken });
             if (res.success) {
               adminSession = {
                 id: res.data.operativeId,
