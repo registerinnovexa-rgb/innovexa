@@ -3978,14 +3978,14 @@ function openProfileModal(encodedData) {
   const saveBtn = document.getElementById('modalSave');
   saveBtn.style.display = 'block';
   saveBtn.innerText = '💾 Save Changes';
-  saveBtn.onclick = () => adminUpdateProfile(m.rowIndex);
+  saveBtn.onclick = () => adminUpdateProfile(m.operativeId);
 
   document.getElementById('modal').classList.add('open');
   document.getElementById('modal').style.display = '';
 }
 
 
-async function adminUpdateProfile(rowIndex) {
+async function adminUpdateProfile(operativeId) {
   const squad = document.getElementById('profSquad').value;
   const rank = document.getElementById('profRank').value;
   const xp = document.getElementById('profXP').value;
@@ -3997,7 +3997,7 @@ async function adminUpdateProfile(rowIndex) {
   btn.disabled = true;
   
   try {
-    const res = await apiWrite('admin_update_profile', { rowIndex, squad, rank, xp, forgeAccess });
+    const res = await apiWrite('admin_update_profile', { operativeId, squad, rank, xp, forgeAccess });
     if (res.success) {
       showToast('Profile updated!', 'success');
       closeModal();
