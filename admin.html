@@ -1591,7 +1591,7 @@ async function captureAndRegisterFace() {
   btn.textContent = 'Saving...';
   
   try {
-    const res = await apiGet('admin_register_face', {
+    const res = await apiPost('admin_register_face', {
       invxId: adminSession.id,
       descriptor: Array.from(faceRegCurrentDescriptor)
     });

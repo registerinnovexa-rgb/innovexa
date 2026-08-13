@@ -1086,7 +1086,11 @@ export default async function handler(req, res) {
           if (m && m.faceDescriptor) {
             try {
               faceDescriptors = JSON.parse(m.faceDescriptor);
-              if (!Array.isArray(faceDescriptors)) faceDescriptors = [];
+              if (Array.isArray(faceDescriptors)) {
+                faceDescriptors = faceDescriptors.filter(d => Array.isArray(d) && d.length > 0);
+              } else {
+                faceDescriptors = [];
+              }
             } catch(e) {
               faceDescriptors = [];
             }
@@ -1096,7 +1100,11 @@ export default async function handler(req, res) {
           if (cfg && cfg.adminMasterFaceDescriptor) {
             try {
               faceDescriptors = JSON.parse(cfg.adminMasterFaceDescriptor);
-              if (!Array.isArray(faceDescriptors)) faceDescriptors = [];
+              if (Array.isArray(faceDescriptors)) {
+                faceDescriptors = faceDescriptors.filter(d => Array.isArray(d) && d.length > 0);
+              } else {
+                faceDescriptors = [];
+              }
             } catch(e) {
               faceDescriptors = [];
             }
@@ -1207,6 +1215,7 @@ export default async function handler(req, res) {
           if (cfg.adminMasterFaceDescriptor) {
             existingFaces = JSON.parse(cfg.adminMasterFaceDescriptor);
             if (!Array.isArray(existingFaces)) existingFaces = [];
+            existingFaces = existingFaces.filter(d => Array.isArray(d) && d.length > 0);
           }
         } catch(e) {}
         existingFaces.push(descriptor);
