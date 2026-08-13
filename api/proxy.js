@@ -1160,6 +1160,41 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, requireOtp: true, message: 'OTP sent to admin email.' });
     }
 
+    if (action === 'admin_init_face_login') {
+      const faceToken = Math.random().toString(36).substring(2, 15);
+      await PlatformSettings.findOneAndUpdate(
+        { key: 'global' },
+        { $set: { adminFaceToken: faceToken, adminFaceTokenTime: Date.now(), adminFacePendingUser: 'ANY' } },
+        { upsert: true }
+      );
+      
+      const allMembers = await Member.find({ faceDescriptor: { $exists: true, $ne: null } }, 'operativeId faceDescriptor');
+      let allFaces = [];
+      
+      for (const m of allMembers) {
+        try {
+          let desc = JSON.parse(m.faceDescriptor);
+          if (Array.isArray(desc)) {
+            desc = desc.filter(d => Array.isArray(d) && d.length > 0);
+            if (desc.length > 0) allFaces.push({ invxId: m.operativeId, descriptors: desc });
+          }
+        } catch(e) {}
+      }
+      
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      if (cfg && cfg.adminMasterFaceDescriptor) {
+        try {
+          let desc = JSON.parse(cfg.adminMasterFaceDescriptor);
+          if (Array.isArray(desc)) {
+             desc = desc.filter(d => Array.isArray(d) && d.length > 0);
+             if (desc.length > 0) allFaces.push({ invxId: 'admin@innovexa', descriptors: desc });
+          }
+        } catch(e) {}
+      }
+      
+      return res.status(200).json({ success: true, faceToken, allFaces });
+    }
+
     if (action === 'admin_verify_face') {
       const { invxId, faceToken } = payload;
       if (!invxId || !faceToken) return res.status(200).json({ success: false, message: 'Missing token or credentials.' });
@@ -1171,7 +1206,7 @@ export default async function handler(req, res) {
       if (cfg.adminFaceToken !== faceToken) {
         return res.status(200).json({ success: false, message: 'Invalid or expired face token (mismatch).' });
       }
-      if (cfg.adminFacePendingUser !== invxId.toUpperCase()) {
+      if (cfg.adminFacePendingUser !== 'ANY' && cfg.adminFacePendingUser !== invxId.toUpperCase()) {
         return res.status(200).json({ success: false, message: 'Invalid or expired face token (user mismatch).' });
       }
       if (Date.now() - (cfg.adminFaceTokenTime || 0) > 5 * 60 * 1000) {

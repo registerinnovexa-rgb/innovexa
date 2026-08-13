@@ -374,6 +374,13 @@
     </div>
     
     <div id="loginInputs">
+      <button class="btn-primary" onclick="initGlobalFaceLogin()" style="width:100%; margin-bottom: 24px; background: linear-gradient(135deg, #3b82f6, #10b981); border:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2v2"/><path d="M19 3a2 2 0 0 1 2 2v2"/><path d="M5 21a2 2 0 0 1-2-2v-2"/><path d="M19 21a2 2 0 0 0 2-2v-2"/><path d="M9 9a2 2 0 1 0 0 4h.01"/><path d="M15 9a2 2 0 1 0 0 4h.01"/><path d="M9 16c1.33 0 2 1.33 4 1.33s2.67-1.33 4-1.33"/></svg>
+        Instant Face Login
+      </button>
+      
+      <div style="text-align:center; margin-bottom:24px; color:var(--text3); font-size:13px; text-transform:uppercase; letter-spacing:2px; font-weight:700;">Or use credentials</div>
+
       <div class="form-group" style="display:flex;flex-direction:column;gap:12px;">
         <input type="text" id="loginId" placeholder="Operative ID (e.g. INVX-01)" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
         <input type="password" id="loginEmail" placeholder="Password (Optional if Face ID enabled)" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
@@ -6134,6 +6141,109 @@ async function commsPostFeed() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+//  GLOBAL FACE LOGIN
+// ══════════════════════════════════════════════════════════════
+async function initGlobalFaceLogin() {
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  document.getElementById('loginInputs').style.display = 'none';
+  document.getElementById('faceAuthInputs').style.display = 'block';
+  
+  const status = document.getElementById('faceAuthStatus');
+  status.textContent = 'Initializing secure face scan...';
+  
+  try {
+    const res = await apiPost('admin_init_face_login', {});
+    if (!res.success) {
+      throw new Error(res.message || 'Failed to initialize Face ID.');
+    }
+    if (!res.allFaces || res.allFaces.length === 0) {
+      throw new Error('No admins have Face ID registered yet.');
+    }
+    
+    status.textContent = 'Loading AI Models...';
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    
+    const labeledDescriptors = res.allFaces.map(f => 
+      new faceapi.LabeledFaceDescriptors(
+        f.invxId,
+        f.descriptors.map(d => new Float32Array(Object.values(d)))
+      )
+    );
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.38);
+
+    startGlobalScanner(res.faceToken, faceMatcher);
+  } catch (e) {
+    console.error(e);
+    cancelOtpLogin();
+    err.style.color = '#ef4444';
+    err.textContent = e.message;
+  }
+}
+
+async function startGlobalScanner(faceToken, faceMatcher) {
+  const video = document.getElementById('faceAuthVideo');
+  const canvas = document.getElementById('faceAuthCanvas');
+  const status = document.getElementById('faceAuthStatus');
+  const err = document.getElementById('loginError');
+
+  try {
+    status.textContent = 'Starting camera...';
+    faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+    video.srcObject = faceAuthStream;
+
+    video.onplay = () => {
+      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      faceapi.matchDimensions(canvas, displaySize);
+      status.textContent = 'Looking for face...';
+      
+      faceAuthInterval = setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+
+        if (detections.length > 0) {
+          const result = faceMatcher.findBestMatch(detections[0].descriptor);
+          if (result.label !== 'unknown') {
+            // Match found!
+            clearInterval(faceAuthInterval);
+            status.textContent = `Welcome! Logging in...`;
+            status.style.color = '#10b981'; // green
+            
+            // Call backend
+            apiPost('admin_verify_face', { invxId: result.label, faceToken }).then(res => {
+              if (res.success) {
+                adminSession = {
+                  id: res.data.operativeId,
+                  email: result.label,
+                  name: res.data.name,
+                  role: res.data.role
+                };
+                sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+                stopFaceAuth();
+                showDashboard();
+              } else {
+                throw new Error(res.message);
+              }
+            }).catch(e => {
+              stopFaceAuth();
+              cancelOtpLogin();
+              err.style.color = '#ef4444';
+              err.textContent = e.message || 'Face Verification failed.';
+            });
+          }
+        }
+      }, 150); // Check every 150ms for instant login
+    };
+  } catch (e) {
+    console.error(e);
+    status.textContent = 'Camera error: ' + e.message;
+  }
+}
 </script>
 </body>
 </html>
