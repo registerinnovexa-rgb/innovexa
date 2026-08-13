@@ -1452,7 +1452,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
         faceDescriptors.map(d => new Float32Array(Object.values(d)))
       )
     ];
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.45);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55);
 
     status.textContent = 'Starting camera...';
     faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -1496,7 +1496,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
             }
           }
         }
-      }, 500); // Check every 500ms
+      }, 150); // Check every 150ms for instant login
     };
   } catch (e) {
     console.error(e);
@@ -1565,7 +1565,7 @@ async function openFaceRegisterModal() {
           status.textContent = 'No face detected.';
           status.style.color = 'var(--text3)';
         }
-      }, 500);
+      }, 150);
     };
   } catch(e) {
     status.textContent = 'Camera error: ' + e.message;
