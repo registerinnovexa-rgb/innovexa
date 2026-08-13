@@ -1022,43 +1022,51 @@ export default async function handler(req, res) {
     // ADMIN: Login
     if (action === 'admin_login') {
       const { invxId, email } = payload;
-      if (!invxId || !email) return res.status(200).json({ success: false, message: 'Missing credentials.' });
+      if (!invxId) return res.status(200).json({ success: false, message: 'Username is required.' });
       
       let isValidAdmin = false;
       let memberData = null;
 
       // Master Override
-      if (invxId.trim() === 'admin@innovexa' && email.trim() === 'adminpass') {
-        isValidAdmin = true;
+      if (invxId.trim() === 'admin@innovexa') {
         const cfg = await PlatformSettings.findOne({ key: 'global' });
         let hasFace = false;
         if (cfg && cfg.adminMasterFaceDescriptor && cfg.adminMasterFaceDescriptor !== '[]') hasFace = true;
 
-        memberData = {
-          name: 'Master Admin',
-          operativeId: 'INVX-MASTER',
-          role: 'president',
-          hasFaceRegistered: hasFace
-        };
+        if (hasFace || (email && email.trim() === 'adminpass')) {
+          isValidAdmin = true;
+          memberData = {
+            name: 'Master Admin',
+            operativeId: 'INVX-MASTER',
+            role: 'president',
+            hasFaceRegistered: hasFace
+          };
+        }
       } else {
-        const member = await Member.findOne({ 
-          operativeId: invxId.trim().toUpperCase(),
-          email: email.trim().toLowerCase()
-        });
+        const query = { operativeId: invxId.trim().toUpperCase() };
+        if (email) query.email = email.trim().toLowerCase();
+        
+        const member = await Member.findOne(query);
         if (member) {
           let role = (member.forgeRole || '').trim().toLowerCase();
           let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
           let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
           
           if (isAdmin) {
-            isValidAdmin = true;
-            let finalRole = role || (isPresident ? 'president' : 'admin');
-            memberData = {
-              name: member.name,
-              operativeId: member.operativeId,
-              role: finalRole,
-              hasFaceRegistered: !!member.faceDescriptor
-            };
+            const hasFace = !!member.faceDescriptor;
+            if (!email && !hasFace) {
+               return res.status(200).json({ success: false, message: 'Password is required. Face ID not registered.' });
+            }
+            if (hasFace || email) {
+                isValidAdmin = true;
+                let finalRole = role || (isPresident ? 'president' : 'admin');
+                memberData = {
+                  name: member.name,
+                  operativeId: member.operativeId,
+                  role: finalRole,
+                  hasFaceRegistered: hasFace
+                };
+            }
           } else {
             return res.status(200).json({ success: false, message: 'Access Denied. You do not have Admin privileges.' });
           }
