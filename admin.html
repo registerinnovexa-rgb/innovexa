@@ -6154,21 +6154,31 @@ async function initGlobalFaceLogin() {
   document.getElementById('faceAuthInputs').style.display = 'block';
   
   const status = document.getElementById('faceAuthStatus');
-  status.textContent = 'Initializing secure face scan...';
+  status.textContent = 'Preparing secure Face ID...';
   
   try {
-    const res = await apiPost('admin_init_face_login', {});
-    if (!res.success) {
-      throw new Error(res.message || 'Failed to initialize Face ID.');
+    // Await preloaded models if they are still loading
+    if (window.preloadModelsPromise) await window.preloadModelsPromise;
+    
+    // Await preloaded faces if they are still loading, or fetch if not started
+    if (!window.globalFacesCache) {
+      if (window.preloadFacesPromise) {
+        await window.preloadFacesPromise;
+      } else {
+        const res = await apiPost('admin_init_face_login', {});
+        if (res.success) window.globalFacesCache = res;
+      }
+    }
+    
+    const res = window.globalFacesCache;
+    if (!res || !res.success) {
+      throw new Error(res?.message || 'Failed to initialize Face ID.');
     }
     if (!res.allFaces || res.allFaces.length === 0) {
       throw new Error('No admins have Face ID registered yet.');
     }
     
-    status.textContent = 'Loading AI Models...';
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    status.textContent = 'Initializing Face Matcher...';
     
     const labeledDescriptors = res.allFaces.map(f => 
       new faceapi.LabeledFaceDescriptors(
@@ -6185,6 +6195,32 @@ async function initGlobalFaceLogin() {
     err.style.color = '#ef4444';
     err.textContent = e.message;
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// BACKGROUND PRELOADING
+// ────────────────────────────────────────────────────────────────────────────
+window.preloadModelsPromise = null;
+window.preloadFacesPromise = null;
+window.globalFacesCache = null;
+
+function startBackgroundPreload() {
+  // Preload heavy AI models asynchronously
+  window.preloadModelsPromise = Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+  ]).catch(err => console.error("Failed to preload models:", err));
+  
+  // Preload face DB asynchronously
+  window.preloadFacesPromise = apiPost('admin_init_face_login', {}).then(res => {
+    if (res.success) window.globalFacesCache = res;
+  }).catch(err => console.error("Failed to preload faces:", err));
+}
+
+// Start preloading immediately if not logged in
+if (!sessionStorage.getItem('adminSession')) {
+  setTimeout(startBackgroundPreload, 100);
 }
 
 async function startGlobalScanner(faceToken, faceMatcher) {
