@@ -3046,7 +3046,6 @@ async function executeGlobalSearch() {
     if (members.length > 0) {
       document.getElementById('memberSearch').value = query;
       switchAdminTab('members');
-      fetchMembers();
     }
   } catch(e) {
     showToast('Search error: ' + e.message, 'error');
@@ -3561,7 +3560,7 @@ async function loadMembers() {
     cachedMembers = data.members || [];
     populateOperativeDatalist();
     populateMemberDetailDropdown();
-    renderMembers(cachedMembers);
+    applyMemberFilters();
   } catch(e) {
     console.error('loadMembers error:', e);
     document.getElementById('membersLoading').innerHTML =
