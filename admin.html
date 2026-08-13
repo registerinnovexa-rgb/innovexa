@@ -1460,7 +1460,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
         faceDescriptors.map(d => new Float32Array(Object.values(d)))
       )
     ];
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.38);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.50);
 
     status.textContent = 'Starting camera...';
     faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -6186,7 +6186,7 @@ async function initGlobalFaceLogin() {
         f.descriptors.map(d => new Float32Array(Object.values(d)))
       )
     );
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.38);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.50);
 
     startGlobalScanner(res.faceToken, faceMatcher);
   } catch (e) {
@@ -6239,22 +6239,26 @@ async function startGlobalScanner(faceToken, faceMatcher) {
       faceapi.matchDimensions(canvas, displaySize);
       status.textContent = 'Looking for face...';
       
+      let isDetecting = false;
       faceAuthInterval = setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        faceapi.draw.drawDetections(canvas, resizedDetections);
+        if (isDetecting) return;
+        isDetecting = true;
+        try {
+          const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+          faceapi.draw.drawDetections(canvas, resizedDetections);
 
-        if (detections.length > 0) {
-          const result = faceMatcher.findBestMatch(detections[0].descriptor);
-          if (result.label !== 'unknown') {
-            // Match found!
-            clearInterval(faceAuthInterval);
-            status.textContent = `Welcome! Logging in...`;
-            status.style.color = '#10b981'; // green
-            
-            // Call backend
-            apiPost('admin_verify_face', { invxId: result.label, faceToken }).then(res => {
+          if (detections.length > 0) {
+            const result = faceMatcher.findBestMatch(detections[0].descriptor);
+            if (result.label !== 'unknown') {
+              // Match found!
+              clearInterval(faceAuthInterval);
+              status.textContent = `Welcome! Logging in...`;
+              status.style.color = '#10b981'; // green
+              
+              // Call backend
+              const res = await apiPost('admin_verify_face', { invxId: result.label, faceToken });
               if (res.success) {
                 adminSession = {
                   id: res.data.operativeId,
@@ -6268,15 +6272,14 @@ async function startGlobalScanner(faceToken, faceMatcher) {
               } else {
                 throw new Error(res.message);
               }
-            }).catch(e => {
-              stopFaceAuth();
-              cancelOtpLogin();
-              err.style.color = '#ef4444';
-              err.textContent = e.message || 'Face Verification failed.';
-            });
+            }
           }
+        } catch (e) {
+          console.error("Detection error:", e);
+        } finally {
+          isDetecting = false;
         }
-      }, 150); // Check every 150ms for instant login
+      }, 300); // Check every 300ms for stable detection
     };
   } catch (e) {
     console.error(e);
