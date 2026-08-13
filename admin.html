@@ -1816,7 +1816,7 @@ async function adminCreateTask() {
 
 let adminTasks = [];
 
-async function loadForgeTasks() {
+async function loadForgeTasks(isSilent = false) {
   try {
 
     const data = await apiGet('admin_get_tasks');
@@ -2029,9 +2029,9 @@ function switchAdminTab(tab) {
 }
 
 // ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
-async function loadSettings() {
+async function loadSettings(isSilent = false) {
   const statusEl = document.getElementById('settingsStatus');
-  statusEl.textContent = 'Loading settings...';
+  if (!isSilent) statusEl.textContent = 'Loading settings...';
   try {
     const res = await apiPost('admin_get_settings', {});
     if (!res.success) throw new Error(res.message);
@@ -2184,9 +2184,9 @@ async function resetMemberOperativeId(opId) {
 // ══════════════════════════════════════════════════════════════════════════════
 let _rankConfigData = [];
 
-async function loadRankConfig() {
+async function loadRankConfig(isSilent = false) {
   const list = document.getElementById('rankConfigList');
-  list.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading rank tiers...</div>';
+  if (!isSilent) list.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading rank tiers...</div>';
   try {
     const res = await apiPost('admin_get_rank_config', {});
     if (!res.success) throw new Error(res.message);
@@ -2237,7 +2237,7 @@ async function saveRankConfig() {
 // ══════════════════════════════════════════════════════════════════════════════
 let _emailTemplates = {};
 
-async function loadEmailTemplates() {
+async function loadEmailTemplates(isSilent = false) {
   try {
     const res = await apiPost('admin_get_email_templates', {});
     if (!res.success) throw new Error(res.message);
@@ -2292,7 +2292,7 @@ async function saveEmailTemplate() {
 // ══════════════════════════════════════════════════════════════════════════════
 let _taxonomies = {};
 
-async function loadTaxonomies() {
+async function loadTaxonomies(isSilent = false) {
   try {
     const res = await apiPost('admin_get_taxonomies', {});
     if (!res.success) throw new Error(res.message);
@@ -2369,9 +2369,9 @@ const DICT_TERMS = [
 ];
 let _dictData = {};
 
-async function loadDictionary() {
+async function loadDictionary(isSilent = false) {
   const tbody = document.getElementById('dictionaryBody');
-  tbody.innerHTML = '<tr><td colspan="2" style="padding:20px;text-align:center;color:var(--text3);">Loading...</td></tr>';
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="2" style="padding:20px;text-align:center;color:var(--text3);">Loading...</td></tr>';
   try {
     const res = await apiPost('admin_get_dictionary', {});
     if (!res.success) throw new Error(res.message);
@@ -2471,7 +2471,7 @@ async function buildReport() {
 // ══════════════════════════════════════════════════════════════════════════════
 let _editingAnnId = null;
 
-async function loadAnnouncements() {
+async function loadAnnouncements(isSilent = false) {
   const loadEl = document.getElementById('announcementsLoading');
   const listEl = document.getElementById('announcementsList');
   loadEl.style.display = 'block';
@@ -2589,9 +2589,9 @@ const PERM_ABILITIES = [
 ];
 let _rolePermsData = {};
 
-async function loadRolePermissions() {
+async function loadRolePermissions(isSilent = false) {
   const el = document.getElementById('rolePermsTable');
-  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Loading...</div>';
+  if (!isSilent) el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px;">Loading...</div>';
   try {
     const res = await apiPost('admin_get_role_permissions', {});
     if (!res.success) throw new Error(res.message);
@@ -2638,9 +2638,9 @@ const WEBHOOK_EVENTS = [
 ];
 let _webhooks = {};
 
-async function loadWebhooks() {
+async function loadWebhooks(isSilent = false) {
   const el = document.getElementById('webhooksList');
-  el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading webhooks...</div>';
+  if (!isSilent) el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading webhooks...</div>';
   try {
     const res = await apiPost('admin_get_webhooks', {});
     if (!res.success) throw new Error(res.message);
@@ -2699,9 +2699,9 @@ async function testWebhook(event) {
 // ── ACCESS CONTROL ────────────────────────────────────────────────────────────
 let _accessRules = [];
 
-async function loadAccessControl() {
+async function loadAccessControl(isSilent = false) {
   const el = document.getElementById('accessControlList');
-  el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading...</div>';
+  if (!isSilent) el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Loading...</div>';
   try {
     const res = await apiPost('admin_get_access_control', {});
     if (!res.success) throw new Error(res.message);
@@ -2749,7 +2749,7 @@ async function saveAccessControl() {
 // ── FACTIONS ──────────────────────────────────────────────────────────────────
 let _editingFactionId = null;
 
-async function loadFactions() {
+async function loadFactions(isSilent = false) {
   const loadEl = document.getElementById('factionsLoading');
   const listEl = document.getElementById('factionsList');
   loadEl.style.display = 'block';
@@ -2853,9 +2853,9 @@ async function deleteFaction(factionId) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── BROADCASTS ─────────────────────────────────────────────────────────────────
-async function loadBroadcasts() {
+async function loadBroadcasts(isSilent = false) {
   const el = document.getElementById('broadcastsList');
-  el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading broadcasts...</div>';
+  if (!isSilent) el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading broadcasts...</div>';
   try {
     const res = await apiPost('admin_get_broadcasts', {});
     if (!res.success) throw new Error(res.message);
@@ -2887,9 +2887,9 @@ async function sendBroadcast() {
 }
 
 // ── GAMIFICATION ───────────────────────────────────────────────────────────────
-async function loadGamificationConfig() {
+async function loadGamificationConfig(isSilent = false) {
   const st = document.getElementById('gamStatus');
-  st.textContent = 'Loading...';
+  if (!isSilent) st.textContent = 'Loading...';
   try {
     const res = await apiPost('admin_get_gamification_config', {});
     if (!res.success) throw new Error(res.message);
@@ -2922,9 +2922,9 @@ async function saveGamificationConfig() {
 // ── CERTIFICATES ───────────────────────────────────────────────────────────────
 let _certFields = [];
 
-async function loadCertTemplates() {
+async function loadCertTemplates(isSilent = false) {
   const el = document.getElementById('certList');
-  el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading templates...</div>';
+  if (!isSilent) el.innerHTML = '<div style="color:var(--text3);padding:20px;">Loading templates...</div>';
   try {
     const res = await apiPost('admin_get_cert_templates', {});
     if (!res.success) throw new Error(res.message);
@@ -3000,9 +3000,9 @@ async function saveCertTemplate() {
 }
 
 // ── CUSTOM CSS ─────────────────────────────────────────────────────────────────
-async function loadCustomCss() {
+async function loadCustomCss(isSilent = false) {
   const st = document.getElementById('customCssStatus');
-  st.textContent = 'Loading...';
+  if (!isSilent) st.textContent = 'Loading...';
   try {
     const res = await apiPost('admin_get_custom_css', {});
     if (!res.success) throw new Error(res.message);
@@ -3061,9 +3061,9 @@ async function executeGlobalSearch() {
 // ══════════════════════════════════════════════════════════════════════════════
 
 // ── AI TOOLS (Feature #16) ────────────────────────────────────────────────────
-async function loadAiConfig() {
+async function loadAiConfig(isSilent = false) {
   const st = document.getElementById('aiStatus');
-  st.textContent = 'Loading...';
+  if (!isSilent) st.textContent = 'Loading...';
   try {
     const res = await apiPost('admin_get_ai_config', {});
     if (!res.success) throw new Error(res.message);
@@ -3086,9 +3086,9 @@ async function saveAiConfig() {
 }
 
 // ── A/B TESTING (Feature #17) ─────────────────────────────────────────────────
-async function loadAbTest() {
+async function loadAbTest(isSilent = false) {
   const st = document.getElementById('abStatus');
-  st.textContent = 'Loading...';
+  if (!isSilent) st.textContent = 'Loading...';
   try {
     const res = await apiPost('admin_get_ab_test', {});
     if (!res.success) throw new Error(res.message);
@@ -3147,7 +3147,7 @@ async function executeCohortQuery() {
 }
 
 // ── SKILL TREES (Feature #23) ─────────────────────────────────────────────────
-async function loadSkillTrees() {
+async function loadSkillTrees(isSilent = false) {
   const el = document.getElementById('skillHeatmap');
   el.innerHTML = '<div style="color:var(--text3);">Aggregating skills...</div>';
   try {
@@ -3202,9 +3202,9 @@ setTimeout(startAdminPresencePing, 3000);
 
 let allAuditLogs = [];
 
-async function loadAuditLogs() {
+async function loadAuditLogs(isSilent = false) {
   const tbody = document.getElementById('logsTbody');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Fetching logs from mainframe...</td></tr>';
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Fetching logs from mainframe...</td></tr>';
   
   try {
     const res = await apiGet('admin_get_audit_logs');
@@ -3510,7 +3510,7 @@ function drawCharts(members) {
   }
 }
 
-async function loadOverview() {
+async function loadOverview(isSilent = false) {
   try {
     const membersData = await apiGet('adminMembers');
     const members = membersData.members || [];
@@ -4043,7 +4043,7 @@ function populateMemberDetailDropdown() {
   }
 }
 
-async function loadMemberDetailView() {
+async function loadMemberDetailView(isSilent = false) {
   const select = document.getElementById('memberDetailSelect');
   const opId = select.value;
   
@@ -4391,8 +4391,8 @@ async function updateStatus(emailEncoded, status) {
 // ══════════════════════════════════════════════════════════════
 //  EVENTS
 // ══════════════════════════════════════════════════════════════
-async function loadEventsOld() {
-  document.getElementById('eventsLoading').style.display = 'flex';
+async function loadEventsOld(isSilent = false) {
+  if (!isSilent) document.getElementById('eventsLoading').style.display = 'flex';
   document.getElementById('eventsGrid').innerHTML = '';
   try {
     const data = await apiGet('events');
@@ -4496,8 +4496,8 @@ async function deleteSession(rowIndex) {
 // ══════════════════════════════════════════════════════════════
 //  RESOURCES
 // ══════════════════════════════════════════════════════════════
-async function loadResources() {
-  document.getElementById('resourcesLoading').style.display = 'flex';
+async function loadResources(isSilent = false) {
+  if (!isSilent) document.getElementById('resourcesLoading').style.display = 'flex';
   document.getElementById('resourcesTable').style.display = 'none';
   try {
     const data = await apiGet('forge_get_resources');
@@ -4544,8 +4544,8 @@ async function deleteResource(rowIndex) {
 // ══════════════════════════════════════════════════════════════
 //  TEAM
 // ══════════════════════════════════════════════════════════════
-async function loadTeam() {
-  document.getElementById('teamLoading').style.display = 'flex';
+async function loadTeam(isSilent = false) {
+  if (!isSilent) document.getElementById('teamLoading').style.display = 'flex';
   document.getElementById('teamGrid').innerHTML = '';
   try {
     const data = await apiGet('team');
@@ -4741,7 +4741,7 @@ document.querySelectorAll('.sidebar-btn').forEach(btn => {
 // ══════════════════════════════════════════════════════════════
 let cachedAssets = [];
 
-async function loadAssets() {
+async function loadAssets(isSilent = false) {
   try {
     const data = await apiGet('assets');
     cachedAssets = data.assets || [];
@@ -5282,7 +5282,7 @@ function downloadPublicNOC() {
 }
 
 // ══════ CERTIFICATE REQUEST MANAGEMENT ══════
-async function loadCertRequests() {
+async function loadCertRequests(isSilent = false) {
   const loading = document.getElementById('certReqsLoading');
   const table = document.getElementById('certReqsTable');
   const empty = document.getElementById('certReqsEmpty');
@@ -5397,7 +5397,7 @@ async function adminSaveTask() {
 
 // Ensure loadForgeResources exists
 var forgeCachedResources = [];
-async function loadForgeResources() {
+async function loadForgeResources(isSilent = false) {
   try {
     const data = await apiGet('forge_get_resources');
     forgeCachedResources = data.resources || [];
@@ -5506,19 +5506,28 @@ function startLiveSync() {
     const onclick = activeTab.getAttribute('onclick') || '';
     
     // Refresh based on active tab
-    if (onclick.includes('dashboard')) loadOverview();
+    if (onclick.includes('dashboard')) loadOverview(true);
     else if (onclick.includes('members')) {
-       // Only refresh if not actively searching
        if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers(true);
     }
-    else if (onclick.includes('bounties')) loadForgeTasks();
+    else if (onclick.includes('bounties') || onclick.includes('forgeOps')) loadForgeTasks(true);
     else if (onclick.includes('sessions')) {
        if (document.getElementById('detailPanel') && document.getElementById('detailPanel').style.display === 'block') {
-         loadAttendance(true); // Live refresh attendance
+         loadAttendance(true);
        } else {
          loadSessions(true);
        }
     }
+    else if (onclick.includes('surveillance')) loadAuditLogs(true);
+    else if (onclick.includes('sysSettings')) loadSettings(true);
+    else if (onclick.includes('rankConfig')) loadRankConfig(true);
+    else if (onclick.includes('emailTemplates')) loadEmailTemplates(true);
+    else if (onclick.includes('taxonomies')) loadTaxonomies(true);
+    else if (onclick.includes('dictionary')) loadDictionary(true);
+    else if (onclick.includes('cms')) loadAnnouncements(true);
+    else if (onclick.includes('rolePerms')) loadRolePermissions(true);
+    else if (onclick.includes('webhooks')) loadWebhooks(true);
+    else if (onclick.includes('accessControl')) loadAccessControl(true);
   }, 3000); // 3 seconds is the safest minimum
 }
 document.addEventListener('DOMContentLoaded', startLiveSync);
