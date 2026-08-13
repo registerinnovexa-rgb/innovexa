@@ -1030,11 +1030,15 @@ export default async function handler(req, res) {
       // Master Override
       if (invxId.trim() === 'admin@innovexa' && email.trim() === 'adminpass') {
         isValidAdmin = true;
+        const cfg = await PlatformSettings.findOne({ key: 'global' });
+        let hasFace = false;
+        if (cfg && cfg.adminMasterFaceDescriptor && cfg.adminMasterFaceDescriptor !== '[]') hasFace = true;
+
         memberData = {
           name: 'Master Admin',
           operativeId: 'INVX-MASTER',
           role: 'president',
-          hasFaceRegistered: false
+          hasFaceRegistered: hasFace
         };
       } else {
         const member = await Member.findOne({ 
@@ -1082,6 +1086,16 @@ export default async function handler(req, res) {
           if (m && m.faceDescriptor) {
             try {
               faceDescriptors = JSON.parse(m.faceDescriptor);
+              if (!Array.isArray(faceDescriptors)) faceDescriptors = [];
+            } catch(e) {
+              faceDescriptors = [];
+            }
+          }
+        } else {
+          const cfg = await PlatformSettings.findOne({ key: 'global' });
+          if (cfg && cfg.adminMasterFaceDescriptor) {
+            try {
+              faceDescriptors = JSON.parse(cfg.adminMasterFaceDescriptor);
               if (!Array.isArray(faceDescriptors)) faceDescriptors = [];
             } catch(e) {
               faceDescriptors = [];
@@ -1186,6 +1200,21 @@ export default async function handler(req, res) {
       const { invxId, descriptor } = payload;
       if (!invxId || !descriptor) return res.status(200).json({ success: false, message: 'Missing parameters.' });
       
+      if (invxId.toUpperCase() === 'INVX-MASTER') {
+        const cfg = await PlatformSettings.findOne({ key: 'global' }) || new PlatformSettings({ key: 'global' });
+        let existingFaces = [];
+        try {
+          if (cfg.adminMasterFaceDescriptor) {
+            existingFaces = JSON.parse(cfg.adminMasterFaceDescriptor);
+            if (!Array.isArray(existingFaces)) existingFaces = [];
+          }
+        } catch(e) {}
+        existingFaces.push(descriptor);
+        cfg.adminMasterFaceDescriptor = JSON.stringify(existingFaces);
+        await cfg.save();
+        return res.status(200).json({ success: true, message: 'Face added for Master Admin.', faceCount: existingFaces.length });
+      }
+
       const member = await Member.findOne({ operativeId: invxId.toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
 

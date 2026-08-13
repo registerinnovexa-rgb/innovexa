@@ -184,6 +184,7 @@ const PlatformSettingsSchema = new mongoose.Schema({
   adminFaceToken: { type: String, default: '' },
   adminFaceTokenTime: { type: Number, default: 0 },
   adminFacePendingUser: { type: String, default: '' },
+  adminMasterFaceDescriptor: { type: String, default: '' },
   updatedAt: { type: Date, default: Date.now }
 });
 
