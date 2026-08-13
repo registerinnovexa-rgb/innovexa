@@ -1339,7 +1339,7 @@ async function handleLogin() {
   btn.textContent = 'Authenticating...';
   
   try {
-    const res = await apiGet('admin_login', { invxId: user, email: pass });
+    const res = await apiPost('admin_login', { invxId: user, email: pass });
     
     if (res.success) {
       if (res.requireFace) {
@@ -1398,7 +1398,7 @@ async function handleVerifyOtp() {
   btn.textContent = 'Verifying...';
   
   try {
-    const res = await apiGet('admin_verify_otp', { invxId: user, email: pass, otp });
+    const res = await apiPost('admin_verify_otp', { invxId: user, email: pass, otp });
     if (res.success) {
       adminSession = {
         id: res.data.operativeId,
