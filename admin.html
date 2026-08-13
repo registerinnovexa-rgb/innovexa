@@ -378,16 +378,19 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2v2"/><path d="M19 3a2 2 0 0 1 2 2v2"/><path d="M5 21a2 2 0 0 1-2-2v-2"/><path d="M19 21a2 2 0 0 0 2-2v-2"/><path d="M9 9a2 2 0 1 0 0 4h.01"/><path d="M15 9a2 2 0 1 0 0 4h.01"/><path d="M9 16c1.33 0 2 1.33 4 1.33s2.67-1.33 4-1.33"/></svg>
         Instant Face Login
       </button>
-      
-      <div style="text-align:center; margin-bottom:24px; color:var(--text3); font-size:13px; text-transform:uppercase; letter-spacing:2px; font-weight:700;">Or use credentials</div>
-
-      <div class="form-group" style="display:flex;flex-direction:column;gap:12px;">
-        <input type="text" id="loginId" placeholder="Operative ID (e.g. INVX-01)" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
-        <input type="password" id="loginEmail" placeholder="Password (Optional if Face ID enabled)" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
+      <div style="text-align:center; margin-top:16px;">
+        <a href="#" onclick="document.getElementById('emergencyLogin').style.display='block'; this.style.display='none'; return false;" style="color:var(--text3); font-size:11px; text-decoration:none;">Admin Fallback</a>
       </div>
-      <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%; margin-top:24px;">
-        Login
-      </button>
+      
+      <div id="emergencyLogin" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid var(--border);">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:12px;">
+          <input type="text" id="loginId" placeholder="Operative ID (e.g. INVX-01)" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
+          <input type="password" id="loginEmail" placeholder="Password" style="padding:12px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font-family:monospace;" />
+        </div>
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()" style="width:100%; margin-top:12px; background:var(--bg2); color:var(--text); border:1px solid var(--border);">
+          Fallback Login
+        </button>
+      </div>
     </div>
     
     <div id="otpInputs" style="display:none;">
