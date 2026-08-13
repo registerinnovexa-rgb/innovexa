@@ -1065,6 +1065,39 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: false, message: 'Invalid Credentials.' });
       }
 
+      // Face ID Bypass Check
+      if (memberData && memberData.hasFaceRegistered) {
+        // Generate a face auth token to secure the session
+        const faceToken = Math.random().toString(36).substring(2, 15);
+        await PlatformSettings.findOneAndUpdate(
+          { key: 'global' },
+          { $set: { adminFaceToken: faceToken, adminFaceTokenTime: Date.now(), adminFacePendingUser: invxId.toUpperCase() } },
+          { upsert: true }
+        );
+        
+        // Fetch descriptors
+        let faceDescriptors = [];
+        if (memberData.operativeId !== 'INVX-MASTER') {
+          const m = await Member.findOne({ operativeId: memberData.operativeId });
+          if (m && m.faceDescriptor) {
+            try {
+              faceDescriptors = JSON.parse(m.faceDescriptor);
+              if (!Array.isArray(faceDescriptors)) faceDescriptors = [];
+            } catch(e) {
+              faceDescriptors = [];
+            }
+          }
+        }
+        
+        return res.status(200).json({ 
+          success: true, 
+          requireFace: true, 
+          faceDescriptors: faceDescriptors,
+          faceToken: faceToken,
+          message: 'Face ID required.' 
+        });
+      }
+
       // Generate and send OTP
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       await PlatformSettings.findOneAndUpdate(
@@ -1095,6 +1128,92 @@ export default async function handler(req, res) {
       }
 
       return res.status(200).json({ success: true, requireOtp: true, message: 'OTP sent to admin email.' });
+    }
+
+    if (action === 'admin_verify_face') {
+      const { invxId, faceToken } = payload;
+      if (!invxId || !faceToken) return res.status(200).json({ success: false, message: 'Missing token or credentials.' });
+
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      if (!cfg || cfg.adminFaceToken !== faceToken || cfg.adminFacePendingUser !== invxId.toUpperCase()) {
+        return res.status(200).json({ success: false, message: 'Invalid or expired face token.' });
+      }
+      if (Date.now() - (cfg.adminFaceTokenTime || 0) > 5 * 60 * 1000) {
+        return res.status(200).json({ success: false, message: 'Face session expired.' });
+      }
+
+      // Valid Face verification token
+      let memberData = null;
+      if (invxId.trim() === 'admin@innovexa') {
+        memberData = {
+          name: 'Master Admin',
+          operativeId: 'INVX-MASTER',
+          role: 'president',
+          hasFaceRegistered: false
+        };
+      } else {
+        const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
+        if (member) {
+          let role = (member.forgeRole || '').trim().toLowerCase();
+          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
+          let finalRole = role || (isPresident ? 'president' : 'admin');
+          memberData = {
+            name: member.name,
+            operativeId: member.operativeId,
+            role: finalRole,
+            hasFaceRegistered: !!member.faceDescriptor
+          };
+        }
+      }
+
+      if (!memberData) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      // Clear Token
+      await PlatformSettings.findOneAndUpdate({ key: 'global' }, { $unset: { adminFaceToken: "", adminFaceTokenTime: "", adminFacePendingUser: "" } });
+
+      await new ActionLog({
+        timestamp: new Date(),
+        type: 'LOGIN',
+        content: `Admin logged into console via Face ID.`,
+        operativeId: memberData.operativeId,
+        name: memberData.name
+      }).save();
+
+      return res.status(200).json({ success: true, data: memberData, message: 'Face verification successful.' });
+    }
+
+    if (action === 'admin_register_face') {
+      const { invxId, descriptor } = payload;
+      if (!invxId || !descriptor) return res.status(200).json({ success: false, message: 'Missing parameters.' });
+      
+      const member = await Member.findOne({ operativeId: invxId.toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      let currentDescriptors = [];
+      if (member.faceDescriptor) {
+        try {
+          currentDescriptors = JSON.parse(member.faceDescriptor);
+          if (!Array.isArray(currentDescriptors)) currentDescriptors = [];
+        } catch(e) {
+          currentDescriptors = [];
+        }
+      }
+      
+      // We expect descriptor to be a valid Array of numbers or object from face-api
+      currentDescriptors.push(descriptor);
+      
+      member.faceDescriptor = JSON.stringify(currentDescriptors);
+      await member.save();
+
+      await new ActionLog({
+        timestamp: new Date(),
+        type: 'PROFILE_UPDATED',
+        content: `Admin registered a new Face ID profile. Total faces: ${currentDescriptors.length}.`,
+        operativeId: member.operativeId,
+        name: member.name
+      }).save();
+
+      return res.status(200).json({ success: true, message: 'Face registered successfully.', faceCount: currentDescriptors.length });
     }
 
     if (action === 'admin_verify_otp') {

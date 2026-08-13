@@ -181,6 +181,9 @@ const PlatformSettingsSchema = new mongoose.Schema({
   otpMaxAttempts: { type: Number, default: 5 },
   adminOtp: { type: String, default: '' },
   adminOtpTime: { type: Number, default: 0 },
+  adminFaceToken: { type: String, default: '' },
+  adminFaceTokenTime: { type: Number, default: 0 },
+  adminFacePendingUser: { type: String, default: '' },
   updatedAt: { type: Date, default: Date.now }
 });
 

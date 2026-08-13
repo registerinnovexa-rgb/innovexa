@@ -349,6 +349,7 @@
   <!-- EasyMDE for Markdown Editing -->
   <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
   <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
   <style>
     /* Dark Theme Overrides for EasyMDE */
     .editor-toolbar { border-color: var(--border); background: var(--bg2); opacity: 0.9; border-top-left-radius: 8px; border-top-right-radius: 8px; }
@@ -397,6 +398,16 @@
       </button>
     </div>
 
+    <div id="faceAuthInputs" style="display:none; text-align:center;">
+      <div style="font-size:14px;color:var(--text);margin-bottom:12px;font-weight:600;">Face Verification Required</div>
+      <div id="faceVideoContainer" style="position:relative; width:100%; max-width:320px; margin:0 auto 16px auto; aspect-ratio:4/3; background:#000; border-radius:12px; overflow:hidden;">
+        <video id="faceAuthVideo" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
+        <canvas id="faceAuthCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+      </div>
+      <div id="faceAuthStatus" style="font-size:13px; color:var(--text3); margin-bottom:16px;">Loading Face Models...</div>
+      <button class="btn-cancel" onclick="cancelOtpLogin()" style="width:100%;">Cancel</button>
+    </div>
+
     <div class="login-error" id="loginError"></div>
   </div>
 </div>
@@ -413,8 +424,9 @@
       <span>Admin Console</span>
     </div>
     <div class="topbar-right">
-      <span class="topbar-badge">INVX-01 · President</span>
+      <span class="topbar-badge" id="adminBadge">INVX-01 · President</span>
       <span class="topbar-user" id="adminName"></span>
+      <button class="btn-logout" onclick="openFaceRegisterModal()" style="margin-right:8px; background:var(--bg3);">Register Face</button>
       <a href="index.html" class="btn-logout">← Portal</a>
       <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
@@ -1055,6 +1067,25 @@
   </div>
 </div>
 
+<!-- FACE REGISTRATION MODAL -->
+<div class="modal-overlay" id="modalFaceRegister">
+  <div class="modal-box" style="max-width:400px;">
+    <h2 style="margin-bottom:12px;">Register Face ID</h2>
+    <div style="text-align:center;">
+      <p style="font-size:14px;color:var(--text3);margin-bottom:16px;">Look directly at the camera to register your face. You can register multiple faces.</p>
+      <div id="faceRegVideoContainer" style="position:relative; width:100%; aspect-ratio:4/3; background:#000; border-radius:12px; overflow:hidden; margin-bottom:16px;">
+        <video id="faceRegVideo" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
+        <canvas id="faceRegCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+      </div>
+      <div id="faceRegStatus" style="font-size:13px; color:var(--text3); font-weight:600; margin-bottom:16px;">Initializing camera...</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeFaceRegisterModal()">Cancel</button>
+      <button class="btn-save" id="faceRegCaptureBtn" onclick="captureAndRegisterFace()" disabled>Capture & Register</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -1311,6 +1342,14 @@ async function handleLogin() {
     const res = await apiGet('admin_login', { invxId: user, email: pass });
     
     if (res.success) {
+      if (res.requireFace) {
+        document.getElementById('loginInputs').style.display = 'none';
+        document.getElementById('faceAuthInputs').style.display = 'block';
+        err.style.color = 'var(--text3)';
+        err.textContent = 'Please look at the camera to verify.';
+        startFaceAuth(res.faceToken, user, res.faceDescriptors);
+        return;
+      }
       if (res.requireOtp) {
         document.getElementById('loginInputs').style.display = 'none';
         document.getElementById('otpInputs').style.display = 'block';
@@ -1383,9 +1422,193 @@ async function handleVerifyOtp() {
 
 function cancelOtpLogin() {
   document.getElementById('otpInputs').style.display = 'none';
+  document.getElementById('faceAuthInputs').style.display = 'none';
   document.getElementById('loginInputs').style.display = 'block';
   document.getElementById('loginOtp').value = '';
   document.getElementById('loginError').textContent = '';
+  stopFaceAuth();
+}
+
+let faceAuthStream = null;
+let faceAuthInterval = null;
+
+async function startFaceAuth(faceToken, invxId, faceDescriptors) {
+  const video = document.getElementById('faceAuthVideo');
+  const canvas = document.getElementById('faceAuthCanvas');
+  const status = document.getElementById('faceAuthStatus');
+  const err = document.getElementById('loginError');
+
+  try {
+    status.textContent = 'Loading Face Models...';
+    // Load models
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    
+    // Parse descriptors and create FaceMatcher
+    const labeledDescriptors = [
+      new faceapi.LabeledFaceDescriptors(
+        invxId,
+        faceDescriptors.map(d => new Float32Array(Object.values(d)))
+      )
+    ];
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.45);
+
+    status.textContent = 'Starting camera...';
+    faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+    video.srcObject = faceAuthStream;
+
+    video.onplay = () => {
+      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      faceapi.matchDimensions(canvas, displaySize);
+      status.textContent = 'Looking for face...';
+      
+      faceAuthInterval = setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+
+        if (detections.length > 0) {
+          const result = faceMatcher.findBestMatch(detections[0].descriptor);
+          if (result.label === invxId) {
+            // Match found!
+            clearInterval(faceAuthInterval);
+            status.textContent = 'Face verified. Logging in...';
+            status.style.color = '#10b981'; // green
+            
+            // Call backend
+            const res = await apiGet('admin_verify_face', { invxId, faceToken });
+            if (res.success) {
+              adminSession = {
+                id: res.data.operativeId,
+                email: document.getElementById('loginEmail').value,
+                name: res.data.name,
+                role: res.data.role
+              };
+              sessionStorage.setItem('adminSession', JSON.stringify(adminSession));
+              stopFaceAuth();
+              showDashboard();
+            } else {
+              err.style.color = '#ef4444';
+              err.textContent = res.message || 'Face verification backend error.';
+              status.textContent = 'Verification failed.';
+            }
+          }
+        }
+      }, 500); // Check every 500ms
+    };
+  } catch (e) {
+    console.error(e);
+    status.textContent = 'Camera/Model error.';
+    err.style.color = '#ef4444';
+    err.textContent = e.message;
+  }
+}
+
+function stopFaceAuth() {
+  if (faceAuthInterval) clearInterval(faceAuthInterval);
+  if (faceAuthStream) {
+    faceAuthStream.getTracks().forEach(track => track.stop());
+    faceAuthStream = null;
+  }
+}
+// ════════════ FACE REGISTRATION LOGIC ════════════
+
+let faceRegStream = null;
+let faceRegInterval = null;
+let faceRegCurrentDescriptor = null;
+
+async function openFaceRegisterModal() {
+  document.getElementById('modalFaceRegister').classList.add('open');
+  const video = document.getElementById('faceRegVideo');
+  const canvas = document.getElementById('faceRegCanvas');
+  const status = document.getElementById('faceRegStatus');
+  const captureBtn = document.getElementById('faceRegCaptureBtn');
+  
+  captureBtn.disabled = true;
+  status.textContent = 'Loading models...';
+  
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    
+    status.textContent = 'Starting camera...';
+    faceRegStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+    video.srcObject = faceRegStream;
+    
+    video.onplay = () => {
+      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      faceapi.matchDimensions(canvas, displaySize);
+      status.textContent = 'Position your face in view...';
+      
+      faceRegInterval = setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+        
+        if (detections.length === 1) {
+          faceRegCurrentDescriptor = detections[0].descriptor;
+          captureBtn.disabled = false;
+          status.textContent = 'Face detected. Ready to capture.';
+          status.style.color = '#10b981';
+        } else if (detections.length > 1) {
+          faceRegCurrentDescriptor = null;
+          captureBtn.disabled = true;
+          status.textContent = 'Too many faces detected!';
+          status.style.color = '#ef4444';
+        } else {
+          faceRegCurrentDescriptor = null;
+          captureBtn.disabled = true;
+          status.textContent = 'No face detected.';
+          status.style.color = 'var(--text3)';
+        }
+      }, 500);
+    };
+  } catch(e) {
+    status.textContent = 'Camera error: ' + e.message;
+    status.style.color = '#ef4444';
+  }
+}
+
+function closeFaceRegisterModal() {
+  document.getElementById('modalFaceRegister').classList.remove('open');
+  if (faceRegInterval) clearInterval(faceRegInterval);
+  if (faceRegStream) {
+    faceRegStream.getTracks().forEach(t => t.stop());
+    faceRegStream = null;
+  }
+}
+
+async function captureAndRegisterFace() {
+  if (!faceRegCurrentDescriptor) return;
+  const btn = document.getElementById('faceRegCaptureBtn');
+  const status = document.getElementById('faceRegStatus');
+  
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  
+  try {
+    const res = await apiGet('admin_register_face', {
+      invxId: adminSession.id,
+      descriptor: Array.from(faceRegCurrentDescriptor)
+    });
+    
+    if (res.success) {
+      showToast('Face successfully registered! Total faces: ' + res.faceCount, 'success');
+      closeFaceRegisterModal();
+    } else {
+      throw new Error(res.message);
+    }
+  } catch(e) {
+    status.textContent = e.message || 'Failed to save face.';
+    status.style.color = '#ef4444';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Capture & Register';
+  }
 }
 
 function showDashboard() {
