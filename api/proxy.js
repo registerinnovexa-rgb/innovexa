@@ -1400,10 +1400,23 @@ export default async function handler(req, res) {
       const link = payload.submitLink || payload.link;
       if (!invxId || !taskId || !link) return res.status(200).json({ success: false, message: 'Missing fields.' });
       
-      const task = await Task.findOne({ taskId, assignedTo: invxId.trim().toUpperCase() });
+      const invxIdUpper = invxId.trim().toUpperCase();
+      const task = await Task.findOne({ 
+        taskId, 
+        $or: [
+          { assignedTo: invxIdUpper },
+          { assignedTo: 'Open' },
+          { assignedTo: 'OPEN' }
+        ]
+      });
       if (!task) return res.status(200).json({ success: false, message: 'Task not found or not assigned to you.' });
       if (task.status === 'Completed' || task.status === 'Submitted') {
         return res.status(200).json({ success: false, message: 'Task is already submitted/completed.' });
+      }
+      
+      // Auto-claim the task if it was open
+      if (task.assignedTo === 'Open' || task.assignedTo === 'OPEN') {
+        task.assignedTo = invxIdUpper;
       }
       
       task.submitLink = link;
