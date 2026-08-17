@@ -1543,7 +1543,13 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
               err.textContent = res.message || 'Face verification backend error.';
               status.textContent = 'Verification failed.';
             }
+          } else {
+            status.textContent = `Scanning... Score: ${result.distance.toFixed(2)} / 0.50`;
+            status.style.color = '#f59e0b';
           }
+        } else {
+          status.textContent = 'Looking for face...';
+          status.style.color = 'var(--text3)';
         }
       }, 150); // Check every 150ms for instant login
     };
@@ -6323,7 +6329,13 @@ async function startGlobalScanner(faceToken, faceMatcher) {
               } else {
                 throw new Error(res.message);
               }
+            } else {
+              status.textContent = `Scanning... Score: ${result.distance.toFixed(2)} / 0.50`;
+              status.style.color = '#f59e0b';
             }
+          } else {
+            status.textContent = 'Looking for face...';
+            status.style.color = 'var(--text3)';
           }
         } catch (e) {
           console.error("Detection error:", e);
