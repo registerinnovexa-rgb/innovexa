@@ -1501,7 +1501,7 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
         faceDescriptors.map(d => new Float32Array(Object.values(d)))
       )
     ];
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.50);
 
     status.textContent = 'Starting camera...';
     faceAuthStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -6237,7 +6237,7 @@ async function initGlobalFaceLogin() {
         f.descriptors.map(d => new Float32Array(Object.values(d)))
       )
     );
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.60);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.50);
 
     startGlobalScanner(res.faceToken, faceMatcher);
   } catch (e) {
