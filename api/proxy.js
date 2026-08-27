@@ -5,8 +5,16 @@ import nodemailer from 'nodemailer';
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
 // Uses Zoho SMTP. Set EMAIL_USER=updates.innovexa@zohomail.in and EMAIL_PASS in env.
 function createTransporter() {
+  const user = process.env.EMAIL_USER || '';
+  let host = 'smtp.zoho.in';
+  if (user.includes('@gmail.com')) {
+    host = 'smtp.gmail.com';
+  } else if (user.includes('@zoho.com')) {
+    host = 'smtp.zoho.com';
+  }
+  
   return nodemailer.createTransport({
-    host: 'smtp.zoho.in',
+    host: host,
     port: 465,
     secure: true, // SSL
     auth: {
@@ -1011,6 +1019,16 @@ export default async function handler(req, res) {
           name: fullName,
           detail: `New member registered. Email: ${email} | College: ${college || 'N/A'} | Branch: ${branch || 'N/A'}, ${year || 'N/A'} Year | UTR: ${utr || 'Not provided'}`
         });
+
+        // Notify member that their registration was received
+        await notifyUser(
+          email.trim().toLowerCase(),
+          'Registration Received - Innovexa Hub',
+          `<h2 style="color:#000;">Welcome, ${fullName}!</h2>
+           <p style="color:#334155;font-size:15px;line-height:1.6;">We have successfully received your registration for Innovexa Hub.</p>
+           <p style="color:#334155;font-size:15px;line-height:1.6;">Your application is currently <strong style="color:#f59e0b;">Pending Review</strong>. Once an admin approves your profile, you will receive another email containing your unique Operative ID and dashboard access instructions.</p>
+           <p style="color:#334155;font-size:15px;line-height:1.6;">Thank you for your patience!</p>`
+        );
 
         return res.status(200).json({ 
           success: true, 
