@@ -59,7 +59,11 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
         <html>
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
         <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-          <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
             <!-- Header -->
             <div style="background:linear-gradient(135deg,${cfg.color} 0%,${cfg.color}cc 100%);padding:28px 32px;">
               ${urgentBar}
@@ -122,7 +126,11 @@ async function notifyUser(email, subject, htmlContent) {
         <html>
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
         <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-          <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:0px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:0px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
             <div style="background:var(--accent,#000000);padding:24px 32px;">
               <h2 style="margin:0;font-size:20px;color:#000;">${subject}</h2>
             </div>
@@ -318,7 +326,11 @@ export default async function handler(req, res) {
             <html>
             <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
             <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-              <div style="max-width:480px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:480px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                 <!-- Header -->
                 <div style="background:#000000;padding:32px;text-align:center;">
                   <div style="width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔐</div>
@@ -1574,7 +1586,11 @@ export default async function handler(req, res) {
               <html>
               <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
               <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                   <!-- Header -->
                   <div style="background:#000000;padding:36px 32px;text-align:center;">
                     <div style="font-size:52px;margin-bottom:12px;">🎉</div>
@@ -1619,7 +1635,11 @@ export default async function handler(req, res) {
               <html>
               <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
               <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="max-width:520px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                   <!-- Header -->
                   <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:36px 32px;text-align:center;">
                     <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
