@@ -20,6 +20,71 @@
 
   <link rel="stylesheet" href="css/index.css?v=3" />
   <script src="/js/shield.js"></script>
+
+<style>
+/* CYBER EFFECTS */
+.redact-text {
+  background: #000;
+  color: transparent;
+  padding: 0 4px;
+  border-radius: 2px;
+  cursor: crosshair;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+.redact-text:hover {
+  background: rgba(0,0,0,0.05);
+  color: #000;
+  box-shadow: inset 0 -2px 0 #000;
+}
+
+/* Glitch Title */
+.glitch-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.glitch {
+  position: relative;
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+.glitch::before {
+  left: 2px;
+  text-shadow: -1px 0 #9ca3af;
+  clip: rect(24px, 550px, 90px, 0);
+  animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+.glitch::after {
+  left: -2px;
+  text-shadow: 1px 0 #4b5563;
+  clip: rect(85px, 550px, 140px, 0);
+  animation: glitch-anim 2.5s infinite linear alternate-reverse;
+}
+@keyframes glitch-anim {
+  0% { clip: rect(10px, 9999px, 31px, 0); }
+  20% { clip: rect(65px, 9999px, 98px, 0); }
+  40% { clip: rect(2px, 9999px, 12px, 0); }
+  60% { clip: rect(89px, 9999px, 102px, 0); }
+  80% { clip: rect(24px, 9999px, 55px, 0); }
+  100% { clip: rect(72px, 9999px, 80px, 0); }
+}
+@keyframes glitch-anim-2 {
+  0% { clip: rect(65px, 9999px, 100px, 0); }
+  20% { clip: rect(3px, 9999px, 14px, 0); }
+  40% { clip: rect(78px, 9999px, 88px, 0); }
+  60% { clip: rect(12px, 9999px, 25px, 0); }
+  80% { clip: rect(98px, 9999px, 108px, 0); }
+  100% { clip: rect(34px, 9999px, 45px, 0); }
+}
+</style>
+
 </head>
 <body>
 
@@ -90,9 +155,9 @@
       Applications Open — Batch 2026
     </div>
 
-    <h1 class="hero-headline fade-up delay-1">
-      Engineering the <br>
-      <span class="italic">next era</span> of builders.
+    <h1 class="hero-headline fade-up delay-1 glitch-wrapper" style="font-family: monospace;">
+      <span class="glitch" data-text="Engineering the">Engineering the</span> <br>
+      <span class="italic" style="color:#000;">next era</span> of builders.
     </h1>
 
     <p class="hero-sub fade-up delay-2">
@@ -221,7 +286,7 @@
   <div class="mission-inner fade-up">
     <h2 class="mission-title">The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Directive.</span></h2>
     <p class="mission-text">
-      Innovexa Hub was forged with a singular objective: to eradicate the gap between academic theory and elite industry execution. We are not a club. We are a collective of driven engineers, designers, and systems architects who believe in building the future by actually building it. We provide the capital, the network, and the environment. You provide the execution.
+      Innovexa Hub was forged with a singular objective: to <span class="redact-text">eradicate the gap</span> between academic theory and elite industry execution. We are not a club. We are a <span class="redact-text">clandestine collective</span> of driven engineers, designers, and systems architects who believe in building the future by actually building it. We provide the capital, the network, and the environment. You provide the <span class="redact-text">execution</span>.
     </p>
   </div>
 </section>
@@ -571,7 +636,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Gowtham S</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Gowtham S" style="font-size:20px; font-family: monospace;">9XSHI8Q 6</h3>
         <p class="arsenal-desc">Director of Operations</p>
       </div>
       
@@ -579,7 +644,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Jaiakash</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Jaiakash" style="font-size:20px; font-family: monospace;">%FFY$S5D</h3>
         <p class="arsenal-desc">Founder & President</p>
       </div>
 
@@ -587,7 +652,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Puneet Ramesh</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Puneet Ramesh" style="font-size:20px; font-family: monospace;">Y5MJ$R J!UQ#9</h3>
         <p class="arsenal-desc">Director of Logistics</p>
       </div>
 
@@ -595,7 +660,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">J Pawan Bramha Gowd</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="J Pawan Bramha Gowd" style="font-size:20px; font-family: monospace;">D O5N2Y 7*YZ57 #H0F</h3>
         <p class="arsenal-desc">General Secretary</p>
       </div>
 
@@ -603,7 +668,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Susidharan Vadivel</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Susidharan Vadivel" style="font-size:20px; font-family: monospace;">G4!CAQN035 35BJKOB</h3>
         <p class="arsenal-desc">Executive Advisor</p>
       </div>
 
@@ -611,7 +676,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Visakan KC</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Visakan KC" style="font-size:20px; font-family: monospace;">12AZNKW V%</h3>
         <p class="arsenal-desc">Director of Media & Branding</p>
       </div>
 
@@ -619,7 +684,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">G S LESLIE JOY</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="G S LESLIE JOY" style="font-size:20px; font-family: monospace;">S ^ &HSN$2 CGH</h3>
         <p class="arsenal-desc">Technical Outreach Coordinator</p>
       </div>
 
@@ -627,7 +692,7 @@
         <div class="arsenal-icon" style="margin-bottom:16px; opacity:0.8;">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
-        <h3 class="arsenal-title" style="font-size:20px;">Keerthinathan</h3>
+        <h3 class="arsenal-title decrypt-target" data-value="Keerthinathan" style="font-size:20px; font-family: monospace;">2O@COUHC$98RB</h3>
         <p class="arsenal-desc">Head of Marketing & Branding</p>
       </div>
     </div>
@@ -810,6 +875,35 @@
     loadMemberCount();
     loadConfirmedOperatives();
   });
+  
+  // Decrypt Effect for Team
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  document.querySelectorAll('.decrypt-target').forEach(el => {
+    el.addEventListener('mouseover', event => {
+      let iterations = 0;
+      const originalText = event.target.dataset.value;
+      
+      clearInterval(event.target.interval);
+      
+      event.target.interval = setInterval(() => {
+        event.target.innerText = originalText.split("")
+          .map((letter, index) => {
+            if(index < iterations) {
+              return originalText[index];
+            }
+            return letters[Math.floor(Math.random() * letters.length)];
+          })
+          .join("");
+        
+        if(iterations >= originalText.length){ 
+          clearInterval(event.target.interval);
+        }
+        
+        iterations += 1 / 3;
+      }, 30);
+    });
+  });
+
   // Randomize Core Team
   const teamGrid = document.querySelector('.arsenal-grid');
   if (teamGrid) {
