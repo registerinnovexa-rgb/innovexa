@@ -627,44 +627,86 @@
 
 
 
-<!-- ══ SKILL TREE VISUALIZER ════════════════════════════════════════ -->
-<section class="roadmap-section container" style="margin-top:40px;">
-  <div class="roadmap-inner">
-    <div class="roadmap-header fade-up">
-      <h2>The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Progression.</span></h2>
-      <p style="color:var(--text3); font-size:16px; margin-top:16px;">How we forge operatives from zero to production-ready engineers.</p>
+
+<!-- ══ SKILL TREE VISUALIZER (CONSOLE STORY) ════════════════════════════════════════ -->
+<section class="roadmap-section container fade-up" style="margin-top:80px; margin-bottom: 80px;">
+  <div class="roadmap-header" style="text-align: center; margin-bottom: 40px;">
+    <h2>The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Progression.</span></h2>
+    <p style="color:var(--text3); font-size:16px; margin-top:16px; max-width: 600px; margin-left: auto; margin-right: auto;">How we forge operatives from zero to production-ready engineers.</p>
+  </div>
+
+  <div style="background: #0a0a0a; border-radius: 12px; border: 1px solid #222; max-width: 800px; margin: 0 auto; padding: 40px; font-family: 'Courier New', monospace; font-size: 15px; line-height: 1.8; color: #a3a3a3; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; text-align: left;">
+    
+    <div id="console-story" style="min-height: 380px;">
+       <!-- JavaScript will type this out -->
     </div>
     
-    <div style="display:flex; flex-direction:column; gap:16px; margin-top:40px; position:relative;">
-      <!-- connecting line -->
-      <div style="position:absolute; top:0; bottom:0; left:24px; width:2px; background:var(--border); z-index:0;"></div>
-      
-      <div class="fade-up delay-1" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; position:relative; z-index:1; display:flex; gap:24px; align-items:center;">
-        <div style="min-width:48px; height:48px; border-radius:50%; background:var(--bg); border:2px solid var(--text3); display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--text3);">01</div>
-        <div>
-          <h3 style="font-size:20px; font-family:var(--font-d); margin-bottom:8px;">Initiate</h3>
-          <p style="color:var(--text2); font-size:14px;">Master the fundamentals. Git, Command Line, HTML/CSS, Vanilla JavaScript. The bedrock of all modern development.</p>
-        </div>
-      </div>
-
-      <div class="fade-up delay-2" style="background:var(--bg2); border:1px solid var(--accent); border-radius:var(--radius); padding:24px; position:relative; z-index:1; display:flex; gap:24px; align-items:center; box-shadow:0 0 20px rgba(0, 112, 243, 0.1);">
-        <div style="min-width:48px; height:48px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff;">02</div>
-        <div>
-          <h3 style="font-size:20px; font-family:var(--font-d); margin-bottom:8px;">Pathfinder</h3>
-          <p style="color:var(--text2); font-size:14px;">Enter the bootcamps. React.js frontend architecture, Node.js backends, REST APIs, and database modeling.</p>
-        </div>
-      </div>
-
-      <div class="fade-up delay-3" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; position:relative; z-index:1; display:flex; gap:24px; align-items:center;">
-        <div style="min-width:48px; height:48px; border-radius:50%; background:var(--bg); border:2px solid var(--accent2); display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--accent2);">03</div>
-        <div>
-          <h3 style="font-size:20px; font-family:var(--font-d); margin-bottom:8px;">Architect</h3>
-          <p style="color:var(--text2); font-size:14px;">Scale systems. Applied AI/LLM integrations, Docker, Cloud Deployments, and Systems Design.</p>
-        </div>
-      </div>
-    </div>
   </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const scriptLines = [
+        { text: "> init_operative_training()", color: "#10b981", delay: 400 },
+        { text: "  [SYS] Establishing baseline...", color: "#6b7280", delay: 300 },
+        { text: "> Phase 01: INITIATE", color: "#f59e0b", delay: 400 },
+        { text: "  Installing dependencies: [Git, HTML/CSS, Vanilla JS]...", color: "#d1d5db", delay: 500 },
+        { text: "  [OK] Bedrock fundamentals secured.", color: "#10b981", delay: 300 },
+        { text: " ", color: "transparent", delay: 100 },
+        { text: "> Phase 02: PATHFINDER", color: "#f59e0b", delay: 400 },
+        { text: "  Upgrading frameworks: [React.js, Node.js, REST APIs, MongoDB]...", color: "#d1d5db", delay: 500 },
+        { text: "  [OK] Full-stack architecture compiled.", color: "#10b981", delay: 300 },
+        { text: " ", color: "transparent", delay: 100 },
+        { text: "> Phase 03: ARCHITECT", color: "#f59e0b", delay: 400 },
+        { text: "  Deploying scale systems: [Docker, Applied AI, Cloud]...", color: "#d1d5db", delay: 500 },
+        { text: "  [OK] System design parameters met.", color: "#10b981", delay: 500 },
+        { text: " ", color: "transparent", delay: 100 },
+        { text: "> STATUS: OPERATIVE PRODUCTION-READY", color: "#3b82f6", delay: 2000, bold: true }
+      ];
+
+      const consoleDiv = document.getElementById('console-story');
+      let currentLine = 0;
+      let isTyping = false;
+
+      function typeLine() {
+        if (currentLine >= scriptLines.length) {
+          // Add blinking cursor at the end
+          const cursor = document.createElement('div');
+          cursor.innerHTML = `<span style="color:#fff; animation: blink 1s step-end infinite;">> _</span>`;
+          consoleDiv.appendChild(cursor);
+          return;
+        }
+
+        const line = scriptLines[currentLine];
+        const div = document.createElement('div');
+        div.style.color = line.color;
+        if(line.bold) div.style.fontWeight = 'bold';
+        consoleDiv.appendChild(div);
+        
+        let charIndex = 0;
+        const typingInterval = setInterval(() => {
+          div.textContent += line.text[charIndex] || " ";
+          charIndex++;
+          if (charIndex >= line.text.length) {
+            clearInterval(typingInterval);
+            currentLine++;
+            setTimeout(typeLine, line.delay);
+          }
+        }, 15); // Fast typing speed
+      }
+
+      // Start when scrolled into view
+      const observer = new IntersectionObserver((entries) => {
+        if(entries[0].isIntersecting && !isTyping) {
+          isTyping = true;
+          typeLine();
+        }
+      }, { threshold: 0.5 });
+      
+      if(consoleDiv) observer.observe(consoleDiv);
+    });
+  </script>
 </section>
+
 
     <div class="neural-header fade-up" style="margin-bottom: 20px; margin-top: 40px;">
       <h2>Comm-<span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Link.</span></h2>
