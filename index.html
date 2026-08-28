@@ -38,51 +38,7 @@
   box-shadow: inset 0 -2px 0 #000;
 }
 
-/* Glitch Title */
-.glitch-wrapper {
-  position: relative;
-  display: inline-block;
-}
-.glitch {
-  position: relative;
-}
-.glitch::before, .glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-}
-.glitch::before {
-  left: 2px;
-  text-shadow: -1px 0 #9ca3af;
-  clip: rect(24px, 550px, 90px, 0);
-  animation: glitch-anim-2 3s infinite linear alternate-reverse;
-}
-.glitch::after {
-  left: -2px;
-  text-shadow: 1px 0 #4b5563;
-  clip: rect(85px, 550px, 140px, 0);
-  animation: glitch-anim 2.5s infinite linear alternate-reverse;
-}
-@keyframes glitch-anim {
-  0% { clip: rect(10px, 9999px, 31px, 0); }
-  20% { clip: rect(65px, 9999px, 98px, 0); }
-  40% { clip: rect(2px, 9999px, 12px, 0); }
-  60% { clip: rect(89px, 9999px, 102px, 0); }
-  80% { clip: rect(24px, 9999px, 55px, 0); }
-  100% { clip: rect(72px, 9999px, 80px, 0); }
-}
-@keyframes glitch-anim-2 {
-  0% { clip: rect(65px, 9999px, 100px, 0); }
-  20% { clip: rect(3px, 9999px, 14px, 0); }
-  40% { clip: rect(78px, 9999px, 88px, 0); }
-  60% { clip: rect(12px, 9999px, 25px, 0); }
-  80% { clip: rect(98px, 9999px, 108px, 0); }
-  100% { clip: rect(34px, 9999px, 45px, 0); }
-}
+
 </style>
 
 </head>
@@ -155,9 +111,9 @@
       Applications Open — Batch 2026
     </div>
 
-    <h1 class="hero-headline fade-up delay-1 glitch-wrapper" style="font-family: monospace;">
-      <span class="glitch" data-text="Engineering the">Engineering the</span> <br>
-      <span class="italic" style="color:#000;">next era</span> of builders.
+    <h1 class="hero-headline fade-up delay-1">
+      Engineering the <br>
+      <span class="italic">next era</span> of builders.
     </h1>
 
     <p class="hero-sub fade-up delay-2">
@@ -878,15 +834,18 @@
   
   // Decrypt Effect for Team
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-  document.querySelectorAll('.decrypt-target').forEach(el => {
-    el.addEventListener('mouseover', event => {
+  document.querySelectorAll('.arsenal-card').forEach(card => {
+    const target = card.querySelector('.decrypt-target');
+    if(!target) return;
+    
+    card.addEventListener('mouseenter', () => {
       let iterations = 0;
-      const originalText = event.target.dataset.value;
+      const originalText = target.dataset.value;
       
-      clearInterval(event.target.interval);
+      clearInterval(target.interval);
       
-      event.target.interval = setInterval(() => {
-        event.target.innerText = originalText.split("")
+      target.interval = setInterval(() => {
+        target.innerText = originalText.split("")
           .map((letter, index) => {
             if(index < iterations) {
               return originalText[index];
@@ -896,7 +855,7 @@
           .join("");
         
         if(iterations >= originalText.length){ 
-          clearInterval(event.target.interval);
+          clearInterval(target.interval);
         }
         
         iterations += 1 / 3;
