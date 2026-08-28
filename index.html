@@ -228,47 +228,59 @@
 
 
 
-<!-- ══ INNOVEXA FORGE ═══════════════════════════════════════ -->
+
+<!-- ══ INNOVEXA FORGE (TERMINAL) ═══════════════════════════════════════ -->
 <section class="programs-section container fade-up" style="margin: 80px auto;">
-  <div style="text-align: center; margin-bottom: 60px;">
+  <div style="text-align: center; margin-bottom: 40px;">
     <h2 style="font-size: 36px; font-family: var(--font-d); letter-spacing: -0.03em;">The <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Innovexa Forge.</span></h2>
-    <p style="color: var(--text-muted); font-size: 16px; max-width: 650px; margin: 16px auto 0; line-height: 1.6;">Our custom-built, proprietary command center. The Forge is the digital infrastructure that powers the collective, strictly accessible only to verified operatives.</p>
+    <p style="color: var(--text-muted); font-size: 16px; max-width: 650px; margin: 16px auto 0; line-height: 1.6;">Our proprietary command center. The Forge is the digital infrastructure that powers the collective.</p>
   </div>
   
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+  <div style="max-width: 800px; margin: 0 auto; background: #0f111a; border-radius: 12px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid #222; text-align: left;">
+    <!-- Terminal Header -->
+    <div style="background: #1a1d27; padding: 12px 20px; display: flex; align-items: center; border-bottom: 1px solid #2a2d3a;">
+      <div style="display: flex; gap: 8px;">
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; border: 1px solid #e0443e;"></div>
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; border: 1px solid #dea123;"></div>
+        <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f; border: 1px solid #1aab29;"></div>
+      </div>
+      <div style="margin: 0 auto; color: #6b7280; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 1px;">innovexa@forge:~</div>
+      <div style="width: 44px;"></div> <!-- Spacer to balance flex -->
+    </div>
     
-    <!-- Feature 1 -->
-    <div style="background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.03); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 24px rgba(0,0,0,0.03)';">
-      <div style="font-size: 32px; margin-bottom: 24px;">🔐</div>
-      <h3 style="font-size: 20px; margin: 0 0 12px; font-family: var(--font-m); font-weight: 600; letter-spacing:-0.02em;">Secure Initialization</h3>
-      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.7; margin: 0;">Access is locked behind your unique Operative ID and an encrypted, time-sensitive OTP protocol, ensuring absolute exclusivity.</p>
-    </div>
+    <!-- Terminal Body -->
+    <div style="padding: 40px; font-family: 'Courier New', monospace; color: #e5e7eb; font-size: 14px; line-height: 1.8;">
+      <div style="margin-bottom: 24px;">
+        <span style="color: #10b981;">innovexa@forge</span><span style="color: #fff;">:</span><span style="color: #3b82f6;">~</span>$ ./explain_forge.sh<br>
+        <span style="color: #9ca3af;">[SYS.LOG] Extracting operational architecture...</span>
+      </div>
 
-    <!-- Feature 2 -->
-    <div style="background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.03); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 24px rgba(0,0,0,0.03)';">
-      <div style="font-size: 32px; margin-bottom: 24px;">🎯</div>
-      <h3 style="font-size: 20px; margin: 0 0 12px; font-family: var(--font-m); font-weight: 600; letter-spacing:-0.02em;">Bounty Matrix</h3>
-      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.7; margin: 0;">Operatives claim and execute open technical bounties. Successfully deployed tasks yield XP, actively altering your rank in the collective.</p>
-    </div>
+      <div style="padding-left: 20px; border-left: 2px solid #374151; margin-bottom: 24px;">
+        <div style="color: #f59e0b; font-weight: bold; margin-bottom: 4px;">[01] // SECURE_AUTH_PROTOCOL</div>
+        <div style="color: #9ca3af; margin-bottom: 24px;">Access strictly locked behind Operative ID and an encrypted, time-sensitive OTP. Unauthorized access is impossible.</div>
 
-    <!-- Feature 3 -->
-    <div style="background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.03); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 24px rgba(0,0,0,0.03)';">
-      <div style="font-size: 32px; margin-bottom: 24px;">🗄️</div>
-      <h3 style="font-size: 20px; margin: 0 0 12px; font-family: var(--font-m); font-weight: 600; letter-spacing:-0.02em;">Atlas Repository</h3>
-      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.7; margin: 0;">Direct access to a centralized, high-signal knowledge graph containing architecture diagrams, tech stacks, and premium internal resources.</p>
-    </div>
+        <div style="color: #f59e0b; font-weight: bold; margin-bottom: 4px;">[02] // THE_BOUNTY_MATRIX</div>
+        <div style="color: #9ca3af; margin-bottom: 24px;">Operatives claim and execute open technical bounties. Deploy solutions, earn XP, and alter your rank within the collective in real-time.</div>
 
-    <!-- Feature 4 -->
-    <div style="background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 40px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.03); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 24px rgba(0,0,0,0.03)';">
-      <div style="font-size: 32px; margin-bottom: 24px;">📊</div>
-      <h3 style="font-size: 20px; margin: 0 0 12px; font-family: var(--font-m); font-weight: 600; letter-spacing:-0.02em;">Live Telemetry</h3>
-      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.7; margin: 0;">Real-time leaderboards, automated certificate generation, and an active SOS protocol for rapid operational support.</p>
-    </div>
+        <div style="color: #f59e0b; font-weight: bold; margin-bottom: 4px;">[03] // ATLAS_REPOSITORY</div>
+        <div style="color: #9ca3af; margin-bottom: 24px;">Direct access to a centralized, high-signal knowledge graph containing architecture diagrams, tech stacks, and premium internal resources.</div>
 
+        <div style="color: #f59e0b; font-weight: bold; margin-bottom: 4px;">[04] // LIVE_TELEMETRY</div>
+        <div style="color: #9ca3af;">Real-time leaderboards, automated cryptographic certificate generation, and an active SOS protocol for rapid operational support.</div>
+      </div>
+
+      <div>
+        <span style="color: #10b981;">innovexa@forge</span><span style="color: #fff;">:</span><span style="color: #3b82f6;">~</span>$ <span style="display:inline-block; width:8px; height:16px; background:#e5e7eb; vertical-align:middle; animation: blink 1s step-end infinite;"></span>
+      </div>
+    </div>
   </div>
   
+  <style>
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+
   <div style="text-align: center; margin-top: 40px;">
-    <a href="forge.html" class="btn-outline" style="border-radius: 100px; font-size: 13px;">Access the Forge</a>
+    <a href="forge.html" class="btn-outline" style="border-radius: 100px; font-size: 13px;">Execute Initialization (Open Forge)</a>
   </div>
 </section>
 
