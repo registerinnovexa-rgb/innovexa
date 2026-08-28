@@ -47,6 +47,7 @@
 
 
 
+
 <!-- ══ SYSTEM BOOT SEQUENCE ══════════════════════════════════════════════════ -->
 <div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #faf9f6; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;">
   
@@ -64,6 +65,30 @@
       <div style="position: absolute; top: 0; left: 0; width: 120px; height: 100%; background: linear-gradient(90deg, transparent, #10b981, #fff); box-shadow: 0 0 15px 3px rgba(16, 185, 129, 0.9); transform: translateX(-120px); animation: laserScan 3s cubic-bezier(0.8, 0, 0.2, 1) forwards 1s;"></div>
       
     </div>
+
+    <!-- Partner Logos -->
+    <div style="margin-top: 48px; display: flex; align-items: center; justify-content: center; gap: 40px; opacity: 0; animation: fadeUp 1s forwards 1.4s;">
+      
+      <!-- Yenepoya -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-family: 'Courier New', monospace; font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 2px;">At</span>
+        <img src="assets/yenepoya-logo.svg" alt="Yenepoya University" style="height: 48px; filter: grayscale(100%); opacity: 0.8;">
+        <span style="font-family: 'Courier New', monospace; font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 2px;">Bangalore</span>
+      </div>
+
+      <div style="width: 1px; height: 50px; background: rgba(0,0,0,0.1);"></div>
+
+      <!-- Kalvium -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <span style="font-family: 'Courier New', monospace; font-size: 10px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 2px;">Industrial Partner</span>
+        <div style="height: 48px; display: flex; align-items: center;">
+          <img src="assets/kalvium-logo.png" alt="Kalvium" style="height: 24px; filter: grayscale(100%); opacity: 0.8;">
+        </div>
+        <span style="font-family: 'Courier New', monospace; font-size: 9px; color: transparent; user-select: none;">Spacer</span> <!-- alignment spacer -->
+      </div>
+      
+    </div>
+
   </div>
 </div>
 
