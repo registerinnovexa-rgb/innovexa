@@ -464,7 +464,8 @@
     const nextBtn = document.getElementById('quiz-next-btn');
 
     let currentCorrectAnswer = "";
-    let isFetching = false;
+    let questionBuffer = [];
+    let isFetchingBatch = false;
 
     function decodeHTML(html) {
       var txt = document.createElement("textarea");
@@ -472,66 +473,83 @@
       return txt.value;
     }
 
-    async function fetchChallenge() {
-      if (isFetching) return;
-      isFetching = true;
-      
-      // Reset UI
+    async function fillBuffer() {
+      if (isFetchingBatch) return;
+      isFetchingBatch = true;
+      try {
+        // Fetch 15 questions at once
+        const response = await fetch('https://opentdb.com/api.php?amount=15&category=18&type=multiple');
+        const data = await response.json();
+        if (data.results && data.results.length > 0) {
+          questionBuffer.push(...data.results);
+        }
+      } catch (err) {
+        console.error("Grid fetch error", err);
+      }
+      isFetchingBatch = false;
+    }
+
+    async function loadNextQuestion() {
+      // Hide next button and feedback instantly
       feedbackEl.style.display = 'none';
       nextBtn.style.display = 'none';
       optionsContainer.innerHTML = '';
-      difficultyBadge.innerText = 'FETCHING...';
-      difficultyBadge.style.color = '#888';
-      difficultyBadge.style.background = '#f3f4f6';
-      questionEl.innerText = 'Connecting to global grid...';
       
-      try {
-        const response = await fetch('https://opentdb.com/api.php?amount=1&category=18&type=multiple');
-        const data = await response.json();
+      // If buffer is empty (e.g. on very first load or if they answered 15 very fast)
+      if (questionBuffer.length === 0) {
+        difficultyBadge.innerText = 'FETCHING...';
+        difficultyBadge.style.color = '#888';
+        difficultyBadge.style.background = '#f3f4f6';
+        questionEl.innerText = 'Connecting to global grid...';
         
-        if (data.results && data.results.length > 0) {
-          const q = data.results[0];
-          questionEl.innerText = decodeHTML(q.question);
-          currentCorrectAnswer = decodeHTML(q.correct_answer);
-          
-          // Difficulty Badge Styling
-          difficultyBadge.innerText = `LEVEL: ${q.difficulty.toUpperCase()}`;
-          if (q.difficulty === 'hard') {
-            difficultyBadge.style.color = '#dc2626';
-            difficultyBadge.style.background = '#fef2f2';
-          } else if (q.difficulty === 'medium') {
-            difficultyBadge.style.color = '#d97706';
-            difficultyBadge.style.background = '#fffbeb';
-          } else {
-            difficultyBadge.style.color = '#059669';
-            difficultyBadge.style.background = '#ecfdf5';
-          }
-
-          let options = [...q.incorrect_answers.map(decodeHTML), currentCorrectAnswer];
-          options.sort(() => Math.random() - 0.5);
-
-          const letters = ['A', 'B', 'C', 'D'];
-          options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-opt-btn';
-            btn.innerHTML = `<span class="quiz-opt-letter">${letters[index]}</span> <span>${opt}</span>`;
-            btn.dataset.answer = opt;
-            btn.addEventListener('click', () => handleAnswer(opt, btn));
-            optionsContainer.appendChild(btn);
-          });
-
-        } else {
-          throw new Error("No data");
+        await fillBuffer();
+        
+        if (questionBuffer.length === 0) {
+           questionEl.innerText = "Connection failed. Please check network.";
+           nextBtn.style.display = 'block';
+           return;
         }
-      } catch (err) {
-        questionEl.innerText = "Connection failed. Please check network.";
-        nextBtn.style.display = 'block';
       }
-      isFetching = false;
+
+      // Pop question instantly from buffer
+      const q = questionBuffer.shift();
+      
+      // Render
+      questionEl.innerText = decodeHTML(q.question);
+      currentCorrectAnswer = decodeHTML(q.correct_answer);
+      
+      difficultyBadge.innerText = `LEVEL: ${q.difficulty.toUpperCase()}`;
+      if (q.difficulty === 'hard') {
+        difficultyBadge.style.color = '#dc2626';
+        difficultyBadge.style.background = '#fef2f2';
+      } else if (q.difficulty === 'medium') {
+        difficultyBadge.style.color = '#d97706';
+        difficultyBadge.style.background = '#fffbeb';
+      } else {
+        difficultyBadge.style.color = '#059669';
+        difficultyBadge.style.background = '#ecfdf5';
+      }
+
+      let options = [...q.incorrect_answers.map(decodeHTML), currentCorrectAnswer];
+      options.sort(() => Math.random() - 0.5);
+
+      const letters = ['A', 'B', 'C', 'D'];
+      options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.innerHTML = `<span class="quiz-opt-letter">${letters[index]}</span> <span>${opt}</span>`;
+        btn.dataset.answer = opt;
+        btn.addEventListener('click', () => handleAnswer(opt, btn));
+        optionsContainer.appendChild(btn);
+      });
+
+      // Refill buffer silently in background if running low
+      if (questionBuffer.length < 3) {
+        fillBuffer();
+      }
     }
 
     function handleAnswer(selectedAnswer, clickedBtn) {
-      // Disable all buttons
       const allBtns = optionsContainer.querySelectorAll('.quiz-opt-btn');
       allBtns.forEach(b => b.disabled = true);
       
@@ -546,7 +564,6 @@
         feedbackEl.style.border = '1px solid #10b981';
       } else {
         clickedBtn.classList.add('incorrect');
-        // Highlight the correct one
         allBtns.forEach(b => {
           if (b.dataset.answer === currentCorrectAnswer) {
             b.classList.add('correct');
@@ -559,12 +576,12 @@
       }
     }
 
-    nextBtn.addEventListener('click', fetchChallenge);
+    nextBtn.addEventListener('click', loadNextQuestion);
 
-    // Initial fetch using IntersectionObserver
+    // Fetch batch immediately when in view
     const observer = new IntersectionObserver((entries) => {
       if(entries[0].isIntersecting) {
-        fetchChallenge();
+        loadNextQuestion();
         observer.disconnect();
       }
     }, { threshold: 0.1 });
