@@ -343,6 +343,7 @@
   ];
 
   const grid = document.getElementById('resources-grid');
+  let arsenal = JSON.parse(localStorage.getItem('atlas_arsenal')) || [];
   
   function renderResources(items) {
     if (items.length === 0) {
@@ -383,7 +384,6 @@
 
   
   // --- ARSENAL LOGIC ---
-  let arsenal = JSON.parse(localStorage.getItem('atlas_arsenal')) || [];
   
   function updateArsenalCount() {
     document.getElementById('arsenal-count').innerText = arsenal.length;
