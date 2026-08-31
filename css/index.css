@@ -1,6 +1,6 @@
     /* ── BASE OVERRIDES ─────────────────────────────────────── */
     body {
-      /* background: #f4f3ef; (moved to global gradient) */ /* Slightly warmer/lighter light theme base */
+      background: #f4f3ef; /* Slightly warmer/lighter light theme base */
     }
     .container {
       max-width: 1300px;
