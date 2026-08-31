@@ -27,7 +27,8 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--bg);
+  background: url('../assets/bg-gradient.jpg') center/cover fixed no-repeat;
+  /* background: var(--bg); */
   color: var(--text-1);
   font-family: var(--font-b);
   font-size: 16px;
