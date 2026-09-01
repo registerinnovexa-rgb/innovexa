@@ -753,12 +753,8 @@
       background: #000000;
     }
     .login-logo {
-      width: 64px; height: 64px;
-      object-fit: contain;
-      margin: 0 auto 24px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
+  width: auto; height: 64px; max-width: 100%; object-fit: contain; margin: 0 auto 24px; display: block;
+}
     .login-title {
       font-family: var(--font-d);
       font-size: 26px;

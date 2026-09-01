@@ -118,10 +118,10 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; gap: 10px; flex-shrink: 0;
 }
 .nav-logo img {
-  width: 32px; height: 32px; object-fit: contain; filter: invert(0);
+  width: auto; height: 32px; object-fit: contain;
 }
 .nav-logo-text {
-  font-family: var(--font-d); font-weight: 700; font-size: 18px; color: var(--text-1); letter-spacing: -0.02em;
+  display: none;
 }
 .nav-logo-text span { opacity: 0.45; }
 
