@@ -648,112 +648,81 @@
 </section>
 
 <!-- ══ GALLERY ══════════════════════════════════════════════════ -->
-<section id="gsap-gallery" class="gallery-section fade-up" style="padding: 100px 0; overflow: hidden; position: relative; background: #000; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-  <div class="container" style="margin-bottom: 60px; text-align: center; position: relative; z-index: 10;">
-    <h2 style="font-size: 48px; font-family: var(--font-d); letter-spacing: -0.03em; color: #fff;">
-      Glimpses of <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8; color: var(--accent);">Action.</span>
-    </h2>
-    <p style="color: #94a3b8; max-width: 500px; margin: 10px auto; font-family: var(--font-m);">A visual log of our operatives pushing boundaries.</p>
+<section class="gallery-section fade-up" style="margin: 40px 0; overflow: hidden; position: relative;">
+  <div class="container" style="margin-bottom: 40px; text-align: center;">
+    <h2 style="font-size: 32px; font-family: var(--font-d); letter-spacing: -0.03em;">Glimpses of <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8;">Action.</span></h2>
   </div>
   
-  <div class="gallery-parallax-container" style="display: flex; gap: 2vw; height: 85vh; max-width: 1400px; margin: 0 auto; overflow: hidden; transform: rotate(-4deg) scale(1.15);">
-    
-    <!-- Column 1 (Scrolls UP) -->
-    <div class="gallery-col col-up" style="display: flex; flex-direction: column; gap: 2vw; width: 33.333%; margin-top: 5vh;">
-      <img loading="lazy" src="assets/gallery/1.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/5;">
-      <img loading="lazy" src="assets/gallery/2.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/3.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-      <img loading="lazy" src="assets/gallery/4.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 3/4;">
-      <img loading="lazy" src="assets/gallery/5.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/6.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/5;">
-      <img loading="lazy" src="assets/gallery/7.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 16/9;">
-      <img loading="lazy" src="assets/gallery/8.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/9.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-      <img loading="lazy" src="assets/gallery/10.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 3/4;">
+  <div class="gallery-track-container" style="width: 100vw; margin-left: calc(-50vw + 50%); overflow: hidden; position: relative;">
+    <div class="gallery-track" style="display: flex; gap: 20px; width: max-content; animation: scrollGallery 110s linear infinite; padding: 10px 0;">
+      <!-- Images will be shuffled and duplicated by JS -->
+      <img loading="lazy" src="assets/gallery/1.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/2.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/3.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/4.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/5.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/6.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/7.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/8.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/9.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/10.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/11.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/12.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/13.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/14.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/15.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/16.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/17.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/18.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/19.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/20.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/21.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/22.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/23.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/24.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/25.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/26.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/27.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/28.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
+      <img loading="lazy" src="assets/gallery/29.jpg" style="height: 320px; width: auto; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);" alt="Gallery Image" />
     </div>
     
-    <!-- Column 2 (Scrolls DOWN) -->
-    <div class="gallery-col col-down" style="display: flex; flex-direction: column; gap: 2vw; width: 33.333%; margin-top: -65vh;">
-      <img loading="lazy" src="assets/gallery/11.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/12.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-      <img loading="lazy" src="assets/gallery/13.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 3/4;">
-      <img loading="lazy" src="assets/gallery/14.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 16/9;">
-      <img loading="lazy" src="assets/gallery/15.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/16.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/5;">
-      <img loading="lazy" src="assets/gallery/17.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 3/4;">
-      <img loading="lazy" src="assets/gallery/18.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/19.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 16/9;">
-      <img loading="lazy" src="assets/gallery/20.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-    </div>
-    
-    <!-- Column 3 (Scrolls UP) -->
-    <div class="gallery-col col-up" style="display: flex; flex-direction: column; gap: 2vw; width: 33.333%; margin-top: 15vh;">
-      <img loading="lazy" src="assets/gallery/21.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-      <img loading="lazy" src="assets/gallery/22.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/23.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/5;">
-      <img loading="lazy" src="assets/gallery/24.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 3/4;">
-      <img loading="lazy" src="assets/gallery/25.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 16/9;">
-      <img loading="lazy" src="assets/gallery/26.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-      <img loading="lazy" src="assets/gallery/27.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3;">
-      <img loading="lazy" src="assets/gallery/28.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/5;">
-      <img loading="lazy" src="assets/gallery/29.jpg" style="width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1;">
-    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const track = document.querySelector('.gallery-track');
+        if (track) {
+          const images = Array.from(track.querySelectorAll('img'));
+          track.innerHTML = '';
+          
+          // Shuffle array (Fisher-Yates)
+          for (let i = images.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [images[i], images[j]] = [images[j], images[i]];
+          }
+          
+          // Append shuffled images
+          images.forEach(img => track.appendChild(img));
+          
+          // Clone and append for infinite scroll loop
+          images.forEach(img => {
+            const clone = img.cloneNode(true);
+            track.appendChild(clone);
+          });
+        }
+      });
+    </script>
   </div>
-  
-  <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, #000, transparent); pointer-events: none; z-index: 5;"></div>
-  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to bottom, #000, transparent); pointer-events: none; z-index: 5;"></div>
 </section>
 
-<!-- GSAP and ScrollTrigger Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof gsap !== 'undefined') {
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Parallax effect for the columns
-      const gallerySection = document.querySelector('#gsap-gallery');
-      const colsUp = document.querySelectorAll('.col-up');
-      const colsDown = document.querySelectorAll('.col-down');
-
-      // The outer columns scroll up (negative Y)
-      gsap.to(colsUp, {
-        yPercent: -45,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: gallerySection,
-          start: 'top bottom', // Start when section enters viewport from bottom
-          end: 'bottom top',   // End when section leaves viewport from top
-          scrub: 1             // Smooth scrubbing
-        }
-      });
-
-      // The inner column scrolls down (positive Y)
-      gsap.to(colsDown, {
-        yPercent: 45,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: gallerySection,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1
-        }
-      });
-      
-      // Add subtle hover effect to images
-      const images = gallerySection.querySelectorAll('img');
-      images.forEach(img => {
-        img.addEventListener('mouseenter', () => {
-          gsap.to(img, { scale: 1.05, duration: 0.4, ease: 'power2.out' });
-        });
-        img.addEventListener('mouseleave', () => {
-          gsap.to(img, { scale: 1, duration: 0.4, ease: 'power2.out' });
-        });
-      });
-    }
-  });
-</script>
+<style>
+@keyframes scrollGallery {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 10px)); }
+}
+.gallery-track:hover {
+  animation-play-state: paused;
+}
+</style>
 
 <!-- ══ BENTO GRID ══════════════════════════════════════════════ -->
 <section class="bento-section container" id="ecosystem">
