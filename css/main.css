@@ -448,7 +448,7 @@
       font-family: var(--font-d); font-weight: 700; font-size: 14px;
       display: flex; align-items: center; gap: 8px;
     }
-    .id-card-logo-box img { width: 20px; height: 20px; filter: invert(1); opacity: 0.8; }
+    .id-card-logo-box img { width: auto; height: 24px; filter: invert(1); opacity: 0.8; object-fit: contain; }
     
     .id-card-body { padding: 40px 24px; display: flex; flex-direction: column; position: relative; z-index: 1; }
     .id-card-op-id {
