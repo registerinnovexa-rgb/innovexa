@@ -648,16 +648,98 @@
 </section>
 
 <!-- ══ GALLERY ══════════════════════════════════════════════════ -->
-<section class="gallery-section fade-up" style="margin: 60px 0; overflow: hidden; position: relative;">
-  <div class="container" style="margin-bottom: 40px; text-align: center;">
-    <h2 style="font-size: 32px; font-family: var(--font-d); letter-spacing: -0.03em;">Glimpses of <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8; color: var(--accent);">Action.</span></h2>
-    <p style="color: var(--text3); max-width: 500px; margin: 10px auto; font-family: var(--font-m); font-size: 14px;">Hover to expand</p>
+<section class="gallery-section" style="margin: 40px 0; padding: 40px 0; overflow: hidden; position: relative; height: 75vh; min-height: 550px; background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+  <div class="container" style="text-align: center; position: relative; z-index: 10; margin-bottom: 20px;">
+    <h2 style="font-size: 38px; font-family: var(--font-d); letter-spacing: -0.03em;">Glimpses of <span class="italic" style="font-family:'Times New Roman',serif; font-style:italic; font-weight:400; opacity:0.8; color: var(--accent);">Action.</span></h2>
+    <p style="color: var(--text3); max-width: 500px; margin: 10px auto; font-family: var(--font-m); font-size: 14px;">Drag to explore the archive</p>
   </div>
   
-  <div class="gsap-accordion-container" style="display: flex; width: 100%; max-width: 1200px; height: 50vh; min-height: 400px; margin: 0 auto; gap: 10px; padding: 0 20px;">
-    <!-- JS will populate this with 7 random images -->
+  <div style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); perspective: 1800px; width: 100vw; height: 400px; display: flex; justify-content: center; align-items: center; pointer-events: none;">
+    <div id="gallery-spinner" style="position: relative; width: 280px; height: 380px; transform-style: preserve-3d; pointer-events: auto; cursor: grab;">
+      <!-- JS will append images here -->
+    </div>
   </div>
 </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof gsap === 'undefined') return;
+    gsap.registerPlugin(Draggable);
+
+    const spinner = document.getElementById('gallery-spinner');
+    if (!spinner) return;
+
+    // We will use 12 images for the 3D ring
+    const totalImages = 12;
+    const radius = window.innerWidth < 768 ? 250 : 450; // Dynamic radius based on screen
+    const picked = [];
+    
+    // Pick 12 random images out of 29
+    while (picked.length < totalImages) {
+      const r = Math.floor(Math.random() * 29) + 1;
+      if (!picked.includes(r)) picked.push(r);
+    }
+
+    picked.forEach((num, i) => {
+      const img = document.createElement('img');
+      img.src = `assets/gallery/${num}.jpg`;
+      img.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        backface-visibility: hidden;
+        user-select: none;
+        -webkit-user-drag: none;
+        border: 1px solid rgba(255,255,255,0.1);
+      `;
+      spinner.appendChild(img);
+
+      // Position in 3D circle
+      const angle = (i / totalImages) * Math.PI * 2;
+      gsap.set(img, {
+        rotationY: (angle * 180 / Math.PI),
+        z: radius
+      });
+      
+      // Add slight hover effect
+      img.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.05, duration: 0.3 }));
+      img.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.3 }));
+    });
+
+    // Animate the entire spinner continuously
+    let currentRotation = 0;
+    
+    // Continuous spinning animation
+    const spinAnim = gsap.to(spinner, {
+      rotationY: "+=360",
+      duration: 35,
+      ease: "none",
+      repeat: -1
+    });
+
+    // Make the spinner draggable (like a real carousel)
+    Draggable.create(spinner, {
+      type: "rotationY",
+      inertia: true,
+      onPress: () => {
+        spinAnim.pause();
+        spinner.style.cursor = 'grabbing';
+      },
+      onRelease: () => {
+        spinner.style.cursor = 'grab';
+        // Resume spinning from current position
+        spinAnim.play();
+      }
+    });
+  });
+</script>
 
 <!-- GSAP Script for Accordion -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
