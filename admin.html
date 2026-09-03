@@ -1786,8 +1786,8 @@ function renderForgeAccess() {
   approvedMembers.forEach(m => {
     const isGranted = (String(m.forgeAccess || '').trim() === 'Granted');
     const actionBtn = isGranted 
-      ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Revoked')">Revoke</button>`
-      : `<button class="btn-sm" style="background:var(--green); color:#fff;" onclick="toggleForgeAccess(${m.rowIndex}, 'Granted')">Grant Access</button>`;
+      ? `<button class="btn-sm" style="background:var(--red); color:#fff;" onclick="toggleForgeAccess('${m.operativeId}', 'Revoked')">Revoke</button>`
+      : `<button class="btn-sm" style="background:var(--green); color:#fff;" onclick="toggleForgeAccess('${m.operativeId}', 'Granted')">Grant Access</button>`;
     
     html += `
       <tr>
@@ -1803,7 +1803,7 @@ function renderForgeAccess() {
   tbody.innerHTML = html;
 }
 
-async function toggleForgeAccess(rowIndex, newStatus) {
+async function toggleForgeAccess(operativeId, newStatus) {
   if (!confirm(`Are you sure you want to ${newStatus === 'Granted' ? 'Grant' : 'Revoke'} Forge access for this operative?`)) return;
   
   const btn = event && event.target;
@@ -1811,7 +1811,7 @@ async function toggleForgeAccess(rowIndex, newStatus) {
 
   try {
     showToast('Updating… please wait', 'info');
-    await apiWrite('admin_grant_forge_access', { rowIndex: rowIndex, accessStatus: newStatus });
+    await apiWrite('admin_grant_forge_access', { operativeId: operativeId, accessStatus: newStatus });
     
     const refreshed = await apiGet('adminMembers');
     cachedMembers = refreshed.members || [];
@@ -4465,7 +4465,7 @@ function renderEventCards() {
       <div class="btn-actions">
         ${ev.requiresReg === 'yes' ? `<button class="btn-sm" style="background:rgba(255,107,0,0.1);color:#ff6b00;border:1px solid rgba(255,107,0,0.2)" onclick="viewEventRegs('${escHtml(ev.name)}')">📋 Registrations</button>` : ''}
         <button class="btn-sm btn-edit" onclick="editEvent(${i})">✎ Edit</button>
-        <button class="btn-sm btn-delete" onclick="deleteSession(${ev.rowIndex})">✕ Delete</button>
+        <button class="btn-sm btn-delete" onclick=\"deleteSessionLegacy('${ev.sessionId}')\">✕ Delete</button>
       </div>
     </div>
   `).join('');
@@ -4531,10 +4531,7 @@ async function rejectReg(sessionName, rowIndex) {
   } catch(e) { showToast('Network error', 'error'); }
 }
 
-async function deleteSession(rowIndex) {
-  if (!confirm('Delete this event?')) return;
-  try {
-    const data = await apiWrite('deleteSession', { rowIndex });
+async function deleteSessionLegacy(sessionId) { if(!confirm('Delete this event?')) return; try { const data = await apiWrite('deleteSession', { sessionId });
     if (data.success) { showToast('Event deleted'); loadSessions(); loadOverview(); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
@@ -4566,7 +4563,7 @@ function renderResources() {
       <td>
         <div class="btn-actions">
           <button class="btn-sm btn-edit" onclick="editResource(${i})">✎</button>
-          <button class="btn-sm btn-delete" onclick="deleteResource(${r.rowIndex})">✕</button>
+          <button class="btn-sm btn-delete" onclick=\"deleteResource('${r.id || r.resourceId}')\">✕</button>
         </div>
       </td>
     </tr>
