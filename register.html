@@ -321,7 +321,7 @@
 
     async function checkEmailDuplicate(email) {
       try {
-        const res = await gasGet('/api/proxy?action=status_check&email=' + encodeURIComponent(email));
+        const res = await gasGet('/api/backend?action=status_check&email=' + encodeURIComponent(email));
         if (res && res.found) {
           // Block the form and show already-registered banner
           showAlreadyRegistered(res.data);
@@ -589,7 +589,7 @@
     };
 
     try {
-      const resp = await fetch('/api/proxy', {
+      const resp = await fetch('/api/backend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ payload: payload })

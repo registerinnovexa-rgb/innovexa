@@ -302,7 +302,7 @@
 
     async function _gasFetch(action, extraParams = {}) {
       const params = new URLSearchParams({ action, _t: Date.now(), ...extraParams });
-      const url = '/api/proxy?' + params.toString();
+      const url = '/api/backend?' + params.toString();
       const r = await fetch(url, { method: 'GET', cache: 'no-store' });
       const text = await r.text();
       try { return JSON.parse(text); } catch(_) { throw new Error('Invalid response'); }
@@ -354,7 +354,7 @@
     }
 
     async function apiGetMain(action) {
-      const url = '/api/proxy?action=' + action + '&_t=' + Date.now();
+      const url = '/api/backend?action=' + action + '&_t=' + Date.now();
       const r = await fetch(url, { method: 'GET', cache: 'no-store' });
       return await r.json();
     }
@@ -472,7 +472,7 @@
       btn.textContent = 'Sending...';
 
       try {
-        const r = await fetch('/api/proxy', {
+        const r = await fetch('/api/backend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_request_otp', invxId: id } })
@@ -515,7 +515,7 @@
         const screenRes = `${window.screen.width}x${window.screen.height}`;
         const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark Mode' : 'Light Mode';
         
-        const r = await fetch('/api/proxy', {
+        const r = await fetch('/api/backend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_verify_otp', invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme } })
@@ -808,7 +808,7 @@
       
       toast('Updating submission...');
       try {
-        const r = await fetch('/api/proxy', {
+        const r = await fetch('/api/backend', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_edit_task', taskId, submitLink } })
         });
@@ -827,7 +827,7 @@
       
       toast('Recalling submission...');
       try {
-        const r = await fetch('/api/proxy', {
+        const r = await fetch('/api/backend', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_recall_task', taskId } })
         });
@@ -855,7 +855,7 @@
       logAction(`Submitted mission for review: ${taskId}`);
       
       try {
-        fetch('/api/proxy', {
+        fetch('/api/backend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_submit_task', taskId, submitLink, invxId: session.operativeId } })

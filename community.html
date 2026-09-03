@@ -529,7 +529,7 @@
     btn.textContent = 'Verifying…'; btn.disabled = true;
 
     try {
-      const url = `/api/proxy?action=status_check&email=${encodeURIComponent(email)}`;
+      const url = `/api/backend?action=status_check&email=${encodeURIComponent(email)}`;
       const res  = await fetch(url, { method:'GET', redirect:'follow' });
       const data = await res.json();
 
