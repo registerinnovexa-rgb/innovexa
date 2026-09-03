@@ -760,6 +760,7 @@
   function resizeCanvas() {
     const rect = sigCanvas.parentElement.getBoundingClientRect();
     if (rect.width === 0) return; // Hidden
+    if (sigCanvas.width === Math.floor(rect.width)) return; // No change needed, prevent erase glitch
     
     // Create a temporary canvas to save the current drawing if any
     const tempCanvas = document.createElement('canvas');
@@ -767,7 +768,7 @@
     tempCanvas.height = sigCanvas.height;
     tempCanvas.getContext('2d').drawImage(sigCanvas, 0, 0);
 
-    sigCanvas.width = rect.width;
+    sigCanvas.width = Math.floor(rect.width);
     sigCanvas.height = 150; // fixed height
     sigCtx.lineWidth = 2;
     sigCtx.lineCap = 'round';
