@@ -394,6 +394,16 @@
       .actions-grid { grid-template-columns: 1fr; }
     }
 
+
+    .btn-sm { background:transparent; color:var(--text3); transition:all 0.2s; }
+    .btn-sm:hover { color:var(--text); }
+    .btn-sm.active { background:var(--bg2) !important; color:var(--text) !important; box-shadow:var(--shadow-sm); }
+
+
+    .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s ease; }
+    .data-table tbody tr:hover { background: var(--bg3) !important; }
+    .data-table tbody tr:nth-child(even) { background: #fafafa; }
+    .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
 </style>
 
 
@@ -422,6 +432,16 @@
       .actions-grid { grid-template-columns: 1fr; }
     }
 
+
+    .btn-sm { background:transparent; color:var(--text3); transition:all 0.2s; }
+    .btn-sm:hover { color:var(--text); }
+    .btn-sm.active { background:var(--bg2) !important; color:var(--text) !important; box-shadow:var(--shadow-sm); }
+
+
+    .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s ease; }
+    .data-table tbody tr:hover { background: var(--bg3) !important; }
+    .data-table tbody tr:nth-child(even) { background: #fafafa; }
+    .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
 </style>
     <link rel="icon" type="image/png" href="assets/icon.png" />
 </head>
@@ -727,17 +747,20 @@
 
   <!-- ── FORGE OPS TAB ── -->
   <div class="tab-content" id="tabForgeOps">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <!-- Unified Tab Header -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:16px;">
       <div>
-        <h2 style="font-size:24px;font-weight:800;">Forge Operations</h2>
-        <p style="color:var(--text3);font-size:14px;margin-top:4px;">Manage access, missions, and operative progression.</p>
+        <h2 style="font-size:24px; font-weight:800; color:var(--text); margin:0;">Forge Operations</h2>
+        <div style="font-size:13px; color:var(--text3); margin-top:4px;">Manage operative clearance, bounties, and progression frameworks.</div>
       </div>
-      <div class="tab-filters">
-        <button class="btn-sm active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Ranks</button>
-        <button class="btn-sm" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
-        <button class="btn-sm" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions Queue</button>
-        <button class="btn-sm" id="fNavResources" onclick="switchForgeSubTab('resources')">Resources</button>
-      </div>
+    </div>
+    
+    <!-- Segmented Control Bar for Sub-Tabs -->
+    <div style="display:flex; gap:4px; padding:4px; background:var(--bg3); border-radius:10px; width:fit-content; margin-bottom:24px; border:1px solid var(--border);">
+      <button class="btn-sm active" id="fNavAccess" onclick="switchForgeSubTab('access')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Access & Clearance</button>
+      <button class="btn-sm" id="fNavBounties" onclick="switchForgeSubTab('bounties')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Bounty Board</button>
+      <button class="btn-sm" id="fNavReviews" onclick="switchForgeSubTab('reviews')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Submissions</button>
+      <button class="btn-sm" id="fNavResources" onclick="switchForgeSubTab('resources')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Resources</button>
     </div>
 
     <!-- Sub-tab: Access Management -->
@@ -4385,6 +4408,16 @@ function printIDCards(htmlContent) {
       .actions-grid { grid-template-columns: 1fr; }
     }
 
+
+    .btn-sm { background:transparent; color:var(--text3); transition:all 0.2s; }
+    .btn-sm:hover { color:var(--text); }
+    .btn-sm.active { background:var(--bg2) !important; color:var(--text) !important; box-shadow:var(--shadow-sm); }
+
+
+    .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s ease; }
+    .data-table tbody tr:hover { background: var(--bg3) !important; }
+    .data-table tbody tr:nth-child(even) { background: #fafafa; }
+    .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
 </style>
   <link rel="icon" type="image/png" href="assets/icon.png" />
 </head>
