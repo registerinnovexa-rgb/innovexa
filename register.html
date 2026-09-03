@@ -573,6 +573,7 @@
     document.getElementById('step-3').classList.remove('hidden');
     updateProgress(3);
     window.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(resizeCanvas, 50); // Ensure the DOM has updated width before resizing
   });
 
   if (btnBack1) btnBack1.addEventListener('click', () => {
@@ -691,11 +692,22 @@
   // Fix internal resolution vs CSS resolution
   function resizeCanvas() {
     const rect = sigCanvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0) return; // Hidden
+    
+    // Create a temporary canvas to save the current drawing if any
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = sigCanvas.width;
+    tempCanvas.height = sigCanvas.height;
+    tempCanvas.getContext('2d').drawImage(sigCanvas, 0, 0);
+
     sigCanvas.width = rect.width;
     sigCanvas.height = 150; // fixed height
     sigCtx.lineWidth = 2;
     sigCtx.lineCap = 'round';
     sigCtx.strokeStyle = '#111';
+    
+    // Restore drawing
+    sigCtx.drawImage(tempCanvas, 0, 0);
   }
   window.addEventListener('resize', resizeCanvas);
   setTimeout(resizeCanvas, 100); // initialize
