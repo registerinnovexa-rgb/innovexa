@@ -157,20 +157,20 @@
 <!-- ══ NAVBAR ══════════════════════════════════════════════════ -->
 <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation" style="position: sticky; top: 0; z-index: 1000; background: rgba(250, 249, 246, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05);">
   <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
-    <a href="index.html" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+    <a href="index" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
       <img src="assets/logo.png" alt="Innovexa Hub Logo" style="height:32px; width:auto; object-fit:contain;" />
       
     </a>
     <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
-      <a href="index.html" class="nav-link active" style="font-size:14px; font-weight:500;">Home</a>
-      <a href="register.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Register</a>
-      <a href="status.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Status</a>
-      <a href="pathfinder.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
-      <a href="forge.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Dashboard</a>
-      <a href="atlas.html" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Atlas</a>
+      <a href="index" class="nav-link active" style="font-size:14px; font-weight:500;">Home</a>
+      <a href="register" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Register</a>
+      <a href="status" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Status</a>
+      <a href="pathfinder" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
+      <a href="forge" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Dashboard</a>
+      <a href="atlas" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Atlas</a>
     </div>
     <div class="nav-cta">
-      <a href="register.html" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Initialize Membership</a>
+      <a href="register" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Initialize Membership</a>
     </div>
     <button class="hamburger" id="hamburger-btn">
       <span></span>
@@ -183,12 +183,12 @@
 <!-- Mobile Menu -->
 <div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
   <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
-  <a href="index.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
-  <a href="register.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
-  <a href="status.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
-  <a href="pathfinder.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
-  <a href="forge.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Dashboard</a>
-  <a href="atlas.html" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+  <a href="index" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+  <a href="pathfinder" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="forge" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Dashboard</a>
+  <a href="atlas" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
 </div>
 
 <!-- ══ HERO ════════════════════════════════════════════════════ -->
@@ -237,8 +237,8 @@
     </div>
 
     <div class="hero-actions fade-up delay-3">
-      <a href="register.html" class="btn-magnetic">Initialize Membership</a>
-      <a href="status.html" class="btn-outline">Track Application</a>
+      <a href="register" class="btn-magnetic">Initialize Membership</a>
+      <a href="status" class="btn-outline">Track Application</a>
     </div>
   </div>
 </section>
@@ -643,7 +643,7 @@
   </style>
 
   <div style="text-align: center; margin-top: 40px;">
-    <a href="forge.html" class="btn-outline" style="border-radius: 100px; font-size: 13px;">Execute Initialization (Open Forge)</a>
+    <a href="forge" class="btn-outline" style="border-radius: 100px; font-size: 13px;">Execute Initialization (Open Forge)</a>
   </div>
 </section>
 
@@ -1340,7 +1340,7 @@
     <p style="color: #6b7280; font-size: 17px; max-width: 600px; margin: 0 auto 48px; line-height: 1.6;">Join an elite cohort of builders shaping the digital frontier. Batch 2026 applications are closing soon.</p>
     
     <!-- Execution Command CTA -->
-    <a href="register.html" style="display: inline-flex; align-items: center; justify-content: space-between; background: #111827; border: 1px solid #374151; padding: 18px 24px; border-radius: 8px; text-decoration: none; min-width: 320px; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.6);" onmouseover="this.style.background='#1f2937'; this.style.borderColor='#10b981'; this.querySelector('.cursor').style.opacity='1'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#111827'; this.style.borderColor='#374151'; this.style.transform='translateY(0)';">
+    <a href="register" style="display: inline-flex; align-items: center; justify-content: space-between; background: #111827; border: 1px solid #374151; padding: 18px 24px; border-radius: 8px; text-decoration: none; min-width: 320px; transition: all 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.6);" onmouseover="this.style.background='#1f2937'; this.style.borderColor='#10b981'; this.querySelector('.cursor').style.opacity='1'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#111827'; this.style.borderColor='#374151'; this.style.transform='translateY(0)';">
       <div style="display: flex; align-items: center; gap: 12px; font-family: 'Courier New', monospace; font-size: 15px;">
         <span style="color: #10b981;">root@hub:~#</span>
         <span style="color: #e5e7eb; font-weight: bold;">./init_membership.sh</span>
@@ -1359,17 +1359,17 @@
 <!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
 <footer>
   <div class="footer-inner container">
-    <a href="index.html" class="footer-logo">
+    <a href="index" class="footer-logo">
       <img src="assets/logo.png" alt="Innovexa Hub" />
       
     </a>
     <div class="footer-links">
-      <a href="index.html" class="footer-link">Home</a>
-      <a href="register.html" class="footer-link">Register</a>
-      <a href="status.html" class="footer-link">Status</a>
-      <a href="pathfinder.html" class="footer-link">Pathfinder</a>
-      <a href="forge.html" class="footer-link">Dashboard</a>
-      <a href="atlas.html" class="footer-link">Atlas</a>
+      <a href="index" class="footer-link">Home</a>
+      <a href="register" class="footer-link">Register</a>
+      <a href="status" class="footer-link">Status</a>
+      <a href="pathfinder" class="footer-link">Pathfinder</a>
+      <a href="forge" class="footer-link">Dashboard</a>
+      <a href="atlas" class="footer-link">Atlas</a>
     </div>
     <div class="footer-copy">© 2026 Innovexa Hub. All rights reserved.</div>
   </div>

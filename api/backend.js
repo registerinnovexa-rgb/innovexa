@@ -50,7 +50,7 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
   const cfg = typeConfig[type] || { icon: '📋', color: '#6b7280', label: type.replace(/_/g,' ') };
   const urgentBar = urgent ? `<div style="background:#ef4444;color:#fff;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;margin-bottom:20px;letter-spacing:.5px;">🚨 URGENT — Immediate Action Required</div>` : '';
   try {
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
       to: adminEmail,
       subject: `${cfg.icon} [${cfg.label}] ${name} · ${operativeId}`,
@@ -117,7 +117,7 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
 async function notifyUser(email, subject, htmlContent) {
   if (!email || !process.env.EMAIL_USER) return;
   try {
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: subject,
@@ -258,7 +258,7 @@ export default async function handler(req, res) {
         });
         await log.save();
 
-        await notifyAdmin({
+        notifyAdmin({
           type: 'STATUS_CHECK',
           operativeId: member.operativeId,
           name: member.name,
@@ -317,7 +317,7 @@ export default async function handler(req, res) {
       await member.save();
       
       try {
-        await transporter.sendMail({
+        transporter.sendMail({
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: member.email,
           subject: `🔐 Your Innovexa Login Code: ${otp}`,
@@ -418,7 +418,7 @@ export default async function handler(req, res) {
       }).save();
 
       // Notify admin of login
-      await notifyAdmin({
+      notifyAdmin({
         type: 'LOGIN',
         operativeId: member.operativeId,
         name: member.name,
@@ -480,7 +480,7 @@ export default async function handler(req, res) {
       
       if (justApproved && member.email) {
         try {
-          await transporter.sendMail({
+          transporter.sendMail({
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
             subject: `🎉 Congratulations! Your Innovexa Membership is Approved`,
@@ -1076,7 +1076,7 @@ export default async function handler(req, res) {
         await newMember.save();
 
         // Notify admin about new registration via notifyAdmin
-        await notifyAdmin({
+        notifyAdmin({
           type: 'REGISTRATION',
           operativeId: genId,
           name: fullName,
@@ -1218,7 +1218,7 @@ export default async function handler(req, res) {
       );
 
       try {
-        await transporter.sendMail({
+        transporter.sendMail({
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: 'innovexahub.bangalore@gmail.com',
           subject: `🚨 Admin Login OTP: ${otp}`,
@@ -1436,7 +1436,7 @@ export default async function handler(req, res) {
       // Clear OTP
       await PlatformSettings.findOneAndUpdate({ key: 'global' }, { $unset: { adminOtp: "", adminOtpTime: "" } });
 
-      await notifyAdmin({
+      notifyAdmin({
         type: 'LOGIN',
         operativeId: memberData.operativeId,
         name: memberData.name,
@@ -1517,7 +1517,7 @@ export default async function handler(req, res) {
         await log.save();
 
         // Notify admin immediately
-        await notifyAdmin({
+        notifyAdmin({
           type: 'TASK_SUBMITTED',
           operativeId: member.operativeId,
           name: member.name,
@@ -1617,7 +1617,7 @@ export default async function handler(req, res) {
       await log.save();
 
       // Notify admin about status change
-      await notifyAdmin({
+      notifyAdmin({
         type: 'STATUS_CHANGE',
         operativeId: member.operativeId,
         name: member.name,
@@ -1628,7 +1628,7 @@ export default async function handler(req, res) {
       // Send approval welcome email when status becomes Confirmed or Approved
       if ((status === 'Confirmed' || status === 'Approved') && member.email) {
         try {
-          await transporter.sendMail({
+          transporter.sendMail({
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
             subject: `🎉 Congratulations! Your Innovexa Membership is Approved`,
@@ -1677,7 +1677,7 @@ export default async function handler(req, res) {
       // Send revoke/reject notification email to member
       if ((status === 'Revoked' || status === 'Rejected') && member.email) {
         try {
-          await transporter.sendMail({
+          transporter.sendMail({
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
             subject: `⚠️ Important: Your Innovexa Membership Status Update`,
@@ -2022,7 +2022,7 @@ export default async function handler(req, res) {
       await log.save();
 
       // SOS = urgent admin notification
-      await notifyAdmin({
+      notifyAdmin({
         type: 'SOS_CREATED',
         operativeId: member.operativeId,
         name: member.name,
@@ -2137,7 +2137,7 @@ export default async function handler(req, res) {
         });
         await log.save();
 
-        await notifyAdmin({
+        notifyAdmin({
           type: 'BOUNTY_CLAIMED',
           operativeId,
           name,
@@ -2163,7 +2163,7 @@ export default async function handler(req, res) {
            });
            await log.save();
 
-           await notifyAdmin({
+           notifyAdmin({
              type: 'BOUNTY_COMPLETED',
              operativeId: member.operativeId,
              name: member.name,
@@ -2212,7 +2212,7 @@ export default async function handler(req, res) {
          name: recallerName
        }).save();
 
-       await notifyAdmin({
+       notifyAdmin({
          type: 'TASK_RECALLED',
          operativeId: operativeId || 'SYSTEM',
          name: recallerName,
@@ -2293,7 +2293,7 @@ export default async function handler(req, res) {
       });
       await log.save();
       
-      await notifyAdmin({
+      notifyAdmin({
         type: 'TASK_CREATED',
         operativeId: 'ADMIN',
         name: 'System Admin',
@@ -2314,7 +2314,7 @@ export default async function handler(req, res) {
        if (status !== undefined) t.status = status;
        await t.save();
        
-       await notifyAdmin({
+       notifyAdmin({
          type: 'TASK_UPDATED',
          operativeId: 'ADMIN',
          name: 'System Admin',
@@ -2327,7 +2327,7 @@ export default async function handler(req, res) {
        const { taskId } = payload;
        const t = await Task.findOne({ taskId });
        if (t) {
-         await notifyAdmin({
+         notifyAdmin({
            type: 'TASK_DELETED',
            operativeId: 'ADMIN',
            name: 'System Admin',
@@ -2375,7 +2375,7 @@ export default async function handler(req, res) {
            // Email the member — task approved
            if (member.email && process.env.EMAIL_USER) {
              try {
-               await transporter.sendMail({
+               transporter.sendMail({
                  from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
                  to: member.email,
                  subject: `✅ Task Approved: ${t.title} (+${xpToAward} XP)`,
@@ -2416,7 +2416,7 @@ export default async function handler(req, res) {
            // Email the member — task rejected
            if (member.email && process.env.EMAIL_USER) {
              try {
-               await transporter.sendMail({
+               transporter.sendMail({
                  from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
                  to: member.email,
                  subject: `❌ Task Needs Revision: ${t.title}`,
@@ -2469,7 +2469,7 @@ export default async function handler(req, res) {
          subject: subject,
          text: body
        };
-       await transporter.sendMail(mailOptions);
+       transporter.sendMail(mailOptions);
        return res.status(200).json({ success: true, message: `Sent email to ${emails.length} operatives` });
     }
 
@@ -2479,7 +2479,7 @@ export default async function handler(req, res) {
          return res.status(200).json({ success: false, message: 'EMAIL_USER or EMAIL_PASS environment variable is missing on Vercel.' });
        }
        try {
-         await transporter.sendMail({
+         transporter.sendMail({
            from: `"Innovexa Hub Admin" <${process.env.EMAIL_USER}>`,
            to: adminEmail,
            subject: '🧪 [TEST EMAIL] Innovexa Admin Notification System Check',
