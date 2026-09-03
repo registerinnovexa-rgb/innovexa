@@ -1028,6 +1028,15 @@ export default async function handler(req, res) {
     }
 
     // PUBLIC: Registration
+    
+    // --- LIVE EMAIL CHECKER ---
+    if (action === 'check_email') {
+       const { email } = payload;
+       if (!email) return res.status(200).json({ exists: false });
+       const existing = await Member.findOne({ email: email.trim().toLowerCase() });
+       return res.status(200).json({ exists: !!existing });
+    }
+
     if (action === 'register_member') {
         const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr } = payload;
         
