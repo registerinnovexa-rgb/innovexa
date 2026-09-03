@@ -404,6 +404,36 @@
     .data-table tbody tr:hover { background: var(--bg3) !important; }
     .data-table tbody tr:nth-child(even) { background: #fafafa; }
     .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
+
+    .segmented-control { user-select: none; }
+    .seg-btn {
+      background: transparent; border: none; border-radius: 6px; padding: 8px 16px;
+      font-size: 13px; font-weight: 600; color: var(--text3); cursor: pointer; transition: all 0.2s;
+      outline: none; text-transform: none; font-family: var(--font-b); letter-spacing: 0;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      background: #ffffff; color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .form-input {
+      padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      font-size: 13px; font-family: var(--font-b); color: var(--text); outline: none; transition: border 0.2s;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .form-input:focus { border-color: var(--accent); }
+    
+    .btn-solid {
+      padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+    }
+    .btn-solid:hover { opacity: 0.9; transform: translateY(-1px); }
+
+
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; white-space: nowrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; box-shadow: var(--shadow-sm); }
+    .data-table th:first-child { border-top-left-radius: 8px; }
+    .data-table th:last-child { border-top-right-radius: 8px; }
+
 </style>
 
 
@@ -442,6 +472,36 @@
     .data-table tbody tr:hover { background: var(--bg3) !important; }
     .data-table tbody tr:nth-child(even) { background: #fafafa; }
     .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
+
+    .segmented-control { user-select: none; }
+    .seg-btn {
+      background: transparent; border: none; border-radius: 6px; padding: 8px 16px;
+      font-size: 13px; font-weight: 600; color: var(--text3); cursor: pointer; transition: all 0.2s;
+      outline: none; text-transform: none; font-family: var(--font-b); letter-spacing: 0;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      background: #ffffff; color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .form-input {
+      padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      font-size: 13px; font-family: var(--font-b); color: var(--text); outline: none; transition: border 0.2s;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .form-input:focus { border-color: var(--accent); }
+    
+    .btn-solid {
+      padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+    }
+    .btn-solid:hover { opacity: 0.9; transform: translateY(-1px); }
+
+
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; white-space: nowrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; box-shadow: var(--shadow-sm); }
+    .data-table th:first-child { border-top-left-radius: 8px; }
+    .data-table th:last-child { border-top-right-radius: 8px; }
+
 </style>
     <link rel="icon" type="image/png" href="assets/icon.png" />
 </head>
@@ -756,11 +816,11 @@
     </div>
     
     <!-- Segmented Control Bar for Sub-Tabs -->
-    <div style="display:flex; gap:4px; padding:4px; background:var(--bg3); border-radius:10px; width:fit-content; margin-bottom:24px; border:1px solid var(--border);">
-      <button class="btn-sm active" id="fNavAccess" onclick="switchForgeSubTab('access')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Access & Clearance</button>
-      <button class="btn-sm" id="fNavBounties" onclick="switchForgeSubTab('bounties')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Bounty Board</button>
-      <button class="btn-sm" id="fNavReviews" onclick="switchForgeSubTab('reviews')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Submissions</button>
-      <button class="btn-sm" id="fNavResources" onclick="switchForgeSubTab('resources')" style="border:none; border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;">Resources</button>
+    <div class="segmented-control" style="display:inline-flex; gap:4px; padding:4px; background:#f1f5f9; border-radius:10px; margin-bottom:24px; border:1px solid #e2e8f0; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);">
+      <button class="seg-btn active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Clearance</button>
+      <button class="seg-btn" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
+      <button class="seg-btn" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions</button>
+      <button class="seg-btn" id="fNavResources" onclick="switchForgeSubTab('resources')">Resources</button>
     </div>
 
     <!-- Sub-tab: Access Management -->
@@ -796,10 +856,10 @@
         <p style="margin-bottom:12px; color:var(--text3);">Add learning materials and links for operatives.</p>
         
         <div style="display:flex; gap:10px; margin-bottom: 20px;">
-          <input type="text" id="resTitle" placeholder="Title (e.g. Intro to React)" style="flex:2;">
-          <input type="text" id="resCategory" placeholder="Category" style="flex:1;">
-          <input type="text" id="resLink" placeholder="URL" style="flex:2;">
-          <button class="btn-sm btn-primary" onclick="adminAddResource()">Add Resource</button>
+          <input type="text" class="form-input" id="resTitle" placeholder="Title (e.g. Intro to React)" style="flex:2;">
+          <input type="text" class="form-input" id="resCategory" placeholder="Category" style="flex:1;">
+          <input type="text" class="form-input" id="resLink" placeholder="URL" style="flex:2;">
+          <button class="btn-solid" onclick="adminAddResource()" style="white-space:nowrap;">+ Add Resource</button>
         </div>
 
         <div style="overflow-x:auto;">
@@ -4418,6 +4478,36 @@ function printIDCards(htmlContent) {
     .data-table tbody tr:hover { background: var(--bg3) !important; }
     .data-table tbody tr:nth-child(even) { background: #fafafa; }
     .table-container { border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; background: #fff; }
+
+    .segmented-control { user-select: none; }
+    .seg-btn {
+      background: transparent; border: none; border-radius: 6px; padding: 8px 16px;
+      font-size: 13px; font-weight: 600; color: var(--text3); cursor: pointer; transition: all 0.2s;
+      outline: none; text-transform: none; font-family: var(--font-b); letter-spacing: 0;
+    }
+    .seg-btn:hover { color: var(--text); }
+    .seg-btn.active {
+      background: #ffffff; color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .form-input {
+      padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff;
+      font-size: 13px; font-family: var(--font-b); color: var(--text); outline: none; transition: border 0.2s;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .form-input:focus { border-color: var(--accent); }
+    
+    .btn-solid {
+      padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+    }
+    .btn-solid:hover { opacity: 0.9; transform: translateY(-1px); }
+
+
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; white-space: nowrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; box-shadow: var(--shadow-sm); }
+    .data-table th:first-child { border-top-left-radius: 8px; }
+    .data-table th:last-child { border-top-right-radius: 8px; }
+
 </style>
   <link rel="icon" type="image/png" href="assets/icon.png" />
 </head>
