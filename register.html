@@ -232,6 +232,31 @@
     <div id="step-3" class="hidden">
       <div style="font-family:var(--font-b); font-size:20px; font-weight:700; margin-bottom:24px; color:var(--text-1);">Final Clearance</div>
 
+      
+      <!-- Photo Upload -->
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label">Profile Photo (ID / Face) <span style="color:red;">*</span></label>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div id="photo-preview" style="width:80px; height:80px; border-radius:12px; border:2px dashed var(--border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <span style="font-size:24px; color:var(--text-3);">👤</span>
+          </div>
+          <div style="flex:1;">
+            <input type="file" id="photo-upload" accept="image/*" capture="user" style="display:none;" />
+            <button type="button" class="btn-outline" onclick="document.getElementById('photo-upload').click()" style="padding:10px 16px; font-size:13px; width:100%; justify-content:center;">Capture / Upload Photo</button>
+            <div style="font-size:11px; color:var(--text-3); margin-top:6px;">Must be a clear photo of your face. Max 4MB.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature Pad -->
+      <div class="form-group" style="margin-bottom:32px;">
+        <label class="form-label" style="display:flex; justify-content:space-between;">Digital Signature <span style="color:red;">*</span> <button type="button" id="clear-signature" style="background:none; border:none; color:var(--text-3); font-size:11px; text-decoration:underline; cursor:pointer;">Clear</button></label>
+        <div style="border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#fff; touch-action:none;">
+          <canvas id="signature-pad" width="400" height="150" style="width:100%; display:block; touch-action:none;"></canvas>
+        </div>
+        <div style="font-size:11px; color:var(--text-3); margin-top:6px;">Sign securely using your mouse or touchscreen.</div>
+      </div>
+
       <div class="payment-box">
         <div style="font-family:var(--font-m); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.6);">Initialization Fee</div>
         
@@ -620,6 +645,104 @@
   initCaptcha();
   document.getElementById('captcha-refresh').addEventListener('click', initCaptcha);
 
+  
+  // --- Photo & Signature Logic ---
+  let compressedPhotoBase64 = null;
+  const photoUpload = document.getElementById('photo-upload');
+  const photoPreview = document.getElementById('photo-preview');
+
+  photoUpload.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        photoPreview.innerHTML = `<img src="${compressedPhotoBase64}" style="width:100%; height:100%; object-fit:cover;" />`;
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Signature Pad
+  const sigCanvas = document.getElementById('signature-pad');
+  const sigCtx = sigCanvas.getContext('2d');
+  let isDrawing = false;
+  let hasSignature = false;
+
+  // Fix internal resolution vs CSS resolution
+  function resizeCanvas() {
+    const rect = sigCanvas.parentElement.getBoundingClientRect();
+    sigCanvas.width = rect.width;
+    sigCanvas.height = 150; // fixed height
+    sigCtx.lineWidth = 2;
+    sigCtx.lineCap = 'round';
+    sigCtx.strokeStyle = '#111';
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 100); // initialize
+
+  function getPos(e) {
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    isDrawing = true;
+    hasSignature = true;
+    const pos = getPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+  }
+
+  function draw(e) {
+    if(!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+  }
+
+  function endDraw(e) {
+    e.preventDefault();
+    isDrawing = false;
+  }
+
+  sigCanvas.addEventListener('mousedown', startDraw);
+  sigCanvas.addEventListener('mousemove', draw);
+  sigCanvas.addEventListener('mouseup', endDraw);
+  sigCanvas.addEventListener('mouseout', endDraw);
+  
+  sigCanvas.addEventListener('touchstart', startDraw, {passive:false});
+  sigCanvas.addEventListener('touchmove', draw, {passive:false});
+  sigCanvas.addEventListener('touchend', endDraw, {passive:false});
+
+  document.getElementById('clear-signature').addEventListener('click', () => {
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    hasSignature = false;
+  });
+
   // Submission
   let isSubmitting = false;
   document.getElementById('submit-btn').addEventListener('click', async () => {
@@ -630,6 +753,17 @@
       alert("⚠️ You must read and agree to the Innovexa Hub Terms of Service before initializing your membership.");
       return;
     }
+
+    
+    if(!compressedPhotoBase64) {
+      alert("⚠️ You must upload a profile photo.");
+      return;
+    }
+    if(!hasSignature) {
+      alert("⚠️ You must provide a digital signature.");
+      return;
+    }
+    const signatureBase64 = sigCanvas.toDataURL('image/png');
 
     const utr = document.getElementById('utr').value.trim();
     if (!utr) { showError('utr', 'UTR is required'); return; }
@@ -655,6 +789,8 @@
       phone: document.getElementById('phone').value.trim(),
       college: document.getElementById('college').value.trim(),
       dob: document.getElementById('dob').value,
+          photo: compressedPhotoBase64,
+          signature: signatureBase64,
       year: document.getElementById('year').value,
       gender: document.getElementById('gender').value,
       branch: document.getElementById('branch').value,

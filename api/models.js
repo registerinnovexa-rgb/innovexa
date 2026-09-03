@@ -15,6 +15,7 @@ const MemberSchema = new mongoose.Schema({
   amount: String,
   operativeId: { type: String, unique: true },
   photoUrl: String,
+  signature: String,
   paymentProofUrl: String,
   gender: String,
   forgeRole: String,

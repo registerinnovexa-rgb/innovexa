@@ -1,0 +1,151 @@
+             data-theme="filled_black"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left"
+             style="display: flex; justify-content: center; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" id="fullName" type="text" placeholder="As per official records" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">University / College</label>
+          <input class="form-control" id="college" type="text" placeholder="e.g. Yenepoya University" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Email Address (via Google)</label>
+          <input class="form-control" id="email" type="email" placeholder="Waiting for Google Auth..." readonly style="opacity:0.7; cursor:not-allowed;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input class="form-control" id="phone" type="tel" placeholder="10-digit mobile number" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-control" id="dob" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year of Study</label>
+          <select class="form-control" id="year">
+            <option value="" disabled selected>Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-control" id="gender">
+            <option value="" disabled selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch / Department</label>
+          <select class="form-control" id="branch">
+            <option value="" disabled selected>Select Branch</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Electronics">Electronics & Communication</option>
+            <option value="Mechanical">Mechanical Engineering</option>
+            <option value="Civil">Civil Engineering</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Current Skill Level</label>
+        <div class="skill-grid" id="skillLevel">
+          <button class="skill-btn active" data-val="Beginner">Beginner</button>
+          <button class="skill-btn" data-val="Intermediate">Intermediate</button>
+          <button class="skill-btn" data-val="Advanced">Advanced</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Domains of Interest (Select Multiple)</label>
+        <div class="chip-grid" id="interests">
+          <div class="chip">Web Dev</div>
+          <div class="chip">Mobile Dev</div>
+          <div class="chip">AI/ML</div>
+          <div class="chip">Cybersecurity</div>
+          <div class="chip">Data Science</div>
+          <div class="chip">UI/UX</div>
+          <div class="chip">DevOps</div>
+          <div class="chip">Blockchain</div>
+          <div class="chip">Game Dev</div>
+          <div class="chip">IoT</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-magnetic" id="btn-next">Proceed to Verification →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Payment -->
+    <div id="step-2" class="hidden">
+      <div class="payment-box">
+        <div style="font-family:var(--font-m); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.6);">Initialization Fee</div>
+        
+        <div class="amount-display" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px;">
+          ₹ 599
+          <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 12px; font-size:12px; cursor:pointer;" onclick="copyToClipboard('599', this)">Copy</button>
+        </div>
+
+        <div class="qr-wrap">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dgpay-12200845070%40okbizaxis%26pn%3DInnovexa%2520Hub%26am%3D599.00%26cu%3DINR" alt="UPI QR Code" />
+        </div>
+        
+        <div class="upi-id" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          gpay-12200845070@okbizaxis
+          <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:4px 8px; font-size:12px; cursor:pointer;" onclick="copyToClipboard('gpay-12200845070@okbizaxis', this)">Copy</button>
+        </div>
+        <p style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:16px; font-weight:300;">Scan QR, use the Pay button, or enter UPI ID to pay</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Transaction Reference (UTR)</label>
+        <input class="form-control" id="utr" type="text" placeholder="Enter 10-15 digit UTR number" />
+      </div>
+
+      <!-- CAPTCHA -->
+      <div class="captcha-box" style="margin-top:30px; padding:20px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
+        <label style="display:block; font-family:var(--font-d); font-size:14px; font-weight:500; margin-bottom:12px;">CAPTCHA Verification <span style="color:red;">*</span></label>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <canvas id="captcha-canvas" width="120" height="40" style="border-radius:8px; border:1px solid var(--border); background:#edeae4;"></canvas>
+          <button type="button" id="captcha-refresh" style="background:none; border:none; cursor:pointer; font-size:20px; color:var(--text-2);" title="Refresh CAPTCHA">↻</button>
+          <input type="text" id="captcha-answer" class="form-control" style="width:140px; text-align:center; font-family:var(--font-m);" placeholder="Type text..." />
+        </div>
+        <div id="captcha-error" class="form-error" style="display:none; margin-top:8px; color:#e02424; font-size:13px;">Incorrect CAPTCHA answer.</div>
+      </div>
+
+      
+      <!-- Terms and Conditions Agreement -->
+      <div class="form-group" style="display:flex; align-items:flex-start; gap:12px; margin: 32px 0; background:rgba(6, 182, 212, 0.05); border:1px solid rgba(6, 182, 212, 0.2); padding:16px; border-radius:12px;">
+        <input type="checkbox" id="termsCheckbox" style="margin-top:2px; width:18px; height:18px; accent-color:var(--accent); cursor:pointer;">
+        <label for="termsCheckbox" style="font-size:13px; color:var(--text-2); line-height:1.5; cursor:pointer;">
+          I have read and agree to the <a href="#" onclick="showTermsModal(event)" style="color:var(--accent); font-weight:600; text-decoration:none;">Terms of Service & Rules</a>. I understand that failing to respond to administrative communications or remaining inactive will result in immediate termination to make room for verified members.
+        </label>
+      </div>
+
+      <div class="form-actions" style="margin-top:40px; display:flex; gap:16px; justify-content:space-between;">
+        <button class="btn-outline" id="btn-back">← Back</button>
+        <button class="btn-magnetic" id="submit-btn">Initialize Membership</button>
+      </div>
