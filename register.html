@@ -392,7 +392,7 @@
 
     async function checkEmailDuplicate(email) {
       try {
-        const res = await gasGet('/api/backend?action=status_check&email=' + encodeURIComponent(email));
+        const res = await apiGet('status_check', { email: email });
         if (res && res.found) {
           // Block the form and show already-registered banner
           showAlreadyRegistered(res.data);
