@@ -1688,6 +1688,7 @@
       arsenal = JSON.parse(raw);
     }
     if (!Array.isArray(arsenal)) arsenal = [];
+    arsenal = arsenal.filter(item => item && typeof item === 'object' && item.title);
   } catch(e) {
     console.error("Failed to parse atlas_arsenal from localStorage:", e);
     arsenal = [];
@@ -1698,6 +1699,8 @@
       grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-2);"><div style="font-size:40px; margin-bottom:16px;">🔍</div><div style="font-size:18px; font-weight:500;">No resources found</div><div style="font-size:14px; margin-top:8px; opacity:0.6;">Try a different search or category.</div></div>`;
       return;
     }
+    grid.style.opacity = '1';
+    grid.style.transform = 'translateY(0)';
     grid.innerHTML = items.map((r, i) => {
       const isSaved = arsenal.some(saved => saved.title === r.title);
       return `
@@ -1714,6 +1717,11 @@
   }
 
   renderResources(resources);
+  // Ensure the grid is always visible regardless of IntersectionObserver timing
+  if (grid) {
+    grid.style.opacity = '1';
+    grid.style.transform = 'translateY(0)';
+  }
 
   // Filters
   let activeCategory = 'all';
