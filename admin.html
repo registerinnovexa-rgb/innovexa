@@ -553,7 +553,7 @@
     <div id="faceAuthInputs" style="display:none; text-align:center;">
       <div style="font-size:14px;color:var(--text);margin-bottom:12px;font-weight:600;">Face Verification Required</div>
       <div id="faceVideoContainer" style="position:relative; width:100%; max-width:320px; margin:0 auto 16px auto; aspect-ratio:4/3; background:#000; border-radius:12px; overflow:hidden;">
-        <video id="faceAuthVideo" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
+        <video id="faceAuthVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
         <canvas id="faceAuthCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
       </div>
       <div id="faceAuthStatus" style="font-size:13px; color:var(--text3); margin-bottom:16px;">Loading Face Models...</div>
@@ -1282,7 +1282,7 @@
     <div style="text-align:center;">
       <p style="font-size:14px;color:var(--text3);margin-bottom:16px;">Look directly at the camera to register your face. You can register multiple faces.</p>
       <div id="faceRegVideoContainer" style="position:relative; width:100%; aspect-ratio:4/3; background:#000; border-radius:12px; overflow:hidden; margin-bottom:16px;">
-        <video id="faceRegVideo" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
+        <video id="faceRegVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
         <canvas id="faceRegCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%;"></canvas>
       </div>
       <div id="faceRegStatus" style="font-size:13px; color:var(--text3); font-weight:600; margin-bottom:16px;">Initializing camera...</div>
@@ -1667,13 +1667,15 @@ async function startFaceAuth(faceToken, invxId, faceDescriptors) {
     video.srcObject = faceAuthStream;
 
     video.onplay = () => {
-      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      let displaySize = { width: video.clientWidth || 320, height: video.clientHeight || 240 };
       faceapi.matchDimensions(canvas, displaySize);
       status.textContent = 'Looking for face...';
       
       faceAuthInterval = setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 })).withFaceLandmarks().withFaceDescriptors();
+        const ds = { width: video.videoWidth || video.clientWidth || 320, height: video.videoHeight || video.clientHeight || 240 };
+          faceapi.matchDimensions(canvas, ds);
+          const resizedDetections = faceapi.resizeResults(detections, ds);
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
 
@@ -1753,13 +1755,15 @@ async function openFaceRegisterModal() {
     video.srcObject = faceRegStream;
     
     video.onplay = () => {
-      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      let displaySize = { width: video.clientWidth || 320, height: video.clientHeight || 240 };
       faceapi.matchDimensions(canvas, displaySize);
       status.textContent = 'Position your face in view...';
       
       faceRegInterval = setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 })).withFaceLandmarks().withFaceDescriptors();
+        const ds = { width: video.videoWidth || video.clientWidth || 320, height: video.videoHeight || video.clientHeight || 240 };
+          faceapi.matchDimensions(canvas, ds);
+          const resizedDetections = faceapi.resizeResults(detections, ds);
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         faceapi.draw.drawDetections(canvas, resizedDetections);
         
@@ -6575,7 +6579,7 @@ async function startGlobalScanner(faceToken, faceMatcher) {
     video.srcObject = faceAuthStream;
 
     video.onplay = () => {
-      const displaySize = { width: video.clientWidth, height: video.clientHeight };
+      let displaySize = { width: video.clientWidth || 320, height: video.clientHeight || 240 };
       faceapi.matchDimensions(canvas, displaySize);
       status.textContent = 'Looking for face...';
       
@@ -6584,8 +6588,10 @@ async function startGlobalScanner(faceToken, faceMatcher) {
         if (isDetecting) return;
         isDetecting = true;
         try {
-          const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.2 })).withFaceLandmarks().withFaceDescriptors();
+          const ds = { width: video.videoWidth || video.clientWidth || 320, height: video.videoHeight || video.clientHeight || 240 };
+          faceapi.matchDimensions(canvas, ds);
+          const resizedDetections = faceapi.resizeResults(detections, ds);
           canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
           faceapi.draw.drawDetections(canvas, resizedDetections);
 
