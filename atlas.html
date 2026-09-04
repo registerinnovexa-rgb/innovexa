@@ -1681,7 +1681,17 @@
   ];
 
   const grid = document.getElementById('resources-grid');
-  let arsenal = JSON.parse(localStorage.getItem('atlas_arsenal')) || [];
+  let arsenal = [];
+  try {
+    const raw = localStorage.getItem('atlas_arsenal');
+    if (raw && raw !== "undefined") {
+      arsenal = JSON.parse(raw);
+    }
+    if (!Array.isArray(arsenal)) arsenal = [];
+  } catch(e) {
+    console.error("Failed to parse atlas_arsenal from localStorage:", e);
+    arsenal = [];
+  }
   
   function renderResources(items) {
     if (items.length === 0) {
