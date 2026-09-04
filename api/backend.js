@@ -1180,7 +1180,7 @@ export default async function handler(req, res) {
             name: 'Master Admin',
             operativeId: 'INVX-MASTER',
             role: 'president',
-            hasFaceRegistered: hasFace
+            hasFaceRegistered: hasFace, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
           };
         }
       } else {
@@ -1205,7 +1205,7 @@ export default async function handler(req, res) {
                   name: member.name,
                   operativeId: member.operativeId,
                   role: finalRole,
-                  hasFaceRegistered: hasFace
+                  hasFaceRegistered: hasFace, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
                 };
             }
           } else {
@@ -1280,7 +1280,7 @@ export default async function handler(req, res) {
       try {
         await transporter.sendMail({
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
-          to: 'innovexahub.bangalore@gmail.com',
+          to: memberData.email || 'innovexahub.bangalore@gmail.com',
           subject: `🚨 Admin Login OTP: ${otp}`,
           html: `
             <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:32px;">
@@ -1361,7 +1361,7 @@ export default async function handler(req, res) {
           name: 'Master Admin',
           operativeId: 'INVX-MASTER',
           role: 'president',
-          hasFaceRegistered: false
+          hasFaceRegistered: false, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
         };
       } else {
         const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
@@ -1373,7 +1373,7 @@ export default async function handler(req, res) {
             name: member.name,
             operativeId: member.operativeId,
             role: finalRole,
-            hasFaceRegistered: !!member.faceDescriptor
+            hasFaceRegistered: !!member.faceDescriptor, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
           };
         }
       }
@@ -1467,7 +1467,7 @@ export default async function handler(req, res) {
           name: 'Master Admin',
           operativeId: 'INVX-MASTER',
           role: 'president',
-          hasFaceRegistered: false
+          hasFaceRegistered: false, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
         };
       } else {
         const member = await Member.findOne({ 
@@ -1485,7 +1485,7 @@ export default async function handler(req, res) {
               name: member.name,
               operativeId: member.operativeId,
               role: finalRole,
-              hasFaceRegistered: !!member.faceDescriptor
+              hasFaceRegistered: !!member.faceDescriptor, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
             };
           }
         }
