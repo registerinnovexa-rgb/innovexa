@@ -293,8 +293,9 @@
     // ── Forge API Cache (Stale-While-Revalidate) ─────────────────
     const _fCache = {};
     const _fInflight = {};
-    const F_TTL = 30000;
+    const F_TTL = 8000;        // 8s — near-realtime
     const F_STORE = 'invx_forge_';
+    const FORGE_SYNC_INTERVAL = 8000; // poll interval
 
     function _fKey(action, params) { return action + '|' + JSON.stringify(params); }
     function _fLoad(k) { try { const r = localStorage.getItem(F_STORE+k); return r ? JSON.parse(r) : null; } catch(_){return null;} }
@@ -440,6 +441,7 @@
     function clearSession() {
       session = null;
       clearTimeout(idleTimer);
+      if (_forgeSyncInterval) { clearInterval(_forgeSyncInterval); _forgeSyncInterval = null; }
       localStorage.removeItem('forge_session');
       document.getElementById('login-view').style.display = 'flex';
       document.getElementById('dashboard-view').style.display = 'none';
@@ -556,6 +558,26 @@
 
     //  DASHBOARD INIT
     // ══════════════════════════════════════════
+    let _forgeSyncInterval = null;
+
+    function startForgeSync() {
+      if (_forgeSyncInterval) clearInterval(_forgeSyncInterval);
+      _forgeSyncInterval = setInterval(() => {
+        if (!session) return;
+        // Find the currently active tab
+        const activeSection = document.querySelector('.view-section.active');
+        if (!activeSection) return;
+        const tabId = activeSection.id.replace('tab-', '');
+
+        // Silently refresh whichever tab is visible
+        if      (tabId === 'dashboard')   { loadFeed(); loadSessions(); }
+        else if (tabId === 'missions')    loadMissions();
+        else if (tabId === 'history')     loadMissions(); // history rendered by same fn
+        else if (tabId === 'leaderboard') loadLeaderboard();
+        else if (tabId === 'resources')   loadResources();
+      }, FORGE_SYNC_INTERVAL);
+    }
+
     function bootDashboard() {
       document.getElementById('login-view').style.display = 'none';
       const dash = document.getElementById('dashboard-view');
@@ -579,10 +601,13 @@
       loadFeed();
       loadSessions();
 
+      // Start real-time background sync
+      startForgeSync();
+
       // Prefetch other tabs in background so switching is instant
       setTimeout(() => {
         gasGet('forge_get_resources').catch(() => {});
-        gasGet('forge_get_tasks', { operativeId: session.operativeId }).catch(() => {});
+        gasGet('forge_get_my_tasks', { invxId: session.operativeId }).catch(() => {});
       }, 800);
     }
 

@@ -1373,7 +1373,7 @@ function driveImgUrl(url) {
 // ── API Cache (Stale-While-Revalidate) ──────────────────────────────────────
 const _apiCache = {};          // in-memory: { key: { data, ts } }
 const _apiInflight = {};       // dedup: { key: Promise }
-const CACHE_TTL   = 30000;     // 30s — show stale, refresh in background
+const CACHE_TTL   = 8000;      // 8s — near-realtime stale-while-revalidate
 const CACHE_STORE = 'invx_api_cache'; // localStorage key prefix
 
 function _cacheKey(action, params) {
@@ -5808,46 +5808,60 @@ window.addEventListener('load', () => {
 });
 
 let liveSyncInterval = null;
+const LIVE_SYNC_INTERVAL = 8000; // 8s — safe for Vercel Hobby + MongoDB Atlas
+
 function startLiveSync() {
   if (liveSyncInterval) clearInterval(liveSyncInterval);
-  // Using 3000ms instead of 1ms because 1ms will freeze the browser and spam Vercel/MongoDB, crashing the site.
   liveSyncInterval = setInterval(() => {
-    // If any modal or editor is open, don't interrupt the admin!
+    // Don't interrupt the admin while a modal or editor is open
     if (document.getElementById('modal') && document.getElementById('modal').classList.contains('open')) return;
     if (document.getElementById('modalCreateSession') && document.getElementById('modalCreateSession').classList.contains('open')) return;
     if (document.getElementById('editBountyModal') && document.getElementById('editBountyModal').style.display !== 'none') return;
     if (document.getElementById('announcementEditorPanel') && document.getElementById('announcementEditorPanel').style.display === 'block') return;
-    if (document.getElementById('dossierEditCard')) return; // Someone is editing a profile
-    
-    // Get active tab
+    if (document.getElementById('dossierEditCard')) return; // profile edit in progress
+
+    // Determine active tab
     const activeTab = document.querySelector('.sidebar a.active');
     if (!activeTab) return;
     const onclick = activeTab.getAttribute('onclick') || '';
-    
-    // Refresh based on active tab
-    if (onclick.includes('dashboard')) loadOverview(true);
+
+    // Refresh the active tab silently — covers every tab in the console
+    if      (onclick.includes('overview') || onclick.includes('dashboard')) loadOverview(true);
     else if (onclick.includes('members')) {
-       if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers(true);
+      if (document.getElementById('memberSearch') && !document.getElementById('memberSearch').value) loadMembers(true);
     }
-    else if (onclick.includes('bounties') || onclick.includes('forgeOps')) loadForgeTasks(true);
+    else if (onclick.includes('forgeOps')) {
+      loadForgeTasks(true);
+      loadForgeResources(true);
+    }
     else if (onclick.includes('sessions')) {
-       if (document.getElementById('detailPanel') && document.getElementById('detailPanel').style.display === 'block') {
-         loadAttendance(true);
-       } else {
-         loadSessions(true);
-       }
+      if (document.getElementById('detailPanel') && document.getElementById('detailPanel').style.display === 'block') {
+        loadAttendance(true);
+      } else {
+        loadSessions(true);
+      }
     }
     else if (onclick.includes('surveillance')) loadAuditLogs(true);
-    else if (onclick.includes('sysSettings')) loadSettings(true);
-    else if (onclick.includes('rankConfig')) loadRankConfig(true);
+    else if (onclick.includes('sysSettings'))  loadSettings(true);
+    else if (onclick.includes('rankConfig'))   loadRankConfig(true);
     else if (onclick.includes('emailTemplates')) loadEmailTemplates(true);
-    else if (onclick.includes('taxonomies')) loadTaxonomies(true);
-    else if (onclick.includes('dictionary')) loadDictionary(true);
-    else if (onclick.includes('cms')) loadAnnouncements(true);
-    else if (onclick.includes('rolePerms')) loadRolePermissions(true);
-    else if (onclick.includes('webhooks')) loadWebhooks(true);
+    else if (onclick.includes('taxonomies'))   loadTaxonomies(true);
+    else if (onclick.includes('dictionary'))   loadDictionary(true);
+    else if (onclick.includes('cms'))          loadAnnouncements(true);
+    else if (onclick.includes('rolePerms'))    loadRolePermissions(true);
+    else if (onclick.includes('webhooks'))     loadWebhooks(true);
     else if (onclick.includes('accessControl')) loadAccessControl(true);
-  }, 3000); // 3 seconds is the safest minimum
+    else if (onclick.includes('factions'))     loadFactions(true);
+    else if (onclick.includes('broadcasts'))   loadBroadcasts(true);
+    else if (onclick.includes('gamification')) loadGamificationConfig(true);
+    else if (onclick.includes('customCss'))    loadCustomCss(true);
+    else if (onclick.includes('aiTools'))      loadAiConfig(true);
+    else if (onclick.includes('abTesting'))    loadAbTest(true);
+    else if (onclick.includes('skillTrees'))   loadSkillTrees(true);
+    else if (onclick.includes('assets'))       loadAssets(true);
+    else if (onclick.includes('team'))         loadTeam(true);
+    else if (onclick.includes('certreqs'))     loadCertRequests(true);
+  }, LIVE_SYNC_INTERVAL);
 }
 // startLiveSync is called from showDashboard() after successful login — NOT on DOMContentLoaded
 let currentEvents = [];
