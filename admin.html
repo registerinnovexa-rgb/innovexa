@@ -1452,6 +1452,12 @@ function invalidateCache(action, params = {}) {
   try { localStorage.removeItem(CACHE_STORE + key); } catch(_) {}
 }
 
+// Bust cache then immediately reload — instant UI update after any write
+function invalidateAndRefresh(cacheAction, reloadFn) {
+  invalidateCache(cacheAction);
+  reloadFn(true);
+}
+
 async function apiPost(action, payload = {}) {
   const res = await fetch('/api/backend', {
     method: 'POST',
@@ -1977,11 +1983,9 @@ async function toggleForgeAccess(operativeId, newStatus) {
   try {
     showToast('Updating… please wait', 'info');
     await apiWrite('admin_grant_forge_access', { operativeId: operativeId, accessStatus: newStatus });
-    
-    const refreshed = await apiGet('adminMembers');
-    cachedMembers = refreshed.members || [];
-    renderForgeAccess();
     showToast('Forge access updated: ' + newStatus, 'success');
+    invalidateAndRefresh('adminMembers', loadMembers);
+    renderForgeAccess();
 
   } catch(e) {
     console.error('toggleForgeAccess error:', e);
@@ -2005,17 +2009,12 @@ async function adminCreateTask() {
     showToast('Deploying bounty...', 'info');
     await apiWrite('admin_create_task', { title, description: desc, xp, difficulty, assignedTo });
     showToast('Bounty deployed!', 'success');
-    
-    closeBountyDrawer(); // Close the drawer correctly
-    
-    // Reset form
+    closeBountyDrawer();
     document.getElementById('tkTitle').value = '';
     mdeCreate.value('');
     document.getElementById('tkXP').value = '100';
     document.getElementById('tkAssign').value = 'Open';
-    
-    await new Promise(r => setTimeout(r, 500));
-    loadForgeTasks();
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -2143,8 +2142,7 @@ async function adminReviewTask(taskId, status) {
     showToast('Updating...', 'info');
     await apiWrite('admin_review_task', { taskId, status, feedback });
     showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
-    await new Promise(r => setTimeout(r, 500));
-    loadForgeTasks();
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -2181,8 +2179,7 @@ async function adminSaveEdit() {
     await apiWrite('admin_edit_task', { taskId, title, description, xp, difficulty, assignedTo });
     closeEditModal();
     showToast('Bounty updated!', 'success');
-    await new Promise(r => setTimeout(r, 500));
-    loadForgeTasks();
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -2192,8 +2189,7 @@ async function adminDeleteTask(taskId) {
   try {
     await apiWrite('admin_delete_task', { taskId });
     showToast('Bounty deleted.', 'success');
-    await new Promise(r => setTimeout(r, 500));
-    loadForgeTasks();
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -2384,8 +2380,8 @@ async function saveDossierEdit() {
     statusEl.style.color = 'var(--green)';
     statusEl.textContent = '✓ Profile updated successfully.';
     showToast('Profile updated!', 'success');
-    // Refresh dossier
-    setTimeout(() => loadMemberDetailView(_dossierOpId), 1200);
+    invalidateAndRefresh('adminMembers', loadMembers);
+    loadMemberDetailView(_dossierOpId);
   } catch(e) {
     statusEl.style.color = 'var(--red)';
     statusEl.textContent = 'Error: ' + e.message;
@@ -2782,7 +2778,7 @@ async function saveAnnouncement() {
     if (!res.success) throw new Error(res.message);
     showToast(_editingAnnId ? 'Announcement updated!' : 'Announcement created!', 'success');
     closeAnnouncementEditor();
-    loadAnnouncements();
+    invalidateAndRefresh('admin_get_announcements', loadAnnouncements);
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
   }
@@ -2794,7 +2790,7 @@ async function deleteAnnouncement(announcementId) {
     const res = await apiPost('admin_delete_announcement', { announcementId });
     if (!res.success) throw new Error(res.message);
     showToast('Announcement deleted.', 'success');
-    loadAnnouncements();
+    invalidateAndRefresh('admin_get_announcements', loadAnnouncements);
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
   }
@@ -3059,7 +3055,7 @@ async function saveFaction() {
     if (!res.success) throw new Error(res.message);
     showToast(_editingFactionId ? 'Faction updated!' : 'Faction created!', 'success');
     closeFactionEditor();
-    loadFactions();
+    invalidateAndRefresh('admin_get_factions', loadFactions);
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -3069,7 +3065,7 @@ async function deleteFaction(factionId) {
     const res = await apiPost('admin_delete_faction', { factionId });
     if (!res.success) throw new Error(res.message);
     showToast('Faction deleted.', 'success');
-    loadFactions();
+    invalidateAndRefresh('admin_get_factions', loadFactions);
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 // ══════════════════════════════════════════════════════════════════════════════ END PHASE 2
@@ -3108,7 +3104,7 @@ async function sendBroadcast() {
     if (!res.success) throw new Error(res.message);
     showToast('Broadcast transmitted!', 'success');
     document.getElementById('broadcastContent').value = '';
-    loadBroadcasts();
+    invalidateAndRefresh('admin_get_broadcasts', loadBroadcasts);
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -3221,7 +3217,7 @@ async function saveCertTemplate() {
     if (!res.success) throw new Error(res.message);
     showToast('Template saved!', 'success');
     document.getElementById('certEditorPanel').style.display = 'none';
-    loadCertTemplates();
+    invalidateAndRefresh('admin_get_cert_templates', loadCertTemplates);
   } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
@@ -3943,8 +3939,8 @@ async function bulkUpdate(status) {
     
     await Promise.all(promises);
     showToast('Bulk update successful!');
-    loadMembers();
-    loadOverview();
+    invalidateAndRefresh('adminMembers', loadMembers);
+    invalidateAndRefresh('adminMembers', loadOverview);
   } catch (error) {
     showToast('Error during bulk update.', 'error');
   } finally {
@@ -4251,8 +4247,8 @@ async function adminUpdateProfile(operativeId) {
     if (res.success) {
       showToast('Profile updated!', 'success');
       closeModal();
-      loadMembers();
-      loadOverview();
+      invalidateAndRefresh('adminMembers', loadMembers);
+      invalidateAndRefresh('adminMembers', loadOverview);
     } else {
       showToast(res.message, 'error');
     }
@@ -4701,9 +4697,8 @@ async function updateStatus(emailEncoded, status) {
     const email = decodeURIComponent(emailEncoded);
     await apiWrite('updateStatus', { email, status });
     showToast('Status updated to: ' + status, 'success');
-    await new Promise(r => setTimeout(r, 500));
-    loadMembers();
-    loadOverview();
+    invalidateAndRefresh('adminMembers', loadMembers);
+    invalidateAndRefresh('adminMembers', loadOverview);
   } catch(e) {
     console.error('updateStatus error:', e);
     showToast('Network error updating status', 'error');
@@ -4807,7 +4802,7 @@ async function rejectReg(sessionName, rowIndex) {
 }
 
 async function deleteSessionLegacy(sessionId) { if(!confirm('Delete this event?')) return; try { const data = await apiWrite('deleteSession', { sessionId });
-    if (data.success) { showToast('Event deleted'); loadSessions(); loadOverview(); }
+    if (data.success) { showToast('Event deleted'); invalidateAndRefresh('admin_get_sessions', loadSessions); invalidateAndRefresh('adminMembers', loadOverview); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
 }
@@ -4855,7 +4850,7 @@ async function deleteResource(rowIndex) {
   if (!confirm('Delete this resource?')) return;
   try {
     const data = await apiWrite('admin_delete_resource', { rowIndex });
-    if (data.success) { showToast('Resource deleted'); loadResources(); loadOverview(); }
+    if (data.success) { showToast('Resource deleted'); invalidateAndRefresh('forge_get_resources', loadResources); invalidateAndRefresh('adminMembers', loadOverview); }
     else showToast(data.message, 'error');
   } catch(e) { showToast('Network error', 'error'); }
 }
@@ -5024,10 +5019,10 @@ async function saveModal() {
     if (data.success) {
       showToast(data.message);
       closeModal();
-      if (savedModal === 'event') loadSessions();
-      if (savedModal === 'resource') loadResources();
-      if (savedModal === 'team') loadTeam();
-      loadOverview();
+      if (savedModal === 'event') invalidateAndRefresh('admin_get_sessions', loadSessions);
+      if (savedModal === 'resource') invalidateAndRefresh('forge_get_resources', loadResources);
+      if (savedModal === 'team') invalidateAndRefresh('team', loadTeam);
+      invalidateAndRefresh('adminMembers', loadOverview);
     } else { showToast(data.message, 'error'); }
   } catch(e) { showToast('Network error', 'error'); }
 
@@ -5124,7 +5119,7 @@ async function borrowAsset() {
     if (data.success) {
       res.style.background = 'var(--green-bg)'; res.style.color = 'var(--green)';
       res.textContent = '✅ ' + data.message;
-      loadAssets();
+      invalidateAndRefresh('assets', loadAssets);
     } else {
       res.style.background = 'var(--red-bg)'; res.style.color = 'var(--red)';
       res.textContent = '❌ ' + data.message;
@@ -5144,7 +5139,7 @@ async function returnAsset() {
     if (data.success) {
       res.style.background = 'var(--green-bg)'; res.style.color = 'var(--green)';
       res.textContent = '✅ ' + data.message;
-      loadAssets();
+      invalidateAndRefresh('assets', loadAssets);
     } else {
       res.style.background = 'var(--red-bg)'; res.style.color = 'var(--red)';
       res.textContent = '❌ ' + data.message;
@@ -5163,7 +5158,7 @@ saveModal = async function() {
     try {
       const data = await apiWrite('addAsset', { name, type, serial });
       showToast(data.message, data.success ? 'success' : 'error');
-      if (data.success) { closeModal(); loadAssets(); }
+      if (data.success) { closeModal(); invalidateAndRefresh('assets', loadAssets); }
     } catch(e) { showToast('Failed to add asset', 'error'); }
     return;
   }
@@ -5509,7 +5504,7 @@ async function approveDocReq(reqId, status) {
   try {
     await apiWrite('docApprove', { requestId: reqId, status: status });
     showToast(reqId + ' → ' + status, status === 'Approved' ? 'success' : 'error');
-    setTimeout(() => fetchDocRequests(), 1500);
+    invalidateAndRefresh('docrequests', fetchDocRequests);
   } catch (e) {
     showToast('Error updating request', 'error');
   }
@@ -5639,7 +5634,7 @@ async function certReqAction(rowIndex, status) {
   try {
     const data = await apiWrite('certApprove', { rowIndex: rowIndex, status: status });
     showToast(data.message, data.success ? 'success' : 'error');
-    loadCertRequests();
+    invalidateAndRefresh('certreqs', loadCertRequests);
   } catch(e) { showToast('Error updating request', 'error'); }
 }
 
@@ -5759,7 +5754,7 @@ async function adminAddResource() {
     document.getElementById('resTitle').value = '';
     document.getElementById('resCategory').value = '';
     document.getElementById('resLink').value = '';
-    await loadForgeResources();
+    invalidateAndRefresh('forge_get_resources', loadForgeResources);
   } catch(e) {
     showToast('Failed to add resource', 'error');
   }
@@ -5771,7 +5766,7 @@ async function adminDeleteResource(id) {
     showToast('Deleting...', 'info');
     await apiWrite('admin_delete_resource', { id });
     showToast('Deleted', 'success');
-    await loadForgeResources();
+    invalidateAndRefresh('forge_get_resources', loadForgeResources);
   } catch(e) {
     showToast('Failed to delete', 'error');
   }
@@ -6170,7 +6165,7 @@ async function submitCreateSession(btn) {
     if(res.success) {
       showToast(editingEventId ? 'Session Updated.' : 'Session Initialized.', 'success');
       closeSessionModal();
-      loadSessions();
+      invalidateAndRefresh('admin_get_sessions', loadSessions);
     } else {
       showToast(res.message, 'error');
     }
@@ -6187,7 +6182,7 @@ async function deleteSession(id) {
   const res = await apiWrite('admin_delete_session', { sessionId: id });
   if(res.success) {
     showToast('Event deleted.', 'success');
-    loadSessions();
+    invalidateAndRefresh('admin_get_sessions', loadSessions);
   } else {
     showToast(res.message, 'error');
   }
