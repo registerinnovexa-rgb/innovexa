@@ -39,6 +39,54 @@ transporter.sendMail = async (options) => {
   return originalSendMail(options);
 };
 
+
+// ── Innovexa Brand Email Template Builder (Template D) ────────────────────────
+function buildEmail({ title, subtitle = '', bodyHtml, accentColor = '#7c3aed', iconEmoji = '📧', footerNote = '' }) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:'Segoe UI',Helvetica,Arial,sans-serif;">
+  <div style="max-width:520px;margin:0 auto;padding:32px 16px;">
+    <!-- Card -->
+    <div style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      <!-- Hero Header -->
+      <div style="background:linear-gradient(90deg,${accentColor} 0%,#000000 60%);padding:28px 32px;display:flex;align-items:center;gap:16px;">
+        <div style="width:52px;height:52px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">${iconEmoji}</div>
+        <div>
+          <div style="color:rgba(255,255,255,0.6);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Innovexa Hub</div>
+          <div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:3px;">${title}</div>
+          ${subtitle ? '<div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px;">' + subtitle + '</div>' : ''}
+        </div>
+      </div>
+      <!-- Body -->
+      <div style="padding:32px;">
+        ${bodyHtml}
+      </div>
+      <!-- Footer -->
+      <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+        <p style="margin:0;font-size:11px;color:#94a3b8;">© Innovexa Hub · Bangalore</p>
+        <a href="https://innovexa-portal.vercel.app" style="font-size:11px;color:${accentColor};text-decoration:none;font-weight:600;">Visit Portal →</a>
+      </div>
+    </div>
+    ${footerNote ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;">' + footerNote + '</p>' : ''}
+  </div>
+</body>
+</html>`;
+}
+
+function buildOtpBlock(otp, accentColor = '#7c3aed') {
+  return `
+    <div style="margin:0 0 24px;border-radius:12px;overflow:hidden;">
+      <div style="background:${accentColor};padding:10px 24px;text-align:center;">
+        <span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Access Code</span>
+      </div>
+      <div style="background:#faf5ff;border:2px solid ${accentColor};border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;">
+        <div style="font-size:48px;font-weight:900;letter-spacing:12px;color:#000000;font-family:'Courier New',monospace;">${otp}</div>
+        <div style="margin-top:8px;font-size:13px;color:${accentColor};font-weight:600;">⏱ Valid for 15 minutes</div>
+      </div>
+    </div>`;
+}
+
 // ── Admin Notification Helper ────────────────────────────────────────────────
 // Sends a quick email to admin for every tracked member action.
 async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) {
@@ -335,45 +383,24 @@ export default async function handler(req, res) {
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: member.email,
           subject: `🔐 Your Innovexa Login Code: ${otp}`,
-          html: `
-            <!DOCTYPE html>
-            <html>
-            <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-            <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-
-          <div style="text-align:center; padding:32px 0 16px;">
-            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
-          </div>
-          <div style="max-width:480px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-                <!-- Header -->
-                <div style="background:#000000;padding:32px;text-align:center;">
-                  <div style="width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔐</div>
-                  <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Secure Login Code</h1>
-                  <p style="margin:8px 0 0;color:rgba(255,255,255,.75);font-size:14px;">Innovexa Forge Dashboard</p>
-                </div>
-                <!-- OTP Block -->
-                <div style="padding:32px;text-align:center;">
-                  <p style="color:#64748b;font-size:15px;margin:0 0 24px;">Hi <strong style="color:#1e293b;">${member.name}</strong>, use the code below to access your Forge dashboard.</p>
-                  <div style="background:#f8fafc;border:2px dashed #c4b5fd;border-radius:14px;padding:28px 24px;margin-bottom:20px;">
-                    <div style="font-size:44px;font-weight:800;letter-spacing:12px;color:#000000;font-family:'Courier New',monospace;">${otp}</div>
-                    <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Copy the code above and paste it into the login screen</p>
-                  </div>
-                  <div style="display:inline-block;background:#ede9fe;color:#000000;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:600;">⏱ Expires in 15 minutes</div>
-                </div>
-                <!-- Details -->
-                <div style="padding:0 32px 24px;">
-                  <div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:4px;padding:12px 16px;">
-                    <p style="margin:0;font-size:13px;color:#92400e;">⚠️ <strong>Do not share this code</strong> with anyone. Innovexa team will never ask for this.</p>
-                  </div>
-                </div>
-                <!-- Footer -->
-                <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
-                  <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you didn't request this, ignore this email.</p>
-                </div>
+          html: buildEmail({
+            title: 'Forge Login Code',
+            subtitle: 'Innovexa Forge Dashboard',
+            iconEmoji: '🔐',
+            accentColor: '#7c3aed',
+            bodyHtml: `
+              <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+              <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
+                Use the secure code below to log into your <strong style="color:#7c3aed;">Innovexa Forge</strong> dashboard.
+              </p>
+              ${buildOtpBlock(otp)}
+              <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
+                <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
+                  🔒 <strong style="color:#374151;">Security notice:</strong> Never share this code. Innovexa staff will never ask for your OTP.
+                </p>
               </div>
-            </body>
-            </html>
-          `
+            \`
+          })
         });
         console.log(`OTP sent to ${member.email}`);
       } catch (err) {
@@ -1074,11 +1101,24 @@ export default async function handler(req, res) {
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: cleanEmail,
           subject: `Innovexa Clearance Protocol - OTP: ${otp}`,
-          html: `<div style="font-family:monospace;background:#0f0f0f;color:#fff;padding:24px;border-radius:8px;">
-                   <h2>Security Clearance</h2>
-                   <p>Your one-time access code is: <strong style="color:#10b981;font-size:24px;">${otp}</strong></p>
-                   <p style="color:#a1a1aa;">This code will expire in 10 minutes.</p>
-                 </div>`
+          html: buildEmail({
+            title: 'Email Verification Code',
+            subtitle: 'Innovexa Registration',
+            iconEmoji: '📧',
+            accentColor: '#7c3aed',
+            bodyHtml: `
+              <p style="font-size:15px;color:#374151;margin:0 0 8px;">Almost there!</p>
+              <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
+                Use the code below to verify your email and complete your registration for <strong style="color:#7c3aed;">Innovexa Hub</strong>.
+              </p>
+              ${buildOtpBlock(otp)}
+              <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
+                <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
+                  ⏱ <strong style="color:#374151;">This code expires in 10 minutes.</strong> If you did not request this, please ignore this email.
+                </p>
+              </div>
+            \`
+          })
         });
         return res.status(200).json({ success: true, message: 'OTP sent successfully.' });
       } catch(e) {
@@ -1296,16 +1336,25 @@ export default async function handler(req, res) {
           from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
           to: memberData.email || 'innovexahub.bangalore@gmail.com',
           subject: `🚨 Admin Login OTP: ${otp}`,
-          html: `
-            <div style="font-family:Arial,sans-serif;background:#f8fafc;padding:32px;">
-              <h2 style="color:#0f172a;margin-bottom:16px;">Admin Access Code</h2>
-              <p style="color:#334155;margin-bottom:24px;">An attempt to access the Admin Console was made by <strong>${memberData.name} (${memberData.operativeId})</strong>.</p>
-              <div style="background:#fff;padding:24px;border:1px dashed #cbd5e1;border-radius:8px;text-align:center;">
-                <div style="font-size:36px;font-weight:700;letter-spacing:8px;color:#000000;">${otp}</div>
+          html: buildEmail({
+            title: 'Admin Access Code',
+            subtitle: '🚨 Admin Console Login',
+            iconEmoji: '🛡️',
+            accentColor: '#dc2626',
+            bodyHtml: `
+              <p style="font-size:14px;color:#374151;margin:0 0 20px;line-height:1.7;">
+                An admin login attempt was made by <strong style="color:#000;">${memberData.name}</strong>
+                <span style="font-family:monospace;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:13px;">(${memberData.operativeId})</span>.
+                Use the code below to authorize access.
+              </p>
+              ${buildOtpBlock(otp, '#dc2626')}
+              <div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;">
+                <p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">
+                  ⚠️ <strong>If you did not initiate this login,</strong> your admin credentials may be compromised. Change them immediately.
+                </p>
               </div>
-              <p style="color:#94a3b8;font-size:12px;margin-top:16px;">This code expires in 15 minutes.</p>
-            </div>
-          `
+            \`
+          })
         });
       } catch (e) {
         console.error('Failed to send Admin OTP email:', e);
@@ -1706,41 +1755,32 @@ export default async function handler(req, res) {
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
             subject: `🎉 Congratulations! Your Innovexa Membership is Approved`,
-            html: `
-              <!DOCTYPE html>
-              <html>
-              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-              <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-
-          <div style="text-align:center; padding:32px 0 16px;">
-            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
-          </div>
-          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-                  <!-- Header -->
-                  <div style="background:#000000;padding:36px 32px;text-align:center;">
-                    <div style="font-size:52px;margin-bottom:12px;">🎉</div>
-                    <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;">You're officially in!</h1>
-                    <p style="margin:10px 0 0;color:rgba(255,255,255,.8);font-size:15px;">Welcome to Innovexa Hub, ${member.name}</p>
+            html: buildEmail({
+              title: "You're officially in! 🎉",
+              subtitle: 'Membership Approved',
+              iconEmoji: '🎉',
+              accentColor: '#10b981',
+              bodyHtml: `
+                <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+                <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
+                  Your Innovexa Hub membership has been <strong style="color:#10b981;">approved</strong>! Welcome to the collective.
+                </p>
+                <div style="margin:0 0 24px;border-radius:12px;overflow:hidden;">
+                  <div style="background:#10b981;padding:10px 24px;text-align:center;">
+                    <span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Operative ID</span>
                   </div>
-                  <!-- Operative ID Card -->
-                  <div style="padding:32px;">
-                    <p style="color:#475569;font-size:15px;margin:0 0 24px;text-align:center;">Your membership has been <strong style="color:#10b981;">approved</strong>. Here's your unique Operative ID:</p>
-                    <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:2px solid #c4b5fd;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px;">
-                      <div style="font-size:11px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">Your Operative ID</div>
-                      <div style="font-size:36px;font-weight:800;color:#5b21b6;font-family:'Courier New',monospace;letter-spacing:6px;">${member.operativeId}</div>
-                      <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
-                    </div>
-                    <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
-                    <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
-                  </div>
-                  <!-- Footer -->
-                  <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
-                    <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you have any issues, contact your admin.</p>
+                  <div style="background:#f0fdf4;border:2px solid #10b981;border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;">
+                    <div style="font-size:38px;font-weight:900;letter-spacing:8px;color:#000000;font-family:'Courier New',monospace;">${member.operativeId}</div>
+                    <div style="margin-top:8px;font-size:13px;color:#10b981;font-weight:600;">Use this ID to log in to your Forge dashboard</div>
                   </div>
                 </div>
-              </body>
-              </html>
-            `
+                <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
+                  Access the <strong style="color:#7c3aed;">Innovexa Forge</strong> — your personal dashboard for resources, task bounties, leaderboard, and SOS support.
+                </p>
+                <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.3px;">Access the Forge Dashboard →</a>
+              \`,
+              footerNote: 'Questions? Contact your admin.'
+            })
           });
           console.log(`Approval email sent to ${member.email}`);
         } catch (emailErr) {
@@ -1755,35 +1795,25 @@ export default async function handler(req, res) {
             from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
             to: member.email,
             subject: `⚠️ Important: Your Innovexa Membership Status Update`,
-            html: `
-              <!DOCTYPE html>
-              <html>
-              <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-              <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-
-          <div style="text-align:center; padding:32px 0 16px;">
-            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
-          </div>
-          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-                  <!-- Header -->
-                  <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:36px 32px;text-align:center;">
-                    <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
-                    <h1 style="margin:0;color:#fff;font-size:22px;font-weight:700;">Membership Status Updated</h1>
-                  </div>
-                  <div style="padding:32px;">
-                    <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 20px;">Hi <strong>${member.name}</strong>, your Innovexa Hub membership status has been updated to <strong style="color:#dc2626;">${status}</strong>.</p>
-                    <div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:4px;padding:14px 18px;margin-bottom:24px;">
-                      <p style="margin:0;font-size:13px;color:#7f1d1d;">If you believe this is an error or would like to appeal, please contact the Innovexa admin team directly.</p>
-                    </div>
-                    <a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#64748b;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
-                  </div>
-                  <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
-                    <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · This is an automated notification.</p>
-                  </div>
+            html: buildEmail({
+              title: 'Membership Status Update',
+              subtitle: `Status changed to: ${status}`,
+              iconEmoji: '⚠️',
+              accentColor: '#dc2626',
+              bodyHtml: `
+                <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+                <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
+                  Your Innovexa Hub membership status has been updated to
+                  <strong style="color:#dc2626;">${status}</strong>.
+                </p>
+                <div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;margin-bottom:24px;">
+                  <p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">
+                    If you believe this is an error, please contact the Innovexa admin team directly to appeal.
+                  </p>
                 </div>
-              </body>
-              </html>
-            `
+                <a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
+              \`
+            })
           });
         } catch (emailErr) {
           console.error('Revoke email failed:', emailErr.message);
@@ -2453,23 +2483,27 @@ export default async function handler(req, res) {
                  from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
                  to: member.email,
                  subject: `✅ Task Approved: ${t.title} (+${xpToAward} XP)`,
-                 html: `
-                   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:10px;">
-                     <div style="font-size:36px;text-align:center;margin-bottom:12px;">🏆</div>
-                     <h2 style="text-align:center;color:#10b981;margin-bottom:4px;">Task Approved!</h2>
-                     <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">Your submission has been reviewed by the admin.</p>
-                     <div style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:16px;">
+                 html: buildEmail({
+                   title: 'Task Approved! 🏆',
+                   subtitle: `+${xpToAward} XP Earned`,
+                   iconEmoji: '✅',
+                   accentColor: '#10b981',
+                   bodyHtml: `
+                     <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+                     <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
+                       Your task submission has been <strong style="color:#10b981;">approved</strong> by the admin. Great work!
+                     </p>
+                     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:20px;">
                        <table style="width:100%;border-collapse:collapse;">
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Task</td><td style="color:#fff;font-weight:700;">${t.title}</td></tr>
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Status</td><td style="color:#10b981;font-weight:700;">✅ Approved</td></tr>
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">XP Earned</td><td style="color:#000000;font-weight:800;font-size:16px;">+${xpToAward} XP</td></tr>
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">New Rank</td><td style="color:#fbbf24;font-weight:700;">${rank}</td></tr>
-                         ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Feedback</td><td style="color:#e2e8f0;font-size:13px;">${feedback}</td></tr>` : ''}
+                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">${t.title}</td></tr>
+                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">XP Earned</td><td style="padding:10px 0;font-size:20px;font-weight:800;color:#10b981;">+${xpToAward} XP</td></tr>
+                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">New Rank</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#7c3aed;">${rank}</td></tr>
+                         ${feedback ? `<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">View Your Forge →</a>
-                     <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
-                   </div>`
+                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Dashboard →</a>
+                   \`
+                 })
                });
              } catch(e) { console.error('Member approval email failed:', e.message); }
            }
@@ -2494,21 +2528,26 @@ export default async function handler(req, res) {
                  from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
                  to: member.email,
                  subject: `❌ Task Needs Revision: ${t.title}`,
-                 html: `
-                   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#0f0f0f;color:#fff;border-radius:10px;">
-                     <div style="font-size:36px;text-align:center;margin-bottom:12px;">🔁</div>
-                     <h2 style="text-align:center;color:#ef4444;margin-bottom:4px;">Revision Required</h2>
-                     <p style="text-align:center;color:#a1a1aa;font-size:13px;margin-bottom:20px;">Your submission needs some changes before it can be approved.</p>
-                     <div style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:16px;">
+                 html: buildEmail({
+                   title: 'Revision Required 🔁',
+                   subtitle: `Task: ${t.title}`,
+                   iconEmoji: '🔁',
+                   accentColor: '#f59e0b',
+                   bodyHtml: `
+                     <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+                     <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
+                       Your task submission needs some changes before it can be approved. Please review and resubmit.
+                     </p>
+                     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:20px;">
                        <table style="width:100%;border-collapse:collapse;">
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Task</td><td style="color:#fff;font-weight:700;">${t.title}</td></tr>
-                         <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Status</td><td style="color:#ef4444;font-weight:700;">❌ Sent Back</td></tr>
-                         ${feedback ? `<tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Admin Feedback</td><td style="color:#fbbf24;font-size:13px;">${feedback}</td></tr>` : ''}
+                         <tr style="border-bottom:1px solid #fef3c7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">${t.title}</td></tr>
+                         <tr ${feedback ? 'style="border-bottom:1px solid #fef3c7;"' : ''}><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Status</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#dc2626;">Sent Back for Revision</td></tr>
+                         ${feedback ? `<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Admin Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">${feedback}</td></tr>` : ''}
                        </table>
                      </div>
-                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Resubmit on Forge →</a>
-                     <p style="color:#3f3f46;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub</p>
-                   </div>`
+                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">Resubmit on Forge →</a>
+                   \`
+                 })
                });
              } catch(e) { console.error('Member rejection email failed:', e.message); }
            }
