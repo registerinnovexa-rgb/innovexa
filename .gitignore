@@ -26,3 +26,7 @@ dist-ssr
 .env
 .aider*
 .env
+.env*.local
+.env.vercel
+.env.vercel.prod
+.bob/

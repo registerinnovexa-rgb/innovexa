@@ -1842,6 +1842,10 @@ function showDashboard() {
   
   loadOverview();
 
+  // Start real-time features only after a successful login
+  startLiveSync();
+  startAdminPresencePing();
+
   // Prefetch all major tabs in background so switching is instant
   setTimeout(() => {
     ['adminMembers', 'admin_get_tasks', 'admin_get_audit_logs', 'assets', 'docrequests', 'certreqs', 'forge_get_resources', 'team'].forEach(action => {
@@ -3400,9 +3404,11 @@ async function loadSkillTrees(isSilent = false) {
 
 // ── ADMIN COLLAB (Feature #25) ────────────────────────────────────────────────
 function startAdminPresencePing() {
-  const adminId = sessionStorage.getItem('adminToken') || 'ADM-' + Math.floor(Math.random()*10000);
-  const name = 'Admin';
-  
+  // Only run after login — adminSession must be set
+  if (!adminSession || !adminSession.id) return;
+  const adminId = adminSession.id;
+  const name = adminSession.name || 'Admin';
+
   async function ping() {
     try {
       const res = await apiPost('admin_ping_presence', { adminId, name });
@@ -3412,13 +3418,11 @@ function startAdminPresencePing() {
       }
     } catch(e) { /* ignore ping errors silently */ }
   }
-  
+
   ping();
   setInterval(ping, 60000); // Ping every 60s
 }
-
-// Start pinging after 3 seconds
-setTimeout(startAdminPresencePing, 3000);
+// startAdminPresencePing is called from showDashboard() after successful login — NOT on page load
 
 // ══════════════════════════════════════════════════════════════════════════════ END PHASE 4
 
@@ -5845,7 +5849,7 @@ function startLiveSync() {
     else if (onclick.includes('accessControl')) loadAccessControl(true);
   }, 3000); // 3 seconds is the safest minimum
 }
-document.addEventListener('DOMContentLoaded', startLiveSync);
+// startLiveSync is called from showDashboard() after successful login — NOT on DOMContentLoaded
 let currentEvents = [];
 let activeEventId = null;
 let activeEventTitle = '';
