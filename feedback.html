@@ -57,7 +57,10 @@
       gap: 5px;
     }
     .rating-group input {
-      display: none;
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
     }
     .rating-group label {
       font-size: 24px;
@@ -180,7 +183,11 @@
       }
       
       const opId = document.getElementById('opId').value.trim().toUpperCase();
-      const rating = document.querySelector('input[name="rating"]:checked').value;
+      const checkedRating = document.querySelector('input[name="rating"]:checked');
+      if (!checkedRating) {
+        return showToast("Please select a rating.");
+      }
+      const rating = checkedRating.value;
       const comments = document.getElementById('comments').value.trim();
       
       document.getElementById('feedbackForm').style.display = 'none';
