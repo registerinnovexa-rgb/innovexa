@@ -25,6 +25,20 @@ function createTransporter() {
 }
 const transporter = createTransporter();
 
+// Global interceptor to prevent emails from going to spam
+const originalSendMail = transporter.sendMail.bind(transporter);
+transporter.sendMail = async (options) => {
+  if (!options.text && options.html) {
+    // Generate a simple text fallback by stripping HTML tags
+    options.text = options.html.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+  }
+  // Set reply-to to help with deliverability
+  if (!options.replyTo) {
+    options.replyTo = `"Innovexa Hub Support" <${process.env.EMAIL_USER}>`;
+  }
+  return originalSendMail(options);
+};
+
 // ── Admin Notification Helper ────────────────────────────────────────────────
 // Sends a quick email to admin for every tracked member action.
 async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) {
