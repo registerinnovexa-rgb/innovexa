@@ -446,7 +446,7 @@ export default async function handler(req, res) {
     
     // ADMIN: Edit Member Profile (Feature #1)
     if (action === 'admin_edit_member') {
-      const { operativeId, name, email, phone, college, branch, year, xp, rank, squad, forgeRole, status } = payload;
+      const { operativeId, name, email, phone, college, branch, year, xp, rank, squad, forgeRole, status, photoUrl, signature } = payload;
       if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
       const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
@@ -462,6 +462,8 @@ export default async function handler(req, res) {
       if (squad !== undefined) member.squad = squad.trim();
       if (forgeRole !== undefined) member.forgeRole = forgeRole.trim();
       if (status !== undefined) member.status = status.trim();
+      if (photoUrl !== undefined) member.photoUrl = photoUrl;
+      if (signature !== undefined) member.signature = signature;
       let notifications = [];
       let justApproved = false;
       if (status !== undefined && status !== before.status) {

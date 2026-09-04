@@ -2333,6 +2333,14 @@ function enableDossierEdit(opId, prof) {
       </div>
       <div class="form-group" style="margin-bottom:0;"><label>Squad</label><input id="dedit_squad" value="${escHtml(prof.squad||'')}"></div>
       <div class="form-group" style="margin-bottom:0;"><label>Forge Role</label><input id="dedit_forgeRole" value="${escHtml(prof.forgeRole||'')}"></div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>New Photo</label>
+        <input type="file" id="dedit_photo" accept="image/*" style="width:100%;padding:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;border-radius:6px;">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>New Signature</label>
+        <input type="file" id="dedit_sign" accept="image/*" style="width:100%;padding:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;border-radius:6px;">
+      </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px;">
       <button class="btn-primary" onclick="saveDossierEdit()">Save Changes</button>
@@ -2347,7 +2355,7 @@ async function saveDossierEdit() {
   const statusEl = document.getElementById('dossierEditStatus');
   statusEl.textContent = 'Saving...';
   try {
-    const res = await apiPost('admin_edit_member', {
+    const payload = {
       operativeId: _dossierOpId,
       name: document.getElementById('dedit_name').value,
       email: document.getElementById('dedit_email').value,
@@ -2360,7 +2368,14 @@ async function saveDossierEdit() {
       status: document.getElementById('dedit_status').value,
       squad: document.getElementById('dedit_squad').value,
       forgeRole: document.getElementById('dedit_forgeRole').value,
-    });
+    };
+    
+    const photoFile = document.getElementById('dedit_photo').files[0];
+    const signFile = document.getElementById('dedit_sign').files[0];
+    if (photoFile) payload.photoUrl = await fileToBase64(photoFile);
+    if (signFile) payload.signature = await fileToBase64(signFile);
+
+    const res = await apiPost('admin_edit_member', payload);
     if (!res.success) throw new Error(res.message);
     statusEl.style.color = 'var(--green)';
     statusEl.textContent = '✓ Profile updated successfully.';
