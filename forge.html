@@ -466,7 +466,7 @@
         err.textContent = 'Please enter your Operative ID.';
         return;
       }
-      
+
       err.textContent = '';
       btn.disabled = true;
       btn.textContent = 'Sending...';
@@ -478,21 +478,21 @@
           body: JSON.stringify({ payload: { action: 'forge_request_otp', invxId: id } })
         });
         const res = await r.json();
-        
+
         if (res.success) {
-           toast(res.message, 'success');
-           document.getElementById('loginDesc').textContent = 'Enter the 6-digit login code sent to your email.';
-           document.getElementById('loginStep1').style.display = 'none';
-           document.getElementById('loginStep2').style.display = 'block';
+          toast(res.message, 'success');
+          document.getElementById('loginDesc').textContent = 'Enter the 6-digit login code sent to your email.';
+          document.getElementById('loginStep1').style.display = 'none';
+          document.getElementById('loginStep2').style.display = 'block';
         } else {
-           err.textContent = res.message || 'Failed to request code.';
+          err.textContent = res.message || 'Failed to request code.';
         }
       } catch(e) {
         err.textContent = 'Network error. Try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Login Code';
       }
-
-      btn.disabled = false;
-      btn.textContent = 'Send Login Code';
     }
 
     async function handleVerifyLoginCode() {
@@ -505,7 +505,7 @@
         err.textContent = 'Please enter the 6-digit code.';
         return;
       }
-      
+
       err.textContent = '';
       btn.disabled = true;
       btn.textContent = 'Authenticating...';
@@ -514,40 +514,36 @@
         const ua = navigator.userAgent;
         const screenRes = `${window.screen.width}x${window.screen.height}`;
         const theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Dark Mode' : 'Light Mode';
-        
+
         const r = await fetch('/api/backend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ payload: { action: 'forge_verify_otp', invxId: id, otp: otp, ua: ua, screen: screenRes, theme: theme } })
         });
         const res = await r.json();
-        
+
         if (res.success && res.data) {
-           if (res.data.access !== 'Granted') {
-              err.textContent = 'Access Denied. You do not have Forge Access.';
-           } else {
-               toast('Authentication successful.', 'success');
-               
-               // Create session
-               session = {
-                  timestamp: new Date().getTime(),
-                  ...res.data
-               };
-               localStorage.setItem('forge_session', JSON.stringify(session));
-               
-               resetIdleTimer();
-               // Boot Dashboard
-               bootDashboard();
-           }
+          if (res.data.access !== 'Granted') {
+            err.textContent = 'Access Denied. You do not have Forge Access.';
+          } else {
+            toast('Authentication successful.', 'success');
+            session = {
+              timestamp: new Date().getTime(),
+              ...res.data
+            };
+            localStorage.setItem('forge_session', JSON.stringify(session));
+            resetIdleTimer();
+            bootDashboard();
+          }
         } else {
-           err.textContent = res.message || 'Authentication failed.';
+          err.textContent = res.message || 'Authentication failed.';
         }
       } catch(e) {
         err.textContent = 'Network error. Try again.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Authenticate';
       }
-
-      btn.disabled = false;
-      btn.textContent = 'Authenticate';
     }
     
     function resetLoginView() {

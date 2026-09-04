@@ -310,24 +310,8 @@ export default async function handler(req, res) {
 
       const member = await Member.findOne({ $or: query });
       if (member) {
-        // Log status check
-        const log = new ActionLog({
-          timestamp: new Date(),
-          type: 'STATUS_CHECK',
-          content: `A member has checked their application status.`,
-          operativeId: member.operativeId,
-          name: member.name
-        });
-        await log.save();
-
-        await notifyAdmin({
-          type: 'STATUS_CHECK',
-          operativeId: member.operativeId,
-          name: member.name,
-          detail: `${member.name} checked their application status.`
-        });
-
-        return res.status(200).json({
+        // Respond immediately — don't block on audit log or admin notification
+        res.status(200).json({
           success: true,
           found: true,
           data: {
@@ -350,6 +334,13 @@ export default async function handler(req, res) {
             college: member.college
           }
         });
+        // Fire-and-forget: audit + admin notify after response is flushed
+        const _scName = member.name, _scOpId = member.operativeId;
+        Promise.all([
+          new ActionLog({ timestamp: new Date(), type: 'STATUS_CHECK', content: `A member has checked their application status.`, operativeId: _scOpId, name: _scName }).save(),
+          notifyAdmin({ type: 'STATUS_CHECK', operativeId: _scOpId, name: _scName, detail: `${_scName} checked their application status.` })
+        ]).catch(e => console.error('status_check post-response tasks failed:', e.message));
+        return;
       }
       return res.status(200).json({ success: true, found: false, message: 'No record found.' });
     }
@@ -378,38 +369,35 @@ export default async function handler(req, res) {
       member.otpAttempts = 0; // reset attempts on new OTP
       await member.save();
       
-      try {
-        await transporter.sendMail({
-          from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
-          to: member.email,
-          subject: `🔐 Your Innovexa Login Code: ${otp}`,
-          html: buildEmail({
-            title: 'Forge Login Code',
-            subtitle: 'Innovexa Forge Dashboard',
-            iconEmoji: '🔐',
-            accentColor: '#7c3aed',
-            bodyHtml: `
-              <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-              <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
-                Use the secure code below to log into your <strong style="color:#7c3aed;">Innovexa Forge</strong> dashboard.
-              </p>
-              ${buildOtpBlock(otp)}
-              <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
-                <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
-                  🔒 <strong style="color:#374151;">Security notice:</strong> Never share this code. Innovexa staff will never ask for your OTP.
-                </p>
-              </div>
-            \`
-          })
-        });
-        console.log(`OTP sent to ${member.email}`);
-      } catch (err) {
-        console.error('Failed to send OTP email:', err.message);
-        // Still return success — OTP is saved in DB so admin can look it up
-      }
-      
       const maskedEmail = member.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + gp3.replace(/./g, '*'));
-      return res.status(200).json({ success: true, message: 'Login code sent to ' + maskedEmail });
+      // Respond immediately — don't block on SMTP delivery
+      res.status(200).json({ success: true, message: 'Login code sent to ' + maskedEmail });
+      // Fire-and-forget: send OTP email after response is already flushed
+      transporter.sendMail({
+        from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+        to: member.email,
+        subject: `🔐 Your Innovexa Login Code: ${otp}`,
+        html: buildEmail({
+          title: 'Forge Login Code',
+          subtitle: 'Innovexa Forge Dashboard',
+          iconEmoji: '🔐',
+          accentColor: '#7c3aed',
+          bodyHtml: `
+            <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+            <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
+              Use the secure code below to log into your <strong style="color:#7c3aed;">Innovexa Forge</strong> dashboard.
+            </p>
+            ${buildOtpBlock(otp)}
+            <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
+              <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
+                🔒 <strong style="color:#374151;">Security notice:</strong> Never share this code. Innovexa staff will never ask for your OTP.
+              </p>
+            </div>
+          \`
+        })
+      }).then(() => console.log(`OTP sent to ${member.email}`))
+        .catch(err => console.error('Failed to send OTP email:', err.message));
+      return;
     }
 
     // FORGE: Verify OTP
@@ -449,24 +437,8 @@ export default async function handler(req, res) {
       member.lastLoginTime = new Date().toISOString();
       await member.save();
 
-      // Save login activity log
-      await new ActionLog({
-        timestamp: new Date(),
-        type: 'LOGIN',
-        content: `Operative ${member.name} logged into Innovexa Forge.`,
-        operativeId: member.operativeId,
-        name: member.name
-      }).save();
-
-      // Notify admin of login
-      await notifyAdmin({
-        type: 'LOGIN',
-        operativeId: member.operativeId,
-        name: member.name,
-        detail: `${member.name} logged into the Forge dashboard. Total logins: ${member.loginCount}.`
-      });
-      
-      return res.status(200).json({
+      // Respond immediately — session data is ready, don't block on audit/email
+      res.status(200).json({
         success: true,
         data: {
           name: member.name,
@@ -483,6 +455,26 @@ export default async function handler(req, res) {
           phone: member.phone
         }
       });
+      // Fire-and-forget: audit log + admin notification after response is flushed
+      const _loginName = member.name;
+      const _loginOpId = member.operativeId;
+      const _loginCount = member.loginCount;
+      Promise.all([
+        new ActionLog({
+          timestamp: new Date(),
+          type: 'LOGIN',
+          content: `Operative ${_loginName} logged into Innovexa Forge.`,
+          operativeId: _loginOpId,
+          name: _loginName
+        }).save(),
+        notifyAdmin({
+          type: 'LOGIN',
+          operativeId: _loginOpId,
+          name: _loginName,
+          detail: `${_loginName} logged into the Forge dashboard. Total logins: ${_loginCount}.`
+        })
+      ]).catch(e => console.error('forge_verify_otp post-response tasks failed:', e.message));
+      return;
     }
     
     // ADMIN: Edit Member Profile (Feature #1)
@@ -1559,17 +1551,16 @@ export default async function handler(req, res) {
       // Clear OTP
       await PlatformSettings.findOneAndUpdate({ key: 'global' }, { $unset: { adminOtp: "", adminOtpTime: "" } });
 
-      await notifyAdmin({
+      // Respond immediately — don't block on admin notification email
+      res.status(200).json({ success: true, data: memberData });
+      // Fire-and-forget: notify admin after response is flushed
+      notifyAdmin({
         type: 'LOGIN',
         operativeId: memberData.operativeId,
         name: memberData.name,
         detail: `Admin login successful via OTP. Role: ${memberData.role}`
-      });
-
-      return res.status(200).json({
-        success: true,
-        data: memberData
-      });
+      }).catch(e => console.error('admin_verify_otp notify failed:', e.message));
+      return;
     }
 
     // FORGE: Get Mentors
