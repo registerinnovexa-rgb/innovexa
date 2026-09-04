@@ -2,588 +2,996 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Innovexa Hub | Clearance Protocol</title>
-  <link rel="stylesheet" href="/assets/design.css" />
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <style>
-    body { background: #050505; color: #a1a1aa; font-family: monospace; overflow: hidden; height: 100vh; margin: 0; display: flex; flex-direction: column; }
-    
-    /* Header */
-    .header { padding: 20px; border-bottom: 1px solid rgba(16, 185, 129, 0.2); display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; flex-shrink: 0; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-    .header-title { font-size: 16px; font-weight: 700; color: #10b981; letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
-    .blinking-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Initialize — Innovexa Hub</title>
+  <meta property="og:image" content="https://innovexa-portal-hgbqn4t2i-innovexahubbangalore-8824s-projects.vercel.app/assets/logo.png" />
 
-    /* Chat Area */
-    .chat-container { flex: 1; overflow-y: auto; padding: 30px 20px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
-    
-    .msg { max-width: 85%; display: flex; flex-direction: column; opacity: 0; animation: fadeUp 0.4s forwards; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .msg.ai { align-self: flex-start; }
-    .msg.ai .bubble { background: #111; border: 1px solid rgba(16, 185, 129, 0.3); border-left: 3px solid #10b981; color: #e4e4e7; border-radius: 4px 12px 12px 12px; }
-    .msg.ai .sender { color: #10b981; font-size: 10px; margin-bottom: 4px; letter-spacing: 1px; }
+  <meta name="description" content="Register to become an Innovexa Hub Operative. Join the premier student tech collective." />
 
-    .msg.user { align-self: flex-end; align-items: flex-end; }
-    .msg.user .bubble { background: #10b981; color: #000; font-weight: 600; border-radius: 12px 4px 12px 12px; }
-    .msg.user .sender { color: #a1a1aa; font-size: 10px; margin-bottom: 4px; letter-spacing: 1px; }
-    
-    .bubble { padding: 12px 16px; font-size: 14px; line-height: 1.5; font-family: sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-    /* Input Area */
-    .input-area { padding: 20px; background: #0a0a0a; border-top: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; min-height: 80px; display: flex; align-items: center; justify-content: center; }
-    
-    .field-group { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; animation: fadeIn 0.3s forwards; }
-    
-    .text-input-wrap { display: flex; gap: 10px; }
-    .text-input-wrap input, .text-input-wrap select { flex: 1; background: #111; border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 12px 16px; font-size: 16px; border-radius: 8px; outline: none; transition: border 0.2s; font-family: monospace; }
-    .text-input-wrap input:focus, .text-input-wrap select:focus { border-color: #10b981; }
-    
-    .btn-send { background: #10b981; color: #000; border: none; padding: 0 24px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: transform 0.1s, background 0.2s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-    .btn-send:hover { background: #0ea5e9; }
-    .btn-send:active { transform: scale(0.95); }
+  <link rel="stylesheet" href="css/design.css" />
+  
 
-    /* Grid Form for Multi-fields */
-    .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media (max-width: 600px) { .grid-form { grid-template-columns: 1fr; } }
-
-    /* Chip Selection */
-    .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-    .chip { padding: 8px 16px; background: #111; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 12px; cursor: pointer; color: #a1a1aa; transition: all 0.2s; font-family: sans-serif; font-weight: 600; }
-    .chip.active { background: #10b981; color: #000; border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-
-    /* Camera UI */
-    .camera-ui { background: #111; padding: 15px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; flex-direction: column; align-items: center; gap: 15px; }
-    #webcam-video { width: 100%; max-width: 320px; border-radius: 8px; background: #000; transform: scaleX(-1); }
-    #photo-preview-img { width: 100%; max-width: 320px; border-radius: 8px; display: none; }
-
-    /* Signature UI */
-    .sig-ui { background: #fff; border-radius: 8px; overflow: hidden; border: 2px solid #10b981; }
-    #sig-canvas { width: 100%; height: 150px; display: block; touch-action: none; }
-    
-    /* Payment UI */
-    .pay-ui { background: #111; padding: 20px; border-radius: 12px; border: 1px solid #10b981; text-align: center; }
-    .qr-box { background: #fff; padding: 10px; border-radius: 8px; display: inline-block; margin: 15px 0; }
-    
-    /* Loader */
-    .typing-indicator { display: flex; gap: 4px; padding: 8px 0; }
-    .typing-indicator span { width: 6px; height: 6px; background: #10b981; border-radius: 50%; animation: type 1s infinite; }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes type { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-4px); opacity: 1; } }
-
-    /* Success Screen */
-    .success-overlay { position: fixed; inset: 0; background: #050505; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
-    .success-overlay.show { opacity: 1; pointer-events: all; }
-    .id-card { background: linear-gradient(135deg, #10b981, #0ea5e9); padding: 3px; border-radius: 16px; margin-top: 30px; box-shadow: 0 20px 50px rgba(16, 185, 129, 0.3); animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .id-card-inner { background: #000; padding: 30px; border-radius: 14px; text-align: center; color: #fff; font-family: sans-serif; }
-    .id-op { font-family: monospace; font-size: 32px; font-weight: 800; color: #10b981; margin: 20px 0; letter-spacing: 2px; }
-
-  </style>
+  <link rel="stylesheet" href="css/main.css" />
+  <script src="/js/shield.js"></script>
+  <link rel="icon" type="image/png" href="assets/icon.png" />
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-title">
-      <div class="blinking-dot"></div>
-      INNOVEXA CLEARANCE PROTOCOL
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner container" style="display:flex; justify-content:space-between; align-items:center; height:80px;">
+    <a href="index" class="nav-logo" style="display:flex; align-items:center; gap:10px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="height:32px; width:auto; object-fit:contain;" />
+      
+    </a>
+    <div class="nav-links" style="display:flex; gap:32px; align-items:center;">
+      <a href="index" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register" class="nav-link active" style="font-size:14px; font-weight:500;">Register</a>
+      <a href="status" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href="pathfinder" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text3);">Pathfinder</a>
+      <a href="forge" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Dashboard</a>
+      <a href="atlas" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
     </div>
+    <div class="nav-cta">
+      <a href="register" class="btn-magnetic" style="padding:10px 24px; font-size:13px;">Join the Collective</a>
+    </div>
+    <button class="hamburger" id="hamburger-btn">
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+      <span style="width:24px; height:2px; background:var(--text-1);"></span>
+    </button>
   </div>
+</nav>
 
-  <div class="chat-container" id="chat">
-    <!-- Messages injected here -->
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu" style="position:fixed; inset:0; background:var(--bg); z-index:2000; padding:80px 24px; transform:translateY(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; gap:32px;">
+  <button class="mobile-close" id="mobile-close-btn" style="position:absolute; top:30px; right:24px; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+  <a href="index" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Home</a>
+  <a href="register" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Register</a>
+  <a href="status" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Status</a>
+      <a href="pathfinder" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Pathfinder</a>
+  <a href="forge" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Dashboard</a>
+  <a href="atlas" class="nav-link" style="font-family:var(--font-d); font-size:32px; font-weight:500;" onclick="closeMobileMenu()">Atlas</a>
+</div>
+
+<!-- HEADER -->
+<header class="page-header">
+  <div class="container fade-up">
+    <h1 class="page-title">Initialize <span class="italic">Membership.</span></h1>
+    <p class="page-sub">Complete the protocol to secure your Operative ID and access the Innovexa Hub network.</p>
   </div>
+</header>
 
-  <div class="input-area" id="input-area">
-    <!-- Input injected here -->
-  </div>
-
-  <div class="success-overlay" id="success">
-    <div style="font-size: 64px; margin-bottom: 20px;">🎖️</div>
-    <h1 style="color: #fff; margin: 0 0 10px 0; font-family: sans-serif;">CLEARANCE GRANTED</h1>
-    <p style="color: #a1a1aa; max-width: 400px; line-height: 1.6;">Your dossier has been submitted. The administration will review your application. Retain your Operative ID.</p>
+<!-- FORM SECTION -->
+<section class="form-wrapper">
+  <div class="form-card fade-up delay-1" id="form-container">
     
-    <div class="id-card">
-      <div class="id-card-inner">
-        <div style="font-size: 10px; letter-spacing: 2px; color: #a1a1aa;">TEMPORARY OPERATIVE ID</div>
-        <div class="id-op" id="gen-id">INVX-XXXX</div>
-        <button class="btn-send" style="padding: 12px 30px; width: 100%;" onclick="window.location.href='/'">RETURN TO TERMINAL</button>
+    <div class="step-indicator" id="step-indicator">
+      <div class="step">
+        <div class="step-num active" id="ind-1">1</div>
+        <div class="step-label active" id="label-1">Identity</div>
+      </div>
+      <div class="step">
+        <div class="step-num" id="ind-2">2</div>
+        <div class="step-label" id="label-2">Verification</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Personal Info -->
+    
+    <div class="wizard-progress" style="display:flex; justify-content:space-between; margin-bottom:40px; position:relative;">
+      <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:rgba(0,0,0,0.05); z-index:1; transform:translateY(-50%);"></div>
+      <div id="prog-1" style="position:relative; z-index:2; background:#fff; padding:0 10px; font-size:12px; font-weight:700; color:var(--accent); display:flex; align-items:center; gap:6px;"><div style="width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center;">1</div> Identity</div>
+      <div id="prog-2" style="position:relative; z-index:2; background:#fff; padding:0 10px; font-size:12px; font-weight:600; color:var(--text-3); display:flex; align-items:center; gap:6px;"><div style="width:24px; height:24px; border-radius:50%; background:var(--bg-3); color:var(--text-3); display:flex; align-items:center; justify-content:center;">2</div> Loadout</div>
+      <div id="prog-3" style="position:relative; z-index:2; background:#fff; padding:0 10px; font-size:12px; font-weight:600; color:var(--text-3); display:flex; align-items:center; gap:6px;"><div style="width:24px; height:24px; border-radius:50%; background:var(--bg-3); color:var(--text-3); display:flex; align-items:center; justify-content:center;">3</div> Clearance</div>
+    </div>
+
+    <div id="step-1">
+      <div class="auth-section" id="otpAuthBox" style="background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; padding: 32px 24px; margin-bottom: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02); transition: all 0.4s ease;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 16V12" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 8H12.01" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div style="font-family: var(--font-b); font-size: 16px; font-weight: 500; color: var(--text-1); margin-bottom: 8px;">
+          Authenticate to Continue
+        </div>
+        <div style="font-size: 13px; color: var(--text-2); margin-bottom: 24px; max-width: 300px; line-height: 1.5;">
+          Secure your identity using an Email OTP to proceed with the initialization protocol.
+        </div>
+        
+        <div id="otp-step-1" style="width: 100%; max-width: 300px;">
+          <input class="form-control" id="authEmail" type="email" placeholder="Enter your email address" style="margin-bottom: 12px; text-align:center;" />
+          <button type="button" class="btn-magnetic" id="btnRequestOtp" style="padding: 12px 24px; width: 100%;">Request OTP</button>
+        </div>
+        
+        <div id="otp-step-2" style="display:none; width: 100%; max-width: 300px;">
+          <input class="form-control" id="authOtp" type="text" placeholder="123456" maxlength="6" style="margin-bottom: 12px; text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;" />
+          <button type="button" class="btn-magnetic" id="btnVerifyOtp" style="padding: 12px 24px; width: 100%;">Verify & Unlock</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-control" id="fullName" type="text" placeholder="As per official records" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">University / College</label>
+          <input class="form-control" id="college" type="text" placeholder="e.g. Yenepoya University" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Email Address (Verified)</label>
+          <input class="form-control" id="email" type="email" placeholder="Waiting for OTP Auth..." readonly style="opacity:0.7; cursor:not-allowed;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input class="form-control" id="phone" type="tel" placeholder="10-digit mobile number" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input class="form-control" id="dob" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Year of Study</label>
+          <select class="form-control" id="year">
+            <option value="" disabled selected>Select Year</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <select class="form-control" id="gender">
+            <option value="" disabled selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch / Department</label>
+          <select class="form-control" id="branch">
+            <option value="" disabled selected>Select Branch</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Electronics">Electronics & Communication</option>
+            <option value="Mechanical">Mechanical Engineering</option>
+            <option value="Civil">Civil Engineering</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      
+      <div class="nav-btns" style="margin-top:30px; text-align:right;">
+        <button class="btn-magnetic" id="btn-next-1" type="button" style="padding:12px 24px;">Next: Loadout &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Loadout (Skills & Interests) -->
+    <div id="step-2" class="hidden">
+      <div style="font-family:var(--font-b); font-size:20px; font-weight:700; margin-bottom:24px; color:var(--text-1);">Configure Loadout</div>
+
+      <div class="form-group">
+        <label class="form-label">Current Skill Level</label>
+        <div class="skill-grid" id="skillLevel">
+          <button class="skill-btn active" data-val="Beginner">Beginner</button>
+          <button class="skill-btn" data-val="Intermediate">Intermediate</button>
+          <button class="skill-btn" data-val="Advanced">Advanced</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Domains of Interest (Select Multiple)</label>
+        <div class="chip-grid" id="interests">
+          <div class="chip">Web Dev</div>
+          <div class="chip">Mobile Dev</div>
+          <div class="chip">AI/ML</div>
+          <div class="chip">Cybersecurity</div>
+          <div class="chip">Data Science</div>
+          <div class="chip">UI/UX</div>
+          <div class="chip">DevOps</div>
+          <div class="chip">Blockchain</div>
+          <div class="chip">Game Dev</div>
+          <div class="chip">IoT</div>
+        </div>
+      </div>
+
+
+      <div class="nav-btns" style="margin-top:40px; display:flex; justify-content:space-between;">
+        <button class="btn-outline" id="btn-back-1" type="button">← Back</button>
+        <button class="btn-magnetic" id="btn-next-2" type="button">Next: Clearance &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Clearance (Payment, Captcha, Terms) -->
+    <div id="step-3" class="hidden">
+      <div style="font-family:var(--font-b); font-size:20px; font-weight:700; margin-bottom:24px; color:var(--text-1);">Final Clearance</div>
+
+      
+      <!-- Photo Upload -->
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label">Profile Photo (ID / Face) <span style="color:red;">*</span></label>
+        
+        <div style="display:flex; flex-direction:column; gap:12px; background:var(--bg-2); border:1px solid var(--border); border-radius:12px; padding:16px;">
+          
+          <div style="display:flex; align-items:center; gap:16px;">
+            <div id="photo-preview" style="width:80px; height:80px; border-radius:12px; border:2px dashed var(--border); background:var(--bg-1); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <span style="font-size:24px; color:var(--text-3);">👤</span>
+            </div>
+            <div style="flex:1; display:flex; gap:10px; flex-wrap:wrap;">
+              <input type="file" id="photo-upload" accept="image/*" style="display:none;" />
+              <button type="button" class="btn-outline" onclick="document.getElementById('photo-upload').click()" style="flex:1; padding:10px; font-size:13px; justify-content:center;">📂 Upload File</button>
+              <button type="button" class="btn-magnetic" id="btn-start-camera" style="flex:1; padding:10px; font-size:13px; justify-content:center;">📷 Use Camera</button>
+            </div>
+          </div>
+          
+          <!-- Live Camera View (Hidden by default) -->
+          <div id="camera-container" style="display:none; flex-direction:column; gap:10px; margin-top:8px; border-top:1px dashed var(--border); padding-top:16px;">
+            <video id="webcam-video" autoplay playsinline style="width:100%; border-radius:8px; background:#000; transform: scaleX(-1);"></video>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn-outline" id="btn-stop-camera" style="flex:1; font-size:12px;">Cancel</button>
+              <button type="button" class="btn-magnetic" id="btn-snap-photo" style="flex:2; font-size:13px; background:#10b981; color:#fff;">📸 Snap Photo</button>
+            </div>
+          </div>
+          
+        </div>
+        <div style="font-size:11px; color:var(--text-3); margin-top:8px;">Must be a clear photo of your face. Max 4MB.</div>
+      </div>
+
+      <!-- Signature Pad -->
+      <div class="form-group" style="margin-bottom:32px;">
+        <label class="form-label" style="display:flex; justify-content:space-between;">Digital Signature <span style="color:red;">*</span> <button type="button" id="clear-signature" style="background:none; border:none; color:var(--text-3); font-size:11px; text-decoration:underline; cursor:pointer;">Clear</button></label>
+        <div style="border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#fff; touch-action:none;">
+          <canvas id="signature-pad" width="400" height="150" style="width:100%; display:block; touch-action:none;"></canvas>
+        </div>
+        <div style="font-size:11px; color:var(--text-3); margin-top:6px;">Sign securely using your mouse or touchscreen.</div>
+      </div>
+
+      <div class="payment-box">
+        <div style="font-family:var(--font-m); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.6);">Initialization Fee</div>
+        
+        <div class="amount-display" style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:16px;">
+          ₹ 599
+          <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 12px; font-size:12px; cursor:pointer;" onclick="copyToClipboard('599', this)">Copy</button>
+        </div>
+
+        <div class="qr-wrap">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dgpay-12200845070%40okbizaxis%26pn%3DInnovexa%2520Hub%26am%3D599.00%26cu%3DINR" alt="UPI QR Code" />
+        </div>
+        
+        <div class="upi-id" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          gpay-12200845070@okbizaxis
+          <button type="button" class="btn-sm" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:4px 8px; font-size:12px; cursor:pointer;" onclick="copyToClipboard('gpay-12200845070@okbizaxis', this)">Copy</button>
+        </div>
+        <p style="font-size:13px; color:rgba(255,255,255,0.5); margin-top:16px; font-weight:300;">Scan QR, use the Pay button, or enter UPI ID to pay</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Transaction Reference (UTR)</label>
+        <input class="form-control" id="utr" type="text" placeholder="Enter 10-15 digit UTR number" />
+      </div>
+
+      <!-- CAPTCHA -->
+      <div class="captcha-box" style="margin-top:30px; padding:20px; background:rgba(0,0,0,0.03); border-radius:12px; border:1px solid var(--border);">
+        <label style="display:block; font-family:var(--font-d); font-size:14px; font-weight:500; margin-bottom:12px;">CAPTCHA Verification <span style="color:red;">*</span></label>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <canvas id="captcha-canvas" width="120" height="40" style="border-radius:8px; border:1px solid var(--border); background:#edeae4;"></canvas>
+          <button type="button" id="captcha-refresh" style="background:none; border:none; cursor:pointer; font-size:20px; color:var(--text-2);" title="Refresh CAPTCHA">↻</button>
+          <input type="text" id="captcha-answer" class="form-control" style="width:140px; text-align:center; font-family:var(--font-m);" placeholder="Type text..." />
+        </div>
+        <div id="captcha-error" class="form-error" style="display:none; margin-top:8px; color:#e02424; font-size:13px;">Incorrect CAPTCHA answer.</div>
+      </div>
+
+      
+      <!-- Terms and Conditions Agreement -->
+      <div class="form-group" style="display:flex; align-items:flex-start; gap:12px; margin: 32px 0; background:rgba(6, 182, 212, 0.05); border:1px solid rgba(6, 182, 212, 0.2); padding:16px; border-radius:12px;">
+        <input type="checkbox" id="termsCheckbox" style="margin-top:2px; width:18px; height:18px; accent-color:var(--accent); cursor:pointer;">
+        <label for="termsCheckbox" style="font-size:13px; color:var(--text-2); line-height:1.5; cursor:pointer;">
+          I have read and agree to the <a href="#" onclick="showTermsModal(event)" style="color:var(--accent); font-weight:600; text-decoration:none;">Terms of Service & Rules</a>. I understand that failing to respond to administrative communications or remaining inactive will result in immediate termination to make room for verified members.
+        </label>
+      </div>
+
+      <div class="form-actions" style="margin-top:40px; display:flex; gap:16px; justify-content:space-between;">
+        <button class="btn-outline" id="btn-back-2" type="button">← Back</button>
+        <button class="btn-magnetic" id="submit-btn">Initialize Membership</button>
       </div>
     </div>
   </div>
 
-<script>
-// --- State & Data ---
-let currentState = 0;
-const data = {
-  email: '', otp: '', fullName: '', phone: '', dob: '', 
-  college: '', branch: '', year: '', gender: '', 
-  skillLevel: '', interests: [], 
-  photo: '', signature: '', utr: ''
-};
-
-const chat = document.getElementById('chat');
-const inputArea = document.getElementById('input-area');
-
-// --- Helper Functions ---
-async function apiPost(action, payload) {
-  try {
-    const res = await fetch('/api/backend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payload: { action, ...payload } })
-    });
-    return await res.json();
-  } catch (e) {
-    return { success: false, message: e.message };
-  }
-}
-
-function scrollToBottom() {
-  setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
-}
-
-function addMsg(text, isAi=true, isHtml=false) {
-  const div = document.createElement('div');
-  div.className = `msg ${isAi ? 'ai' : 'user'}`;
-  const sender = isAi ? 'CORE AI' : 'CANDIDATE';
-  
-  let content = text;
-  if (!isHtml) {
-    content = text.replace(/\\n/g, '<br>');
-  }
-
-  div.innerHTML = `
-    <div class="sender">${sender}</div>
-    <div class="bubble">${content}</div>
-  `;
-  chat.appendChild(div);
-  scrollToBottom();
-}
-
-async function typeAi(text, delay=1000) {
-  return new Promise(resolve => {
-    const div = document.createElement('div');
-    div.className = 'msg ai typing-msg';
-    div.innerHTML = `<div class="sender">CORE AI</div><div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
-    chat.appendChild(div);
-    scrollToBottom();
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen hidden" id="success-screen">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 class="success-title">Protocol Initiated.</h2>
+    <p class="success-desc">Your application has been logged and is pending verification. Please retain your Operative ID below.</p>
     
-    setTimeout(() => {
-      div.remove();
-      addMsg(text);
-      resolve();
-    }, delay);
+    <div class="operative-id-display" id="generated-id">INVX-XX</div>
+    
+    <div style="margin-top:24px;">
+      <a href="status" class="btn-magnetic">Check Status</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner container" style="max-width:var(--max-w); margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:32px;">
+    <a href="index" class="nav-logo" style="display:flex; align-items:center; gap:12px; font-family:var(--font-d); font-weight:600; font-size:18px;">
+      <img src="assets/logo.png" alt="Innovexa Hub Logo" style="height:32px; width:auto; object-fit:contain;" />
+      
+    </a>
+    <div class="footer-links" style="display:flex; gap:32px;">
+      <a href="index" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Home</a>
+      <a href="register" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Register</a>
+      <a href="status" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Status</a>
+      <a href='pathfinder' class='footer-link'>Pathfinder</a>
+      <a href='forge' class='footer-link'>Dashboard</a>
+      <a href="atlas" class="nav-link" style="font-size:14px; font-weight:500; color:var(--text-2);">Atlas</a>
+    </div>
+    <div class="footer-copy" style="font-family:var(--font-m); font-size:12px; color:var(--text-3);">© 2026 Innovexa Hub. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script>
+    // --- Google Sign-In Logic ---
+    function decodeJwtResponse(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    function handleCredentialResponse(response) {
+      try {
+        const responsePayload = decodeJwtResponse(response.credential);
+        
+        document.getElementById('fullName').value = responsePayload.name || '';
+        document.getElementById('email').value = responsePayload.email || '';
+        document.getElementById('email').readOnly = true;
+        document.getElementById('email').style.opacity = '0.7';
+        document.getElementById('email').style.cursor = 'not-allowed';
+        
+        // ── Duplicate email check ──
+        const email = responsePayload.email || '';
+        checkEmailDuplicate(email);
+
+      } catch (err) {
+        console.error('Error handling Google Sign-In:', err);
+        alert('Google Sign-In failed.');
+      }
+    }
+
+    async function checkEmailDuplicate(email) {
+      try {
+        const res = await apiGet('status_check', { email: email });
+        if (res && res.found) {
+          // Block the form and show already-registered banner
+          showAlreadyRegistered(res.data);
+        } else {
+          alert('Google Account linked successfully!');
+        }
+      } catch(e) {
+        alert('Google Account linked successfully!');
+      }
+    }
+
+    function showAlreadyRegistered(data) {
+      // Hide the whole form
+      const formContainer = document.getElementById('form-container');
+      
+      // Remove existing duplicate banner if any
+      const existing = document.getElementById('already-registered-banner');
+      if (existing) existing.remove();
+
+      const status = (data.status || 'Pending').toLowerCase();
+      const statusColor = status === 'approved' ? '#25D366' : status === 'rejected' ? '#ef4444' : '#f59e0b';
+      const statusLabel = status === 'approved' ? 'APPROVED ✓' : status === 'rejected' ? 'REJECTED ✗' : 'PENDING REVIEW';
+
+      const banner = document.createElement('div');
+      banner.id = 'already-registered-banner';
+      banner.innerHTML = `
+        <div style="max-width:560px; margin:40px auto; background:#fff; border:2px solid ${statusColor}; border-radius:20px; padding:40px; text-align:center; box-shadow:0 0 40px rgba(0,0,0,0.08);">
+          <div style="width:64px;height:64px;border-radius:50%;background:${statusColor}22;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${statusColor}" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style="font-family:var(--font-m);font-size:12px;font-weight:700;letter-spacing:3px;color:${statusColor};margin-bottom:12px;">${statusLabel}</div>
+          <h2 style="font-family:var(--font-d);font-size:28px;font-weight:600;margin-bottom:8px;">Already Registered!</h2>
+          <p style="color:#666;font-size:15px;margin-bottom:24px;">The email <strong>${data.email}</strong> has already been used to register as an Innovexa Hub Operative.</p>
+          <div style="background:#f9f9f7;border-radius:12px;padding:20px;margin-bottom:24px;text-align:left;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;"><span style="color:#888;">Name</span><span style="font-weight:600;">${data.name || '—'}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;"><span style="color:#888;">Operative ID</span><span style="font-weight:600;font-family:var(--font-m);">${data.operativeId || 'Pending'}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;"><span style="color:#888;">Status</span><span style="font-weight:700;color:${statusColor};">${statusLabel}</span></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="status" style="padding:12px 28px;background:#111;color:#fff;border-radius:100px;font-weight:600;font-size:14px;text-decoration:none;">Check My Status</a>
+            <a href="index" style="padding:12px 28px;border:1px solid #ddd;color:#333;border-radius:100px;font-weight:500;font-size:14px;text-decoration:none;">Back to Home</a>
+          </div>
+        </div>
+      `;
+      formContainer.style.display = 'none';
+      formContainer.parentNode.insertBefore(banner, formContainer);
+    }
+
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
+    }
+  }, { passive: true });
+
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
   });
-}
-
-function renderInput(html) {
-  inputArea.innerHTML = `<div class="field-group">${html}</div>`;
-  const firstInput = inputArea.querySelector('input');
-  if (firstInput && firstInput.type !== 'file' && firstInput.type !== 'date') {
-    firstInput.focus();
+  function closeMobileMenu() {
+    mobileMenu.style.transform = 'translateY(-100%)';
   }
-}
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
 
-function clearInput() {
-  inputArea.innerHTML = '';
-}
+  // Observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+    observer.observe(el);
+  });
 
-// --- Image Compression ---
-function compressImage(file, maxW=800, maxH=800) {
-  return new Promise((resolve) => {
+  // UI Logic
+  let currentSkill = 'Beginner';
+  document.querySelectorAll('.skill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSkill = btn.dataset.val;
+    });
+  });
+
+  const selectedInterests = new Set();
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('selected');
+      if (chip.classList.contains('selected')) selectedInterests.add(chip.textContent);
+      else selectedInterests.delete(chip.textContent);
+    });
+  });
+
+  // Copy to clipboard helper
+  function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = 'rgba(255,255,255,0.1)';
+      }, 2000);
+    });
+  }
+
+  // Navigation
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.classList.add('error');
+    let err = el.parentElement.querySelector('.form-error');
+    if (!err) {
+      err = document.createElement('div');
+      err.className = 'form-error';
+      el.parentElement.appendChild(err);
+    }
+    err.textContent = msg;
+    el.addEventListener('input', () => { el.classList.remove('error'); if(err) err.remove(); }, {once:true});
+  }
+
+  
+  // --- Wizard Logic ---
+  function updateProgress(step) {
+    for(let i=1; i<=3; i++) {
+      const p = document.getElementById('prog-'+i);
+      const circle = p.querySelector('div');
+      if(i === step) {
+        p.style.color = 'var(--accent)';
+        p.style.fontWeight = '700';
+        circle.style.background = 'var(--accent)';
+        circle.style.color = '#fff';
+      } else if (i < step) {
+        p.style.color = 'var(--text-1)';
+        p.style.fontWeight = '600';
+        circle.style.background = 'var(--text-1)';
+        circle.style.color = '#fff';
+      } else {
+        p.style.color = 'var(--text-3)';
+        p.style.fontWeight = '600';
+        circle.style.background = 'var(--bg-3)';
+        circle.style.color = 'var(--text-3)';
+      }
+    }
+  }
+
+  const btnNext1 = document.getElementById('btn-next-1');
+  const btnNext2 = document.getElementById('btn-next-2');
+  const btnBack1 = document.getElementById('btn-back-1');
+  const btnBack2 = document.getElementById('btn-back-2');
+  
+  if (btnNext1) btnNext1.addEventListener('click', () => {
+    const fn = document.getElementById('fullName').value.trim();
+    const em = document.getElementById('email').value.trim();
+    const ph = document.getElementById('phone').value.trim();
+    const db = document.getElementById('dob').value;
+    const yr = document.getElementById('year').value;
+    const gn = document.getElementById('gender').value;
+    const br = document.getElementById('branch').value;
+    
+    if(!fn){ showError('fullName','Name required'); return;}
+    if(!em){ showError('email','Google Auth required'); return;}
+    if(!ph || ph.length<10){ showError('phone','Valid 10-digit phone required'); return;}
+    if(!db){ showError('dob','DOB required'); return;}
+    if(!yr){ showError('year','Year required'); return;}
+    if(!gn){ showError('gender','Gender required'); return;}
+    if(!br){ showError('branch','Branch required'); return;}
+
+    document.getElementById('step-1').classList.add('hidden');
+    document.getElementById('step-2').classList.remove('hidden');
+    updateProgress(2);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  if (btnNext2) btnNext2.addEventListener('click', () => {
+    document.getElementById('step-2').classList.add('hidden');
+    document.getElementById('step-3').classList.remove('hidden');
+    updateProgress(3);
+    window.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(resizeCanvas, 50); // Ensure the DOM has updated width before resizing
+    setTimeout(initCaptcha, 80);  // Re-init captcha now that the canvas is visible
+  });
+
+  if (btnBack1) btnBack1.addEventListener('click', () => {
+    document.getElementById('step-2').classList.add('hidden');
+    document.getElementById('step-1').classList.remove('hidden');
+    updateProgress(1);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  if (btnBack2) btnBack2.addEventListener('click', () => {
+    document.getElementById('step-3').classList.add('hidden');
+    document.getElementById('step-2').classList.remove('hidden');
+    updateProgress(2);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+
+  // CAPTCHA Logic
+  let currentCaptcha = '';
+  function generateCaptchaText() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let text = '';
+    for (let i = 0; i < 5; i++) {
+      text += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return text;
+  }
+  
+  function initCaptcha() {
+    currentCaptcha = generateCaptchaText();
+    const canvas = document.getElementById('captcha-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Background noise
+    for (let i = 0; i < 50; i++) {
+      ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255},0.1)`;
+      ctx.beginPath();
+      ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    
+    // Text
+    ctx.font = '22px "Geist Mono", monospace';
+    ctx.fillStyle = '#111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Draw with slight rotation
+    for (let i = 0; i < currentCaptcha.length; i++) {
+      ctx.save();
+      ctx.translate(20 + i * 20, 20);
+      ctx.rotate((Math.random() - 0.5) * 0.4);
+      ctx.fillText(currentCaptcha[i], 0, 0);
+      ctx.restore();
+    }
+    
+    // Lines
+    for (let i = 0; i < 4; i++) {
+      ctx.strokeStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255},0.3)`;
+      ctx.beginPath();
+      ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      ctx.stroke();
+    }
+    
+    document.getElementById('captcha-answer').value = '';
+  }
+  initCaptcha();
+  document.getElementById('captcha-refresh').addEventListener('click', initCaptcha);
+
+  
+  // --- Photo & Signature Logic ---
+  let compressedPhotoBase64 = null;
+  const photoUpload = document.getElementById('photo-upload');
+  const photoPreview = document.getElementById('photo-preview');
+
+
+  // --- Webcam Logic ---
+  const btnStartCam = document.getElementById('btn-start-camera');
+  const btnStopCam = document.getElementById('btn-stop-camera');
+  const btnSnap = document.getElementById('btn-snap-photo');
+  const camContainer = document.getElementById('camera-container');
+  const video = document.getElementById('webcam-video');
+  let stream = null;
+
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      video.srcObject = stream;
+      camContainer.style.display = 'flex';
+      btnStartCam.style.display = 'none';
+    } catch (err) {
+      alert("Camera permission denied or not available. Please upload a file instead.");
+      console.error(err);
+    }
+  }
+
+  function stopCamera() {
+    if(stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+    video.srcObject = null;
+    camContainer.style.display = 'none';
+    btnStartCam.style.display = 'flex';
+  }
+
+  btnStartCam.addEventListener('click', startCamera);
+  btnStopCam.addEventListener('click', stopCamera);
+
+  btnSnap.addEventListener('click', () => {
+    if(!stream) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    
+    // Flip context horizontally because video is mirrored (scaleX(-1))
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+    photoPreview.innerHTML = `<img src="${compressedPhotoBase64}" style="width:100%; height:100%; object-fit:cover;" />`;
+    
+    stopCamera();
+  });
+
+  photoUpload.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = function(event) {
       const img = new Image();
-      img.onload = () => {
-        const cvs = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if(w > h) { if(w > maxW) { h *= maxW/w; w = maxW; } } 
-        else      { if(h > maxH) { w *= maxH/h; h = maxH; } }
-        cvs.width = w; cvs.height = h;
-        const ctx = cvs.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(cvs.toDataURL('image/jpeg', 0.8));
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        photoPreview.innerHTML = `<img src="${compressedPhotoBase64}" style="width:100%; height:100%; object-fit:cover;" />`;
       };
-      img.src = e.target.result;
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   });
-}
 
-// --- Flow Logic ---
-async function startFlow() {
-  await typeAi("Welcome to the Innovexa Clearance Protocol.\\nTo begin, please provide your email address for verification.");
-  renderState0();
-}
+  // Signature Pad
+  const sigCanvas = document.getElementById('signature-pad');
+  const sigCtx = sigCanvas.getContext('2d');
+  let isDrawing = false;
+  let hasSignature = false;
 
-function renderState0() {
-  renderInput(`
-    <div class="text-input-wrap">
-      <input type="email" id="f_email" placeholder="agent@example.com" autocomplete="off" />
-      <button class="btn-send" onclick="submitState0()">Verify</button>
-    </div>
-  `);
-  document.getElementById('f_email').addEventListener('keypress', e => e.key === 'Enter' && submitState0());
-}
+  // Fix internal resolution vs CSS resolution
+  function resizeCanvas() {
+    const rect = sigCanvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0) return; // Hidden
+    if (sigCanvas.width === Math.floor(rect.width)) return; // No change needed, prevent erase glitch
+    
+    // Create a temporary canvas to save the current drawing if any
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = sigCanvas.width;
+    tempCanvas.height = sigCanvas.height;
+    tempCanvas.getContext('2d').drawImage(sigCanvas, 0, 0);
 
-async function submitState0() {
-  const val = document.getElementById('f_email').value.trim();
-  if(!val || !val.includes('@')) return alert('Valid email required.');
-  
-  data.email = val;
-  addMsg(val, false);
-  clearInput();
-  
-  await typeAi("Checking clearance...", 500);
-  
-  const res = await apiPost('register_request_otp', { email: val });
-  if(!res.success) {
-    await typeAi(`Error: ${res.message}\\nPlease try a different email.`);
-    renderState0();
-    return;
+    sigCanvas.width = Math.floor(rect.width);
+    sigCanvas.height = 150; // fixed height
+    sigCtx.lineWidth = 2;
+    sigCtx.lineCap = 'round';
+    sigCtx.strokeStyle = '#111';
+    
+    // Restore drawing
+    sigCtx.drawImage(tempCanvas, 0, 0);
   }
-  
-  await typeAi(`An authorization code has been dispatched to ${val}.\\nEnter the 6-digit code below.`);
-  renderState1();
-}
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 100); // initialize
 
-function renderState1() {
-  renderInput(`
-    <div class="text-input-wrap">
-      <input type="text" id="f_otp" placeholder="123456" maxlength="6" style="letter-spacing: 4px; text-align: center; font-size:24px; font-weight:bold;" autocomplete="off" />
-      <button class="btn-send" onclick="submitState1()">Unlock</button>
-    </div>
-  `);
-  document.getElementById('f_otp').addEventListener('keypress', e => e.key === 'Enter' && submitState1());
-}
-
-async function submitState1() {
-  const val = document.getElementById('f_otp').value.trim();
-  if(val.length !== 6) return alert('Enter 6-digit OTP.');
-  
-  addMsg("OTP: " + val, false);
-  clearInput();
-  
-  const res = await apiPost('register_verify_otp', { email: data.email, otp: val });
-  if(!res.success) {
-    await typeAi(`Error: ${res.message}\\nTry again.`);
-    renderState1();
-    return;
-  }
-  
-  await typeAi("Access Granted.\\nPlease state your full legal name.");
-  renderState2();
-}
-
-function renderState2() {
-  renderInput(`
-    <div class="text-input-wrap">
-      <input type="text" id="f_name" placeholder="John Doe" autocomplete="off" />
-      <button class="btn-send" onclick="submitState2()">Submit</button>
-    </div>
-  `);
-  document.getElementById('f_name').addEventListener('keypress', e => e.key === 'Enter' && submitState2());
-}
-
-async function submitState2() {
-  const val = document.getElementById('f_name').value.trim();
-  if(!val || val.split(' ').length < 2) return alert('Please enter your FULL name (first and last).');
-  data.fullName = val;
-  addMsg(val, false);
-  clearInput();
-  
-  await typeAi("Identity noted.\\nProvide your contact number and Date of Birth.");
-  renderState3();
-}
-
-function renderState3() {
-  renderInput(`
-    <div class="grid-form">
-      <input type="tel" id="f_phone" placeholder="Phone (10 digits)" autocomplete="off" />
-      <input type="date" id="f_dob" style="color-scheme: dark;" />
-    </div>
-    <button class="btn-send" onclick="submitState3()" style="width:100%; padding:14px; margin-top:10px;">Next</button>
-  `);
-}
-
-async function submitState3() {
-  const phone = document.getElementById('f_phone').value.trim();
-  const dob = document.getElementById('f_dob').value;
-  if(phone.length < 10) return alert('Invalid phone.');
-  if(!dob) return alert('DOB required.');
-  
-  data.phone = phone; data.dob = dob;
-  addMsg(`Phone: ${phone}\\nDOB: ${dob}`, false);
-  clearInput();
-  
-  await typeAi("Provide your academic assignment:\\nCollege, Branch, Year, and Gender.");
-  renderState4();
-}
-
-function renderState4() {
-  renderInput(`
-    <div class="grid-form">
-      <input type="text" id="f_coll" placeholder="College Name" value="Yenepoya" />
-      <select id="f_branch">
-        <option value="" disabled selected>Select Branch</option>
-        <option>Computer Science</option><option>Information Technology</option>
-        <option>Electronics</option><option>Mechanical</option><option>Other</option>
-      </select>
-      <select id="f_year">
-        <option value="" disabled selected>Year</option>
-        <option>1st Year</option><option>2nd Year</option>
-        <option>3rd Year</option><option>4th Year</option>
-      </select>
-      <select id="f_gender">
-        <option value="" disabled selected>Gender</option>
-        <option>Male</option><option>Female</option><option>Other</option>
-      </select>
-    </div>
-    <button class="btn-send" onclick="submitState4()" style="width:100%; padding:14px; margin-top:10px;">Next</button>
-  `);
-}
-
-async function submitState4() {
-  const coll = document.getElementById('f_coll').value.trim();
-  const br = document.getElementById('f_branch').value;
-  const yr = document.getElementById('f_year').value;
-  const gen = document.getElementById('f_gender').value;
-  if(!coll || !br || !yr || !gen) return alert('All fields required.');
-  
-  data.college = coll; data.branch = br; data.year = yr; data.gender = gen;
-  addMsg(`Academic profile logged.`, false);
-  clearInput();
-  
-  await typeAi("Configure your Neural Loadout.\\nSelect your skill level and primary domains of interest.");
-  window.setSkill = function(el) {
-    document.querySelectorAll('#skill-wrap .chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    data.skillLevel = el.innerText;
-  };
-  window.toggleInt = function(el) { el.classList.toggle('active'); };
-  renderState5();
-}
-
-function renderState5() {
-  renderInput(`
-    <div style="color:#fff; font-size:12px; margin-bottom:5px;">Skill Level:</div>
-    <div class="chip-wrap" id="skill-wrap">
-      <div class="chip active" onclick="setSkill(this)">Beginner</div>
-      <div class="chip" onclick="setSkill(this)">Intermediate</div>
-      <div class="chip" onclick="setSkill(this)">Advanced</div>
-    </div>
-    <div style="color:#fff; font-size:12px; margin-bottom:5px; margin-top:15px;">Domains (Select Multiple):</div>
-    <div class="chip-wrap" id="int-wrap">
-      <div class="chip" onclick="toggleInt(this)">Web Dev</div>
-      <div class="chip" onclick="toggleInt(this)">AI/ML</div>
-      <div class="chip" onclick="toggleInt(this)">Cybersecurity</div>
-      <div class="chip" onclick="toggleInt(this)">App Dev</div>
-      <div class="chip" onclick="toggleInt(this)">UI/UX</div>
-      <div class="chip" onclick="toggleInt(this)">Cloud</div>
-      <div class="chip" onclick="toggleInt(this)">Data Science</div>
-    </div>
-    <button class="btn-send" onclick="submitState5()" style="width:100%; padding:14px; margin-top:15px;">Save Loadout</button>
-  `);
-  data.skillLevel = 'Beginner';
-}
-
-
-async function submitState5() {
-  const ints = Array.from(document.querySelectorAll('#int-wrap .active')).map(c => c.innerText);
-  if(ints.length === 0) return alert('Select at least one domain.');
-  data.interests = ints;
-  
-  addMsg(`Level: ${data.skillLevel}\\nDomains: ${ints.join(', ')}`, false);
-  clearInput();
-  
-  await typeAi("Biometric capture required.\\nPlease provide a clear photo of your face.");
-  renderState6();
-}
-
-let stream = null;
-function renderState6() {
-  renderInput(`
-    <div class="camera-ui">
-      <video id="webcam-video" autoplay playsinline></video>
-      <img id="photo-preview-img" />
-      <div style="display:flex; gap:10px; width:100%;">
-        <button class="btn-send" id="btn-cam" onclick="takePhoto()" style="flex:1; padding:12px;">📸 Capture</button>
-        <button class="btn-send" id="btn-cam-done" onclick="submitState6()" style="flex:1; background:#333; display:none; padding:12px;">Proceed</button>
-      </div>
-      <div style="font-size:11px; text-decoration:underline; cursor:pointer;" onclick="document.getElementById('upload-photo').click()">Or upload file instead</div>
-      <input type="file" id="upload-photo" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)" />
-    </div>
-  `);
-  initCam();
-}
-
-async function initCam() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-    document.getElementById('webcam-video').srcObject = stream;
-  } catch(e) {
-    // silently fail and let them use the upload button
-  }
-}
-
-function stopCam() {
-  if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-}
-
-window.takePhoto = async function() {
-  const vid = document.getElementById('webcam-video');
-  const cvs = document.createElement('canvas');
-  cvs.width = vid.videoWidth; cvs.height = vid.videoHeight;
-  const ctx = cvs.getContext('2d');
-  ctx.translate(cvs.width, 0); ctx.scale(-1, 1);
-  ctx.drawImage(vid, 0, 0, cvs.width, cvs.height);
-  
-  const b64 = cvs.toDataURL('image/jpeg', 0.8);
-  setPhotoAndPreview(b64);
-};
-
-window.handlePhotoUpload = async function(input) {
-  if(!input.files[0]) return;
-  const b64 = await compressImage(input.files[0]);
-  setPhotoAndPreview(b64);
-};
-
-function setPhotoAndPreview(b64) {
-  data.photo = b64;
-  stopCam();
-  document.getElementById('webcam-video').style.display = 'none';
-  const img = document.getElementById('photo-preview-img');
-  img.src = b64;
-  img.style.display = 'block';
-  document.getElementById('btn-cam').style.display = 'none';
-  document.getElementById('btn-cam-done').style.display = 'block';
-  document.getElementById('btn-cam-done').style.background = '#10b981';
-}
-
-async function submitState6() {
-  if(!data.photo) return alert('Photo required.');
-  addMsg("Biometric photo provided.", false);
-  clearInput();
-  
-  await typeAi("Provide your digital signature in the pad below to authorize your application.");
-  renderState7();
-}
-
-let sigPadCtx, isDrawing = false;
-function renderState7() {
-  renderInput(`
-    <div style="width:100%; max-width:400px; display:flex; flex-direction:column; gap:10px;">
-      <div class="sig-ui">
-        <canvas id="sig-canvas"></canvas>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:11px; cursor:pointer; text-decoration:underline;" onclick="clearSig()">Clear Signature</span>
-        <button class="btn-send" onclick="submitState7()">Sign & Proceed</button>
-      </div>
-    </div>
-  `);
-  
-  const cvs = document.getElementById('sig-canvas');
-  cvs.width = cvs.offsetWidth; cvs.height = 150;
-  sigPadCtx = cvs.getContext('2d');
-  sigPadCtx.lineWidth = 2; sigPadCtx.strokeStyle = '#000';
-  
   function getPos(e) {
-    const r = cvs.getBoundingClientRect();
-    const evt = e.touches ? e.touches[0] : e;
-    return { x: evt.clientX - r.left, y: evt.clientY - r.top };
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
   }
-  cvs.onmousedown = cvs.ontouchstart = (e) => { e.preventDefault(); isDrawing = true; const p = getPos(e); sigPadCtx.beginPath(); sigPadCtx.moveTo(p.x, p.y); };
-  cvs.onmousemove = cvs.ontouchmove = (e) => { if(!isDrawing) return; e.preventDefault(); const p = getPos(e); sigPadCtx.lineTo(p.x, p.y); sigPadCtx.stroke(); };
-  cvs.onmouseup = cvs.onmouseout = cvs.ontouchend = () => isDrawing = false;
-  
-  window.clearSig = function() {
-    sigPadCtx.clearRect(0, 0, cvs.width, cvs.height);
-  };
-}
 
-async function submitState7() {
-  const cvs = document.getElementById('sig-canvas');
-  const px = sigPadCtx.getImageData(0,0,cvs.width,cvs.height).data;
-  let hasPixel = false;
-  for(let i=3; i<px.length; i+=4) { if(px[i]>0) { hasPixel = true; break; } }
-  if(!hasPixel) return alert('Signature is blank.');
-  
-  data.signature = cvs.toDataURL('image/png');
-  addMsg("Signature applied.", false);
-  clearInput();
-  
-  await typeAi("Final Step: Clearance Fee.\\nBased on your profile, the initialization fee is ₹599.\\nScan the QR code, pay, and enter the UTR below.");
-  renderState8();
-}
+  function startDraw(e) {
+    e.preventDefault();
+    isDrawing = true;
+    hasSignature = true;
+    const pos = getPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+  }
 
-function renderState8() {
-  renderInput(`
-    <div class="pay-ui">
-      <div style="font-size:12px; letter-spacing:1px; color:#a1a1aa;">AMOUNT TO PAY</div>
-      <div style="font-size:24px; font-weight:800; color:#10b981;">₹ 599</div>
-      <div class="qr-box">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi%3A%2F%2Fpay%3Fpa%3Dgpay-12200845070%40okbizaxis%26pn%3DInnovexa%2520Hub%26am%3D599.00%26cu%3DINR" style="width:150px; display:block;" />
-      </div>
-      <div style="font-size:11px; margin-bottom:15px; color:#a1a1aa;">UPI: gpay-12200845070@okbizaxis</div>
+  function draw(e) {
+    if(!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+  }
+
+  function endDraw(e) {
+    e.preventDefault();
+    isDrawing = false;
+  }
+
+  sigCanvas.addEventListener('mousedown', startDraw);
+  sigCanvas.addEventListener('mousemove', draw);
+  sigCanvas.addEventListener('mouseup', endDraw);
+  sigCanvas.addEventListener('mouseout', endDraw);
+  
+  sigCanvas.addEventListener('touchstart', startDraw, {passive:false});
+  sigCanvas.addEventListener('touchmove', draw, {passive:false});
+  sigCanvas.addEventListener('touchend', endDraw, {passive:false});
+
+  document.getElementById('clear-signature').addEventListener('click', () => {
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    hasSignature = false;
+  });
+
+  // Submission
+  let isSubmitting = false;
+  document.getElementById('submit-btn').addEventListener('click', async () => {
+    if (isSubmitting) return;
+    
+    // Enforce Terms & Conditions
+    if(!document.getElementById('termsCheckbox').checked) {
+      alert("⚠️ You must read and agree to the Innovexa Hub Terms of Service before initializing your membership.");
+      return;
+    }
+
+    
+    if(!compressedPhotoBase64) {
+      alert("⚠️ You must upload a profile photo.");
+      return;
+    }
+    if(!hasSignature) {
+      alert("⚠️ You must provide a digital signature.");
+      return;
+    }
+    const signatureBase64 = sigCanvas.toDataURL('image/png');
+
+    const utr = document.getElementById('utr').value.trim();
+    if (!utr) { showError('utr', 'UTR is required'); return; }
+    if (!/^\d{10,15}$/.test(utr)) { showError('utr', 'UTR must be between 10 and 15 digits'); return; }
+
+    const captchaAns = document.getElementById('captcha-answer').value.trim();
+    if (captchaAns.toLowerCase() !== currentCaptcha.toLowerCase()) {
+      document.getElementById('captcha-error').style.display = 'block';
+      initCaptcha();
+      return;
+    }
+    document.getElementById('captcha-error').style.display = 'none';
+
+    const btn = document.getElementById('submit-btn');
+    isSubmitting = true;
+    btn.classList.add('btn-loading');
+    btn.textContent = 'Processing...';
+
+    const payload = {
+      action: 'register_member',
+      fullName: document.getElementById('fullName').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      college: document.getElementById('college').value.trim(),
+      dob: document.getElementById('dob').value,
+          photo: compressedPhotoBase64,
+          signature: signatureBase64,
+      year: document.getElementById('year').value,
+      gender: document.getElementById('gender').value,
+      branch: document.getElementById('branch').value,
+      skillLevel: currentSkill,
+      interests: Array.from(selectedInterests).join(', '),
+      amount: '599',
+      utr: utr
+    };
+
+    try {
+      const resp = await fetch('/api/backend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload: payload })
+      });
       
-      <div class="text-input-wrap">
-        <input type="text" id="f_utr" placeholder="Enter 12-digit UTR" maxlength="15" autocomplete="off" />
-        <button class="btn-send" id="btn-final" onclick="submitFinal()">Finalize</button>
+      const result = await resp.json();
+      if (!result.success) {
+        alert(result.message || 'Registration failed.');
+        return;
+      }
+      
+
+      // Use the actual alphanumeric Operative ID returned by the backend
+      const genId = (result.data && result.data.operativeId) ? result.data.operativeId : 'INVX-?????';
+      document.getElementById('generated-id').textContent = genId;
+      document.getElementById('form-container').classList.add('hidden');
+      document.getElementById('success-screen').classList.remove('hidden');
+      document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      alert('Initialization failed. Please try again.');
+    } finally {
+      isSubmitting = false;
+      btn.classList.remove('btn-loading');
+      btn.textContent = 'Initialize Membership';
+    }
+  });
+</script>
+<script src="/js/admin-features.js"></script>
+
+<!-- Terms & Conditions Modal -->
+<div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; justify-content:center; align-items:center; animation: fadeIn 0.3s ease;">
+  <div style="background:#ffffff; border:1px solid var(--border); border-radius:16px; width:90%; max-width:700px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform: translateY(0); animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="padding:24px 32px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border-radius:16px 16px 0 0;">
+      <div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="background:var(--accent); color:#fff; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-family:serif;">&sect;</span>
+          <h2 style="font-size:20px; font-weight:800; color:var(--text-1); margin:0; letter-spacing:0.5px;">Terms of Service & Acceptable Use</h2>
+        </div>
+        <div style="font-size:12px; color:var(--text-3); margin-top:6px; font-family:monospace; letter-spacing:1px;">DOCUMENT ID: INVX-TOS-REV4 | CONFIDENTIAL</div>
       </div>
+      <button onclick="document.getElementById('termsModal').style.display='none'" style="background:none; border:none; color:var(--text-3); font-size:28px; cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--text-1)'" onmouseout="this.style.color='var(--text-3)'">&times;</button>
     </div>
-  `);
-}
+    
+    <!-- Modal Body (Scrollable) -->
+    <div style="padding:32px; overflow-y:auto; color:var(--text-2); font-size:14.5px; line-height:1.7; background:#ffffff;">
+      
+      <p style="margin-bottom:24px; font-size:13px; color:var(--text-3); border-bottom:1px dashed var(--border); padding-bottom:16px;">
+        By initializing your membership with Innovexa Hub, you enter into a binding agreement governed by the following strict protocols. Read carefully before accepting.
+      </p>
 
-async function submitFinal() {
-  const utr = document.getElementById('f_utr').value.trim();
-  if(!utr || utr.length < 10) return alert('Valid UTR required.');
-  
-  data.utr = utr;
-  
-  const btn = document.getElementById('btn-final');
-  btn.disabled = true; btn.innerText = 'Encrypting...';
-  
-  const payload = {
-    action: 'register_member',
-    fullName: data.fullName,
-    email: data.email,
-    phone: data.phone,
-    college: data.college,
-    dob: data.dob,
-    year: data.year,
-    gender: data.gender,
-    branch: data.branch,
-    skillLevel: data.skillLevel,
-    interests: data.interests.join(', '),
-    amount: '599',
-    utr: data.utr,
-    photo: data.photo,
-    signature: data.signature
-  };
-  
-  const res = await apiPost('register_member', payload);
-  if(!res.success) {
-    alert(res.message);
-    btn.disabled = false; btn.innerText = 'Finalize';
-    return;
-  }
-  
-  clearInput();
-  addMsg(`UTR Submitted: ${utr}`, false);
-  await typeAi("Dossier compiled successfully.\\nUploading to Mainframe...");
-  
-  setTimeout(() => {
-    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    document.getElementById('gen-id').innerText = (res.data && res.data.operativeId) ? res.data.operativeId : 'INVX-WAIT';
-    document.getElementById('success').classList.add('show');
-  }, 1000);
-}
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">01.</span> Acceptance of Terms</h3>
+        <p style="margin:0;">By registering an account and accessing the Innovexa Hub infrastructure, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</p>
+      </div>
+      
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">02.</span> Confidentiality and Non-Disclosure</h3>
+        <p style="margin:0;">During your tenure, you may gain access to proprietary project repositories and internal communications. You agree to maintain strict confidentiality regarding all internal operations. Sharing private data with unauthorized external entities is strictly prohibited.</p>
+      </div>
+      
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">03.</span> Intellectual Property</h3>
+        <p style="margin:0;">All original code, designs, and resources developed collaboratively within the Forge remain the intellectual property of their respective creators and the Innovexa organization.</p>
+      </div>
+      
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">04.</span> Professional Conduct</h3>
+        <p style="margin:0;">Members are required to maintain a professional, inclusive, and collaborative environment. Unauthorized penetration testing, data scraping, malware distribution, or intentional disruption of the Mainframe services is a direct violation.</p>
+      </div>
+      
+      <!-- Critical Warning Box -->
+      <div style="margin-bottom:24px; padding:20px; background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.2); border-left:4px solid #ef4444; border-radius:8px;">
+        <h3 style="font-size:15px; font-weight:700; color:#b91c1c; margin:0 0 8px 0; display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          05. Communication and Inactivity (Strict Policy)
+        </h3>
+        <p style="margin:0; color:var(--text-2);">Membership privileges are contingent upon active participation. If a member becomes inactive or fails to reply to Innovexa administration messages, requests, or tasks, the member will be <strong>immediately kicked out</strong> of the club. This ensures we maintain an active roster and make room exclusively for verified, contributing members.</p>
+      </div>
+      
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">06.</span> Limitation of Liability</h3>
+        <p style="margin:0;">All resources provided by Innovexa are offered on an "as-is" basis. The organization assumes no liability for data loss or project downtime.</p>
+      </div>
+      
+      <div style="margin-bottom:0;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text-1); margin:0 0 8px 0; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent);">07.</span> Termination of Access</h3>
+        <p style="margin:0;">The Innovexa Administration reserves the absolute right to suspend, demote, or permanently terminate your account and revoke your clearance at any time for any conduct that violates these Terms.</p>
+      </div>
+      
+    </div>
+    
+    <!-- Modal Footer -->
+    <div style="padding:20px 32px; border-top:1px solid var(--border); background:#f8fafc; border-radius:0 0 16px 16px; display:flex; justify-content:space-between; align-items:center;">
+      <button onclick="document.getElementById('termsModal').style.display='none'" class="btn-outline" style="padding:10px 24px; font-size:14px; border:1px solid var(--border); background:transparent; color:var(--text-2); border-radius:8px; cursor:pointer;">Decline</button>
+      <button onclick="acceptTerms()" class="btn-magnetic" style="padding:10px 32px; font-size:14px; font-weight:700; box-shadow:0 4px 12px rgba(6, 182, 212, 0.3);">I Agree &amp; Accept</button>
+    </div>
+  </div>
+</div>
 
-// Start sequence
-window.onload = startFlow;
+<style>
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+function showTermsModal(e) {
+  if(e) e.preventDefault();
+  document.getElementById('termsModal').style.display = 'flex';
+}
+function acceptTerms() {
+  document.getElementById('termsModal').style.display = 'none';
+  document.getElementById('termsCheckbox').checked = true;
+}
 </script>
 
 </body>
