@@ -701,7 +701,7 @@
                  <h4 style="font-size:16px; font-weight:700; margin-bottom:8px; color:#0f172a; font-family:var(--font-d);">${escHtml(ev.title)}</h4>
                  <p style="font-size:13px; color:#64748b; line-height:1.6; margin-bottom:0;">${escHtml(ev.description)}</p>
                  <div style="margin-top:16px; padding-top:12px; border-top:1px dashed #e2e8f0; text-align:right;">
-                   <a href="feedback.html?session=${ev.sessionId || ev.eventId || ''}" style="color:var(--text); font-size:11px; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--accent); padding-bottom:2px;">Feedback →</a>
+                   <a href="feedback?session=${ev.sessionId || ev.eventId || ''}" style="color:var(--text); font-size:11px; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:1px; border-bottom:1px solid var(--accent); padding-bottom:2px;">Feedback →</a>
                  </div>
                </div>
              `;

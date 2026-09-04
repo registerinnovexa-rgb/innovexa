@@ -310,7 +310,7 @@
         document.getElementById('card-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=InnovexaHub_Verified_' + opId;
         let actionRow = document.querySelector('.action-row');
         if (!document.getElementById('forge-ops-btn')) {
-            actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge.html?id=${opId}" class="btn-magnetic" style="background:#fff;color:#111;margin-top:12px;border:1px solid rgba(0,0,0,0.1);width:100%;text-align:center;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Go to Dashboard</a>`);
+            actionRow.insertAdjacentHTML('beforeend', `<a id="forge-ops-btn" href="forge?id=${opId}" class="btn-magnetic" style="background:#fff;color:#111;margin-top:12px;border:1px solid rgba(0,0,0,0.1);width:100%;text-align:center;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Go to Dashboard</a>`);
           }
         approvedAssets.classList.remove('hidden');
       } else if (status === 'rejected') {

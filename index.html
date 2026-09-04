@@ -699,7 +699,7 @@
     }
 
     // Build the HTML for the images
-    const imgHTML = images.map(num => `<img class="marquee-item" loading="lazy" src="assets/gallery/${num}.jpg">`).join('');
+    const imgHTML = images.map(num => `<img class="marquee-item" loading="lazy" src="assets/gallery/${num}.jpg" onerror="this.style.display='none'">`).join('');
     
     // Append the images twice so we can loop seamlessly
     track.innerHTML = imgHTML + imgHTML;
