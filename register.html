@@ -589,6 +589,7 @@
     updateProgress(3);
     window.scrollTo({top:0, behavior:'smooth'});
     setTimeout(resizeCanvas, 50); // Ensure the DOM has updated width before resizing
+    setTimeout(initCaptcha, 80);  // Re-init captcha now that the canvas is visible
   });
 
   if (btnBack1) btnBack1.addEventListener('click', () => {
@@ -899,7 +900,7 @@
       document.getElementById('generated-id').textContent = genId;
       document.getElementById('form-container').classList.add('hidden');
       document.getElementById('success-screen').classList.remove('hidden');
-      window.scrollTo({ top: document.querySelector('.form-wrapper').offsetTop - 100, behavior: 'smooth' });
+      document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
       alert('Initialization failed. Please try again.');
     } finally {

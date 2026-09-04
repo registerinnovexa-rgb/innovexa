@@ -1038,7 +1038,7 @@ export default async function handler(req, res) {
     }
 
     if (action === 'register_member') {
-        const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr } = payload;
+        const { fullName, email, phone, college, dob, year, gender, branch, skillLevel, interests, utr, photo, signature } = payload;
         
         if (!email || !fullName) {
           return res.status(200).json({ success: false, message: 'Missing required fields (Email/Name).' });
@@ -1073,6 +1073,8 @@ export default async function handler(req, res) {
           skillLevel: skillLevel,
           interests: interests,
           utr: utr,
+          photoUrl: photo,
+          signature: signature,
           status: 'Pending',
           amount: '599',
           xp: 0,
