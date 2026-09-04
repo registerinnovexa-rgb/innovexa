@@ -344,6 +344,14 @@ const ABTestConfigSchema = new mongoose.Schema({
 });
 export const ABTestConfig = mongoose.models.ABTestConfig || mongoose.model('ABTestConfig', ABTestConfigSchema);
 
+// Registration OTPs
+const RegistrationOTPSchema = new mongoose.Schema({
+  email: { type: String, unique: true },
+  otp: String,
+  timestamp: { type: Date, default: Date.now, expires: 600 }
+});
+export const RegistrationOTP = mongoose.models.RegistrationOTP || mongoose.model('RegistrationOTP', RegistrationOTPSchema);
+
 // Admin Presence
 const AdminPresenceSchema = new mongoose.Schema({
   adminId: { type: String, unique: true },
