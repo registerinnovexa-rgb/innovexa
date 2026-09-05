@@ -49,24 +49,50 @@ function buildEmail({ title, subtitle = '', bodyHtml, accentColor = '#7c3aed', i
   <div style="max-width:520px;margin:0 auto;padding:32px 16px;">
     <!-- Card -->
     <div style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-      <!-- Hero Header -->
-      <div style="background:linear-gradient(90deg,${accentColor} 0%,#000000 60%);padding:28px 32px;display:flex;align-items:center;gap:16px;">
-        <div style="width:52px;height:52px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">${iconEmoji}</div>
-        <div>
-          <div style="color:rgba(255,255,255,0.6);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Innovexa Hub</div>
-          <div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:3px;">${title}</div>
-          ${subtitle ? '<div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px;">' + subtitle + '</div>' : ''}
-        </div>
-      </div>
+      
+      <!-- Hero Header (Table Layout for Email Clients) -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${accentColor};background:linear-gradient(90deg,${accentColor} 0%,#000000 60%);">
+        <tr>
+          <td style="padding:28px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="52" valign="middle" style="width:52px;padding-right:16px;">
+                  <div style="width:52px;height:52px;background:rgba(255,255,255,0.15);border-radius:14px;text-align:center;line-height:52px;font-size:28px;">${iconEmoji}</div>
+                </td>
+                <td valign="middle">
+                  <div style="color:rgba(255,255,255,0.6);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Innovexa Hub</div>
+                  <div style="color:#ffffff;font-size:20px;font-weight:700;margin-top:3px;">${title}</div>
+                  ${subtitle ? '<div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:2px;">' + subtitle + '</div>' : ''}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
       <!-- Body -->
       <div style="padding:32px;">
         ${bodyHtml}
       </div>
-      <!-- Footer -->
-      <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
-        <p style="margin:0;font-size:11px;color:#94a3b8;">© Innovexa Hub · Bangalore</p>
-        <a href="https://innovexa.register-innovexa.workers.dev" style="font-size:11px;color:${accentColor};text-decoration:none;font-weight:600;">Visit Portal →</a>
-      </div>
+
+      <!-- Footer (Table Layout for Email Clients) -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+        <tr>
+          <td style="padding:16px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="left" valign="middle">
+                  <p style="margin:0;font-size:11px;color:#94a3b8;">© Innovexa Hub · Bangalore</p>
+                </td>
+                <td align="right" valign="middle">
+                  <a href="https://innovexa.register-innovexa.workers.dev" style="font-size:11px;color:${accentColor};text-decoration:none;font-weight:600;">Visit Portal →</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
     </div>
     ${footerNote ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;">' + footerNote + '</p>' : ''}
   </div>
@@ -76,15 +102,19 @@ function buildEmail({ title, subtitle = '', bodyHtml, accentColor = '#7c3aed', i
 
 function buildOtpBlock(otp, accentColor = '#7c3aed') {
   return `
-    <div style="margin:0 0 24px;border-radius:12px;overflow:hidden;">
-      <div style="background:${accentColor};padding:10px 24px;text-align:center;">
-        <span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Access Code</span>
-      </div>
-      <div style="background:#faf5ff;border:2px solid ${accentColor};border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;">
-        <div style="font-size:48px;font-weight:900;letter-spacing:12px;color:#000000;font-family:'Courier New',monospace;">${otp}</div>
-        <div style="margin-top:8px;font-size:13px;color:${accentColor};font-weight:600;">⏱ Valid for 15 minutes</div>
-      </div>
-    </div>`;
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;border-radius:12px;overflow:hidden;border:2px solid ${accentColor};">
+      <tr>
+        <td style="background:${accentColor};padding:10px 24px;text-align:center;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Access Code</span>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#faf5ff;padding:24px;text-align:center;">
+          <div style="font-size:48px;font-weight:900;letter-spacing:12px;color:#000000;font-family:'Courier New',monospace;">${otp}</div>
+          <div style="margin-top:8px;font-size:13px;color:${accentColor};font-weight:600;">⏱ Valid for 15 minutes</div>
+        </td>
+      </tr>
+    </table>`;
 }
 
 // ── Admin Notification Helper ────────────────────────────────────────────────
@@ -120,37 +150,42 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
         <!DOCTYPE html>
         <html>
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-        <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-
+                <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
           <div style="text-align:center; padding:32px 0 16px;">
             <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
           </div>
           <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-            <!-- Header -->
-            <div style="background:linear-gradient(135deg,${cfg.color} 0%,${cfg.color}cc 100%);padding:28px 32px;">
-              ${urgentBar}
-              <div style="display:flex;align-items:center;gap:14px;">
-                <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">${cfg.icon}</div>
-                <div>
-                  <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px;font-weight:600;">${urgent ? '🚨 Urgent ' : ''}Admin Alert</div>
-                  <div style="font-size:20px;font-weight:700;color:#fff;margin-top:2px;">${cfg.label}</div>
-                </div>
-              </div>
-            </div>
+            
+            <!-- Header (Table Layout) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${cfg.color};">
+              <tr>
+                <td style="padding:28px 32px;">
+                  ${urgentBar}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td width="52" valign="middle" style="width:52px;padding-right:14px;">
+                        <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;text-align:center;line-height:52px;font-size:26px;">${cfg.icon}</div>
+                      </td>
+                      <td valign="middle">
+                        <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px;font-weight:600;">${urgent ? '🚨 Urgent ' : ''}Admin Alert</div>
+                        <div style="font-size:18px;color:#ffffff;font-weight:700;margin-top:3px;">${cfg.label}</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
             <!-- Body -->
-            <div style="padding:28px 32px;">
-              <table style="width:100%;border-collapse:collapse;">
+            <div style="padding:24px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="text-align:left;">
                 <tr style="border-bottom:1px solid #f1f5f9;">
-                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;width:36%;">Operative ID</td>
-                  <td style="padding:12px 0;font-size:14px;font-weight:700;color:${cfg.color};font-family:monospace;">${operativeId}</td>
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Operative</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;font-weight:700;border-bottom:1px solid #f1f5f9;">${name} <span style="color:#94a3b8;font-weight:400;font-size:13px;">(${operativeId})</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid #f1f5f9;">
-                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Member Name</td>
-                  <td style="padding:12px 0;font-size:14px;font-weight:600;color:#1e293b;">${name}</td>
-                </tr>
-                <tr style="border-bottom:1px solid #f1f5f9;">
-                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Date & Time</td>
-                  <td style="padding:12px 0;font-size:13px;color:#64748b;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}</td>
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Date & Time</td>
+                  <td style="padding:12px 0;font-size:13px;color:#64748b;border-bottom:1px solid #f1f5f9;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}</td>
                 </tr>
                 <tr>
                   <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;vertical-align:top;">Detail</td>
@@ -158,14 +193,20 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
                 </tr>
               </table>
             </div>
+
             <!-- CTA -->
             <div style="padding:0 32px 28px;">
               <a href="https://innovexa.register-innovexa.workers.dev/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
             </div>
+
             <!-- Footer -->
-            <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub Auto-Alert System · All actions are logged</p>
-            </div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <tr>
+                <td style="padding:16px 32px;text-align:center;">
+                  <p style="margin:0;font-size:11px;color:#94a3b8;">Innovexa Hub Auto-Alert System · All actions are logged</p>
+                </td>
+              </tr>
+            </table>
           </div>
         </body>
         </html>
@@ -187,21 +228,63 @@ async function notifyUser(email, subject, htmlContent) {
         <!DOCTYPE html>
         <html>
         <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-        <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-
+                <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
           <div style="text-align:center; padding:32px 0 16px;">
             <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
           </div>
-          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:0px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-            <div style="background:var(--accent,#000000);padding:24px 32px;">
-              <h2 style="margin:0;font-size:20px;color:#000;">${subject}</h2>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+            
+            <!-- Header (Table Layout) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${cfg.color};">
+              <tr>
+                <td style="padding:28px 32px;">
+                  ${urgentBar}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td width="52" valign="middle" style="width:52px;padding-right:14px;">
+                        <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;text-align:center;line-height:52px;font-size:26px;">${cfg.icon}</div>
+                      </td>
+                      <td valign="middle">
+                        <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px;font-weight:600;">${urgent ? '🚨 Urgent ' : ''}Admin Alert</div>
+                        <div style="font-size:18px;color:#ffffff;font-weight:700;margin-top:3px;">${cfg.label}</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Body -->
+            <div style="padding:24px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="text-align:left;">
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Operative</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;font-weight:700;border-bottom:1px solid #f1f5f9;">${name} <span style="color:#94a3b8;font-weight:400;font-size:13px;">(${operativeId})</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Date & Time</td>
+                  <td style="padding:12px 0;font-size:13px;color:#64748b;border-bottom:1px solid #f1f5f9;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;vertical-align:top;">Detail</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;line-height:1.6;">${detail || 'No additional detail'}</td>
+                </tr>
+              </table>
             </div>
-            <div style="padding:32px;">
-              ${htmlContent}
+
+            <!-- CTA -->
+            <div style="padding:0 32px 28px;">
+              <a href="https://innovexa.register-innovexa.workers.dev/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
             </div>
-            <div style="padding:16px 32px;background:#f8fafc;border-top:1px dashed #e2e8f0;">
-              <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub - Do not reply to this email.</p>
-            </div>
+
+            <!-- Footer -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <tr>
+                <td style="padding:16px 32px;text-align:center;">
+                  <p style="margin:0;font-size:11px;color:#94a3b8;">Innovexa Hub Auto-Alert System · All actions are logged</p>
+                </td>
+              </tr>
+            </table>
           </div>
         </body>
         </html>
@@ -533,31 +616,65 @@ export default async function handler(req, res) {
               <!DOCTYPE html>
               <html>
               <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-              <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
-                <div style="text-align:center; padding:32px 0 16px;">
-                  <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
-                </div>
-                <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-                  <div style="background:#000000;padding:36px 32px;text-align:center;">
-                    <div style="font-size:52px;margin-bottom:12px;">🎉</div>
-                    <h1 style="margin:0;color:#fff;font-size:26px;font-weight:800;">You're officially in!</h1>
-                    <p style="margin:10px 0 0;color:rgba(255,255,255,.8);font-size:15px;">Welcome to Innovexa Hub, ${member.name}</p>
-                  </div>
-                  <div style="padding:32px;">
-                    <p style="color:#475569;font-size:15px;margin:0 0 24px;text-align:center;">Your membership has been <strong style="color:#10b981;">approved</strong>. Here's your unique Operative ID:</p>
-                    <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:2px solid #c4b5fd;border-radius:14px;padding:28px;text-align:center;margin-bottom:24px;">
-                      <div style="font-size:11px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:3px;margin-bottom:10px;">Your Operative ID</div>
-                      <div style="font-size:36px;font-weight:800;color:#5b21b6;font-family:'Courier New',monospace;letter-spacing:6px;">${member.operativeId}</div>
-                      <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
-                    </div>
-                    <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
-                    <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
-                  </div>
-                  <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
-                    <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you have any issues, contact your admin.</p>
-                  </div>
-                </div>
-              </body>
+                      <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
+          <div style="text-align:center; padding:32px 0 16px;">
+            <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+          </div>
+          <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+            
+            <!-- Header (Table Layout) -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${cfg.color};">
+              <tr>
+                <td style="padding:28px 32px;">
+                  ${urgentBar}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td width="52" valign="middle" style="width:52px;padding-right:14px;">
+                        <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;text-align:center;line-height:52px;font-size:26px;">${cfg.icon}</div>
+                      </td>
+                      <td valign="middle">
+                        <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px;font-weight:600;">${urgent ? '🚨 Urgent ' : ''}Admin Alert</div>
+                        <div style="font-size:18px;color:#ffffff;font-weight:700;margin-top:3px;">${cfg.label}</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Body -->
+            <div style="padding:24px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="text-align:left;">
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Operative</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;font-weight:700;border-bottom:1px solid #f1f5f9;">${name} <span style="color:#94a3b8;font-weight:400;font-size:13px;">(${operativeId})</span></td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f1f5f9;">Date & Time</td>
+                  <td style="padding:12px 0;font-size:13px;color:#64748b;border-bottom:1px solid #f1f5f9;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'})}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;vertical-align:top;">Detail</td>
+                  <td style="padding:12px 0;font-size:14px;color:#334155;line-height:1.6;">${detail || 'No additional detail'}</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- CTA -->
+            <div style="padding:0 32px 28px;">
+              <a href="https://innovexa.register-innovexa.workers.dev/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
+            </div>
+
+            <!-- Footer -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <tr>
+                <td style="padding:16px 32px;text-align:center;">
+                  <p style="margin:0;font-size:11px;color:#94a3b8;">Innovexa Hub Auto-Alert System · All actions are logged</p>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </body>
               </html>
             `
           });
