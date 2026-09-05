@@ -790,7 +790,6 @@ export default async function handler(req, res) {
       const hook = await WebhookConfig.findOne({ event });
       if (!hook || !hook.url) return res.status(200).json({ success: false, message: 'No URL configured for this event.' });
       try {
-        const { default: fetch } = await import('node-fetch');
         await fetch(hook.url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1441,7 +1440,9 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: false, message: 'Failed to send OTP to admin email. Please check server logs.' });
       }
 
-      return res.status(200).json({ success: true, requireOtp: true, message: 'OTP sent to admin email.' });
+      const adminEmail = memberData.email || '';
+      const maskedEmail = adminEmail.replace(/(.{2})(.*)(?=@)/, (_, a, b) => a + b.replace(/./g, '*'));
+      return res.status(200).json({ success: true, requireOtp: true, maskedEmail, message: 'OTP sent to admin email.' });
     }
 
     if (action === 'admin_init_face_login') {
@@ -3426,9 +3427,10 @@ export default async function handler(req, res) {
     // ─────────────────────────────────────────────────────────────────────────
     // F-02: XP & Badge Award Engine
     // ─────────────────────────────────────────────────────────────────────────
+    const ADMIN_KEY = process.env.ADMIN_KEY || '';
     if (action === 'admin_award_xp') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { operativeId, amount, xpAction, reason } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, amount, xpAction, reason } = payload;
       if (!operativeId || !amount || !xpAction) return res.status(400).json({ success: false, message: 'operativeId, amount, xpAction required' });
       const delta = xpAction === 'deduct' ? -Math.abs(Number(amount)) : Math.abs(Number(amount));
       const member = await Member.findOne({ operativeId });
@@ -3453,8 +3455,8 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_assign_badge') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { operativeId, badge, note, awardedBy } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, badge, note, awardedBy } = payload;
       if (!operativeId || !badge) return res.status(400).json({ success: false, message: 'operativeId and badge required' });
       const member = await Member.findOne({ operativeId }).lean();
       if (!member) return res.status(200).json({ success: false, message: 'Member not found' });
@@ -3466,14 +3468,14 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_get_xp_leaderboard') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       const members = await Member.find({ status: 'Approved' }, 'operativeId name xp rank squad').sort({ xp: -1 }).lean();
       return res.status(200).json({ success: true, data: members });
     }
 
     if (action === 'admin_get_badges') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { operativeId } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId } = payload;
       const query = operativeId ? { operativeId } : {};
       const badges = await MemberBadge.find(query).sort({ awardedAt: -1 }).lean();
       return res.status(200).json({ success: true, data: badges });
@@ -3483,8 +3485,8 @@ export default async function handler(req, res) {
     // F-03: Certificate Generator & Tracker
     // ─────────────────────────────────────────────────────────────────────────
     if (action === 'admin_record_cert') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { operativeId, name, type, event, date, branch, issuedBy } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, name, type, event, date, branch, issuedBy } = payload;
       if (!name || !type) return res.status(400).json({ success: false, message: 'name and type required' });
       const certId = 'CERT-' + Date.now().toString(36).toUpperCase();
       const cert = new IssuedCertificate({ certId, operativeId: operativeId || '', name, type, event: event || '', date: date || '', branch: branch || '', issuedBy: issuedBy || 'Admin' });
@@ -3495,7 +3497,7 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_get_issued_certs') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       const certs = await IssuedCertificate.find({}).sort({ issuedAt: -1 }).lean();
       return res.status(200).json({ success: true, data: certs });
     }
@@ -3504,7 +3506,7 @@ export default async function handler(req, res) {
     // F-04: Attendance Tracker
     // ─────────────────────────────────────────────────────────────────────────
     if (action === 'admin_get_attendance_overview') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       const sessions = await Session.find({}).sort({ date: -1 }).lean();
       const allAttendance = await Attendance.find({}).lean();
       const members = await Member.find({ status: 'Approved' }, 'operativeId name').lean();
@@ -3531,8 +3533,8 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_get_session_attendance') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { sessionId } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { sessionId } = payload;
       if (!sessionId) return res.status(400).json({ success: false, message: 'sessionId required' });
       const records = await Attendance.find({ sessionId }).lean();
       const session = await Session.findOne({ sessionId }).lean();
@@ -3542,8 +3544,8 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_manual_checkin') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { sessionId, operativeId } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { sessionId, operativeId } = payload;
       if (!sessionId || !operativeId) return res.status(400).json({ success: false, message: 'sessionId and operativeId required' });
       await Attendance.findOneAndUpdate({ sessionId, operativeId }, { status: 'Attended', timestamp: new Date() }, { upsert: true, new: true });
       return res.status(200).json({ success: true, message: 'Checked in successfully' });
@@ -3553,19 +3555,19 @@ export default async function handler(req, res) {
     // F-05: Real-Time Notification Center
     // ─────────────────────────────────────────────────────────────────────────
     if (action === 'admin_get_notifications') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       const notifs = await AdminNotification.find({}).sort({ createdAt: -1 }).limit(40).lean();
       return res.status(200).json({ success: true, data: notifs });
     }
 
     if (action === 'admin_mark_notifs_read') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       await AdminNotification.updateMany({ read: false }, { $set: { read: true } });
       return res.status(200).json({ success: true, message: 'All notifications marked read' });
     }
 
     if (action === 'admin_clear_notifications') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       await AdminNotification.deleteMany({});
       return res.status(200).json({ success: true, message: 'All notifications cleared' });
     }
@@ -3574,7 +3576,7 @@ export default async function handler(req, res) {
     // F-06: Content Moderation Queue
     // ─────────────────────────────────────────────────────────────────────────
     if (action === 'admin_get_mod_queue') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
       // Aggregate: open SOS, pending feedback, pending cert requests, pending doc requests
       const [sosList, feedbackList, certReqs, docReqs] = await Promise.all([
         Sos.find({ status: 'open' }).sort({ timestamp: -1 }).limit(50).lean(),
@@ -3592,8 +3594,8 @@ export default async function handler(req, res) {
     }
 
     if (action === 'admin_mod_action') {
-      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
-      const { itemType, refId, modAction } = body;
+      if (payload.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { itemType, refId, modAction } = payload;
       if (!itemType || !refId || !modAction) return res.status(400).json({ success: false, message: 'itemType, refId, modAction required' });
       if (itemType === 'sos') {
         const newStatus = modAction === 'approve' ? 'resolved' : modAction === 'flag' ? 'flagged' : 'resolved';

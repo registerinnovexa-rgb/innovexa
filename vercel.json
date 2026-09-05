@@ -2,7 +2,13 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "functions": {
+    "api/backend.js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" }
+    { "source": "/api/backend", "destination": "/api/backend" },
+    { "source": "/api/backend/:path*", "destination": "/api/backend" }
   ]
 }
