@@ -241,7 +241,7 @@
 
     /* ── Modal ── */
     .modal-overlay {
-      display:none; position:fixed; inset:0; z-index:200; background:#ffffff;
+      display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.55);
       backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
       align-items:center; justify-content:center; padding:20px;
     }
@@ -279,7 +279,7 @@
     /* ── Hamburger ── */
     .hamburger { display:none; background:none; border:none; color:var(--text); cursor:pointer; padding:4px; }
     .hamburger svg { width:24px; height:24px; }
-    .admin-overlay { display:none; position:fixed; inset:0; top:64px; background:#ffffff; backdrop-filter:blur(4px); z-index:80; }
+    .admin-overlay { display:none; position:fixed; inset:0; top:64px; background:rgba(0,0,0,0.35); backdrop-filter:blur(4px); z-index:80; }
     .admin-overlay.active { display:block; }
 
     /* ── Responsive ── */
@@ -731,6 +731,20 @@
     <div class="topbar-right">
       <span class="topbar-badge" id="adminBadge">INVX-01 · President</span>
       <span class="topbar-user" id="adminName"></span>
+      <!-- Notification Bell (F-05) -->
+      <div style="position:relative;">
+        <button id="notifBellBtn" onclick="toggleNotifPanel()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:6px 10px;cursor:pointer;position:relative;font-size:16px;line-height:1;transition:all .2s;" title="Notifications">
+          🔔
+          <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;line-height:1.2;min-width:16px;text-align:center;"></span>
+        </button>
+        <div id="notifPanel" style="display:none;position:absolute;top:42px;right:0;width:340px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:500;max-height:420px;overflow:hidden;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);">
+            <span style="font-size:13px;font-weight:700;">Notifications</span>
+            <button onclick="clearAllNotifs()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">Clear All</button>
+          </div>
+          <div id="notifList" style="overflow-y:auto;max-height:340px;padding:8px 0;"></div>
+        </div>
+      </div>
       <button class="btn-logout" onclick="openFaceRegisterModal()" style="margin-right:8px; background:var(--bg3);">Register Face</button>
       <a href="index" class="btn-logout">← Portal</a>
       <button class="btn-logout" onclick="logout()">Logout</button>
@@ -779,10 +793,25 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       System Settings
     </button>
-    
-    
-    
-    
+
+    <div class="sidebar-label" style="margin-top:16px;">Advanced</div>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('xpBadges')" id="navXpBadges">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM12 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4l2-4z"/></svg>
+      XP & Badges
+    </button>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('certGen')" id="navCertGen">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      Certificates
+    </button>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('modQueue')" id="navModQueue" style="position:relative;">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      Moderation
+      <span id="modQueueBadge" style="display:none;position:absolute;top:6px;right:8px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.4;"></span>
+    </button>
+
   </div>
 
   <!-- Main Content -->
@@ -1148,7 +1177,7 @@
                 <span style="font-size:14px; font-weight:600; color:var(--text);">Forge Ops</span>
                 <span style="font-size:12px; color:var(--text3);">Manage bounties & ranks</span>
               </button>
-              <button onclick="switchAdminTab('comms')" style="padding:16px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; text-align:left; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; gap:8px;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+              <button onclick="switchAdminTab('commsHub')" style="padding:16px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; text-align:left; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; gap:8px;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
                 <span style="font-size:20px;">📡</span>
                 <span style="font-size:14px; font-weight:600; color:var(--text);">Comms & Alerts</span>
                 <span style="font-size:12px; color:var(--text3);">Broadcast messages</span>
@@ -1452,12 +1481,12 @@
 
     <datalist id="operativeList"></datalist>
     <!-- Edit Bounty Modal -->
-    <div id="editBountyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+    <div id="editBountyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center;">
       <div style="background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:28px; width:100%; max-width:480px; margin:16px;">
         <h3 style="margin-bottom:16px;">✏️ Edit Bounty</h3>
         <input type="hidden" id="editTaskId">
         <div class="form-group"><label>Title</label><input type="text" id="editTkTitle"></div>
-        <div class="form-group"><label>Description</label><textarea id="editTkDesc" rows="3"></textarea></div>
+        <div class="form-group"><label>Description</label><textarea id="editTkDesc" rows="4" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-family:var(--font-b);resize:vertical;"></textarea></div>
         <div style="display:flex; gap:12px; margin-bottom:12px;">
           <div class="form-group" style="flex:1;"><label>XP Reward</label><input type="number" id="editTkXP"></div>
           <div class="form-group" style="flex:1;"><label>Difficulty</label>
@@ -2415,7 +2444,7 @@ async function apiWrite(op, payload) {
     const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payload })
+      body: JSON.stringify(payload)
     });
     const result = await res.json();
     
@@ -4890,15 +4919,6 @@ function switchCommsTab(tab) {
     if (panel) panel.style.display = t === tab ? '' : 'none';
     if (btn) btn.classList.toggle('active', t === tab);
   });
-  // Fix panel IDs: commsEmailPanel, commsAnnouncementPanel, commsWhatsappPanel, commsHistoryPanel
-  ['email','announcement','whatsapp','history'].forEach(t => {
-    const id = 'comms' + t.charAt(0).toUpperCase() + t.slice(1) + 'Panel';
-    const el = document.getElementById(id);
-    if (el) el.style.display = t === tab ? '' : 'none';
-    const btnId = 'commsTab' + t.charAt(0).toUpperCase() + t.slice(1);
-    const btnEl = document.getElementById(btnId);
-    if (btnEl) btnEl.classList.toggle('active', t === tab);
-  });
 }
 
 function loadCommsTemplate() {
@@ -7232,10 +7252,11 @@ async function loadAssets(isSilent = false) {
 
 function renderAssets() {
   const tbody = document.querySelector('#assetsTable tbody');
-  tbody.innerHTML = '';
+  if (!tbody) return;
+  let html = '';
   let available = 0, borrowed = 0;
   const sel = document.getElementById('asset-select');
-  sel.innerHTML = '<option value="">Select Asset</option>';
+  if (sel) sel.innerHTML = '<option value="">Select Asset</option>';
 
   cachedAssets.forEach((a, i) => {
     const isBorrowed = a.status === 'Borrowed';
@@ -7251,12 +7272,13 @@ function renderAssets() {
     const opt = document.createElement('option');
     opt.value = a.name;
     opt.textContent = `${a.name} [${a.status}]`;
-    sel.appendChild(opt);
+    if (sel) sel.appendChild(opt);
   });
 
-  document.getElementById('totalAssets').textContent = cachedAssets.length;
-  document.getElementById('availableAssets').textContent = available;
-  document.getElementById('borrowedAssets').textContent = borrowed;
+  tbody.innerHTML = html;
+  if (document.getElementById('totalAssets'))     document.getElementById('totalAssets').textContent     = cachedAssets.length;
+  if (document.getElementById('availableAssets')) document.getElementById('availableAssets').textContent = available;
+  if (document.getElementById('borrowedAssets'))  document.getElementById('borrowedAssets').textContent  = borrowed;
 }
 
 function openAssetModal() {
@@ -8162,11 +8184,11 @@ function startLiveSync() {
     if (document.getElementById('modal') && document.getElementById('modal').classList.contains('open')) return;
     if (document.getElementById('modalCreateSession') && document.getElementById('modalCreateSession').classList.contains('open')) return;
     if (document.getElementById('editBountyModal') && document.getElementById('editBountyModal').style.display !== 'none') return;
-    if (document.getElementById('announcementEditorPanel') && document.getElementById('announcementEditorPanel').style.display === 'block') return;
+    if (document.getElementById('memberSlidePanel') && document.getElementById('memberSlidePanel').classList.contains('open')) return;
     if (document.getElementById('dossierEditCard')) return; // profile edit in progress
 
-    // Determine active tab
-    const activeTab = document.querySelector('.sidebar a.active');
+    // Determine active tab — sidebar uses <button class="sidebar-btn active">
+    const activeTab = document.querySelector('.sidebar-btn.active');
     if (!activeTab) return;
     const onclick = activeTab.getAttribute('onclick') || '';
 
