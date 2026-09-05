@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { cloudflare } from '@cloudflare/vite-plugin';
 
 export default defineConfig({
   base: '/',
+  plugins: [cloudflare()],
   build: {
     rollupOptions: {
       input: {
@@ -10,7 +12,7 @@ export default defineConfig({
         register: resolve(__dirname, 'register.html'),
         status: resolve(__dirname, 'status.html'),
         atlas: resolve(__dirname, 'atlas.html'),
-                admin: resolve(__dirname, 'admin.html'),
+        admin: resolve(__dirname, 'admin.html'),
         packetRoute: resolve(__dirname, 'packet-route.html'),
         forge: resolve(__dirname, 'forge.html'),
         pathfinder: resolve(__dirname, 'pathfinder.html'),
