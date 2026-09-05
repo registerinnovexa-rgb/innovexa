@@ -2321,7 +2321,7 @@ function _saveToStorage(key, entry) {
 }
 
 async function _fetchFresh(action, params) {
-  let url = `/api/backend?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
+  let url = `https://innovexa-backend-x57p.onrender.com/api/backend?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
   for (const [k, v] of Object.entries(params)) {
     url += `&${k}=${encodeURIComponent(v)}`;
   }
@@ -2389,7 +2389,7 @@ function invalidateAndRefresh(cacheAction, reloadFn) {
 }
 
 async function apiPost(action, payload = {}) {
-  const res = await fetch('/api/backend', {
+  const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...payload, action })
@@ -2412,7 +2412,7 @@ async function apiWrite(op, payload) {
   // All write ops go directly to /api/backend as POST with action in payload
   payload.action = op;
   try {
-    const res = await fetch('/api/backend', {
+    const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload })
@@ -8615,7 +8615,7 @@ async function uploadEvImg(file) {
       fileName: file.name
     };
 
-    const res = await fetch('/api/backend', {
+    const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload })

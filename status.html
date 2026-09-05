@@ -249,7 +249,7 @@
       const payload = decodeJwtResponse(response.credential);
       const email = payload.email;
       if (!email) throw new Error("No email found in Google response.");
-      const r = await fetch('/api/backend', {
+      const r = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ payload: { action: 'status_check', email: email } })
@@ -353,7 +353,7 @@
       else if (/^\d{7,}$/.test(q)) { type = (q.length >= 10 ? 'utr' : 'phone'); }
       else if (/^\d{10}$/.test(q)) { type = 'phone'; }
 
-      const r = await fetch('/api/backend', {
+      const r = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ payload: { action: 'status_check', [type]: value } })

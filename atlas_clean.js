@@ -1,0 +1,1625 @@
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 40) {
+      navbar.style.background = 'rgba(244,243,239,0.8)';
+      navbar.style.backdropFilter = 'blur(16px)';
+      navbar.style.borderBottom = '1px solid rgba(0,0,0,0.05)';
+    } else {
+      navbar.style.background = 'transparent';
+      navbar.style.backdropFilter = 'none';
+      navbar.style.borderBottom = '1px solid transparent';
+    }
+  }, { passive: true });
+
+  // Mobile Menu
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.style.transform = 'translateY(0)';
+  });
+  function closeMobileMenu() {
+    mobileMenu.style.transform = 'translateY(-100%)';
+  }
+  document.getElementById('mobile-close-btn').addEventListener('click', closeMobileMenu);
+
+  // Observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(40px)';
+    el.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    if(el.classList.contains('delay-1')) el.style.transitionDelay = '0.1s';
+    observer.observe(el);
+  });
+
+  // Resources Data
+  const resources = [
+{
+    "title": "React",
+    "desc": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+    "cat": "Web Dev",
+    "link": "https://github.com/facebook/react"
+  },
+  {
+    "title": "Vue.js",
+    "desc": "Vue.js is a progressive, incrementally-adoptable JavaScript framework for building UI on the web.",
+    "cat": "Web Dev",
+    "link": "https://github.com/vuejs/core"
+  },
+  {
+    "title": "Angular",
+    "desc": "The modern web developer's platform.",
+    "cat": "Web Dev",
+    "link": "https://github.com/angular/angular"
+  },
+  {
+    "title": "Next.js",
+    "desc": "The React Framework",
+    "cat": "Web Dev",
+    "link": "https://github.com/vercel/next.js"
+  },
+  {
+    "title": "Nuxt",
+    "desc": "The Intuitive Vue Framework.",
+    "cat": "Web Dev",
+    "link": "https://github.com/nuxt/nuxt"
+  },
+  {
+    "title": "Svelte",
+    "desc": "Cybernetically enhanced web apps",
+    "cat": "Web Dev",
+    "link": "https://github.com/sveltejs/svelte"
+  },
+  {
+    "title": "Tailwind CSS",
+    "desc": "A utility-first CSS framework for rapid UI development.",
+    "cat": "Web Dev",
+    "link": "https://github.com/tailwindlabs/tailwindcss"
+  },
+  {
+    "title": "Bootstrap",
+    "desc": "The most popular HTML, CSS, and JavaScript framework for developing responsive, mobile first projects on the web.",
+    "cat": "Web Dev",
+    "link": "https://github.com/twbs/bootstrap"
+  },
+  {
+    "title": "Node.js",
+    "desc": "Node.js JavaScript runtime",
+    "cat": "Web Dev",
+    "link": "https://github.com/nodejs/node"
+  },
+  {
+    "title": "Express",
+    "desc": "Fast, unopinionated, minimalist web framework for node.",
+    "cat": "Web Dev",
+    "link": "https://github.com/expressjs/express"
+  },
+  {
+    "title": "Django",
+    "desc": "The Web framework for perfectionists with deadlines.",
+    "cat": "Web Dev",
+    "link": "https://github.com/django/django"
+  },
+  {
+    "title": "Flask",
+    "desc": "The Python micro framework for building web applications.",
+    "cat": "Web Dev",
+    "link": "https://github.com/pallets/flask"
+  },
+  {
+    "title": "FastAPI",
+    "desc": "FastAPI framework, high performance, easy to learn, fast to code, ready for production",
+    "cat": "Web Dev",
+    "link": "https://github.com/tiangolo/fastapi"
+  },
+  {
+    "title": "Laravel",
+    "desc": "A PHP framework for web artisans",
+    "cat": "Web Dev",
+    "link": "https://github.com/laravel/laravel"
+  },
+  {
+    "title": "Ruby on Rails",
+    "desc": "Ruby on Rails",
+    "cat": "Web Dev",
+    "link": "https://github.com/rails/rails"
+  },
+  {
+    "title": "Spring Boot",
+    "desc": "Spring Boot",
+    "cat": "Web Dev",
+    "link": "https://github.com/spring-projects/spring-boot"
+  },
+  {
+    "title": "Deno",
+    "desc": "A modern runtime for JavaScript and TypeScript.",
+    "cat": "Web Dev",
+    "link": "https://github.com/denoland/deno"
+  },
+  {
+    "title": "NestJS",
+    "desc": "A progressive Node.js framework for building efficient, scalable, and enterprise-grade server-side applications",
+    "cat": "Web Dev",
+    "link": "https://github.com/nestjs/nest"
+  },
+  {
+    "title": "Strapi",
+    "desc": "The leading open-source headless CMS. It\u2019s 100% JavaScript and fully customizable.",
+    "cat": "Web Dev",
+    "link": "https://github.com/strapi/strapi"
+  },
+  {
+    "title": "Supabase",
+    "desc": "The open source Firebase alternative.",
+    "cat": "Web Dev",
+    "link": "https://github.com/supabase/supabase"
+  },
+  {
+    "title": "Prisma",
+    "desc": "Next-generation ORM for Node.js & TypeScript | PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, MongoDB and CockroachDB",
+    "cat": "Web Dev",
+    "link": "https://github.com/prisma/prisma"
+  },
+  {
+    "title": "Vite",
+    "desc": "Next generation frontend tooling. It's fast!",
+    "cat": "Web Dev",
+    "link": "https://github.com/vitejs/vite"
+  },
+  {
+    "title": "Webpack",
+    "desc": "A bundler for javascript and friends.",
+    "cat": "Web Dev",
+    "link": "https://github.com/webpack/webpack"
+  },
+  {
+    "title": "Babel",
+    "desc": "Babel is a compiler for writing next generation JavaScript.",
+    "cat": "Web Dev",
+    "link": "https://github.com/babel/babel"
+  },
+  {
+    "title": "Storybook",
+    "desc": "Storybook is a frontend workshop for building UI components and pages in isolation.",
+    "cat": "Web Dev",
+    "link": "https://github.com/storybookjs/storybook"
+  },
+  {
+    "title": "Redux",
+    "desc": "Predictable state container for JavaScript apps",
+    "cat": "Web Dev",
+    "link": "https://github.com/reduxjs/redux"
+  },
+  {
+    "title": "Zustand",
+    "desc": "Bear necessities for state management in React",
+    "cat": "Web Dev",
+    "link": "https://github.com/pmndrs/zustand"
+  },
+  {
+    "title": "GraphQL",
+    "desc": "GraphQL is a query language and execution engine tied to any backend service.",
+    "cat": "Web Dev",
+    "link": "https://github.com/graphql/graphql-spec"
+  },
+  {
+    "title": "Apollo Client",
+    "desc": "A fully-featured, production ready caching GraphQL client for every UI framework and GraphQL server.",
+    "cat": "Web Dev",
+    "link": "https://github.com/apollographql/apollo-client"
+  },
+  {
+    "title": "tRPC",
+    "desc": "End-to-end typesafe APIs made easy",
+    "cat": "Web Dev",
+    "link": "https://github.com/trpc/trpc"
+  },
+  {
+    "title": "Gatsby",
+    "desc": "The fastest frontend for the headless web.",
+    "cat": "Web Dev",
+    "link": "https://github.com/gatsbyjs/gatsby"
+  },
+  {
+    "title": "Astro",
+    "desc": "The web framework for content-driven websites.",
+    "cat": "Web Dev",
+    "link": "https://github.com/withastro/astro"
+  },
+  {
+    "title": "Qwik",
+    "desc": "The HTML-first framework. Instant apps of any size with ~ 1kb JS",
+    "cat": "Web Dev",
+    "link": "https://github.com/BuilderIO/qwik"
+  },
+  {
+    "title": "SolidJS",
+    "desc": "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
+    "cat": "Web Dev",
+    "link": "https://github.com/solidjs/solid"
+  },
+  {
+    "title": "Three.js",
+    "desc": "JavaScript 3D Library.",
+    "cat": "Web Dev",
+    "link": "https://github.com/mrdoob/three.js"
+  },
+  {
+    "title": "ECharts",
+    "desc": "Apache ECharts is a powerful, interactive charting and data visualization library for browser",
+    "cat": "Web Dev",
+    "link": "https://github.com/apache/echarts"
+  },
+  {
+    "title": "Chart.js",
+    "desc": "Simple HTML5 Charts using the <canvas> tag",
+    "cat": "Web Dev",
+    "link": "https://github.com/chartjs/Chart.js"
+  },
+  {
+    "title": "Ant Design",
+    "desc": "An enterprise-class UI design language and React UI library",
+    "cat": "Web Dev",
+    "link": "https://github.com/ant-design/ant-design"
+  },
+  {
+    "title": "MUI",
+    "desc": "MUI Core: Ready-to-use foundational React components, free forever.",
+    "cat": "Web Dev",
+    "link": "https://github.com/mui/material-ui"
+  },
+  {
+    "title": "Chakra UI",
+    "desc": "Simple, Modular & Accessible UI Components for your React Applications",
+    "cat": "Web Dev",
+    "link": "https://github.com/chakra-ui/chakra-ui"
+  },
+  {
+    "title": "DaisyUI",
+    "desc": "The most popular component library for Tailwind CSS",
+    "cat": "Web Dev",
+    "link": "https://github.com/saadeghi/daisyui"
+  },
+  {
+    "title": "Framer Motion",
+    "desc": "Open source, production-ready animation and gesture library for React",
+    "cat": "Web Dev",
+    "link": "https://github.com/framer/motion"
+  },
+  {
+    "title": "HTMX",
+    "desc": "</> htmx - high power tools for HTML",
+    "cat": "Web Dev",
+    "link": "https://github.com/bigskysoftware/htmx"
+  },
+  {
+    "title": "jQuery",
+    "desc": "jQuery JavaScript Library",
+    "cat": "Web Dev",
+    "link": "https://github.com/jquery/jquery"
+  },
+  {
+    "title": "Alpine.js",
+    "desc": "A rugged, minimal framework for composing JavaScript behavior in your markup.",
+    "cat": "Web Dev",
+    "link": "https://github.com/alpinejs/alpine"
+  },
+  {
+    "title": "Playwright",
+    "desc": "Playwright is a framework for Web Testing and Automation.",
+    "cat": "Web Dev",
+    "link": "https://github.com/microsoft/playwright"
+  },
+  {
+    "title": "Puppeteer",
+    "desc": "Headless Chrome Node.js API",
+    "cat": "Web Dev",
+    "link": "https://github.com/puppeteer/puppeteer"
+  },
+  {
+    "title": "Cypress",
+    "desc": "Fast, easy and reliable testing for anything that runs in a browser.",
+    "cat": "Web Dev",
+    "link": "https://github.com/cypress-io/cypress"
+  },
+  {
+    "title": "Jest",
+    "desc": "Delightful JavaScript Testing.",
+    "cat": "Web Dev",
+    "link": "https://github.com/jestjs/jest"
+  },
+  {
+    "title": "Vitest",
+    "desc": "Next generation testing framework powered by Vite.",
+    "cat": "Web Dev",
+    "link": "https://github.com/vitest-dev/vitest"
+  },
+  {
+    "title": "TensorFlow",
+    "desc": "An Open Source Machine Learning Framework for Everyone",
+    "cat": "AI/ML",
+    "link": "https://github.com/tensorflow/tensorflow"
+  },
+  {
+    "title": "PyTorch",
+    "desc": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+    "cat": "AI/ML",
+    "link": "https://github.com/pytorch/pytorch"
+  },
+  {
+    "title": "Keras",
+    "desc": "Deep Learning for humans",
+    "cat": "AI/ML",
+    "link": "https://github.com/keras-team/keras"
+  },
+  {
+    "title": "Scikit-Learn",
+    "desc": "Machine learning in Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/scikit-learn/scikit-learn"
+  },
+  {
+    "title": "Hugging Face Transformers",
+    "desc": "State-of-the-art Machine Learning for Pytorch, TensorFlow, and JAX.",
+    "cat": "AI/ML",
+    "link": "https://github.com/huggingface/transformers"
+  },
+  {
+    "title": "LangChain",
+    "desc": "Building applications with LLMs through composability",
+    "cat": "AI/ML",
+    "link": "https://github.com/langchain-ai/langchain"
+  },
+  {
+    "title": "AutoGPT",
+    "desc": "An experimental open-source attempt to make GPT-4 fully autonomous.",
+    "cat": "AI/ML",
+    "link": "https://github.com/Significant-Gravitas/AutoGPT"
+  },
+  {
+    "title": "Stable Diffusion WebUI",
+    "desc": "Stable Diffusion web UI",
+    "cat": "AI/ML",
+    "link": "https://github.com/AUTOMATIC1111/stable-diffusion-webui"
+  },
+  {
+    "title": "OpenCV",
+    "desc": "Open Source Computer Vision Library",
+    "cat": "AI/ML",
+    "link": "https://github.com/opencv/opencv"
+  },
+  {
+    "title": "YOLOv5",
+    "desc": "YOLOv5 in PyTorch > ONNX > CoreML > TFLite",
+    "cat": "AI/ML",
+    "link": "https://github.com/ultralytics/yolov5"
+  },
+  {
+    "title": "YOLOv8",
+    "desc": "Ultralytics YOLOv8",
+    "cat": "AI/ML",
+    "link": "https://github.com/ultralytics/ultralytics"
+  },
+  {
+    "title": "DeepSpeed",
+    "desc": "DeepSpeed is a deep learning optimization library that makes distributed training easy",
+    "cat": "AI/ML",
+    "link": "https://github.com/microsoft/DeepSpeed"
+  },
+  {
+    "title": "Ray",
+    "desc": "Ray is a unified framework for scaling AI and Python applications.",
+    "cat": "AI/ML",
+    "link": "https://github.com/ray-project/ray"
+  },
+  {
+    "title": "Gradio",
+    "desc": "Create UIs for your machine learning model in Python in 3 minutes",
+    "cat": "AI/ML",
+    "link": "https://github.com/gradio-app/gradio"
+  },
+  {
+    "title": "Streamlit",
+    "desc": "Streamlit \u2014 The fastest way to build data apps in Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/streamlit/streamlit"
+  },
+  {
+    "title": "XGBoost",
+    "desc": "Scalable, Portable and Distributed Gradient Boosting (GBDT, GBRT or GBM) Library",
+    "cat": "AI/ML",
+    "link": "https://github.com/dmlc/xgboost"
+  },
+  {
+    "title": "LightGBM",
+    "desc": "A fast, distributed, high performance gradient boosting framework",
+    "cat": "AI/ML",
+    "link": "https://github.com/microsoft/LightGBM"
+  },
+  {
+    "title": "Pandas",
+    "desc": "Flexible and powerful data analysis / manipulation library for Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/pandas-dev/pandas"
+  },
+  {
+    "title": "NumPy",
+    "desc": "The fundamental package for scientific computing with Python.",
+    "cat": "AI/ML",
+    "link": "https://github.com/numpy/numpy"
+  },
+  {
+    "title": "Matplotlib",
+    "desc": "Matplotlib: plotting with Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/matplotlib/matplotlib"
+  },
+  {
+    "title": "Seaborn",
+    "desc": "Statistical data visualization in Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/mwaskom/seaborn"
+  },
+  {
+    "title": "NLTK",
+    "desc": "Natural Language Toolkit",
+    "cat": "AI/ML",
+    "link": "https://github.com/nltk/nltk"
+  },
+  {
+    "title": "SpaCy",
+    "desc": "Industrial-strength Natural Language Processing (NLP) in Python",
+    "cat": "AI/ML",
+    "link": "https://github.com/explosion/spaCy"
+  },
+  {
+    "title": "Diffusers",
+    "desc": "Diffusers: State-of-the-art diffusion models for image and audio generation in PyTorch.",
+    "cat": "AI/ML",
+    "link": "https://github.com/huggingface/diffusers"
+  },
+  {
+    "title": "LlamaIndex",
+    "desc": "LlamaIndex (GPT Index) is a data framework for your LLM applications",
+    "cat": "AI/ML",
+    "link": "https://github.com/run-llama/llama_index"
+  },
+  {
+    "title": "Ollama",
+    "desc": "Get up and running with Llama 3, Mistral, Gemma, and other large language models.",
+    "cat": "AI/ML",
+    "link": "https://github.com/ollama/ollama"
+  },
+  {
+    "title": "LocalAI",
+    "desc": "Free, Open Source OpenAI alternative.",
+    "cat": "AI/ML",
+    "link": "https://github.com/mudler/LocalAI"
+  },
+  {
+    "title": "Chroma",
+    "desc": "The AI-native open-source embedding database",
+    "cat": "AI/ML",
+    "link": "https://github.com/chroma-core/chroma"
+  },
+  {
+    "title": "Milvus",
+    "desc": "A cloud-native vector database, storage for next generation AI applications",
+    "cat": "AI/ML",
+    "link": "https://github.com/milvus-io/milvus"
+  },
+  {
+    "title": "Qdrant",
+    "desc": "Qdrant - Vector Database for the next generation of AI applications.",
+    "cat": "AI/ML",
+    "link": "https://github.com/qdrant/qdrant"
+  },
+  {
+    "title": "Faiss",
+    "desc": "A library for efficient similarity search and clustering of dense vectors.",
+    "cat": "AI/ML",
+    "link": "https://github.com/facebookresearch/faiss"
+  },
+  {
+    "title": "Gymnasium",
+    "desc": "An API standard for single-agent reinforcement learning environments",
+    "cat": "AI/ML",
+    "link": "https://github.com/Farama-Foundation/Gymnasium"
+  },
+  {
+    "title": "MLflow",
+    "desc": "Open source platform for the machine learning lifecycle",
+    "cat": "AI/ML",
+    "link": "https://github.com/mlflow/mlflow"
+  },
+  {
+    "title": "Weights & Biases",
+    "desc": "A tool for machine learning experiment tracking, dataset versioning, and project collaboration.",
+    "cat": "AI/ML",
+    "link": "https://github.com/wandb/wandb"
+  },
+  {
+    "title": "ONNX",
+    "desc": "Open Neural Network Exchange",
+    "cat": "AI/ML",
+    "link": "https://github.com/onnx/onnx"
+  },
+  {
+    "title": "TensorRT",
+    "desc": "NVIDIA TensorRT is a C++ library for high performance inference on NVIDIA GPUs",
+    "cat": "AI/ML",
+    "link": "https://github.com/NVIDIA/TensorRT"
+  },
+  {
+    "title": "vLLM",
+    "desc": "A high-throughput and memory-efficient LLM inference and serving engine",
+    "cat": "AI/ML",
+    "link": "https://github.com/vllm-project/vllm"
+  },
+  {
+    "title": "Jupyter",
+    "desc": "Jupyter Notebook",
+    "cat": "AI/ML",
+    "link": "https://github.com/jupyter/notebook"
+  },
+  {
+    "title": "ColossalAI",
+    "desc": "Making large AI models cheaper, faster, and more accessible",
+    "cat": "AI/ML",
+    "link": "https://github.com/hpcaitech/ColossalAI"
+  },
+  {
+    "title": "Whisper",
+    "desc": "Robust Speech Recognition via Large-Scale Weak Supervision",
+    "cat": "AI/ML",
+    "link": "https://github.com/openai/whisper"
+  },
+  {
+    "title": "Metasploit",
+    "desc": "Metasploit Framework",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/rapid7/metasploit-framework"
+  },
+  {
+    "title": "Nmap",
+    "desc": "Nmap - the Network Mapper.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/nmap/nmap"
+  },
+  {
+    "title": "Wireshark",
+    "desc": "Wireshark is the world's most popular network protocol analyzer.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/wireshark/wireshark"
+  },
+  {
+    "title": "Sqlmap",
+    "desc": "Automatic SQL injection and database takeover tool",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/sqlmapproject/sqlmap"
+  },
+  {
+    "title": "Radare2",
+    "desc": "UNIX-like reverse engineering framework and command-line toolset",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/radareorg/radare2"
+  },
+  {
+    "title": "Ghidra",
+    "desc": "Ghidra is a software reverse engineering (SRE) framework",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/NationalSecurityAgency/ghidra"
+  },
+  {
+    "title": "Aircrack-ng",
+    "desc": "WiFi security auditing tools suite",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/aircrack-ng/aircrack-ng"
+  },
+  {
+    "title": "BloodHound",
+    "desc": "Six Degrees of Domain Admin",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/BloodHoundAD/BloodHound"
+  },
+  {
+    "title": "Hashcat",
+    "desc": "World's fastest and most advanced password recovery utility",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/hashcat/hashcat"
+  },
+  {
+    "title": "John the Ripper",
+    "desc": "John the Ripper jumbo - advanced offline password cracker",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/openwall/john"
+  },
+  {
+    "title": "Burp Suite Free/Pro Extensions",
+    "desc": "Various extensions for Burp Suite",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/PortSwigger/bapps"
+  },
+  {
+    "title": "ZAP",
+    "desc": "The OWASP ZAP core project",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/zaproxy/zaproxy"
+  },
+  {
+    "title": "Nuclei",
+    "desc": "Fast and customizable vulnerability scanner based on simple YAML based DSL.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/projectdiscovery/nuclei"
+  },
+  {
+    "title": "FFuF",
+    "desc": "Fast web fuzzer written in Go",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/ffuf/ffuf"
+  },
+  {
+    "title": "Gobuster",
+    "desc": "Directory/File, DNS and VHost busting tool written in Go",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/OJ/gobuster"
+  },
+  {
+    "title": "Amass",
+    "desc": "In-depth Attack Surface Mapping and Asset Discovery",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/owasp-amass/amass"
+  },
+  {
+    "title": "Sublist3r",
+    "desc": "Fast subdomains enumeration tool for penetration testers",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/aboul3la/Sublist3r"
+  },
+  {
+    "title": "WpScan",
+    "desc": "WPScan is a free, for non-commercial use, black box WordPress vulnerability scanner",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/wpscanteam/wpscan"
+  },
+  {
+    "title": "Responder",
+    "desc": "Responder is a LLMNR, NBT-NS and MDNS poisoner",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/SpiderLabs/Responder"
+  },
+  {
+    "title": "Empire",
+    "desc": "Empire is a PowerShell and Python post-exploitation agent.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/BC-SECURITY/Empire"
+  },
+  {
+    "title": "Cobalt Strike Community Kit",
+    "desc": "Community kit for Cobalt Strike",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/Cobalt-Strike/community_kit"
+  },
+  {
+    "title": "Sliver",
+    "desc": "Adversary Emulation Framework",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/BishopFox/sliver"
+  },
+  {
+    "title": "Mythic",
+    "desc": "A collaborative, multi-platform, cross-architecture, command and control framework.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/its-a-feature/Mythic"
+  },
+  {
+    "title": "Impacket",
+    "desc": "Impacket is a collection of Python classes for working with network protocols.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/fortra/impacket"
+  },
+  {
+    "title": "Dirsearch",
+    "desc": "Web path scanner",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/maurosoria/dirsearch"
+  },
+  {
+    "title": "TruffleHog",
+    "desc": "Find and verify credentials",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/trufflesecurity/trufflehog"
+  },
+  {
+    "title": "Gitleaks",
+    "desc": "Scan git repos (or files) for secrets using regex and entropy",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/zricethezav/gitleaks"
+  },
+  {
+    "title": "Semgrep",
+    "desc": "Lightweight static analysis for many languages",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/returntocorp/semgrep"
+  },
+  {
+    "title": "Wazuh",
+    "desc": "Wazuh - The Open Source Security Platform",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/wazuh/wazuh"
+  },
+  {
+    "title": "Suricata",
+    "desc": "Suricata is a network Intrusion Detection System, Intrusion Prevention System and Network Security Monitoring engine.",
+    "cat": "Cybersecurity",
+    "link": "https://github.com/OISF/suricata"
+  },
+  {
+    "title": "Flutter",
+    "desc": "Flutter makes it easy and fast to build beautiful apps for mobile and beyond",
+    "cat": "Mobile",
+    "link": "https://github.com/flutter/flutter"
+  },
+  {
+    "title": "React Native",
+    "desc": "A framework for building native applications using React",
+    "cat": "Mobile",
+    "link": "https://github.com/facebook/react-native"
+  },
+  {
+    "title": "Expo",
+    "desc": "An open-source platform for making universal native apps for Android, iOS, and the web with JavaScript and React",
+    "cat": "Mobile",
+    "link": "https://github.com/expo/expo"
+  },
+  {
+    "title": "Ionic",
+    "desc": "A powerful cross-platform UI toolkit for building native-quality iOS, Android, and Progressive Web Apps with HTML, CSS, and JavaScript.",
+    "cat": "Mobile",
+    "link": "https://github.com/ionic-team/ionic-framework"
+  },
+  {
+    "title": "Capacitor",
+    "desc": "Build cross-platform Native Progressive Web Apps for iOS, Android, and the Web",
+    "cat": "Mobile",
+    "link": "https://github.com/ionic-team/capacitor"
+  },
+  {
+    "title": "Tauri",
+    "desc": "Build smaller, faster, and more secure desktop/mobile applications with a web frontend.",
+    "cat": "Mobile",
+    "link": "https://github.com/tauri-apps/tauri"
+  },
+  {
+    "title": "Cordova",
+    "desc": "Apache Cordova is a platform for building native mobile applications using HTML, CSS and JavaScript",
+    "cat": "Mobile",
+    "link": "https://github.com/apache/cordova-ios"
+  },
+  {
+    "title": "NativeScript",
+    "desc": "NativeScript empowers you to access native APIs from JavaScript directly",
+    "cat": "Mobile",
+    "link": "https://github.com/NativeScript/NativeScript"
+  },
+  {
+    "title": "Kotlin",
+    "desc": "The Kotlin Programming Language.",
+    "cat": "Mobile",
+    "link": "https://github.com/JetBrains/kotlin"
+  },
+  {
+    "title": "Swift",
+    "desc": "The Swift Programming Language",
+    "cat": "Mobile",
+    "link": "https://github.com/apple/swift"
+  },
+  {
+    "title": "Alamofire",
+    "desc": "Elegant HTTP Networking in Swift",
+    "cat": "Mobile",
+    "link": "https://github.com/Alamofire/Alamofire"
+  },
+  {
+    "title": "Retrofit",
+    "desc": "A type-safe HTTP client for Android and Java",
+    "cat": "Mobile",
+    "link": "https://github.com/square/retrofit"
+  },
+  {
+    "title": "OkHttp",
+    "desc": "Square\u2019s meticulous HTTP client for the JVM, Android, and GraalVM.",
+    "cat": "Mobile",
+    "link": "https://github.com/square/okhttp"
+  },
+  {
+    "title": "Glide",
+    "desc": "An image loading and caching library for Android focused on smooth scrolling",
+    "cat": "Mobile",
+    "link": "https://github.com/bumptech/glide"
+  },
+  {
+    "title": "Picasso",
+    "desc": "A powerful image downloading and caching library for Android",
+    "cat": "Mobile",
+    "link": "https://github.com/square/picasso"
+  },
+  {
+    "title": "Lottie (Android)",
+    "desc": "Render After Effects animations natively on Android and iOS, Web, and React Native",
+    "cat": "Mobile",
+    "link": "https://github.com/airbnb/lottie-android"
+  },
+  {
+    "title": "Lottie (iOS)",
+    "desc": "An iOS library to natively render After Effects vector animations",
+    "cat": "Mobile",
+    "link": "https://github.com/airbnb/lottie-ios"
+  },
+  {
+    "title": "RxJava",
+    "desc": "RxJava \u2013 Reactive Extensions for the JVM",
+    "cat": "Mobile",
+    "link": "https://github.com/ReactiveX/RxJava"
+  },
+  {
+    "title": "RxSwift",
+    "desc": "Reactive Programming in Swift",
+    "cat": "Mobile",
+    "link": "https://github.com/ReactiveX/RxSwift"
+  },
+  {
+    "title": "Realm",
+    "desc": "Realm is a mobile database: a replacement for SQLite & Core Data",
+    "cat": "Mobile",
+    "link": "https://github.com/realm/realm-swift"
+  },
+  {
+    "title": "Fastlane",
+    "desc": "The easiest way to automate building and releasing your iOS and Android apps",
+    "cat": "Mobile",
+    "link": "https://github.com/fastlane/fastlane"
+  },
+  {
+    "title": "Appium",
+    "desc": "Cross-platform test automation framework for native, hybrid, and mobile web apps.",
+    "cat": "Mobile",
+    "link": "https://github.com/appium/appium"
+  },
+  {
+    "title": "Detox",
+    "desc": "Gray box end-to-end testing and automation framework for mobile apps",
+    "cat": "Mobile",
+    "link": "https://github.com/wix/Detox"
+  },
+  {
+    "title": "Maestro",
+    "desc": "The easiest way to automate UI testing for your mobile app.",
+    "cat": "Mobile",
+    "link": "https://github.com/mobile-dev-inc/maestro"
+  },
+  {
+    "title": "Ignite",
+    "desc": "The most popular React Native boilerplate.",
+    "cat": "Mobile",
+    "link": "https://github.com/infinitered/ignite"
+  },
+  {
+    "title": "React Navigation",
+    "desc": "Routing and navigation for your React Native apps",
+    "cat": "Mobile",
+    "link": "https://github.com/react-navigation/react-navigation"
+  },
+  {
+    "title": "Reanimated",
+    "desc": "React Native's Animated library reimplemented",
+    "cat": "Mobile",
+    "link": "https://github.com/software-mansion/react-native-reanimated"
+  },
+  {
+    "title": "Flipper",
+    "desc": "A desktop debugging platform for mobile developers.",
+    "cat": "Mobile",
+    "link": "https://github.com/facebook/flipper"
+  },
+  {
+    "title": "Kingfisher",
+    "desc": "A lightweight, pure-Swift library for downloading and caching images from the web.",
+    "cat": "Mobile",
+    "link": "https://github.com/onevcat/Kingfisher"
+  },
+  {
+    "title": "SnapKit",
+    "desc": "A Swift Autolayout DSL for iOS & OS X",
+    "cat": "Mobile",
+    "link": "https://github.com/SnapKit/SnapKit"
+  },
+  {
+    "title": "Docker",
+    "desc": "Docker - the open-source application container engine",
+    "cat": "DevOps",
+    "link": "https://github.com/docker/docker-ce"
+  },
+  {
+    "title": "Kubernetes",
+    "desc": "Production-Grade Container Scheduling and Management",
+    "cat": "DevOps",
+    "link": "https://github.com/kubernetes/kubernetes"
+  },
+  {
+    "title": "Terraform",
+    "desc": "Terraform enables you to safely and predictably create, change, and improve infrastructure.",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/terraform"
+  },
+  {
+    "title": "Ansible",
+    "desc": "Ansible is a radically simple IT automation platform",
+    "cat": "DevOps",
+    "link": "https://github.com/ansible/ansible"
+  },
+  {
+    "title": "Helm",
+    "desc": "The Kubernetes Package Manager",
+    "cat": "DevOps",
+    "link": "https://github.com/helm/helm"
+  },
+  {
+    "title": "Prometheus",
+    "desc": "The Prometheus monitoring system and time series database.",
+    "cat": "DevOps",
+    "link": "https://github.com/prometheus/prometheus"
+  },
+  {
+    "title": "Grafana",
+    "desc": "The open and composable observability and data visualization platform.",
+    "cat": "DevOps",
+    "link": "https://github.com/grafana/grafana"
+  },
+  {
+    "title": "GitLab",
+    "desc": "GitLab is an open source end-to-end software development platform",
+    "cat": "DevOps",
+    "link": "https://github.com/gitlabhq/gitlabhq"
+  },
+  {
+    "title": "ArgoCD",
+    "desc": "Declarative continuous deployment for Kubernetes.",
+    "cat": "DevOps",
+    "link": "https://github.com/argoproj/argo-cd"
+  },
+  {
+    "title": "Jenkins",
+    "desc": "Jenkins is the leading open source automation server",
+    "cat": "DevOps",
+    "link": "https://github.com/jenkinsci/jenkins"
+  },
+  {
+    "title": "Vault",
+    "desc": "A tool for secrets management, encryption as a service, and privileged access management",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/vault"
+  },
+  {
+    "title": "Consul",
+    "desc": "Consul is a distributed, highly available, and data center aware solution to connect and configure applications",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/consul"
+  },
+  {
+    "title": "Nomad",
+    "desc": "Nomad is an easy-to-use, flexible, and performant workload orchestrator",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/nomad"
+  },
+  {
+    "title": "Istio",
+    "desc": "Connect, secure, control, and observe services.",
+    "cat": "DevOps",
+    "link": "https://github.com/istio/istio"
+  },
+  {
+    "title": "Linkerd",
+    "desc": "Ultralight, security-first service mesh for Kubernetes",
+    "cat": "DevOps",
+    "link": "https://github.com/linkerd/linkerd2"
+  },
+  {
+    "title": "Traefik",
+    "desc": "The Cloud Native Application Proxy",
+    "cat": "DevOps",
+    "link": "https://github.com/traefik/traefik"
+  },
+  {
+    "title": "Caddy",
+    "desc": "Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS",
+    "cat": "DevOps",
+    "link": "https://github.com/caddyserver/caddy"
+  },
+  {
+    "title": "Nginx",
+    "desc": "NGINX official repository",
+    "cat": "DevOps",
+    "link": "https://github.com/nginx/nginx"
+  },
+  {
+    "title": "Elasticsearch",
+    "desc": "Free and Open, Distributed, RESTful Search Engine",
+    "cat": "DevOps",
+    "link": "https://github.com/elastic/elasticsearch"
+  },
+  {
+    "title": "Logstash",
+    "desc": "Logstash - transport and process your logs, events, or other data",
+    "cat": "DevOps",
+    "link": "https://github.com/elastic/logstash"
+  },
+  {
+    "title": "Kibana",
+    "desc": "Your window into the Elastic Stack",
+    "cat": "DevOps",
+    "link": "https://github.com/elastic/kibana"
+  },
+  {
+    "title": "Loki",
+    "desc": "Like Prometheus, but for logs.",
+    "cat": "DevOps",
+    "link": "https://github.com/grafana/loki"
+  },
+  {
+    "title": "Jaeger",
+    "desc": "CNCF Jaeger, a Distributed Tracing Platform",
+    "cat": "DevOps",
+    "link": "https://github.com/jaegertracing/jaeger"
+  },
+  {
+    "title": "OpenTelemetry",
+    "desc": "OpenTelemetry observability framework",
+    "cat": "DevOps",
+    "link": "https://github.com/open-telemetry/opentelemetry-collector"
+  },
+  {
+    "title": "Minikube",
+    "desc": "Run Kubernetes locally",
+    "cat": "DevOps",
+    "link": "https://github.com/kubernetes/minikube"
+  },
+  {
+    "title": "K3s",
+    "desc": "Lightweight Kubernetes",
+    "cat": "DevOps",
+    "link": "https://github.com/k3s-io/k3s"
+  },
+  {
+    "title": "Pulumi",
+    "desc": "Pulumi - Infrastructure as Code in any programming language.",
+    "cat": "DevOps",
+    "link": "https://github.com/pulumi/pulumi"
+  },
+  {
+    "title": "LocalStack",
+    "desc": "A fully functional local AWS cloud stack.",
+    "cat": "DevOps",
+    "link": "https://github.com/localstack/localstack"
+  },
+  {
+    "title": "Vagrant",
+    "desc": "Vagrant is a tool for building and distributing development environments.",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/vagrant"
+  },
+  {
+    "title": "Packer",
+    "desc": "Packer is a tool for creating identical machine images for multiple platforms from a single source configuration.",
+    "cat": "DevOps",
+    "link": "https://github.com/hashicorp/packer"
+  },
+  {
+    "title": "Figma Plugins",
+    "desc": "Explore top Figma open-source plugins.",
+    "cat": "UI/UX",
+    "link": "https://github.com/topics/figma-plugin"
+  },
+  {
+    "title": "Excalidraw",
+    "desc": "Virtual whiteboard for sketching hand-drawn like diagrams",
+    "cat": "UI/UX",
+    "link": "https://github.com/excalidraw/excalidraw"
+  },
+  {
+    "title": "Penpot",
+    "desc": "Penpot - The Open-Source design & prototyping platform",
+    "cat": "UI/UX",
+    "link": "https://github.com/penpot/penpot"
+  },
+  {
+    "title": "Feather Icons",
+    "desc": "Simply beautiful open source icons",
+    "cat": "UI/UX",
+    "link": "https://github.com/feathericons/feather"
+  },
+  {
+    "title": "FontAwesome",
+    "desc": "The iconic SVG, font, and CSS toolkit",
+    "cat": "UI/UX",
+    "link": "https://github.com/FortAwesome/Font-Awesome"
+  },
+  {
+    "title": "Lucide",
+    "desc": "Beautiful & consistent icons",
+    "cat": "UI/UX",
+    "link": "https://github.com/lucide-icons/lucide"
+  },
+  {
+    "title": "Heroicons",
+    "desc": "A set of free MIT-licensed high-quality SVG icons for UI development.",
+    "cat": "UI/UX",
+    "link": "https://github.com/tailwindlabs/heroicons"
+  },
+  {
+    "title": "Radix UI",
+    "desc": "Primitives and themes for building react apps.",
+    "cat": "UI/UX",
+    "link": "https://github.com/radix-ui/primitives"
+  },
+  {
+    "title": "Headless UI",
+    "desc": "Completely unstyled, fully accessible UI components",
+    "cat": "UI/UX",
+    "link": "https://github.com/tailwindlabs/headlessui"
+  },
+  {
+    "title": "Tailwind Components",
+    "desc": "Free open source Tailwind CSS components.",
+    "cat": "UI/UX",
+    "link": "https://tailwindcomponents.com"
+  },
+  {
+    "title": "Shadcn UI",
+    "desc": "Beautifully designed components that you can copy and paste into your apps.",
+    "cat": "UI/UX",
+    "link": "https://github.com/shadcn-ui/ui"
+  },
+  {
+    "title": "Mantine",
+    "desc": "A fully featured React components library",
+    "cat": "UI/UX",
+    "link": "https://github.com/mantinedev/mantine"
+  },
+  {
+    "title": "Chakra UI",
+    "desc": "Simple, Modular & Accessible UI Components for your React Applications",
+    "cat": "UI/UX",
+    "link": "https://github.com/chakra-ui/chakra-ui"
+  },
+  {
+    "title": "Design Resources",
+    "desc": "A curated list of design and UI resources",
+    "cat": "UI/UX",
+    "link": "https://github.com/bradtraversy/design-resources-for-developers"
+  },
+  {
+    "title": "Dribbble",
+    "desc": "Discover the world\u2019s top designers & creatives",
+    "cat": "UI/UX",
+    "link": "https://dribbble.com"
+  },
+  {
+    "title": "Behance",
+    "desc": "Showcase and discover creative work",
+    "cat": "UI/UX",
+    "link": "https://www.behance.net"
+  },
+  {
+    "title": "Awwwards",
+    "desc": "Website Awards - Best Web Design Trends",
+    "cat": "UI/UX",
+    "link": "https://www.awwwards.com"
+  },
+  {
+    "title": "Color Hunt",
+    "desc": "Color Palettes for Designers and Artists",
+    "cat": "UI/UX",
+    "link": "https://colorhunt.co"
+  },
+  {
+    "title": "Coolors",
+    "desc": "The super fast color palettes generator!",
+    "cat": "UI/UX",
+    "link": "https://coolors.co"
+  },
+  {
+    "title": "Google Fonts",
+    "desc": "Making the web more beautiful, fast, and open through great typography",
+    "cat": "UI/UX",
+    "link": "https://fonts.google.com"
+  },
+    { title: 'Meteor', desc: 'An ultra-simple environment for building modern web applications.', cat: 'Web Dev', link: 'https://github.com/meteor/meteor' },
+    { title: 'Remix', desc: 'Build Better Websites. Create modern, resilient user experiences with web fundamentals.', cat: 'Web Dev', link: 'https://github.com/remix-run/remix' },
+    { title: 'Ember.js', desc: 'Ember.js - A JavaScript framework for creating ambitious web applications', cat: 'Web Dev', link: 'https://github.com/emberjs/ember.js' },
+    { title: 'Preact', desc: 'Fast 3kB alternative to React with the same modern API.', cat: 'Web Dev', link: 'https://github.com/preactjs/preact' },
+    { title: 'Lit', desc: 'Lit is a simple base class for creating fast, lightweight web components.', cat: 'Web Dev', link: 'https://github.com/lit/lit' },
+    { title: 'Stencil', desc: 'A Compiler for Web Components and High Performance Web Apps.', cat: 'Web Dev', link: 'https://github.com/ionic-team/stencil' },
+    { title: 'Mithril', desc: 'A JavaScript Framework for Building Brilliant Applications', cat: 'Web Dev', link: 'https://github.com/MithrilJS/mithril.js' },
+    { title: 'Fastify', desc: 'Fast and low overhead web framework, for Node.js', cat: 'Web Dev', link: 'https://github.com/fastify/fastify' },
+    { title: 'Koa', desc: 'Expressive middleware for node.js using ES2017 async functions', cat: 'Web Dev', link: 'https://github.com/koajs/koa' },
+    { title: 'AdonisJS', desc: 'A fully featured web framework for Node.js', cat: 'Web Dev', link: 'https://github.com/adonisjs/core' },
+    { title: 'Sails.js', desc: 'Realtime MVC Framework for Node.js', cat: 'Web Dev', link: 'https://github.com/balderdashy/sails' },
+    { title: 'Hapi', desc: 'The Simple, Secure Framework Developers Trust', cat: 'Web Dev', link: 'https://github.com/hapijs/hapi' },
+    { title: 'Feathers', desc: 'The API and real-time application framework', cat: 'Web Dev', link: 'https://github.com/feathersjs/feathers' },
+    { title: 'LoopBack', desc: 'A highly extensible Node.js and TypeScript framework for building APIs and microservices.', cat: 'Web Dev', link: 'https://github.com/strongloop/loopback-next' },
+    { title: 'Socket.IO', desc: 'Realtime application framework (Node.JS server)', cat: 'Web Dev', link: 'https://github.com/socketio/socket.io' },
+    { title: 'TypeORM', desc: 'ORM for TypeScript and JavaScript (ES7, ES6, ES5)', cat: 'Web Dev', link: 'https://github.com/typeorm/typeorm' },
+    { title: 'Sequelize', desc: 'An easy-to-use multi SQL dialect ORM for Node.js', cat: 'Web Dev', link: 'https://github.com/sequelize/sequelize' },
+    { title: 'Mongoose', desc: 'MongoDB object modeling designed to work in an asynchronous environment.', cat: 'Web Dev', link: 'https://github.com/Automattic/mongoose' },
+    { title: 'Drizzle ORM', desc: 'TypeScript ORM that feels like SQL', cat: 'Web Dev', link: 'https://github.com/drizzle-team/drizzle-orm' },
+    { title: 'WatermelonDB', desc: 'Reactive & asynchronous database for powerful React and React Native apps', cat: 'Web Dev', link: 'https://github.com/Nozbe/WatermelonDB' },
+    { title: 'RxDB', desc: 'A fast, offline-first, reactive database for JavaScript Applications', cat: 'Web Dev', link: 'https://github.com/pubkey/rxdb' },
+    { title: 'PouchDB', desc: 'PouchDB is a pocket-sized database.', cat: 'Web Dev', link: 'https://github.com/pouchdb/pouchdb' },
+    { title: 'Gun', desc: 'An open source cybersecurity protocol for syncing decentralized graph data.', cat: 'Web Dev', link: 'https://github.com/amark/gun' },
+    { title: 'Hasura', desc: 'Blazing fast, instant realtime GraphQL APIs on all your data', cat: 'Web Dev', link: 'https://github.com/hasura/graphql-engine' },
+    { title: 'PostGraphile', desc: 'Execute one blazing-fast GraphQL query for any SQL database', cat: 'Web Dev', link: 'https://github.com/graphile/postgraphile' },
+    { title: 'Relay', desc: 'Relay is a JavaScript framework for building data-driven React applications.', cat: 'Web Dev', link: 'https://github.com/facebook/relay' },
+    { title: 'URQL', desc: 'A highly customizable and versatile GraphQL client for React', cat: 'Web Dev', link: 'https://github.com/urql-graphql/urql' },
+    { title: 'SWR', desc: 'React Hooks for Data Fetching', cat: 'Web Dev', link: 'https://github.com/vercel/swr' },
+    { title: 'React Query', desc: 'Powerful asynchronous state management for TS/JS, React, Solid, Vue and Svelte', cat: 'Web Dev', link: 'https://github.com/TanStack/query' },
+    { title: 'MobX', desc: 'Simple, scalable state management.', cat: 'Web Dev', link: 'https://github.com/mobxjs/mobx' },
+    { title: 'Recoil', desc: 'An experimental state management library for React apps', cat: 'Web Dev', link: 'https://github.com/facebookexperimental/Recoil' },
+    { title: 'Jotai', desc: 'Primitive and flexible state management for React', cat: 'Web Dev', link: 'https://github.com/pmndrs/jotai' },
+    { title: 'XState', desc: 'State machines and statecharts for the modern web.', cat: 'Web Dev', link: 'https://github.com/statelyai/xstate' },
+    { title: 'Immer', desc: 'Create the next immutable state by mutating the current one', cat: 'Web Dev', link: 'https://github.com/immerjs/immer' },
+    { title: 'RxJS', desc: 'A reactive programming library for JavaScript', cat: 'Web Dev', link: 'https://github.com/ReactiveX/rxjs' },
+    { title: 'Lodash', desc: 'A modern JavaScript utility library delivering modularity, performance, & extras.', cat: 'Web Dev', link: 'https://github.com/lodash/lodash' },
+    { title: 'Ramda', desc: 'Practical functional Javascript', cat: 'Web Dev', link: 'https://github.com/ramda/ramda' },
+    { title: 'Moment.js', desc: 'Parse, validate, manipulate, and display dates in javascript.', cat: 'Web Dev', link: 'https://github.com/moment/moment' },
+    { title: 'Date-fns', desc: 'Modern JavaScript date utility library', cat: 'Web Dev', link: 'https://github.com/date-fns/date-fns' },
+    { title: 'Day.js', desc: '2KB immutable date-time library alternative to Moment.js', cat: 'Web Dev', link: 'https://github.com/iamkun/dayjs' },
+    { title: 'Axios', desc: 'Promise based HTTP client for the browser and node.js', cat: 'Web Dev', link: 'https://github.com/axios/axios' },
+    { title: 'Ky', desc: 'Tiny & elegant HTTP client based on the browser Fetch API', cat: 'Web Dev', link: 'https://github.com/sindresorhus/ky' },
+    { title: 'Superagent', desc: 'Ajax with less suck - (and node.js HTTP client to match)', cat: 'Web Dev', link: 'https://github.com/ladjs/superagent' },
+    { title: 'Parcel', desc: 'The zero configuration build tool for the web.', cat: 'Web Dev', link: 'https://github.com/parcel-bundler/parcel' },
+    { title: 'Rollup', desc: 'Next-generation ES module bundler', cat: 'Web Dev', link: 'https://github.com/rollup/rollup' },
+    { title: 'Esbuild', desc: 'An extremely fast JavaScript and CSS bundler and minifier.', cat: 'Web Dev', link: 'https://github.com/evanw/esbuild' },
+    { title: 'SWC', desc: 'Rust-based platform for the Web', cat: 'Web Dev', link: 'https://github.com/swc-project/swc' },
+    { title: 'Turbopack', desc: 'An incremental bundler optimized for JavaScript and TypeScript', cat: 'Web Dev', link: 'https://github.com/vercel/turbo' },
+    { title: 'Rome / Biome', desc: 'A toolchain for web projects, aimed to provide functionality to maintain them.', cat: 'Web Dev', link: 'https://github.com/biomejs/biome' },
+    { title: 'Prettier', desc: 'Prettier is an opinionated code formatter.', cat: 'Web Dev', link: 'https://github.com/prettier/prettier' },
+    { title: 'JAX', desc: 'Composable transformations of Python+NumPy programs: differentiate, vectorize, JIT to GPU/TPU', cat: 'AI/ML', link: 'https://github.com/google/jax' },
+    { title: 'Flax', desc: 'A neural network library and ecosystem for JAX', cat: 'AI/ML', link: 'https://github.com/google/flax' },
+    { title: 'Haiku', desc: 'JAX-based neural network library', cat: 'AI/ML', link: 'https://github.com/deepmind/dm-haiku' },
+    { title: 'Optax', desc: 'Gradient processing and optimization library for JAX', cat: 'AI/ML', link: 'https://github.com/deepmind/optax' },
+    { title: 'FastAPI (AI use)', desc: 'Often used for serving ML models quickly.', cat: 'AI/ML', link: 'https://github.com/tiangolo/fastapi' },
+    { title: 'BentoML', desc: 'Build Reliable, Scalable, and Cost-Efficient AI Applications', cat: 'AI/ML', link: 'https://github.com/bentoml/BentoML' },
+    { title: 'Ray Serve', desc: 'Scalable model serving library', cat: 'AI/ML', link: 'https://github.com/ray-project/ray' },
+    { title: 'Seldon Core', desc: 'An MLOps framework to package, deploy, monitor and manage thousands of production ML models', cat: 'AI/ML', link: 'https://github.com/SeldonIO/seldon-core' },
+    { title: 'Kubeflow', desc: 'Machine Learning Toolkit for Kubernetes', cat: 'AI/ML', link: 'https://github.com/kubeflow/kubeflow' },
+    { title: 'TFX', desc: 'TensorFlow Extended (TFX) is an end-to-end platform for deploying production ML pipelines', cat: 'AI/ML', link: 'https://github.com/tensorflow/tfx' },
+    { title: 'CatBoost', desc: 'A fast, scalable, high performance Gradient Boosting on Decision Trees library', cat: 'AI/ML', link: 'https://github.com/catboost/catboost' },
+    { title: 'Prophet', desc: 'Tool for producing high quality forecasts for time series data', cat: 'AI/ML', link: 'https://github.com/facebook/prophet' },
+    { title: 'Statsmodels', desc: 'Statistical modeling and econometrics in Python', cat: 'AI/ML', link: 'https://github.com/statsmodels/statsmodels' },
+    { title: 'PyMC', desc: 'Probabilistic Programming in Python: Bayesian Modeling and Probabilistic Machine Learning', cat: 'AI/ML', link: 'https://github.com/pymc-devs/pymc' },
+    { title: 'Tesseract', desc: 'Tesseract Open Source OCR Engine', cat: 'AI/ML', link: 'https://github.com/tesseract-ocr/tesseract' },
+    { title: 'EasyOCR', desc: 'Ready-to-use OCR with 80+ supported languages and all popular writing scripts', cat: 'AI/ML', link: 'https://github.com/JaidedAI/EasyOCR' },
+    { title: 'Detectron2', desc: 'Detectron2 is a platform for object detection, segmentation and other visual recognition tasks', cat: 'AI/ML', link: 'https://github.com/facebookresearch/detectron2' },
+    { title: 'MMDetection', desc: 'OpenMMLab Detection Toolbox and Benchmark', cat: 'AI/ML', link: 'https://github.com/open-mmlab/mmdetection' },
+    { title: 'MediaPipe', desc: 'Cross-platform, customizable ML solutions for live and streaming media', cat: 'AI/ML', link: 'https://github.com/google/mediapipe' },
+    { title: 'DeepFace', desc: 'A Lightweight Face Recognition and Facial Attribute Analysis Library for Python', cat: 'AI/ML', link: 'https://github.com/serengil/deepface' },
+    { title: 'Gensim', desc: 'Topic Modelling for Humans', cat: 'AI/ML', link: 'https://github.com/piskvorky/gensim' },
+    { title: 'AllenNLP', desc: 'An open-source NLP research library, built on PyTorch', cat: 'AI/ML', link: 'https://github.com/allenai/allennlp' },
+    { title: 'Stanza', desc: 'Official Stanford NLP Python Library for Many Human Languages', cat: 'AI/ML', link: 'https://github.com/stanfordnlp/stanza' },
+    { title: 'Fairseq', desc: 'A sequence modeling toolkit that allows researchers to train custom models', cat: 'AI/ML', link: 'https://github.com/facebookresearch/fairseq' },
+    { title: 'ESPnet', desc: 'End-to-End Speech Processing Toolkit', cat: 'AI/ML', link: 'https://github.com/espnet/espnet' },
+    { title: 'SpeechBrain', desc: 'A PyTorch-based Speech Toolkit', cat: 'AI/ML', link: 'https://github.com/speechbrain/speechbrain' },
+    { title: 'Librosa', desc: 'Python library for audio and music analysis', cat: 'AI/ML', link: 'https://github.com/librosa/librosa' },
+    { title: 'Stable Baselines3', desc: 'PyTorch version of Stable Baselines, reliable implementations of reinforcement learning algorithms', cat: 'AI/ML', link: 'https://github.com/DLR-RM/stable-baselines3' },
+    { title: 'RLlib', desc: 'Industry-grade reinforcement learning library', cat: 'AI/ML', link: 'https://github.com/ray-project/ray/tree/master/rllib' },
+    { title: 'PettingZoo', desc: 'An API standard for multi-agent reinforcement learning', cat: 'AI/ML', link: 'https://github.com/Farama-Foundation/PettingZoo' },
+    { title: 'Optuna', desc: 'A hyperparameter optimization framework', cat: 'AI/ML', link: 'https://github.com/optuna/optuna' },
+    { title: 'Hyperopt', desc: 'Distributed Asynchronous Hyperparameter Optimization', cat: 'AI/ML', link: 'https://github.com/hyperopt/hyperopt' },
+    { title: 'Dask', desc: 'Parallel computing with task scheduling', cat: 'AI/ML', link: 'https://github.com/dask/dask' },
+    { title: 'Vaex', desc: 'Out-of-Core DataFrames for Python, ML, visualization', cat: 'AI/ML', link: 'https://github.com/vaexio/vaex' },
+    { title: 'Modin', desc: 'Speed up your Pandas workflows by changing a single line of code', cat: 'AI/ML', link: 'https://github.com/modin-project/modin' },
+    { title: 'Polars', desc: 'Fast multi-threaded, hybrid-streaming DataFrame library', cat: 'AI/ML', link: 'https://github.com/pola-rs/polars' },
+    { title: 'DuckDB', desc: 'DuckDB is an in-process SQL OLAP Database Management System', cat: 'AI/ML', link: 'https://github.com/duckdb/duckdb' },
+    { title: 'Apache Spark', desc: 'Apache Spark - A unified analytics engine for large-scale data processing', cat: 'AI/ML', link: 'https://github.com/apache/spark' },
+    { title: 'Apache Flink', desc: 'Apache Flink', cat: 'AI/ML', link: 'https://github.com/apache/flink' },
+    { title: 'Apache Kafka', desc: 'Mirror of Apache Kafka', cat: 'AI/ML', link: 'https://github.com/apache/kafka' },
+    { title: 'Snort', desc: 'Snort - Network Intrusion Detection and Prevention System', cat: 'Cybersecurity', link: 'https://github.com/snort3/snort3' },
+    { title: 'Zeek', desc: 'Zeek is a powerful network analysis framework', cat: 'Cybersecurity', link: 'https://github.com/zeek/zeek' },
+    { title: 'OSSEC', desc: 'OSSEC is a full platform to monitor and control your systems', cat: 'Cybersecurity', link: 'https://github.com/ossec/ossec-hids' },
+    { title: 'Security Onion', desc: 'Linux distro for intrusion detection, enterprise security monitoring, and log management', cat: 'Cybersecurity', link: 'https://github.com/Security-Onion-Solutions/securityonion' },
+    { title: 'MISP', desc: 'MISP (core software) - Open Source Threat Intelligence and Sharing Platform', cat: 'Cybersecurity', link: 'https://github.com/MISP/MISP' },
+    { title: 'TheHive', desc: 'A Scalable, Open Source and Free Security Incident Response Platform', cat: 'Cybersecurity', link: 'https://github.com/TheHive-Project/TheHive' },
+    { title: 'Cortex', desc: 'Powerful Observable Analysis and Active Response Engine', cat: 'Cybersecurity', link: 'https://github.com/TheHive-Project/Cortex' },
+    { title: 'YARA', desc: 'The pattern matching swiss knife', cat: 'Cybersecurity', link: 'https://github.com/VirusTotal/yara' },
+    { title: 'Sigma', desc: 'Generic Signature Format for SIEM Systems', cat: 'Cybersecurity', link: 'https://github.com/SigmaHQ/sigma' },
+    { title: 'Volatility', desc: 'An advanced memory forensics framework', cat: 'Cybersecurity', link: 'https://github.com/volatilityfoundation/volatility3' },
+    { title: 'Rekall', desc: 'Memory Forensic Framework', cat: 'Cybersecurity', link: 'https://github.com/google/rekall' },
+    { title: 'Autopsy', desc: 'Autopsy is a digital forensics platform and graphical interface to The Sleuth Kit', cat: 'Cybersecurity', link: 'https://github.com/sleuthkit/autopsy' },
+    { title: 'The Sleuth Kit', desc: 'The Sleuth Kit (TSK) is a library and collection of command line digital forensics tools', cat: 'Cybersecurity', link: 'https://github.com/sleuthkit/sleuthkit' },
+    { title: 'Cuckoo Sandbox', desc: 'Cuckoo Sandbox is an automated dynamic malware analysis system', cat: 'Cybersecurity', link: 'https://github.com/cuckoosandbox/cuckoo' },
+    { title: 'CAPE Sandbox', desc: 'Malware Configuration And Payload Extraction', cat: 'Cybersecurity', link: 'https://github.com/kevoreilly/CAPEv2' },
+    { title: 'Ghidra (Scripts)', desc: 'Community scripts for Ghidra', cat: 'Cybersecurity', link: 'https://github.com/NationalSecurityAgency/ghidra/tree/master/Ghidra/Features/Python/ghidra_scripts' },
+    { title: 'Cutter', desc: 'Free and Open Source Reverse Engineering Platform powered by rizin', cat: 'Cybersecurity', link: 'https://github.com/rizinorg/cutter' },
+    { title: 'Rizin', desc: 'UNIX-like reverse engineering framework and command-line toolset', cat: 'Cybersecurity', link: 'https://github.com/rizinorg/rizin' },
+    { title: 'x64dbg', desc: 'An open-source x64/x32 debugger for windows', cat: 'Cybersecurity', link: 'https://github.com/x64dbg/x64dbg' },
+    { title: 'Frida', desc: 'Clone this repo to build Frida', cat: 'Cybersecurity', link: 'https://github.com/frida/frida' },
+    { title: 'MobSF', desc: 'Mobile Security Framework is an automated, all-in-one mobile application pen-testing tool', cat: 'Cybersecurity', link: 'https://github.com/MobSF/Mobile-Security-Framework-MobSF' },
+    { title: 'Drozer', desc: 'The Leading Security Assessment Framework for Android.', cat: 'Cybersecurity', link: 'https://github.com/WithSecureLabs/drozer' },
+    { title: 'Needle', desc: 'The iOS Security Testing Framework', cat: 'Cybersecurity', link: 'https://github.com/WithSecureLabs/needle' },
+    { title: 'Objection', desc: 'Runtime Mobile Exploration', cat: 'Cybersecurity', link: 'https://github.com/sensepost/objection' },
+    { title: 'Kube-bench', desc: 'Checks whether Kubernetes is deployed according to security best practices', cat: 'Cybersecurity', link: 'https://github.com/aquasecurity/kube-bench' },
+    { title: 'Kube-hunter', desc: 'Hunt for security weaknesses in Kubernetes clusters', cat: 'Cybersecurity', link: 'https://github.com/aquasecurity/kube-hunter' },
+    { title: 'Trivy', desc: 'Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repos, clouds', cat: 'Cybersecurity', link: 'https://github.com/aquasecurity/trivy' },
+    { title: 'Checkov', desc: 'Prevent cloud misconfigurations and find vulnerabilities during build-time in infrastructure as code', cat: 'Cybersecurity', link: 'https://github.com/bridgecrewio/checkov' },
+    { title: 'ScoutSuite', desc: 'Multi-Cloud Security Auditing Tool', cat: 'Cybersecurity', link: 'https://github.com/nccgroup/ScoutSuite' },
+    { title: 'Prowler', desc: 'Prowler is an Open Source security tool to perform AWS, GCP and Azure security best practices assessments', cat: 'Cybersecurity', link: 'https://github.com/prowler-cloud/prowler' },
+    { title: 'Redux Toolkit', desc: 'The official, opinionated, batteries-included toolset for efficient Redux development', cat: 'Mobile', link: 'https://github.com/reduxjs/redux-toolkit' },
+    { title: 'React Native Elements', desc: 'Cross-Platform React Native UI Toolkit', cat: 'Mobile', link: 'https://github.com/react-native-elements/react-native-elements' },
+    { title: 'NativeBase', desc: 'Mobile-first, accessible components for React Native & Web', cat: 'Mobile', link: 'https://github.com/GeekyAnts/NativeBase' },
+    { title: 'React Native Paper', desc: 'Material Design for React Native', cat: 'Mobile', link: 'https://github.com/callstack/react-native-paper' },
+    { title: 'WatermelonDB (Mobile)', desc: 'Reactive & asynchronous database for powerful React and React Native apps', cat: 'Mobile', link: 'https://github.com/Nozbe/WatermelonDB' },
+    { title: 'Lottie-React-Native', desc: 'Lottie wrapper for React Native', cat: 'Mobile', link: 'https://github.com/lottie-react-native/lottie-react-native' },
+    { title: 'React Native Vector Icons', desc: 'Customizable Icons for React Native', cat: 'Mobile', link: 'https://github.com/oblador/react-native-vector-icons' },
+    { title: 'React Native Maps', desc: 'React Native Mapview component', cat: 'Mobile', link: 'https://github.com/react-native-maps/react-native-maps' },
+    { title: 'React Native Firebase', desc: 'A well-tested, feature-rich modular Firebase implementation for React Native', cat: 'Mobile', link: 'https://github.com/invertase/react-native-firebase' },
+    { title: 'React Native Camera', desc: 'A Camera component for React Native. Also supports barcode scanning!', cat: 'Mobile', link: 'https://github.com/react-native-camera/react-native-camera' },
+    { title: 'Bloc', desc: 'A predictable state management library that helps implement the BLoC design pattern', cat: 'Mobile', link: 'https://github.com/felangel/bloc' },
+    { title: 'Provider', desc: 'InheritedWidget, but simple', cat: 'Mobile', link: 'https://github.com/rrousselGit/provider' },
+    { title: 'Riverpod', desc: 'A reactive caching and data-binding framework', cat: 'Mobile', link: 'https://github.com/rrousselGit/riverpod' },
+    { title: 'GetX', desc: 'Open source library for Flutter to handle state management, dependency injection, and route management', cat: 'Mobile', link: 'https://github.com/jonataslaw/getx' },
+    { title: 'Dio', desc: 'A powerful Http client for Dart', cat: 'Mobile', link: 'https://github.com/cfug/dio' },
+    { title: 'Hive', desc: 'Lightweight and blazing fast key-value database written in pure Dart.', cat: 'Mobile', link: 'https://github.com/isar/hive' },
+    { title: 'Isar', desc: 'Extremely fast, easy to use, and fully async NoSQL database for Flutter', cat: 'Mobile', link: 'https://github.com/isar/isar' },
+    { title: 'Sqflite', desc: 'SQLite flutter plugin', cat: 'Mobile', link: 'https://github.com/tekartik/sqflite' },
+    { title: 'FlutterFire', desc: 'A collection of Firebase plugins for Flutter apps', cat: 'Mobile', link: 'https://github.com/firebase/flutterfire' },
+    { title: 'Cached Network Image', desc: 'Flutter library to load and cache network images.', cat: 'Mobile', link: 'https://github.com/Baseflow/flutter_cached_network_image' },
+    { title: 'Dagger', desc: 'A fast dependency injector for Android and Java.', cat: 'Mobile', link: 'https://github.com/google/dagger' },
+    { title: 'Hilt', desc: 'Dependency injection library for Android that reduces the boilerplate of doing manual dependency injection', cat: 'Mobile', link: 'https://github.com/google/dagger' },
+    { title: 'Coroutines', desc: 'Library support for Kotlin coroutines', cat: 'Mobile', link: 'https://github.com/Kotlin/kotlinx.coroutines' },
+    { title: 'Room', desc: 'The Room persistence library provides an abstraction layer over SQLite', cat: 'Mobile', link: 'https://developer.android.com/training/data-storage/room' },
+    { title: 'Moya', desc: 'Network abstraction layer written in Swift.', cat: 'Mobile', link: 'https://github.com/Moya/Moya' },
+    { title: 'SwiftyJSON', desc: 'The better way to deal with JSON data in Swift.', cat: 'Mobile', link: 'https://github.com/SwiftyJSON/SwiftyJSON' },
+    { title: 'PromiseKit', desc: 'Promises for Swift & ObjC.', cat: 'Mobile', link: 'https://github.com/mxcl/PromiseKit' },
+    { title: 'Iguana', desc: 'An open source mobile app development tool', cat: 'Mobile', link: 'https://github.com/mac-c/Iguana' },
+    { title: 'Bitrise', desc: 'Mobile Continuous Integration and Delivery', cat: 'Mobile', link: 'https://github.com/bitrise-io/bitrise' },
+    { title: 'CodePush', desc: 'A cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users\' devices.', cat: 'Mobile', link: 'https://github.com/microsoft/code-push' },
+    { title: 'OpenFaaS', desc: 'Serverless Functions Made Simple', cat: 'DevOps', link: 'https://github.com/openfaas/faas' },
+    { title: 'Serverless Framework', desc: 'Build applications on AWS Lambda and other next-gen cloud services', cat: 'DevOps', link: 'https://github.com/serverless/serverless' },
+    { title: 'Knative', desc: 'Kubernetes-based platform to build, deploy, and manage modern serverless workloads', cat: 'DevOps', link: 'https://github.com/knative/serving' },
+    { title: 'OpenWhisk', desc: 'Apache OpenWhisk is a serverless, open source cloud platform', cat: 'DevOps', link: 'https://github.com/apache/openwhisk' },
+    { title: 'Fission', desc: 'Fast and Simple Serverless Functions for Kubernetes', cat: 'DevOps', link: 'https://github.com/fission/fission' },
+    { title: 'Kubeless', desc: 'Kubernetes Native Serverless Framework', cat: 'DevOps', link: 'https://github.com/vmware-archive/kubeless' },
+    { title: 'Nuclio', desc: 'High-Performance Serverless event and data processing platform', cat: 'DevOps', link: 'https://github.com/nuclio/nuclio' },
+    { title: 'KEDA', desc: 'Kubernetes-based Event Driven Autoscaling', cat: 'DevOps', link: 'https://github.com/kedacore/keda' },
+    { title: 'Tekton', desc: 'A Kubernetes-native framework for creating CI/CD systems', cat: 'DevOps', link: 'https://github.com/tektoncd/pipeline' },
+    { title: 'Spinnaker', desc: 'Spinnaker is an open source, multi-cloud continuous delivery platform', cat: 'DevOps', link: 'https://github.com/spinnaker/spinnaker' },
+    { title: 'Flux', desc: 'Open and extensible continuous delivery solution for Kubernetes', cat: 'DevOps', link: 'https://github.com/fluxcd/flux2' },
+    { title: 'Crossplane', desc: 'Cloud Native Control Planes', cat: 'DevOps', link: 'https://github.com/crossplane/crossplane' },
+    { title: 'CDK', desc: 'AWS Cloud Development Kit', cat: 'DevOps', link: 'https://github.com/aws/aws-cdk' },
+    { title: 'Terragrunt', desc: 'Terragrunt is a thin wrapper for Terraform that provides extra tools', cat: 'DevOps', link: 'https://github.com/gruntwork-io/terragrunt' },
+    { title: 'Atlantis', desc: 'Terraform Pull Request Automation', cat: 'DevOps', link: 'https://github.com/runatlantis/atlantis' },
+    { title: 'Checkov (DevOps)', desc: 'Static code analysis tool for infrastructure-as-code', cat: 'DevOps', link: 'https://github.com/bridgecrewio/checkov' },
+    { title: 'TFSec', desc: 'Security scanner for your Terraform code', cat: 'DevOps', link: 'https://github.com/aquasecurity/tfsec' },
+    { title: 'Infracost', desc: 'Cloud cost estimates for Terraform in pull requests', cat: 'DevOps', link: 'https://github.com/infracost/infracost' },
+    { title: 'K9s', desc: 'Kubernetes CLI To Manage Your Clusters In Style', cat: 'DevOps', link: 'https://github.com/derailed/k9s' },
+    { title: 'Lens', desc: 'Lens - The Kubernetes IDE', cat: 'DevOps', link: 'https://github.com/lensapp/lens' },
+    { title: 'Helmfile', desc: 'Declarative spec for deploying helm charts', cat: 'DevOps', link: 'https://github.com/helmfile/helmfile' },
+    { title: 'Skaffold', desc: 'Easy and Repeatable Kubernetes Development', cat: 'DevOps', link: 'https://github.com/GoogleContainerTools/skaffold' },
+    { title: 'Tilt', desc: 'A multi-service dev environment for teams on Kubernetes', cat: 'DevOps', link: 'https://github.com/tilt-dev/tilt' },
+    { title: 'Telepresence', desc: 'Local development against a remote Kubernetes or OpenShift cluster', cat: 'DevOps', link: 'https://github.com/telepresenceio/telepresence' },
+    { title: 'Velero', desc: 'Backup and migrate Kubernetes applications and their persistent volumes', cat: 'DevOps', link: 'https://github.com/vmware-tanzu/velero' },
+    { title: 'Cert-Manager', desc: 'Automatically provision and manage TLS certificates in Kubernetes', cat: 'DevOps', link: 'https://github.com/cert-manager/cert-manager' },
+    { title: 'External-DNS', desc: 'Configure external DNS servers (AWS Route53, Google CloudDNS and others) for Kubernetes Ingresses and Services', cat: 'DevOps', link: 'https://github.com/kubernetes-sigs/external-dns' },
+    { title: 'Promtail', desc: 'Agent which ships the contents of local logs to a private Grafana Loki instance', cat: 'DevOps', link: 'https://github.com/grafana/loki/tree/main/clients/cmd/promtail' },
+    { title: 'Fluentd', desc: 'Fluentd: Unified Logging Layer', cat: 'DevOps', link: 'https://github.com/fluent/fluentd' },
+    { title: 'Fluent Bit', desc: 'Fast and Lightweight Logs and Metrics processor for Linux, BSD, OSX and Windows', cat: 'DevOps', link: 'https://github.com/fluent/fluent-bit' },
+    { title: 'Storybook (UI)', desc: 'Build UI components and pages in isolation', cat: 'UI/UX', link: 'https://github.com/storybookjs/storybook' },
+    { title: 'Lottie', desc: 'Render After Effects animations natively on Web, Android and iOS', cat: 'UI/UX', link: 'https://github.com/airbnb/lottie-web' },
+    { title: 'GSAP (UI)', desc: 'Professional-grade JavaScript animation for the modern web', cat: 'UI/UX', link: 'https://github.com/greensock/GSAP' },
+    { title: 'Framer Motion (UI)', desc: 'Open source, production-ready animation and gesture library for React', cat: 'UI/UX', link: 'https://github.com/framer/motion' },
+    { title: 'React Spring', desc: 'A spring physics based React animation library', cat: 'UI/UX', link: 'https://github.com/pmndrs/react-spring' },
+    { title: 'Anime.js', desc: 'JavaScript animation engine', cat: 'UI/UX', link: 'https://github.com/juliangarnier/anime' },
+    { title: 'Three.js (UI)', desc: 'JavaScript 3D Library', cat: 'UI/UX', link: 'https://github.com/mrdoob/three.js' },
+    { title: 'React Three Fiber', desc: 'A React renderer for Three.js', cat: 'UI/UX', link: 'https://github.com/pmndrs/react-three-fiber' },
+    { title: 'Drei', desc: 'Useful helpers for react-three-fiber', cat: 'UI/UX', link: 'https://github.com/pmndrs/drei' },
+    { title: 'Spline', desc: '3D Design tool in the browser', cat: 'UI/UX', link: 'https://spline.design' },
+    { title: 'Rive', desc: 'Interactive animations for all platforms', cat: 'UI/UX', link: 'https://rive.app' },
+    { title: 'Figma', desc: 'The collaborative interface design tool.', cat: 'UI/UX', link: 'https://figma.com' },
+    { title: 'Framer', desc: 'The web builder for creative pros.', cat: 'UI/UX', link: 'https://framer.com' },
+    { title: 'Webflow', desc: 'Create custom websites visually.', cat: 'UI/UX', link: 'https://webflow.com' },
+    { title: 'Material Design', desc: 'Build beautiful, usable products faster.', cat: 'UI/UX', link: 'https://m3.material.io' },
+    { title: 'Apple Human Interface Guidelines', desc: 'In-depth information and UI resources for designing great apps.', cat: 'UI/UX', link: 'https://developer.apple.com/design/human-interface-guidelines/' },
+    { title: 'IBM Carbon Design System', desc: 'Carbon is IBM’s open source design system for products and digital experiences.', cat: 'UI/UX', link: 'https://carbondesignsystem.com' },
+    { title: 'Atlassian Design System', desc: 'Use Atlassian’s end-to-end design language to create simple, intuitive and beautiful experiences.', cat: 'UI/UX', link: 'https://atlassian.design' },
+    { title: 'Shopify Polaris', desc: 'Our design system helps us work together to build a great experience for all of Shopify’s merchants.', cat: 'UI/UX', link: 'https://polaris.shopify.com' },
+    { title: 'GitLab Pajamas', desc: 'The GitLab design system', cat: 'UI/UX', link: 'https://design.gitlab.com' }
+  ];
+
+  const grid = document.getElementById('resources-grid');
+  let arsenal = JSON.parse(localStorage.getItem('atlas_arsenal')) || [];
+  
+  function renderResources(items) {
+    if (items.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-2);"><div style="font-size:40px; margin-bottom:16px;">🔍</div><div style="font-size:18px; font-weight:500;">No resources found</div><div style="font-size:14px; margin-top:8px; opacity:0.6;">Try a different search or category.</div></div>`;
+      return;
+    }
+    grid.innerHTML = items.map((r, i) => {
+      const isSaved = arsenal.some(saved => saved.title === r.title);
+      return `
+      <div class="resource-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div class="badge badge-primary">${r.cat}</div>
+          <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave('${r.title}', '${r.link}', this)">${isSaved ? '✓ Saved' : '+ Save'}</button>
+        </div>
+        <h3 class="resource-title" style="margin-top: 16px;">${r.title}</h3>
+        <p class="resource-desc">${r.desc}</p>
+        <a href="${r.link}" target="_blank" class="resource-link">Access Resource →</a>
+      </div>
+    `}).join('');
+  }
+
+  renderResources(resources);
+
+  // Filters
+  let activeCategory = 'all';
+  const tabs = document.querySelectorAll('.filter-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeCategory = tab.dataset.cat;
+      const searchQ = document.getElementById('search-input').value.toLowerCase();
+      let filtered = activeCategory === 'all' ? resources : resources.filter(r => r.cat === activeCategory);
+      if (searchQ) filtered = filtered.filter(r => r.title.toLowerCase().includes(searchQ) || r.desc.toLowerCase().includes(searchQ));
+      renderResources(filtered);
+    });
+  });
+
+  
+  // --- ARSENAL LOGIC ---
+  
+  function updateArsenalCount() {
+    document.getElementById('arsenal-count').innerText = arsenal.length;
+  }
+  
+  function toggleSave(title, link, btnEl) {
+    const existsIndex = arsenal.findIndex(r => r.title === title);
+    if (existsIndex > -1) {
+      arsenal.splice(existsIndex, 1);
+      btnEl.classList.remove('saved');
+      btnEl.innerText = '+ Save';
+    } else {
+      arsenal.push({ title, link });
+      btnEl.classList.add('saved');
+      btnEl.innerText = '✓ Saved';
+    }
+    localStorage.setItem('atlas_arsenal', JSON.stringify(arsenal));
+    updateArsenalCount();
+    renderArsenalList();
+  }
+  
+  function toggleArsenal() {
+    const modal = document.getElementById('arsenal-modal');
+    if (modal.style.display === 'none' || modal.style.display === '') {
+      modal.style.display = 'flex';
+      renderArsenalList();
+    } else {
+      modal.style.display = 'none';
+    }
+  }
+  
+  function clearArsenal() {
+    arsenal = [];
+    localStorage.removeItem('atlas_arsenal');
+    updateArsenalCount();
+    renderArsenalList();
+    renderResources(activeCategory === 'all' ? resources : resources.filter(r => r.cat === activeCategory));
+  }
+  
+  function renderArsenalList() {
+    const list = document.getElementById('arsenal-list');
+    if (arsenal.length === 0) {
+      list.innerHTML = '<div style="color:#888; font-size:14px; text-align:center; padding:40px 0;">Your arsenal is empty. Save resources to build your stack.</div>';
+      return;
+    }
+    list.innerHTML = arsenal.map(r => `
+      <div style="padding: 16px; background: #faf9f6; border: 1px solid #eaeaea; border-radius: 8px;">
+        <div style="font-weight: 600; font-size: 15px; margin-bottom: 8px;">${r.title}</div>
+        <a href="${r.link}" target="_blank" style="font-size: 13px; color: #0070f3; text-decoration: none; font-weight: 500;">Access →</a>
+      </div>
+    `).join('');
+  }
+  
+  updateArsenalCount();
+
+
+  // --- TERMINAL LIBRARIAN & CHEAT SHEETS ---
+  const termInput = document.getElementById('search-input');
+  const termOutput = document.getElementById('terminal-output');
+  
+  const cheatSheets = {
+    'lookup react': `<span style="color:#60a5fa">React.js Quick Ref:</span><br>• useState: const [state, setState] = useState(initial)<br>• useEffect: useEffect(() => { /* run */ }, [deps])<br>• Props: Passed down from parent to child.<br><span style="color:#10b981">System Recommendation:</span> Focus on unidirectional data flow.`,
+    'lookup flexbox': `<span style="color:#c084fc">CSS Flexbox Quick Ref:</span><br>• display: flex<br>• justify-content: center | space-between | flex-start<br>• align-items: center | stretch<br>• flex-direction: row | column<br><span style="color:#10b981">System Recommendation:</span> Always use flexbox for 1D layouts.`,
+    'lookup git': `<span style="color:#fbbf24">Git Quick Ref:</span><br>• git status<br>• git add .<br>• git commit -m "msg"<br>• git push origin main<br><span style="color:#10b981">System Recommendation:</span> Commit often. Push working code.`
+  };
+
+  termInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    
+    // Check if it's a cheat sheet command
+    if (cheatSheets[q]) {
+      termOutput.style.display = 'block';
+      termOutput.innerHTML = cheatSheets[q];
+      renderResources([]); // Hide resources to focus on terminal
+      return;
+    } 
+    
+    // Librarian AI NLP Simulation
+    if (q.includes('want to build') || q.includes('how to build')) {
+      termOutput.style.display = 'block';
+      let recs = [];
+      if (q.includes('ios') || q.includes('android') || q.includes('mobile') || q.includes('app')) {
+        termOutput.innerHTML = `> Natural Language Protocol Engaged.<br>> Analysis: You wish to construct a mobile application.<br>> <span style="color:#10b981">LIBRARIAN RECOMMENDATION:</span> Proceed to 'Flutter Dev' or React Native documentation. Filtering grid now...`;
+        recs = resources.filter(r => r.cat === 'Mobile');
+      } else if (q.includes('ai') || q.includes('bot') || q.includes('machine learning')) {
+        termOutput.innerHTML = `> Natural Language Protocol Engaged.<br>> Analysis: You wish to train neural networks.<br>> <span style="color:#10b981">LIBRARIAN RECOMMENDATION:</span> Study 'PyTorch Tutorials' and 'Hugging Face'. Filtering grid now...`;
+        recs = resources.filter(r => r.cat === 'AI/ML');
+      } else {
+        termOutput.innerHTML = `> Natural Language Protocol Engaged.<br>> Analysis: Standard web application.<br>> <span style="color:#10b981">LIBRARIAN RECOMMENDATION:</span> Begin with MDN Web Docs and React. Filtering grid now...`;
+        recs = resources.filter(r => r.cat === 'Web Dev');
+      }
+      renderResources(recs);
+      return;
+    }
+    
+    // Standard Search
+    termOutput.style.display = 'none';
+    let filtered = activeCategory === 'all' ? resources : resources.filter(r => r.cat === activeCategory);
+    if (q) filtered = filtered.filter(r =>
+      r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q)
+    );
+    renderResources(filtered);
+  });
+
+
+  // --- TECH TREE PROGRESSION ---
+  function initTechTree() {
+    const milestones = document.querySelectorAll('.milestone');
+    milestones.forEach((m, idx) => {
+      // Modify HTML to include a checkbox
+      const originalTitle = m.querySelector('.milestone-title').innerText;
+      const originalDesc = m.querySelector('.milestone-desc').innerText;
+      
+      const isSaved = localStorage.getItem('techtree_' + idx) === 'true';
+      
+      m.innerHTML = `
+        <div class="tech-tree-node ${isSaved ? 'tree-node-active' : ''}" onclick="toggleTreeNode(this, ${idx})">
+          <div class="tree-checkbox"></div>
+          <div>
+            <div class="milestone-title" style="font-weight: 600; font-size: 18px; margin-bottom: 4px;">${originalTitle}</div>
+            <div class="milestone-desc" style="color: var(--text3); font-size: 14px;">${originalDesc}</div>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  function toggleTreeNode(el, idx) {
+    const isActive = el.classList.toggle('tree-node-active');
+    localStorage.setItem('techtree_' + idx, isActive ? 'true' : 'false');
+  }
+
+  // Call initTechTree on load
+  initTechTree();
+
+
