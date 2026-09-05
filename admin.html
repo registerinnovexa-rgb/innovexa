@@ -812,6 +812,16 @@
       <span id="modQueueBadge" style="display:none;position:absolute;top:6px;right:8px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.4;"></span>
     </button>
 
+    <button class="sidebar-btn" onclick="switchAdminTab('roleMgmt')" id="navRoleMgmt">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Role Manager
+    </button>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('attendance')" id="navAttendance">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      Attendance
+    </button>
+
   </div>
 
   <!-- Main Content -->
@@ -1951,6 +1961,326 @@
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- F-02: XP & BADGE AWARD ENGINE TAB                         -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tabXpBadges">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">⭐ XP & Badge Award Engine</h2>
+        <span style="font-size:13px;color:var(--text3);">Manually award or deduct XP, grant badges, view XP history.</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+
+        <!-- Grant / Deduct XP -->
+        <div class="admin-card">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">💰 Grant / Deduct XP</h3>
+          <div class="form-group">
+            <label>Operative ID</label>
+            <input type="text" id="xpOpId" placeholder="e.g. INVX-09" list="operativeList" class="form-input" style="width:100%;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>XP Amount</label>
+              <input type="number" id="xpAmount" placeholder="e.g. 150" min="1" max="9999" class="form-input" style="width:100%;">
+            </div>
+            <div class="form-group">
+              <label>Action</label>
+              <select id="xpAction" class="form-input" style="width:100%;padding:10px 14px;">
+                <option value="grant">➕ Grant XP</option>
+                <option value="deduct">➖ Deduct XP</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Reason (shown in audit log)</label>
+            <input type="text" id="xpReason" placeholder="e.g. Outstanding workshop participation" class="form-input" style="width:100%;">
+          </div>
+          <button onclick="awardXP()" class="btn-solid" style="width:100%;margin-top:4px;">⚡ Apply XP Change</button>
+          <div id="xpStatus" style="font-size:13px;margin-top:10px;font-weight:600;min-height:20px;"></div>
+        </div>
+
+        <!-- Badge Assignment -->
+        <div class="admin-card">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">🏅 Assign Badge</h3>
+          <div class="form-group">
+            <label>Operative ID</label>
+            <input type="text" id="badgeOpId" placeholder="e.g. INVX-09" list="operativeList" class="form-input" style="width:100%;">
+          </div>
+          <div class="form-group">
+            <label>Badge</label>
+            <select id="badgeSelect" class="form-input" style="width:100%;padding:10px 14px;">
+              <option value="🔥 Top Contributor">🔥 Top Contributor</option>
+              <option value="🏆 Champion">🏆 Champion</option>
+              <option value="⚡ Sprint King">⚡ Sprint King</option>
+              <option value="🛠 Builder">🛠 Builder</option>
+              <option value="🎯 Precision">🎯 Precision</option>
+              <option value="🌟 Rising Star">🌟 Rising Star</option>
+              <option value="🤝 Collaborator">🤝 Collaborator</option>
+              <option value="📚 Scholar">📚 Scholar</option>
+              <option value="🚀 Launcher">🚀 Launcher</option>
+              <option value="🔬 Researcher">🔬 Researcher</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Note (optional)</label>
+            <input type="text" id="badgeNote" placeholder="e.g. Won the Hackathon 2025" class="form-input" style="width:100%;">
+          </div>
+          <button onclick="assignBadge()" class="btn-solid" style="width:100%;margin-top:4px;background:#7c3aed;">🏅 Assign Badge</button>
+          <div id="badgeStatus" style="font-size:13px;margin-top:10px;font-weight:600;min-height:20px;"></div>
+        </div>
+      </div>
+
+      <!-- XP Leaderboard & History -->
+      <div class="admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">📊 XP Leaderboard</h3>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="xpLbSearch" placeholder="🔍 Filter by name or ID…" oninput="filterXpLeaderboard()" class="form-input" style="min-width:200px;">
+            <button onclick="exportXpCSV()" class="btn-export">⬇ Export CSV</button>
+          </div>
+        </div>
+        <div id="xpLeaderboardLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading leaderboard…</div>
+        <div class="table-wrap" id="xpLeaderboardTable" style="display:none;">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Operative ID</th><th>Name</th><th>Rank</th><th>XP</th><th>Actions</th></tr></thead>
+            <tbody id="xpLeaderboardBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- F-03: CERTIFICATE GENERATOR & TRACKER TAB                  -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tabCertGen">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">🏅 Certificate Generator & Tracker</h2>
+        <span style="font-size:13px;color:var(--text3);">Generate & download participation certificates. Track issued certs.</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+
+        <!-- Generator Panel -->
+        <div class="admin-card">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">📄 Generate Certificate</h3>
+          <div class="form-group">
+            <label>Certificate Type</label>
+            <select id="certGenType" class="form-input" style="width:100%;padding:10px 14px;" onchange="updateCertPreview()">
+              <option value="participation">🎟 Participation</option>
+              <option value="completion">✅ Course Completion</option>
+              <option value="achievement">🏆 Achievement</option>
+              <option value="appreciation">🤝 Appreciation</option>
+              <option value="internship">💼 Internship</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Member Name</label>
+            <input type="text" id="certGenName" placeholder="Full name" class="form-input" style="width:100%;" oninput="updateCertPreview()">
+          </div>
+          <div class="form-group">
+            <label>Operative ID (optional)</label>
+            <input type="text" id="certGenOpId" placeholder="e.g. INVX-09" list="operativeList" class="form-input" style="width:100%;" oninput="prefillCertFromId()">
+          </div>
+          <div class="form-group">
+            <label>Event / Session Name</label>
+            <input type="text" id="certGenEvent" placeholder="e.g. Forge Session #5 — AI Workshop" class="form-input" style="width:100%;" oninput="updateCertPreview()">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="certGenDate" class="form-input" style="width:100%;" oninput="updateCertPreview()">
+            </div>
+            <div class="form-group">
+              <label>Branch / Department</label>
+              <input type="text" id="certGenBranch" placeholder="CSE / ECE…" class="form-input" style="width:100%;">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button onclick="previewCertificate()" class="btn-solid" style="flex:1;">👁 Preview</button>
+            <button onclick="downloadCertificate()" class="btn-solid" style="flex:1;background:#059669;">⬇ Download PDF</button>
+            <button onclick="recordIssuedCert()" class="btn-solid" style="flex:1;background:#7c3aed;">📋 Record & Issue</button>
+          </div>
+          <div id="certGenStatus" style="font-size:13px;margin-top:10px;font-weight:600;min-height:20px;"></div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="admin-card" style="background:var(--bg3);">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">🖼 Live Preview</h3>
+          <div id="certGenPreview" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:28px;font-family:'Inter',sans-serif;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;">
+            <div style="font-size:13px;color:#888;">Fill in the form to see preview</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Issued Certificate Tracker -->
+      <div class="admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">📋 Issued Certificates</h3>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="certTrackerSearch" placeholder="🔍 Search by name or event…" oninput="filterCertTracker()" class="form-input" style="min-width:200px;">
+            <button onclick="loadIssuedCerts()" class="btn-export">↻ Refresh</button>
+          </div>
+        </div>
+        <div id="certTrackerLoading" style="text-align:center;padding:30px;color:var(--text3);">Click Refresh to load issued certificates…</div>
+        <div class="table-wrap" id="certTrackerTable" style="display:none;">
+          <table class="data-table">
+            <thead><tr><th>Issued On</th><th>Name</th><th>Op. ID</th><th>Type</th><th>Event</th><th>Actions</th></tr></thead>
+            <tbody id="certTrackerBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- F-06: CONTENT MODERATION QUEUE TAB                         -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tabModQueue">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">🚨 Content Moderation Queue</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="loadModQueue()" class="btn-add" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);">↻ Refresh</button>
+          <button onclick="approveAllMod()" class="btn-add" style="background:var(--green,#059669);">✅ Approve All Visible</button>
+        </div>
+      </div>
+
+      <!-- Keyword Blocklist -->
+      <div class="admin-card" style="margin-bottom:24px;">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">🚫 Keyword Blocklist</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <input type="text" id="blocklistInput" placeholder="Add keyword to block…" class="form-input" style="min-width:220px;" onkeydown="if(event.key==='Enter') addBlocklistWord()">
+          <button onclick="addBlocklistWord()" class="btn-solid">+ Add</button>
+        </div>
+        <div id="blocklistTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+        <select id="modTypeFilter" onchange="filterModQueue()" class="form-input" style="padding:9px 14px;">
+          <option value="">All Types</option>
+          <option value="forge_post">Forge Post</option>
+          <option value="feedback">Session Feedback</option>
+          <option value="sos">SOS Alert</option>
+        </select>
+        <select id="modStatusFilter" onchange="filterModQueue()" class="form-input" style="padding:9px 14px;">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending Review</option>
+          <option value="approved">Approved</option>
+          <option value="flagged">Flagged</option>
+        </select>
+        <input type="text" id="modSearch" placeholder="Search content…" oninput="filterModQueue()" class="form-input" style="min-width:200px;">
+        <button onclick="clearModFilters()" class="btn-export">✕ Clear</button>
+      </div>
+
+      <div id="modQueueLoading" style="text-align:center;padding:40px;color:var(--text3);">Click Refresh to load moderation queue…</div>
+      <div id="modQueueGrid" style="display:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;"></div>
+      <div id="modQueueEmpty" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="font-size:32px;margin-bottom:12px;">✅</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">Queue Clear</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:6px;">No content pending moderation.</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- F-01: ROLE & PERMISSION MANAGER TAB                        -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tabRoleMgmt">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">🔐 Role & Permission Manager</h2>
+        <span style="font-size:13px;color:var(--text3);">Configure what each rank can do across the platform (RBAC).</span>
+      </div>
+
+      <!-- Permission Matrix -->
+      <div class="admin-card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">⚙️ Permission Matrix</h3>
+          <div style="display:flex;gap:8px;">
+            <button onclick="loadRoleMgmtTab()" class="btn-export">↻ Refresh</button>
+            <button onclick="saveRolePermissions()" class="btn-solid">💾 Save All Permissions</button>
+          </div>
+        </div>
+        <div id="rolePermStatus" style="font-size:13px;font-weight:600;min-height:20px;margin-bottom:12px;"></div>
+        <div id="rolePermLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading permissions…</div>
+        <div class="table-wrap" id="rolePermTable" style="display:none;overflow-x:auto;">
+          <table class="data-table" id="rolePermMatrix">
+            <thead id="rolePermHead"></thead>
+            <tbody id="rolePermBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Access Control Rules -->
+      <div class="admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">🛡 Access Control Rules</h3>
+          <button onclick="saveAccessRules()" class="btn-solid" style="background:#7c3aed;">💾 Save Rules</button>
+        </div>
+        <div id="accessRulesStatus" style="font-size:13px;font-weight:600;min-height:18px;margin-bottom:12px;"></div>
+        <div id="accessRulesBody" style="display:flex;flex-direction:column;gap:10px;">
+          <!-- rows injected by loadRoleMgmtTab() -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- F-04: ATTENDANCE TRACKER TAB                               -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="tab-content" id="tabAttendance">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">📋 Attendance Tracker</h2>
+        <span style="font-size:13px;color:var(--text3);">QR check-in management, per-member attendance %, session rollcall.</span>
+      </div>
+
+      <!-- QR Generator & Session Selector -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+        <div class="admin-card">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">🔳 Session QR Check-In</h3>
+          <div class="form-group">
+            <label>Select Session</label>
+            <select id="attSessionSelect" class="form-input" style="width:100%;padding:10px 14px;" onchange="generateAttQR()">
+              <option value="">— Select a session —</option>
+            </select>
+          </div>
+          <div id="attQrContainer" style="display:none;text-align:center;margin-top:16px;">
+            <div id="attQrCode" style="display:inline-block;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;"></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:8px;" id="attQrLabel">Scan to check-in</div>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+              <button onclick="downloadAttQR()" class="btn-export">⬇ Download QR</button>
+              <button onclick="copyAttQRLink()" class="btn-export">🔗 Copy Link</button>
+            </div>
+          </div>
+          <div id="attQrPlaceholder" style="text-align:center;padding:30px;color:var(--text3);font-size:13px;">Select a session to generate QR code.</div>
+        </div>
+
+        <div class="admin-card">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;">📊 Session Attendance Stats</h3>
+          <div id="attSessionStats" style="color:var(--text3);font-size:13px;text-align:center;padding:30px;">Select a session to view stats.</div>
+        </div>
+      </div>
+
+      <!-- Per-Member Attendance Table -->
+      <div class="admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <h3 style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">👥 Member Attendance Overview</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <input type="text" id="attMemberSearch" placeholder="🔍 Search member…" oninput="filterAttendanceTable()" class="form-input" style="min-width:180px;">
+            <select id="attSessionFilter" class="form-input" style="padding:9px 14px;" onchange="loadAttendanceTable()">
+              <option value="">All Sessions</option>
+            </select>
+            <button onclick="exportAttendanceCSV()" class="btn-export">⬇ CSV</button>
+            <button onclick="loadAttendanceTable()" class="btn-export">↻ Refresh</button>
+          </div>
+        </div>
+        <div id="attTableLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading attendance data…</div>
+        <div class="table-wrap" id="attTableWrap" style="display:none;">
+          <table class="data-table">
+            <thead><tr><th>Operative ID</th><th>Name</th><th>Sessions Attended</th><th>Total Sessions</th><th>Attendance %</th><th>Last Seen</th></tr></thead>
+            <tbody id="attTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div> <!-- Close main-content -->
 
 <!-- ════════ MEMBER SLIDE-IN PANEL ════════ -->
@@ -2350,7 +2680,7 @@ function _saveToStorage(key, entry) {
 }
 
 async function _fetchFresh(action, params) {
-  let url = `https://innovexa-backend-x57p.onrender.com/api/backend?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
+  let url = `/api/backend?action=${encodeURIComponent(action)}&_t=${Date.now()}`;
   for (const [k, v] of Object.entries(params)) {
     url += `&${k}=${encodeURIComponent(v)}`;
   }
@@ -2418,7 +2748,7 @@ function invalidateAndRefresh(cacheAction, reloadFn) {
 }
 
 async function apiPost(action, payload = {}) {
-  const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
+  const res = await fetch('/api/backend', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...payload, action })
@@ -2441,7 +2771,7 @@ async function apiWrite(op, payload) {
   // All write ops go directly to /api/backend as POST with action in payload
   payload.action = op;
   try {
-    const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
+    const res = await fetch('/api/backend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -2819,6 +3149,7 @@ function showDashboard() {
   // Start real-time features only after a successful login
   startLiveSync();
   startAdminPresencePing();
+  startNotifPolling();
 
   // Prefetch all major tabs in background so switching is instant
   setTimeout(() => {
@@ -3431,6 +3762,11 @@ function switchAdminTab(tab) {
   if (tab === 'abTesting') loadAbTest();
   if (tab === 'cohortBuilder') clearCohortBuilder();
   if (tab === 'skillTrees') loadSkillTrees();
+  if (tab === 'xpBadges') loadXpLeaderboard();
+  if (tab === 'certGen') { loadIssuedCerts(); }
+  if (tab === 'modQueue') loadModQueue();
+  if (tab === 'roleMgmt') loadRoleMgmtTab();
+  if (tab === 'attendance') loadAttendanceTab();
 }
 
 // ── SYSTEM SETTINGS ─────────────────────────────────────────────────────────
@@ -8144,6 +8480,783 @@ async function adminDeleteResource(id) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-02: XP & BADGE AWARD ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+let _xpLeaderboardAll = [];
+
+async function loadXpLeaderboard() {
+  const loadEl = document.getElementById('xpLeaderboardLoading');
+  const tableEl = document.getElementById('xpLeaderboardTable');
+  if (!loadEl) return;
+  loadEl.style.display = 'block';
+  loadEl.textContent = 'Loading leaderboard…';
+  tableEl.style.display = 'none';
+  try {
+    const res = await apiWrite('admin_get_xp_leaderboard', {});
+    if (!res.success) throw new Error(res.message);
+    _xpLeaderboardAll = res.data || [];
+    renderXpLeaderboard(_xpLeaderboardAll);
+  } catch(e) {
+    loadEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+function renderXpLeaderboard(list) {
+  const loadEl = document.getElementById('xpLeaderboardLoading');
+  const tableEl = document.getElementById('xpLeaderboardTable');
+  const tbody = document.getElementById('xpLeaderboardBody');
+  if (!tbody) return;
+  loadEl.style.display = 'none';
+  tableEl.style.display = 'block';
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:30px;">No members found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map((m, i) => `
+    <tr>
+      <td><strong>${i + 1}</strong></td>
+      <td><code style="font-size:12px;">${escHtml(m.operativeId || '—')}</code></td>
+      <td>${escHtml(m.name || '—')}</td>
+      <td><span style="background:var(--blue-bg);color:var(--blue);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">${escHtml(m.rank || '—')}</span></td>
+      <td><strong style="color:var(--accent);">${m.xp || 0}</strong> XP</td>
+      <td>
+        <button onclick="quickXpFill('${escHtml(m.operativeId || '')}')" style="font-size:11px;padding:4px 10px;background:var(--blue-bg);color:var(--blue);border:none;border-radius:6px;cursor:pointer;">⚡ Award XP</button>
+        <button onclick="quickBadgeFill('${escHtml(m.operativeId || '')}')" style="font-size:11px;padding:4px 10px;background:#f3e8ff;color:#7c3aed;border:none;border-radius:6px;cursor:pointer;margin-left:4px;">🏅 Badge</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterXpLeaderboard() {
+  const q = (document.getElementById('xpLbSearch')?.value || '').toLowerCase();
+  if (!q) { renderXpLeaderboard(_xpLeaderboardAll); return; }
+  renderXpLeaderboard(_xpLeaderboardAll.filter(m =>
+    (m.name || '').toLowerCase().includes(q) || (m.operativeId || '').toLowerCase().includes(q)
+  ));
+}
+
+function quickXpFill(opId) {
+  const el = document.getElementById('xpOpId');
+  if (el) { el.value = opId; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+function quickBadgeFill(opId) {
+  const el = document.getElementById('badgeOpId');
+  if (el) { el.value = opId; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+
+async function awardXP() {
+  const operativeId = document.getElementById('xpOpId')?.value?.trim();
+  const amount = document.getElementById('xpAmount')?.value?.trim();
+  const xpAction = document.getElementById('xpAction')?.value;
+  const reason = document.getElementById('xpReason')?.value?.trim();
+  const statusEl = document.getElementById('xpStatus');
+  if (!operativeId || !amount) { statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Operative ID and amount are required.'; return; }
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Applying…';
+  try {
+    const res = await apiWrite('admin_award_xp', { operativeId, amount: Number(amount), xpAction, reason });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = `✅ ${res.message}`;
+    showToast(res.message, 'success');
+    document.getElementById('xpOpId').value = '';
+    document.getElementById('xpAmount').value = '';
+    document.getElementById('xpReason').value = '';
+    loadXpLeaderboard();
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + e.message;
+    showToast(e.message, 'error');
+  }
+}
+
+async function assignBadge() {
+  const operativeId = document.getElementById('badgeOpId')?.value?.trim();
+  const badge = document.getElementById('badgeSelect')?.value;
+  const note = document.getElementById('badgeNote')?.value?.trim();
+  const statusEl = document.getElementById('badgeStatus');
+  if (!operativeId) { statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Operative ID required.'; return; }
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Assigning…';
+  try {
+    const res = await apiWrite('admin_assign_badge', { operativeId, badge, note, awardedBy: adminSession?.name || 'Admin' });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = `✅ ${res.message}`;
+    showToast(res.message, 'success');
+    document.getElementById('badgeOpId').value = '';
+    document.getElementById('badgeNote').value = '';
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + e.message;
+    showToast(e.message, 'error');
+  }
+}
+
+function exportXpCSV() {
+  if (!_xpLeaderboardAll.length) { showToast('Load leaderboard first', 'error'); return; }
+  const rows = [['Rank','Operative ID','Name','XP','Rank Title','Squad']];
+  _xpLeaderboardAll.forEach((m, i) => rows.push([i+1, m.operativeId||'', m.name||'', m.xp||0, m.rank||'', m.squad||'']));
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'innovexa_xp_leaderboard_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-03: CERTIFICATE GENERATOR & TRACKER
+// ═══════════════════════════════════════════════════════════════════════════════
+let _issuedCertsAll = [];
+
+const CERT_TYPE_LABELS = {
+  participation: 'Certificate of Participation',
+  completion: 'Certificate of Completion',
+  achievement: 'Certificate of Achievement',
+  appreciation: 'Certificate of Appreciation',
+  internship: 'Certificate of Internship'
+};
+
+function updateCertPreview() {
+  const name = document.getElementById('certGenName')?.value || '';
+  const type = document.getElementById('certGenType')?.value || 'participation';
+  const event = document.getElementById('certGenEvent')?.value || '';
+  const date = document.getElementById('certGenDate')?.value || '';
+  const branch = document.getElementById('certGenBranch')?.value || '';
+  const preview = document.getElementById('certGenPreview');
+  if (!preview) return;
+  if (!name && !event) {
+    preview.innerHTML = '<div style="font-size:13px;color:#888;">Fill in the form to see preview</div>';
+    return;
+  }
+  const formattedDate = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+  preview.innerHTML = `
+    <div style="width:100%;border:2px solid #d4af37;border-radius:10px;padding:24px 20px;background:linear-gradient(135deg,#fffdf7,#fff9e6);font-family:'Inter',sans-serif;text-align:center;">
+      <div style="font-size:10px;letter-spacing:3px;color:#9ca3af;text-transform:uppercase;margin-bottom:8px;">Innovexa Hub — Yenepoya University</div>
+      <div style="font-size:18px;font-weight:800;color:#1f2937;margin-bottom:4px;">${CERT_TYPE_LABELS[type] || 'Certificate'}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:16px;">This is to certify that</div>
+      <div style="font-size:22px;font-weight:900;color:#111827;font-family:'Space Grotesk',sans-serif;border-bottom:2px solid #d4af37;padding-bottom:8px;margin-bottom:8px;">${escHtml(name) || '&lt;Name&gt;'}</div>
+      ${branch ? `<div style="font-size:11px;color:#6b7280;margin-bottom:10px;">${escHtml(branch)}</div>` : ''}
+      ${event ? `<div style="font-size:12px;color:#374151;margin-bottom:10px;">has successfully participated in<br><strong style="color:#7c3aed;">${escHtml(event)}</strong></div>` : ''}
+      <div style="font-size:11px;color:#9ca3af;margin-top:10px;">Date: ${formattedDate}</div>
+      <div style="display:flex;justify-content:space-around;margin-top:16px;border-top:1px solid #e5e7eb;padding-top:12px;">
+        <div style="text-align:center;"><div style="font-size:10px;color:#9ca3af;">Club Head</div><div style="font-size:12px;font-weight:700;">Innovexa Hub</div></div>
+        <div style="text-align:center;"><div style="font-size:10px;color:#9ca3af;">Authorized by</div><div style="font-size:12px;font-weight:700;">${escHtml(adminSession?.name || 'Admin')}</div></div>
+      </div>
+    </div>`;
+}
+
+function prefillCertFromId() {
+  const opId = document.getElementById('certGenOpId')?.value?.trim();
+  if (!opId || !cachedMembers) return;
+  const m = cachedMembers.find(x => (x.operativeId || '').toUpperCase() === opId.toUpperCase());
+  if (!m) return;
+  const nameEl = document.getElementById('certGenName');
+  const branchEl = document.getElementById('certGenBranch');
+  if (nameEl && !nameEl.value) nameEl.value = m.name || '';
+  if (branchEl && !branchEl.value) branchEl.value = m.branch || '';
+  updateCertPreview();
+}
+
+function previewCertificate() {
+  updateCertPreview();
+  document.getElementById('certGenPreview')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function downloadCertificate() {
+  const name = document.getElementById('certGenName')?.value?.trim();
+  const type = document.getElementById('certGenType')?.value || 'participation';
+  const event = document.getElementById('certGenEvent')?.value?.trim();
+  const date = document.getElementById('certGenDate')?.value;
+  const branch = document.getElementById('certGenBranch')?.value?.trim();
+  const statusEl = document.getElementById('certGenStatus');
+  if (!name) { statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Please enter member name.'; return; }
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Generating PDF…';
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = 297, H = 210;
+    // Gold border
+    doc.setDrawColor(212, 175, 55); doc.setLineWidth(3);
+    doc.rect(8, 8, W - 16, H - 16);
+    doc.setLineWidth(1); doc.rect(12, 12, W - 24, H - 24);
+    // Header
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.setTextColor(156, 163, 175);
+    doc.text('INNOVEXA HUB — YENEPOYA UNIVERSITY, BANGALORE', W / 2, 30, { align: 'center' });
+    // Title
+    doc.setFontSize(28); doc.setTextColor(31, 41, 55);
+    doc.text(CERT_TYPE_LABELS[type] || 'Certificate', W / 2, 55, { align: 'center' });
+    // Body
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(107, 114, 128);
+    doc.text('This is to certify that', W / 2, 75, { align: 'center' });
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(24); doc.setTextColor(17, 24, 39);
+    doc.text(name, W / 2, 95, { align: 'center' });
+    // Gold underline
+    doc.setDrawColor(212, 175, 55); doc.setLineWidth(0.8);
+    doc.line(W / 2 - 60, 100, W / 2 + 60, 100);
+    if (branch) { doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(107, 114, 128); doc.text(branch, W / 2, 108, { align: 'center' }); }
+    if (event) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(55, 65, 81);
+      doc.text('has successfully participated in', W / 2, 120, { align: 'center' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(124, 58, 237);
+      doc.text(event, W / 2, 132, { align: 'center' });
+    }
+    // Date
+    const formattedDate = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(156, 163, 175);
+    doc.text('Date: ' + formattedDate, W / 2, 152, { align: 'center' });
+    // Signatures
+    doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+    doc.line(50, 178, 110, 178); doc.line(W - 110, 178, W - 50, 178);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(107, 114, 128);
+    doc.text('Club Head, Innovexa Hub', 80, 184, { align: 'center' });
+    doc.text(adminSession?.name || 'Admin', W - 80, 184, { align: 'center' });
+    const filename = 'Certificate_' + name.replace(/\s+/g, '_') + '_' + (type) + '.pdf';
+    doc.save(filename);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = '✅ PDF downloaded!';
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ PDF error: ' + e.message;
+  }
+}
+
+async function recordIssuedCert() {
+  const name = document.getElementById('certGenName')?.value?.trim();
+  const type = document.getElementById('certGenType')?.value || 'participation';
+  const event = document.getElementById('certGenEvent')?.value?.trim();
+  const date = document.getElementById('certGenDate')?.value;
+  const branch = document.getElementById('certGenBranch')?.value?.trim();
+  const operativeId = document.getElementById('certGenOpId')?.value?.trim();
+  const statusEl = document.getElementById('certGenStatus');
+  if (!name) { statusEl.style.color = 'var(--red)'; statusEl.textContent = 'Name is required.'; return; }
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Recording…';
+  try {
+    const res = await apiWrite('admin_record_cert', { name, type, event, date, branch, operativeId, issuedBy: adminSession?.name || 'Admin' });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = `✅ Recorded! Cert ID: ${res.certId}`;
+    showToast('Certificate recorded: ' + res.certId, 'success');
+    loadIssuedCerts();
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + e.message;
+  }
+}
+
+async function loadIssuedCerts() {
+  const loadEl = document.getElementById('certTrackerLoading');
+  const tableEl = document.getElementById('certTrackerTable');
+  if (!loadEl) return;
+  loadEl.style.display = 'block'; loadEl.textContent = 'Loading…';
+  if (tableEl) tableEl.style.display = 'none';
+  try {
+    const res = await apiWrite('admin_get_issued_certs', {});
+    if (!res.success) throw new Error(res.message);
+    _issuedCertsAll = res.data || [];
+    renderCertTracker(_issuedCertsAll);
+    loadEl.style.display = 'none';
+  } catch(e) {
+    loadEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+function renderCertTracker(list) {
+  const tableEl = document.getElementById('certTrackerTable');
+  const tbody = document.getElementById('certTrackerBody');
+  if (!tbody) return;
+  if (!list.length) { if (tableEl) tableEl.style.display = 'none'; document.getElementById('certTrackerLoading').style.display = 'block'; document.getElementById('certTrackerLoading').textContent = 'No certificates issued yet.'; return; }
+  if (tableEl) tableEl.style.display = 'block';
+  tbody.innerHTML = list.map(c => `
+    <tr>
+      <td style="font-size:12px;">${c.issuedAt ? new Date(c.issuedAt).toLocaleDateString('en-IN') : '—'}</td>
+      <td>${escHtml(c.name || '—')}</td>
+      <td><code style="font-size:11px;">${escHtml(c.operativeId || '—')}</code></td>
+      <td><span style="background:#f3e8ff;color:#7c3aed;padding:2px 8px;border-radius:10px;font-size:11px;">${escHtml(c.type || '—')}</span></td>
+      <td style="font-size:12px;">${escHtml(c.event || '—')}</td>
+      <td>
+        <button onclick="rePrintCert(${JSON.stringify(c).replace(/"/g, '&quot;')})" style="font-size:11px;padding:4px 10px;background:var(--blue-bg);color:var(--blue);border:none;border-radius:6px;cursor:pointer;">⬇ Re-Print</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filterCertTracker() {
+  const q = (document.getElementById('certTrackerSearch')?.value || '').toLowerCase();
+  if (!q) { renderCertTracker(_issuedCertsAll); return; }
+  renderCertTracker(_issuedCertsAll.filter(c =>
+    (c.name || '').toLowerCase().includes(q) || (c.event || '').toLowerCase().includes(q) || (c.operativeId || '').toLowerCase().includes(q)
+  ));
+}
+
+function rePrintCert(c) {
+  document.getElementById('certGenName').value = c.name || '';
+  document.getElementById('certGenOpId').value = c.operativeId || '';
+  document.getElementById('certGenEvent').value = c.event || '';
+  document.getElementById('certGenDate').value = c.date || '';
+  document.getElementById('certGenBranch').value = c.branch || '';
+  document.getElementById('certGenType').value = c.type || 'participation';
+  updateCertPreview();
+  downloadCertificate();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-05: REAL-TIME NOTIFICATION CENTER
+// ═══════════════════════════════════════════════════════════════════════════════
+let _notifPollInterval = null;
+let _notifData = [];
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none' && panel.style.display !== '';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) { fetchNotifications(); markNotifsRead(); }
+}
+
+async function fetchNotifications() {
+  try {
+    const res = await apiWrite('admin_get_notifications', {});
+    if (!res.success) return;
+    _notifData = res.data || [];
+    renderNotifPanel(_notifData);
+    // Update bell badge
+    const unread = _notifData.filter(n => !n.read).length;
+    const badge = document.getElementById('notifBellBadge');
+    if (badge) { badge.textContent = unread > 9 ? '9+' : unread; badge.style.display = unread > 0 ? 'flex' : 'none'; }
+  } catch(_) {}
+}
+
+function renderNotifPanel(list) {
+  const body = document.getElementById('notifPanelBody');
+  if (!body) return;
+  if (!list.length) { body.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:13px;">🔔 No notifications yet.</div>'; return; }
+  body.innerHTML = list.map(n => `
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;background:${n.read ? 'transparent' : 'var(--blue-bg)'};">
+      <div style="font-size:18px;line-height:1;">${getNotifIcon(n.type)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">${escHtml(n.message || '')}</div>
+        <div style="font-size:11px;color:var(--text3);">${n.createdAt ? new Date(n.createdAt).toLocaleString('en-IN') : ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function getNotifIcon(type) {
+  const icons = { 'new_member': '👤', 'sos': '🚨', 'task_complete': '✅', 'cert_request': '🏅', 'doc_request': '📄', 'xp_award': '⭐', 'badge_assign': '🏆' };
+  return icons[type] || '🔔';
+}
+
+async function markNotifsRead() {
+  try { await apiWrite('admin_mark_notifs_read', {}); } catch(_) {}
+}
+
+async function clearAllNotifs() {
+  if (!confirm('Clear all notifications?')) return;
+  try {
+    await apiWrite('admin_clear_notifications', {});
+    _notifData = [];
+    renderNotifPanel([]);
+    const badge = document.getElementById('notifBellBadge');
+    if (badge) badge.style.display = 'none';
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+function startNotifPolling() {
+  fetchNotifications();
+  _notifPollInterval = setInterval(fetchNotifications, 30000); // poll every 30s
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-06: CONTENT MODERATION QUEUE
+// ═══════════════════════════════════════════════════════════════════════════════
+let _modQueueAll = [];
+let _blocklistWords = JSON.parse(localStorage.getItem('innovexa_blocklist') || '[]');
+
+async function loadModQueue() {
+  const loadEl = document.getElementById('modQueueLoading');
+  const gridEl = document.getElementById('modQueueGrid');
+  const emptyEl = document.getElementById('modQueueEmpty');
+  if (!loadEl) return;
+  loadEl.style.display = 'block'; loadEl.textContent = 'Loading queue…';
+  if (gridEl) { gridEl.style.display = 'none'; }
+  if (emptyEl) emptyEl.style.display = 'none';
+  renderBlocklistTags();
+  try {
+    const res = await apiWrite('admin_get_mod_queue', {});
+    if (!res.success) throw new Error(res.message);
+    _modQueueAll = res.data || [];
+    // Auto-flag items with blocklist words
+    _blocklistWords.forEach(word => {
+      _modQueueAll.forEach(item => {
+        if ((item.content || '').toLowerCase().includes(word.toLowerCase()) && item.status === 'approved') {
+          item.status = 'flagged'; item._autoFlagged = true;
+        }
+      });
+    });
+    // Update badge
+    const pending = _modQueueAll.filter(i => i.status === 'pending').length;
+    const badge = document.getElementById('modQueueBadge');
+    if (badge) { badge.textContent = pending; badge.style.display = pending > 0 ? 'block' : 'none'; }
+    filterModQueue();
+    loadEl.style.display = 'none';
+  } catch(e) {
+    loadEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+function filterModQueue() {
+  const typeF = document.getElementById('modTypeFilter')?.value || '';
+  const statusF = document.getElementById('modStatusFilter')?.value || '';
+  const searchF = (document.getElementById('modSearch')?.value || '').toLowerCase();
+  let filtered = _modQueueAll.filter(i => {
+    if (typeF && i.type !== typeF) return false;
+    if (statusF && i.status !== statusF) return false;
+    if (searchF && !(i.content || '').toLowerCase().includes(searchF) && !(i.name || '').toLowerCase().includes(searchF)) return false;
+    return true;
+  });
+  renderModQueue(filtered);
+}
+
+function renderModQueue(list) {
+  const gridEl = document.getElementById('modQueueGrid');
+  const emptyEl = document.getElementById('modQueueEmpty');
+  const loadEl = document.getElementById('modQueueLoading');
+  if (!gridEl) return;
+  if (loadEl) loadEl.style.display = 'none';
+  if (!list.length) { gridEl.style.display = 'none'; if (emptyEl) emptyEl.style.display = 'block'; return; }
+  if (emptyEl) emptyEl.style.display = 'none';
+  gridEl.style.display = 'grid';
+  const statusColors = { pending: '#fef9c3', approved: '#dcfce7', flagged: '#fee2e2' };
+  const statusText = { pending: '#d97706', approved: '#059669', flagged: '#dc2626' };
+  const typeLabels = { sos: '🚨 SOS', feedback: '💬 Feedback', cert_request: '🏅 Cert Req', doc_request: '📄 Doc Req', forge_post: '🔧 Forge Post' };
+  gridEl.innerHTML = list.map(item => `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <span style="font-size:11px;font-weight:700;background:var(--bg3);padding:2px 8px;border-radius:10px;">${typeLabels[item.type] || item.type}</span>
+        <span style="font-size:11px;font-weight:600;background:${statusColors[item.status]||'var(--bg3)'};color:${statusText[item.status]||'var(--text)'};padding:2px 8px;border-radius:10px;">${item.status || '—'}${item._autoFlagged ? ' (auto)' : ''}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text);line-height:1.5;word-break:break-word;">${escHtml((item.content || '').slice(0, 180))}${(item.content||'').length > 180 ? '…' : ''}</div>
+      <div style="font-size:11px;color:var(--text3);">By: <strong>${escHtml(item.name || item.operativeId || '—')}</strong> · ${item.timestamp ? new Date(item.timestamp).toLocaleDateString('en-IN') : '—'}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="modAction('${item.refId}','${item.type}','approve')" style="flex:1;min-width:70px;font-size:11px;padding:6px;background:#dcfce7;color:#059669;border:none;border-radius:6px;cursor:pointer;font-weight:600;">✅ Approve</button>
+        <button onclick="modAction('${item.refId}','${item.type}','flag')" style="flex:1;min-width:70px;font-size:11px;padding:6px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;cursor:pointer;font-weight:600;">🚩 Flag</button>
+        <button onclick="modAction('${item.refId}','${item.type}','reject')" style="flex:1;min-width:70px;font-size:11px;padding:6px;background:var(--bg3);color:var(--text3);border:none;border-radius:6px;cursor:pointer;font-weight:600;">🗑 Reject</button>
+      </div>
+    </div>`).join('');
+}
+
+async function modAction(refId, itemType, action) {
+  try {
+    const res = await apiWrite('admin_mod_action', { refId, itemType, modAction: action });
+    if (!res.success) throw new Error(res.message);
+    showToast(res.message, 'success');
+    loadModQueue();
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+async function approveAllMod() {
+  const pending = _modQueueAll.filter(i => i.status === 'pending');
+  if (!pending.length) { showToast('No pending items', 'info'); return; }
+  if (!confirm(`Approve all ${pending.length} pending items?`)) return;
+  let ok = 0;
+  for (const item of pending) {
+    try { await apiWrite('admin_mod_action', { refId: item.refId, itemType: item.type, modAction: 'approve' }); ok++; } catch(_) {}
+  }
+  showToast(`Approved ${ok} items`, 'success');
+  loadModQueue();
+}
+
+function clearModFilters() {
+  const mTypeF = document.getElementById('modTypeFilter'); if (mTypeF) mTypeF.value = '';
+  const mStatusF = document.getElementById('modStatusFilter'); if (mStatusF) mStatusF.value = '';
+  const mSearch = document.getElementById('modSearch'); if (mSearch) mSearch.value = '';
+  renderModQueue(_modQueueAll);
+}
+
+function addBlocklistWord() {
+  const input = document.getElementById('blocklistInput');
+  if (!input) return;
+  const word = input.value.trim().toLowerCase();
+  if (!word || _blocklistWords.includes(word)) { input.value = ''; return; }
+  _blocklistWords.push(word);
+  localStorage.setItem('innovexa_blocklist', JSON.stringify(_blocklistWords));
+  input.value = '';
+  renderBlocklistTags();
+}
+
+function removeBlocklistWord(word) {
+  _blocklistWords = _blocklistWords.filter(w => w !== word);
+  localStorage.setItem('innovexa_blocklist', JSON.stringify(_blocklistWords));
+  renderBlocklistTags();
+}
+
+function renderBlocklistTags() {
+  const container = document.getElementById('blocklistTags');
+  if (!container) return;
+  container.innerHTML = _blocklistWords.map(w => `
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;">
+      🚫 ${escHtml(w)} <button onclick="removeBlocklistWord('${escHtml(w)}')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:14px;padding:0;line-height:1;">×</button>
+    </span>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-01: ROLE & PERMISSION MANAGER
+// ═══════════════════════════════════════════════════════════════════════════════
+const ROLE_PERMISSION_DEFS = [
+  { key: 'canViewDashboard',    label: 'View Dashboard' },
+  { key: 'canReviewTasks',      label: 'Review & Grade Tasks' },
+  { key: 'canCreateTasks',      label: 'Create Tasks' },
+  { key: 'canCreateBounties',   label: 'Create Bounties' },
+  { key: 'canApproveMembers',   label: 'Approve Members' },
+  { key: 'canExportData',       label: 'Export Data (CSV)' },
+  { key: 'canManageSessions',   label: 'Manage Sessions' },
+  { key: 'canViewAuditLog',     label: 'View Audit Log' },
+  { key: 'canSendAnnouncements',label: 'Send Announcements' },
+  { key: 'canAwardXP',          label: 'Award XP / Badges' },
+  { key: 'canIssueCerts',       label: 'Issue Certificates' },
+  { key: 'canModerateContent',  label: 'Moderate Content' },
+  { key: 'canManageResources',  label: 'Manage Resources' },
+  { key: 'canViewSOS',          label: 'View & Manage SOS' },
+];
+
+const DEFAULT_RANKS = ['Apprentice', 'Vanguard', 'Specialist', 'Commander', 'Legend'];
+
+let _rolePermsData = {};
+let _accessRulesData = [];
+
+async function loadRoleMgmtTab() {
+  const loadEl = document.getElementById('rolePermLoading');
+  const tableEl = document.getElementById('rolePermTable');
+  if (!loadEl) return;
+  loadEl.style.display = 'block'; loadEl.textContent = 'Loading permissions…';
+  if (tableEl) tableEl.style.display = 'none';
+  try {
+    const [permRes, acRes] = await Promise.all([
+      apiWrite('admin_get_role_permissions', {}),
+      apiWrite('admin_get_access_control', {})
+    ]);
+    _rolePermsData = (permRes.success && permRes.data?.permissions) ? permRes.data.permissions : {};
+    _accessRulesData = (acRes.success && acRes.data?.rules) ? acRes.data.rules : [];
+    renderRolePermMatrix();
+    renderAccessRules();
+    loadEl.style.display = 'none';
+    if (tableEl) tableEl.style.display = 'block';
+  } catch(e) {
+    loadEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+function renderRolePermMatrix() {
+  const thead = document.getElementById('rolePermHead');
+  const tbody = document.getElementById('rolePermBody');
+  if (!thead || !tbody) return;
+  const ranks = DEFAULT_RANKS;
+  // Header
+  thead.innerHTML = '<tr><th style="min-width:160px;">Permission</th>' + ranks.map(r => `<th style="text-align:center;min-width:100px;">${r}</th>`).join('') + '</tr>';
+  // Body rows
+  tbody.innerHTML = ROLE_PERMISSION_DEFS.map(perm => {
+    const cells = ranks.map(rank => {
+      const val = (_rolePermsData[rank] || {})[perm.key] === true;
+      return `<td style="text-align:center;"><label style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><input type="checkbox" data-rank="${rank}" data-perm="${perm.key}" ${val ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);"></label></td>`;
+    }).join('');
+    return `<tr><td style="font-size:13px;font-weight:500;">${perm.label}</td>${cells}</tr>`;
+  }).join('');
+}
+
+async function saveRolePermissions() {
+  const statusEl = document.getElementById('rolePermStatus');
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Saving…';
+  const perms = {};
+  DEFAULT_RANKS.forEach(rank => { perms[rank] = {}; });
+  document.querySelectorAll('#rolePermBody input[type=checkbox]').forEach(chk => {
+    const rank = chk.dataset.rank; const perm = chk.dataset.perm;
+    if (!perms[rank]) perms[rank] = {};
+    perms[rank][perm] = chk.checked;
+  });
+  try {
+    const res = await apiWrite('admin_save_role_permissions', { permissions: perms });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = '✅ Permissions saved!';
+    showToast('Role permissions saved', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + e.message;
+  }
+}
+
+function renderAccessRules() {
+  const container = document.getElementById('accessRulesBody');
+  if (!container) return;
+  const defaultRoutes = ['sos', 'bounty', 'resources', 'sessions', 'leaderboard', 'forge'];
+  // Merge existing with defaults
+  const routeMap = {};
+  defaultRoutes.forEach(p => { routeMap[p] = { path: p, minRank: 'Apprentice', enabled: true }; });
+  _accessRulesData.forEach(r => { routeMap[r.path] = r; });
+  container.innerHTML = Object.values(routeMap).map(rule => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border-radius:8px;flex-wrap:wrap;">
+      <span style="font-size:13px;font-weight:600;min-width:100px;">🔒 ${rule.path}</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:12px;color:var(--text3);">Min Rank:</label>
+        <select data-path="${rule.path}" class="rule-minrank-select form-input" style="padding:6px 10px;font-size:12px;">
+          ${DEFAULT_RANKS.map(r => `<option value="${r}" ${rule.minRank === r ? 'selected' : ''}>${r}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:12px;color:var(--text3);">Enabled:</label>
+        <input type="checkbox" data-path="${rule.path}" class="rule-enabled-chk" ${rule.enabled !== false ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);">
+      </div>
+    </div>`).join('');
+}
+
+async function saveAccessRules() {
+  const statusEl = document.getElementById('accessRulesStatus');
+  statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Saving…';
+  const rules = [];
+  const paths = new Set();
+  document.querySelectorAll('.rule-minrank-select').forEach(sel => { paths.add(sel.dataset.path); });
+  paths.forEach(path => {
+    const minRank = document.querySelector(`.rule-minrank-select[data-path="${path}"]`)?.value || 'Apprentice';
+    const enabled = document.querySelector(`.rule-enabled-chk[data-path="${path}"]`)?.checked !== false;
+    rules.push({ path, minRank, enabled });
+  });
+  try {
+    const res = await apiWrite('admin_save_access_control', { rules });
+    if (!res.success) throw new Error(res.message);
+    statusEl.style.color = 'var(--green)'; statusEl.textContent = '✅ Access rules saved!';
+    showToast('Access control saved', 'success');
+  } catch(e) {
+    statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + e.message;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// F-04: ATTENDANCE TRACKER
+// ═══════════════════════════════════════════════════════════════════════════════
+let _attTableAll = [];
+let _attSessionsList = [];
+let _attQrUrl = '';
+
+async function loadAttendanceTab() {
+  await loadAttendanceTable();
+}
+
+async function loadAttendanceTable() {
+  const loadEl = document.getElementById('attTableLoading');
+  const tableEl = document.getElementById('attTableWrap');
+  if (!loadEl) return;
+  loadEl.style.display = 'block'; loadEl.textContent = 'Loading attendance data…';
+  if (tableEl) tableEl.style.display = 'none';
+  try {
+    const res = await apiWrite('admin_get_attendance_overview', {});
+    if (!res.success) throw new Error(res.message);
+    _attTableAll = res.data || [];
+    _attSessionsList = res.sessions || [];
+    populateAttSessionSelects();
+    renderAttTable(_attTableAll);
+    loadEl.style.display = 'none';
+    if (tableEl) tableEl.style.display = 'block';
+  } catch(e) {
+    loadEl.textContent = 'Failed: ' + e.message;
+  }
+}
+
+function populateAttSessionSelects() {
+  ['attSessionSelect', 'attSessionFilter'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = (id === 'attSessionFilter' ? '<option value="">All Sessions</option>' : '<option value="">— Select a session —</option>') +
+      _attSessionsList.map(s => `<option value="${escHtml(s.sessionId)}">${escHtml(s.title)} (${s.date || '—'})</option>`).join('');
+    sel.value = current;
+  });
+}
+
+function renderAttTable(list) {
+  const tbody = document.getElementById('attTableBody');
+  if (!tbody) return;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3);">No attendance data found.</td></tr>'; return; }
+  tbody.innerHTML = list.map(m => {
+    const pct = m.pct || 0;
+    const color = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--yellow)' : 'var(--red)';
+    return `<tr>
+      <td><code style="font-size:12px;">${escHtml(m.operativeId || '—')}</code></td>
+      <td>${escHtml(m.name || '—')}</td>
+      <td style="text-align:center;">${m.attended || 0}</td>
+      <td style="text-align:center;">${m.total || 0}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--bg3);border-radius:10px;height:8px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${color};border-radius:10px;transition:width 0.5s;"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${color};min-width:36px;">${pct}%</span>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--text3);">${m.lastSeen ? new Date(m.lastSeen).toLocaleDateString('en-IN') : 'Never'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAttendanceTable() {
+  const q = (document.getElementById('attMemberSearch')?.value || '').toLowerCase();
+  const filtered = q ? _attTableAll.filter(m => (m.name || '').toLowerCase().includes(q) || (m.operativeId || '').toLowerCase().includes(q)) : _attTableAll;
+  renderAttTable(filtered);
+}
+
+function generateAttQR() {
+  const sel = document.getElementById('attSessionSelect');
+  const sessionId = sel?.value;
+  const qrContainer = document.getElementById('attQrContainer');
+  const qrPlaceholder = document.getElementById('attQrPlaceholder');
+  const qrCodeDiv = document.getElementById('attQrCode');
+  const qrLabel = document.getElementById('attQrLabel');
+  if (!sessionId) { if (qrContainer) qrContainer.style.display = 'none'; if (qrPlaceholder) qrPlaceholder.style.display = 'block'; return; }
+  const checkInUrl = 'https://innovexa.register-innovexa.workers.dev/forge.html?checkin=' + encodeURIComponent(sessionId);
+  _attQrUrl = checkInUrl;
+  if (qrLabel) qrLabel.textContent = 'Scan to check-in: ' + sessionId;
+  if (qrPlaceholder) qrPlaceholder.style.display = 'none';
+  if (qrContainer) qrContainer.style.display = 'block';
+  if (qrCodeDiv) {
+    qrCodeDiv.innerHTML = '';
+    try {
+      new QRCode(qrCodeDiv, { text: checkInUrl, width: 160, height: 160, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    } catch(e) {
+      qrCodeDiv.innerHTML = `<div style="font-size:11px;word-break:break-all;padding:8px;max-width:160px;">${escHtml(checkInUrl)}</div>`;
+    }
+    // Load session stats
+    loadSessionAttStats(sessionId);
+  }
+}
+
+async function loadSessionAttStats(sessionId) {
+  const statsEl = document.getElementById('attSessionStats');
+  if (!statsEl) return;
+  statsEl.innerHTML = '<span style="color:var(--text3);">Loading stats…</span>';
+  try {
+    const res = await apiWrite('admin_get_session_attendance', { sessionId });
+    if (!res.success) throw new Error(res.message);
+    const pct = res.total > 0 ? Math.round((res.attended / res.total) * 100) : 0;
+    const color = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--yellow)' : 'var(--red)';
+    statsEl.innerHTML = `
+      <div style="text-align:center;">
+        <div style="font-size:48px;font-weight:900;color:${color};">${pct}%</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;">Attendance Rate</div>
+        <div style="font-size:13px;margin-top:12px;"><strong>${res.attended}</strong> checked in out of <strong>${res.total}</strong> approved members</div>
+        ${res.session ? `<div style="font-size:12px;color:var(--text3);margin-top:8px;">${escHtml(res.session.title)} · ${res.session.date || '—'}</div>` : ''}
+      </div>`;
+  } catch(e) {
+    statsEl.innerHTML = '<span style="color:var(--red);">Failed: ' + escHtml(e.message) + '</span>';
+  }
+}
+
+function downloadAttQR() {
+  const canvas = document.querySelector('#attQrCode canvas');
+  if (!canvas) { showToast('Generate a QR first', 'error'); return; }
+  const a = document.createElement('a'); a.href = canvas.toDataURL('image/png');
+  a.download = 'innovexa_checkin_qr.png'; a.click();
+}
+
+function copyAttQRLink() {
+  if (!_attQrUrl) { showToast('Generate a QR first', 'error'); return; }
+  navigator.clipboard.writeText(_attQrUrl).then(() => showToast('Link copied!', 'success')).catch(() => { showToast(_attQrUrl, 'info'); });
+}
+
+function exportAttendanceCSV() {
+  if (!_attTableAll.length) { showToast('Load data first', 'error'); return; }
+  const rows = [['Operative ID','Name','Sessions Attended','Total Sessions','Attendance %','Last Seen']];
+  _attTableAll.forEach(m => rows.push([m.operativeId||'', m.name||'', m.attended||0, m.total||0, (m.pct||0)+'%', m.lastSeen ? new Date(m.lastSeen).toLocaleDateString('en-IN') : 'Never']));
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'innovexa_attendance_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
+}
+
 </script>
 <script>
 let mdeCreate, mdeEdit, mdeEventDesc;
@@ -8637,7 +9750,7 @@ async function uploadEvImg(file) {
       fileName: file.name
     };
 
-    const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend', {
+    const res = await fetch('/api/backend', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload })

@@ -1,5 +1,5 @@
 import { connectToDatabase } from './db.js';
-import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction, GamificationConfig, CertTemplate, CustomStyle, BroadcastMessage, AIConfig, ABTestConfig, AdminPresence, RegistrationOTP } from './models.js';
+import { Member, ActionLog, Task, Sos, Session, Bounty, Resource, Attendance, Feedback, Asset, DocRequest, CertReq, PlatformSettings, EmailTemplate, Taxonomy, Dictionary, Announcement, RankConfig, RolePermissions, WebhookConfig, AccessControl, Faction, GamificationConfig, CertTemplate, CustomStyle, BroadcastMessage, AIConfig, ABTestConfig, AdminPresence, RegistrationOTP, IssuedCertificate, MemberBadge, AdminNotification } from './models.js';
 import nodemailer from 'nodemailer';
 
 // ── Global Zoho Mail Transporter ─────────────────────────────────────────────
@@ -3421,6 +3421,193 @@ export default async function handler(req, res) {
       });
       await log.save();
       return res.status(200).json({ success: true, message: `Certificates dispatched: ${sent} sent, ${failed} failed`, sent, failed });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // F-02: XP & Badge Award Engine
+    // ─────────────────────────────────────────────────────────────────────────
+    if (action === 'admin_award_xp') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, amount, xpAction, reason } = body;
+      if (!operativeId || !amount || !xpAction) return res.status(400).json({ success: false, message: 'operativeId, amount, xpAction required' });
+      const delta = xpAction === 'deduct' ? -Math.abs(Number(amount)) : Math.abs(Number(amount));
+      const member = await Member.findOne({ operativeId });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found' });
+      member.xp = Math.max(0, (member.xp || 0) + delta);
+      // Auto-rank update using RankConfig
+      const rc = await RankConfig.findOne({ key: 'global' }).lean();
+      if (rc && rc.ranks && rc.ranks.length) {
+        const sorted = rc.ranks.slice().sort((a, b) => b.minXP - a.minXP);
+        const newRank = sorted.find(r => member.xp >= r.minXP);
+        if (newRank) member.rank = newRank.name;
+      }
+      await member.save();
+      const log = new ActionLog({ timestamp: new Date(), type: 'ADMIN_XP_AWARD', content: `${xpAction === 'deduct' ? 'Deducted' : 'Granted'} ${Math.abs(delta)} XP to ${operativeId}. Reason: ${reason || 'N/A'}`, operativeId, name: member.name });
+      await log.save();
+      // Push AdminNotification
+      try {
+        const n = new AdminNotification({ notifId: 'notif_' + Date.now(), type: 'xp_award', message: `XP ${xpAction}: ${Math.abs(delta)} XP for ${member.name} (${operativeId})`, relatedId: operativeId });
+        await n.save();
+      } catch(_) {}
+      return res.status(200).json({ success: true, message: `${xpAction === 'deduct' ? 'Deducted' : 'Granted'} ${Math.abs(delta)} XP. New total: ${member.xp}`, newXp: member.xp, newRank: member.rank });
+    }
+
+    if (action === 'admin_assign_badge') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, badge, note, awardedBy } = body;
+      if (!operativeId || !badge) return res.status(400).json({ success: false, message: 'operativeId and badge required' });
+      const member = await Member.findOne({ operativeId }).lean();
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found' });
+      const mb = new MemberBadge({ operativeId, name: member.name, badge, note: note || '', awardedBy: awardedBy || 'Admin' });
+      await mb.save();
+      const log = new ActionLog({ timestamp: new Date(), type: 'ADMIN_BADGE_ASSIGN', content: `Badge "${badge}" assigned to ${operativeId}. Note: ${note || 'N/A'}`, operativeId, name: member.name });
+      await log.save();
+      return res.status(200).json({ success: true, message: `Badge "${badge}" assigned to ${member.name}` });
+    }
+
+    if (action === 'admin_get_xp_leaderboard') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const members = await Member.find({ status: 'Approved' }, 'operativeId name xp rank squad').sort({ xp: -1 }).lean();
+      return res.status(200).json({ success: true, data: members });
+    }
+
+    if (action === 'admin_get_badges') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId } = body;
+      const query = operativeId ? { operativeId } : {};
+      const badges = await MemberBadge.find(query).sort({ awardedAt: -1 }).lean();
+      return res.status(200).json({ success: true, data: badges });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // F-03: Certificate Generator & Tracker
+    // ─────────────────────────────────────────────────────────────────────────
+    if (action === 'admin_record_cert') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { operativeId, name, type, event, date, branch, issuedBy } = body;
+      if (!name || !type) return res.status(400).json({ success: false, message: 'name and type required' });
+      const certId = 'CERT-' + Date.now().toString(36).toUpperCase();
+      const cert = new IssuedCertificate({ certId, operativeId: operativeId || '', name, type, event: event || '', date: date || '', branch: branch || '', issuedBy: issuedBy || 'Admin' });
+      await cert.save();
+      const log = new ActionLog({ timestamp: new Date(), type: 'CERT_ISSUED', content: `Certificate (${type}) issued to ${name} (${operativeId || 'N/A'}) for "${event || 'N/A'}"`, operativeId: operativeId || 'ADMIN', name });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Certificate recorded', certId });
+    }
+
+    if (action === 'admin_get_issued_certs') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const certs = await IssuedCertificate.find({}).sort({ issuedAt: -1 }).lean();
+      return res.status(200).json({ success: true, data: certs });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // F-04: Attendance Tracker
+    // ─────────────────────────────────────────────────────────────────────────
+    if (action === 'admin_get_attendance_overview') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const sessions = await Session.find({}).sort({ date: -1 }).lean();
+      const allAttendance = await Attendance.find({}).lean();
+      const members = await Member.find({ status: 'Approved' }, 'operativeId name').lean();
+      const totalSessions = sessions.length;
+      const memberMap = {};
+      members.forEach(m => { memberMap[m.operativeId] = { operativeId: m.operativeId, name: m.name, attended: 0, lastSeen: null }; });
+      const attendedStatuses = ['Attended', 'Present', 'Verified', 'Checked-In'];
+      allAttendance.forEach(a => {
+        if (attendedStatuses.includes(a.status) && memberMap[a.operativeId]) {
+          memberMap[a.operativeId].attended++;
+          const ts = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+          if (!memberMap[a.operativeId].lastSeen || ts > memberMap[a.operativeId].lastSeen) {
+            memberMap[a.operativeId].lastSeen = ts;
+          }
+        }
+      });
+      const result = Object.values(memberMap).map(m => ({
+        ...m,
+        total: totalSessions,
+        pct: totalSessions > 0 ? Math.round((m.attended / totalSessions) * 100) : 0,
+        lastSeen: m.lastSeen ? new Date(m.lastSeen).toISOString() : null
+      })).sort((a, b) => b.pct - a.pct);
+      return res.status(200).json({ success: true, data: result, sessions: sessions.map(s => ({ sessionId: s.sessionId, title: s.title, date: s.date })) });
+    }
+
+    if (action === 'admin_get_session_attendance') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { sessionId } = body;
+      if (!sessionId) return res.status(400).json({ success: false, message: 'sessionId required' });
+      const records = await Attendance.find({ sessionId }).lean();
+      const session = await Session.findOne({ sessionId }).lean();
+      const total = await Member.countDocuments({ status: 'Approved' });
+      const attended = records.filter(r => ['Attended','Present','Verified','Checked-In'].includes(r.status)).length;
+      return res.status(200).json({ success: true, data: records, session, total, attended });
+    }
+
+    if (action === 'admin_manual_checkin') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { sessionId, operativeId } = body;
+      if (!sessionId || !operativeId) return res.status(400).json({ success: false, message: 'sessionId and operativeId required' });
+      await Attendance.findOneAndUpdate({ sessionId, operativeId }, { status: 'Attended', timestamp: new Date() }, { upsert: true, new: true });
+      return res.status(200).json({ success: true, message: 'Checked in successfully' });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // F-05: Real-Time Notification Center
+    // ─────────────────────────────────────────────────────────────────────────
+    if (action === 'admin_get_notifications') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const notifs = await AdminNotification.find({}).sort({ createdAt: -1 }).limit(40).lean();
+      return res.status(200).json({ success: true, data: notifs });
+    }
+
+    if (action === 'admin_mark_notifs_read') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      await AdminNotification.updateMany({ read: false }, { $set: { read: true } });
+      return res.status(200).json({ success: true, message: 'All notifications marked read' });
+    }
+
+    if (action === 'admin_clear_notifications') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      await AdminNotification.deleteMany({});
+      return res.status(200).json({ success: true, message: 'All notifications cleared' });
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // F-06: Content Moderation Queue
+    // ─────────────────────────────────────────────────────────────────────────
+    if (action === 'admin_get_mod_queue') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      // Aggregate: open SOS, pending feedback, pending cert requests, pending doc requests
+      const [sosList, feedbackList, certReqs, docReqs] = await Promise.all([
+        Sos.find({ status: 'open' }).sort({ timestamp: -1 }).limit(50).lean(),
+        Feedback.find({}).sort({ timestamp: -1 }).limit(50).lean(),
+        CertReq.find({ status: 'Pending' }).sort({ timestamp: -1 }).limit(30).lean(),
+        DocRequest.find({ status: 'Pending' }).sort({ timestamp: -1 }).limit(30).lean()
+      ]);
+      const items = [
+        ...sosList.map(s => ({ id: s._id.toString(), type: 'sos', status: s.status === 'open' ? 'pending' : 'approved', content: s.title + ': ' + s.description, operativeId: s.operativeId, name: s.name, timestamp: s.timestamp, refId: s._id.toString() })),
+        ...feedbackList.map(f => ({ id: f._id.toString(), type: 'feedback', status: 'approved', content: `[${f.rating}/5] ${f.comment}`, operativeId: f.operativeId, name: f.name, timestamp: f.timestamp, refId: f.eventId })),
+        ...certReqs.map(c => ({ id: c._id.toString(), type: 'cert_request', status: 'pending', content: `Cert Request: ${c.eventType}`, operativeId: c.operativeId, name: c.name, timestamp: c.timestamp, refId: c.requestId })),
+        ...docReqs.map(d => ({ id: d._id.toString(), type: 'doc_request', status: 'pending', content: `Doc Request: ${d.docType} — ${d.purpose}`, operativeId: d.operativeId, name: d.name, timestamp: d.timestamp, refId: d.requestId }))
+      ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      return res.status(200).json({ success: true, data: items });
+    }
+
+    if (action === 'admin_mod_action') {
+      if (body.adminKey !== ADMIN_KEY) return res.status(403).json({ success: false, message: 'Forbidden' });
+      const { itemType, refId, modAction } = body;
+      if (!itemType || !refId || !modAction) return res.status(400).json({ success: false, message: 'itemType, refId, modAction required' });
+      if (itemType === 'sos') {
+        const newStatus = modAction === 'approve' ? 'resolved' : modAction === 'flag' ? 'flagged' : 'resolved';
+        await Sos.findByIdAndUpdate(refId, { status: newStatus });
+      } else if (itemType === 'cert_request') {
+        const s = modAction === 'approve' ? 'Approved' : modAction === 'flag' ? 'Flagged' : 'Rejected';
+        await CertReq.findOneAndUpdate({ requestId: refId }, { status: s });
+      } else if (itemType === 'doc_request') {
+        const s = modAction === 'approve' ? 'Approved' : modAction === 'flag' ? 'Flagged' : 'Rejected';
+        await DocRequest.findOneAndUpdate({ requestId: refId }, { status: s });
+      }
+      const log = new ActionLog({ timestamp: new Date(), type: 'MOD_ACTION', content: `Mod action "${modAction}" on ${itemType} ref:${refId}`, operativeId: 'ADMIN', name: 'Admin' });
+      await log.save();
+      return res.status(200).json({ success: true, message: `Action "${modAction}" applied to ${itemType}` });
     }
 
     return res.status(200).json({ success: false, message: 'Unknown or unmigrated action: ' + action });

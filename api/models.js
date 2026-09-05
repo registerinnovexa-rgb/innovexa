@@ -365,3 +365,39 @@ const AdminPresenceSchema = new mongoose.Schema({
   lastPing: { type: Date, default: Date.now }
 });
 export const AdminPresence = mongoose.models.AdminPresence || mongoose.model('AdminPresence', AdminPresenceSchema);
+
+// Issued Certificate Tracker
+const IssuedCertificateSchema = new mongoose.Schema({
+  certId: { type: String, unique: true },
+  operativeId: { type: String, default: '' },
+  name: String,
+  type: String,            // participation | completion | achievement | appreciation | internship
+  event: String,
+  date: String,
+  branch: String,
+  issuedBy: String,
+  issuedAt: { type: Date, default: Date.now }
+});
+export const IssuedCertificate = mongoose.models.IssuedCertificate || mongoose.model('IssuedCertificate', IssuedCertificateSchema);
+
+// Member Badge Awards
+const MemberBadgeSchema = new mongoose.Schema({
+  operativeId: String,
+  name: String,
+  badge: String,
+  note: { type: String, default: '' },
+  awardedBy: String,
+  awardedAt: { type: Date, default: Date.now }
+});
+export const MemberBadge = mongoose.models.MemberBadge || mongoose.model('MemberBadge', MemberBadgeSchema);
+
+// Admin Notification
+const AdminNotificationSchema = new mongoose.Schema({
+  notifId: { type: String, unique: true },
+  type: String,           // 'new_member' | 'sos' | 'task_complete' | 'cert_request' | 'doc_request'
+  message: String,
+  relatedId: String,
+  read: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+export const AdminNotification = mongoose.models.AdminNotification || mongoose.model('AdminNotification', AdminNotificationSchema);
