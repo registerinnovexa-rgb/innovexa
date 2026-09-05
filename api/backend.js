@@ -65,7 +65,7 @@ function buildEmail({ title, subtitle = '', bodyHtml, accentColor = '#7c3aed', i
       <!-- Footer -->
       <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
         <p style="margin:0;font-size:11px;color:#94a3b8;">© Innovexa Hub · Bangalore</p>
-        <a href="https://innovexa-portal.vercel.app" style="font-size:11px;color:${accentColor};text-decoration:none;font-weight:600;">Visit Portal →</a>
+        <a href="https://innovexa.register-innovexa.workers.dev" style="font-size:11px;color:${accentColor};text-decoration:none;font-weight:600;">Visit Portal →</a>
       </div>
     </div>
     ${footerNote ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px;">' + footerNote + '</p>' : ''}
@@ -123,7 +123,7 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
         <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
 
           <div style="text-align:center; padding:32px 0 16px;">
-            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+            <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
           </div>
           <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
             <!-- Header -->
@@ -160,7 +160,7 @@ async function notifyAdmin({ type, operativeId, name, detail, urgent = false }) 
             </div>
             <!-- CTA -->
             <div style="padding:0 32px 28px;">
-              <a href="https://innovexareg.vercel.app/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
+              <a href="https://innovexa.register-innovexa.workers.dev/admin.html" style="display:block;text-align:center;padding:13px 24px;background:${cfg.color};color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;letter-spacing:.3px;">Open Admin Console →</a>
             </div>
             <!-- Footer -->
             <div style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
@@ -190,7 +190,7 @@ async function notifyUser(email, subject, htmlContent) {
         <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
 
           <div style="text-align:center; padding:32px 0 16px;">
-            <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+            <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
           </div>
           <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:0px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
             <div style="background:var(--accent,#000000);padding:24px 32px;">
@@ -535,7 +535,7 @@ export default async function handler(req, res) {
               <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
               <body style="margin:0;padding:0;background:#f1f5f9;font-family:'Segoe UI',Arial,sans-serif;">
                 <div style="text-align:center; padding:32px 0 16px;">
-                  <img src="https://innovexareg.vercel.app/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
+                  <img src="https://innovexa.register-innovexa.workers.dev/assets/logo.png" alt="Innovexa Hub" style="height:56px; width:auto;">
                 </div>
                 <div style="max-width:520px;margin:0 auto 32px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
                   <div style="background:#000000;padding:36px 32px;text-align:center;">
@@ -551,7 +551,7 @@ export default async function handler(req, res) {
                       <div style="margin-top:12px;font-size:12px;color:#94a3b8;">Use this ID to log in to your Forge dashboard</div>
                     </div>
                     <p style="color:#64748b;font-size:14px;line-height:1.7;margin:0 0 24px;">Access the <strong>Innovexa Forge</strong> — your personal dashboard for exclusive resources, task bounties, the leaderboard, and SOS support.</p>
-                    <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
+                    <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;">Access the Forge Dashboard →</a>
                   </div>
                   <div style="padding:18px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;">
                     <p style="margin:0;font-size:11px;color:#94a3b8;text-align:center;">Innovexa Hub · If you have any issues, contact your admin.</p>
@@ -573,7 +573,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -1861,7 +1861,7 @@ export default async function handler(req, res) {
                 + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Your Innovexa Hub membership has been <strong style="color:#10b981;">approved</strong>! Welcome to the collective.</p>'
                 + '<div style="margin:0 0 24px;border-radius:12px;overflow:hidden;"><div style="background:#10b981;padding:10px 24px;text-align:center;"><span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Operative ID</span></div><div style="background:#f0fdf4;border:2px solid #10b981;border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;"><div style="font-size:38px;font-weight:900;letter-spacing:8px;color:#000000;font-family:\'Courier New\',monospace;">' + member.operativeId + '</div><div style="margin-top:8px;font-size:13px;color:#10b981;font-weight:600;">Use this ID to log in to your Forge dashboard</div></div></div>'
                 + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Access the <strong style="color:#7c3aed;">Innovexa Forge</strong> — your personal dashboard for resources, task bounties, leaderboard, and SOS support.</p>'
-                + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.3px;">Access the Forge Dashboard &#8594;</a>',
+                + '<a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.3px;">Access the Forge Dashboard &#8594;</a>',
               footerNote: 'Questions? Contact your admin.'
             })
           });
@@ -1886,7 +1886,7 @@ export default async function handler(req, res) {
               bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
                 + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your Innovexa Hub membership status has been updated to <strong style="color:#dc2626;">' + status + '</strong>.</p>'
                 + '<div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;margin-bottom:24px;"><p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">If you believe this is an error, please contact the Innovexa admin team directly to appeal.</p></div>'
-                + '<a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>'
+                + '<a href="https://innovexa.register-innovexa.workers.dev" style="display:block;text-align:center;padding:13px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>'
                 + ''
             })
           });
@@ -1928,7 +1928,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Role Updated', `
         <p>Your role in the Innovexa Hub has been updated by an administrator.</p>
         <p>New Role: <strong>${role}</strong></p>
-        <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Role updated to ' + role });
@@ -1945,8 +1945,6 @@ export default async function handler(req, res) {
       let member;
       if (operativeId && !email) {
         member = await Member.findOne({ operativeId: String(operativeId).trim().toUpperCase() });
-        // rowIndex might be a numeric row — fall back to finding by position if not found by ID
-        if (!member) member = await Member.findOne({ email: email });
       } else {
         member = await Member.findOne({ email: email.trim().toLowerCase() });
       }
@@ -1965,7 +1963,7 @@ export default async function handler(req, res) {
       await notifyUser(member.email, 'Innovexa Hub - Access Updated', `
         <p>Your access level in the Innovexa Hub has been updated by an administrator.</p>
         <p>Forge Access: <strong>${access}</strong></p>
-        <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+        <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
       `);
       
       return res.status(200).json({ success: true, message: 'Access updated to ' + access });
@@ -2016,7 +2014,7 @@ export default async function handler(req, res) {
           <ul style="margin:20px 0;padding-left:20px;color:#0f172a;font-size:14px;line-height:1.8;">
             ${notifications.map(n => `<li>${n}</li>`).join('')}
           </ul>
-          <a href="https://innovexareg.vercel.app/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
+          <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:inline-block;padding:10px 20px;background:#000000;color:#fff;text-decoration:none;font-weight:700;font-size:13px;margin-top:10px;">VIEW DASHBOARD →</a>
         `);
       }
       
@@ -2568,7 +2566,7 @@ export default async function handler(req, res) {
                    bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
                      + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your task submission has been <strong style="color:#10b981;">approved</strong> by the admin. Great work!</p>'
                      + '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;"><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">' + t.title + '</td></tr><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">XP Earned</td><td style="padding:10px 0;font-size:20px;font-weight:800;color:#10b981;">+' + xpToAward + ' XP</td></tr><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">New Rank</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#7c3aed;">' + rank + '</td></tr>' + (feedback ? '<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">' + feedback + '</td></tr>' : '') + '</table></div>'
-                     + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Dashboard &#8594;</a>'
+                     + '<a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Dashboard &#8594;</a>'
                      + ''
                  })
                });
@@ -2603,7 +2601,7 @@ export default async function handler(req, res) {
                    bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
                      + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your task submission needs some changes before it can be approved. Please review and resubmit.</p>'
                      + '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;"><tr style="border-bottom:1px solid #fef3c7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">' + t.title + '</td></tr><tr' + (feedback ? ' style="border-bottom:1px solid #fef3c7;"' : '') + '><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Status</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#dc2626;">Sent Back for Revision</td></tr>' + (feedback ? '<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Admin Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">' + feedback + '</td></tr>' : '') + '</table></div>'
-                     + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">Resubmit on Forge &#8594;</a>'
+                     + '<a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">Resubmit on Forge &#8594;</a>'
                      + ''
                  })
                });
@@ -2667,7 +2665,7 @@ export default async function handler(req, res) {
                    <tr><td style="padding:6px 0;color:#71717a;font-size:12px;">Sent At</td><td style="color:#a1a1aa;font-size:12px;">${new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})}</td></tr>
                  </table>
                </div>
-               <a href="https://innovexareg.vercel.app/admin.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
+               <a href="https://innovexa.register-innovexa.workers.dev/admin.html" style="display:block;text-align:center;padding:12px;background:#000000;color:#fff;text-decoration:none;border-radius:8px;font-weight:700;">Open Admin Console →</a>
                <p style="color:#52525b;font-size:10px;text-align:center;margin-top:16px;">Innovexa Hub Auto-Notification Engine</p>
              </div>`
          });
@@ -3406,7 +3404,7 @@ export default async function handler(req, res) {
                   <div style="font-size:20px;font-weight:800;color:#000;">${member.name}</div>
                   <div style="font-size:12px;color:#6b7280;margin-top:4px;">Operative ID: ${member.operativeId}</div>
                 </div>
-                <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Profile →</a>
+                <a href="https://innovexa.register-innovexa.workers.dev/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Profile →</a>
               `
             })
           });
