@@ -4632,7 +4632,7 @@ async function loadBroadcasts(isSilent = false) {
   } catch(e) { el.innerHTML = `<div style="color:var(--red);">${e.message}</div>`; }
 }
 
-async function sendBroadcast() {
+async function sendBroadcast_old() {
   const content = document.getElementById('broadcastContent').value.trim();
   const priority = document.getElementById('broadcastPriority').value;
   if (!content) return showToast('Enter broadcast content.', 'error');
@@ -9013,7 +9013,7 @@ const ROLE_PERMISSION_DEFS = [
 
 const DEFAULT_RANKS = ['Apprentice', 'Vanguard', 'Specialist', 'Commander', 'Legend'];
 
-let _rolePermsData = {};
+_rolePermsData = {};
 let _accessRulesData = [];
 
 async function loadRoleMgmtTab() {
@@ -9055,7 +9055,7 @@ function renderRolePermMatrix() {
   }).join('');
 }
 
-async function saveRolePermissions() {
+async function saveRolePermissions_duplicate() {
   const statusEl = document.getElementById('rolePermStatus');
   statusEl.style.color = 'var(--text3)'; statusEl.textContent = 'Saving…';
   const perms = {};
@@ -9652,7 +9652,7 @@ const _origLoadSessions = loadSessions;
 // This is done by monkey-patching after the tbody is built — we hook into the existing logic.
 // The loadSessions function already uses innerHTML += — we add via post-processing.
 // Instead we override by replacing the tbody fill section:
-async function loadSessions(isSilent = false) {
+async function loadSessions_duplicate(isSilent = false) {
   const tbody = document.getElementById('sessionsListTbody');
   if (!isSilent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
 
@@ -10093,7 +10093,7 @@ async function submitManualAttendance() {
 let isScanning = false;
 let lastScanned = 0;
 
-function startScanner() {
+function startScanner_duplicate() {
   if (isScanning) return;
   document.getElementById('scannerWrapper').style.display = 'block';
   isScanning = true;
@@ -10110,7 +10110,7 @@ function startScanner() {
   });
 }
 
-function stopScanner() {
+function stopScanner_duplicate() {
   if(html5QrcodeScanner) {
     html5QrcodeScanner.stop().then(() => {
       html5QrcodeScanner.clear();
@@ -10122,7 +10122,7 @@ function stopScanner() {
 
 function onScanFailure(error) { }
 
-async function onScanSuccess(decodedText, decodedResult) {
+async function onScanSuccess_duplicate(decodedText, decodedResult) {
   // Prevent double scans within 3 seconds
   if (Date.now() - lastScanned < 3000) return;
   lastScanned = Date.now();
@@ -10156,7 +10156,7 @@ async function onScanSuccess(decodedText, decodedResult) {
 }
 
 // ── Event Analytics & Tools ──
-function exportAttendanceCSV() {
+function exportAttendanceCSV_duplicate() {
   if(!currentAttendance || currentAttendance.length === 0) {
     return showToast("No attendees to export.", "error");
   }
