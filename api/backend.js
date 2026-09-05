@@ -357,76 +357,86 @@ export default async function handler(req, res) {
 
       // OTP Rate Limiting: check if a recent OTP was already sent
       const cfg = await PlatformSettings.findOne({ key: 'global' });
-      const rateLimitSeconds = cfg ? cfg.otpRateLimitSeconds : 60;
+      const rateLimitSeconds = cfg ? (cfg.otpRateLimitSeconds || 60) : 60;
       if (member.otpTime && (Date.now() - member.otpTime < rateLimitSeconds * 1000)) {
         const wait = Math.ceil((rateLimitSeconds * 1000 - (Date.now() - member.otpTime)) / 1000);
         return res.status(200).json({ success: false, message: `Please wait ${wait}s before requesting a new code.` });
       }
 
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      // FIX Bug #10: store OTP trimmed to avoid whitespace comparison issues
+      const otp = Math.floor(100000 + Math.random() * 900000).toString().trim();
       member.otp = otp;
       member.otpTime = Date.now();
-      member.otpAttempts = 0; // reset attempts on new OTP
+      member.otpAttempts = 0;
       await member.save();
       
       const maskedEmail = member.email.replace(/(.{2})(.*)(?=@)/, (gp1, gp2, gp3) => gp2 + gp3.replace(/./g, '*'));
-      // Respond immediately — don't block on SMTP delivery
-      res.status(200).json({ success: true, message: 'Login code sent to ' + maskedEmail });
-      // Fire-and-forget: send OTP email after response is already flushed
-      transporter.sendMail({
-        from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
-        to: member.email,
-        subject: `🔐 Your Innovexa Login Code: ${otp}`,
-        html: buildEmail({
-          title: 'Forge Login Code',
-          subtitle: 'Innovexa Forge Dashboard',
-          iconEmoji: '🔐',
-          accentColor: '#7c3aed',
-          bodyHtml: `
-            <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-            <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
-              Use the secure code below to log into your <strong style="color:#7c3aed;">Innovexa Forge</strong> dashboard.
-            </p>
-            ${buildOtpBlock(otp)}
-            <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
-              <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
-                🔒 <strong style="color:#374151;">Security notice:</strong> Never share this code. Innovexa staff will never ask for your OTP.
-              </p>
-            </div>
-          \`
-        })
-      }).then(() => console.log(`OTP sent to ${member.email}`))
-        .catch(err => console.error('Failed to send OTP email:', err.message));
-      return;
+
+      // FIX Bug #8: await email send and surface errors to the user instead of fire-and-forget
+      try {
+        await transporter.sendMail({
+          from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+          to: member.email,
+          subject: `🔐 Your Innovexa Login Code: ${otp}`,
+          html: buildEmail({
+            title: 'Forge Login Code',
+            subtitle: 'Innovexa Forge Dashboard',
+            iconEmoji: '🔐',
+            accentColor: '#7c3aed',
+            bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
+              + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Use the secure code below to log into your <strong style="color:#7c3aed;">Innovexa Forge</strong> dashboard.</p>'
+              + buildOtpBlock(otp)
+              + '<div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;"><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">🔒 <strong style="color:#374151;">Security notice:</strong> Never share this code. Innovexa staff will never ask for your OTP.</p></div>'
+              + ''
+          })
+        });
+        console.log('OTP sent to ' + member.email);
+        return res.status(200).json({ success: true, message: 'Login code sent to ' + maskedEmail });
+      } catch (emailErr) {
+        console.error('Failed to send OTP email: ' + emailErr.message);
+        // Roll back the OTP so the member can try again
+        member.otp = '';
+        member.otpTime = 0;
+        await member.save();
+        return res.status(200).json({ success: false, message: 'Failed to send login code. Please check your email or try again later.' });
+      }
     }
 
     // FORGE: Verify OTP
     if (action === 'forge_verify_otp') {
       const { invxId, otp } = payload;
       if (!invxId || !otp) return res.status(200).json({ success: false, message: 'Missing parameters.' });
+
+      // FIX Bug #16: validate OTP is exactly 6 digits
+      const otpClean = String(otp).trim();
+      if (!/^\d{6}$/.test(otpClean)) {
+        return res.status(200).json({ success: false, message: 'OTP must be a 6-digit number.' });
+      }
       
       const member = await Member.findOne({ operativeId: invxId.trim().toUpperCase() });
       if (!member) return res.status(200).json({ success: false, message: 'Operative ID not found.' });
 
       // Max attempt lockout
       const cfg = await PlatformSettings.findOne({ key: 'global' });
-      const maxAttempts = cfg ? cfg.otpMaxAttempts : 5;
+      const maxAttempts = cfg ? (cfg.otpMaxAttempts || 5) : 5;
       if ((member.otpAttempts || 0) >= maxAttempts) {
         return res.status(200).json({ success: false, message: `Too many failed attempts. Request a new code.` });
       }
 
       // Expiry check
-      if (!member.otp || Date.now() - member.otpTime > 15 * 60 * 1000) {
+      if (!member.otp || Date.now() - (member.otpTime || 0) > 15 * 60 * 1000) {
         member.otp = '';
         await member.save();
         return res.status(200).json({ success: false, message: 'Login code expired. Please request a new one.' });
       }
 
-      // Wrong OTP
-      if (member.otp !== otp) {
+      // FIX Bug #10: compare trimmed values
+      if (member.otp.trim() !== otpClean) {
         member.otpAttempts = (member.otpAttempts || 0) + 1;
         await member.save();
         const remaining = maxAttempts - member.otpAttempts;
+        // FIX Bug #19: log failed attempt
+        new ActionLog({ timestamp: new Date(), type: 'OTP_FAILED', content: `Wrong OTP attempt for forge login. ${remaining} left.`, operativeId: member.operativeId, name: member.name }).save().catch(() => {});
         return res.status(200).json({ success: false, message: `Invalid code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` });
       }
       
@@ -1122,15 +1132,33 @@ export default async function handler(req, res) {
     if (action === 'register_request_otp') {
       const { email } = payload;
       if (!email) return res.status(200).json({ success: false, message: 'Missing email.' });
-      
+
+      // FIX Bug #13: validate email format
       const cleanEmail = email.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return res.status(200).json({ success: false, message: 'Invalid email address.' });
+      }
+
       const existing = await Member.findOne({ email: cleanEmail });
       if (existing) return res.status(200).json({ success: false, message: 'Email is already registered.' });
+
+      // FIX Bug #3: rate limiting for registration OTP (prevent email spam)
+      const existingOtp = await RegistrationOTP.findOne({ email: cleanEmail });
+      if (existingOtp && existingOtp.timestamp) {
+        const secondsSinceLast = (Date.now() - new Date(existingOtp.timestamp).getTime()) / 1000;
+        const cfg = await PlatformSettings.findOne({ key: 'global' });
+        const rateLimitSecs = cfg ? (cfg.otpRateLimitSeconds || 60) : 60;
+        if (secondsSinceLast < rateLimitSecs) {
+          const wait = Math.ceil(rateLimitSecs - secondsSinceLast);
+          return res.status(200).json({ success: false, message: `Please wait ${wait}s before requesting a new code.` });
+        }
+      }
       
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      // FIX Bug #10: store OTP trimmed
+      const otp = Math.floor(100000 + Math.random() * 900000).toString().trim();
       await RegistrationOTP.findOneAndUpdate(
         { email: cleanEmail },
-        { otp, timestamp: Date.now() },
+        { otp, timestamp: new Date() },
         { upsert: true, new: true }
       );
       
@@ -1144,36 +1172,55 @@ export default async function handler(req, res) {
             subtitle: 'Innovexa Registration',
             iconEmoji: '📧',
             accentColor: '#7c3aed',
-            bodyHtml: `
-              <p style="font-size:15px;color:#374151;margin:0 0 8px;">Almost there!</p>
-              <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
-                Use the code below to verify your email and complete your registration for <strong style="color:#7c3aed;">Innovexa Hub</strong>.
-              </p>
-              ${buildOtpBlock(otp)}
-              <div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;">
-                <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
-                  ⏱ <strong style="color:#374151;">This code expires in 10 minutes.</strong> If you did not request this, please ignore this email.
-                </p>
-              </div>
-            \`
+            bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Almost there!</p>'
+              + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Use the code below to verify your email and complete your registration for <strong style="color:#7c3aed;">Innovexa Hub</strong>.</p>'
+              + buildOtpBlock(otp)
+              + '<div style="background:#f9fafb;border-radius:8px;padding:14px 18px;border-left:4px solid #7c3aed;"><p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">&#8987; <strong style="color:#374151;">This code expires in 10 minutes.</strong> If you did not request this, please ignore this email.</p></div>'
+              + ''
           })
         });
         return res.status(200).json({ success: true, message: 'OTP sent successfully.' });
       } catch(e) {
-        return res.status(200).json({ success: false, message: 'Failed to send OTP email.' });
+        console.error('register_request_otp email error:', e.message);
+        // Roll back the OTP record on email failure so rate limit does not block retry
+        await RegistrationOTP.deleteOne({ email: cleanEmail });
+        return res.status(200).json({ success: false, message: 'Failed to send OTP email. Please check your email address and try again.' });
       }
     }
 
     if (action === 'register_verify_otp') {
       const { email, otp } = payload;
-      const cleanEmail = (email||'').trim().toLowerCase();
+
+      // FIX Bug #13: validate inputs
+      if (!email || !otp) return res.status(200).json({ success: false, message: 'Email and OTP are required.' });
+      const cleanEmail = email.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return res.status(200).json({ success: false, message: 'Invalid email address.' });
+      }
+
+      // FIX Bug #16: validate OTP format
+      const otpClean = String(otp).trim();
+      if (!/^\d{6}$/.test(otpClean)) {
+        return res.status(200).json({ success: false, message: 'OTP must be a 6-digit number.' });
+      }
+
       const record = await RegistrationOTP.findOne({ email: cleanEmail });
       if (!record) return res.status(200).json({ success: false, message: 'No OTP requested for this email or it has expired.' });
-      
-      if (record.otp === otp.trim()) {
+
+      // FIX Bug #4: explicit expiry check (10 min) in addition to MongoDB TTL
+      const ageSecs = (Date.now() - new Date(record.timestamp).getTime()) / 1000;
+      if (ageSecs > 600) {
+        await RegistrationOTP.deleteOne({ email: cleanEmail });
+        return res.status(200).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+      }
+
+      // FIX Bug #10: compare trimmed stored OTP
+      if (record.otp.trim() === otpClean) {
         await RegistrationOTP.deleteOne({ email: cleanEmail });
         return res.status(200).json({ success: true, message: 'OTP Verified. Access Granted.' });
       } else {
+        // FIX Bug #19: log failed attempt
+        new ActionLog({ timestamp: new Date(), type: 'OTP_FAILED', content: `Wrong registration OTP for ${cleanEmail}`, operativeId: 'UNREGISTERED', name: cleanEmail }).save().catch(() => {});
         return res.status(200).json({ success: false, message: 'Invalid OTP.' });
       }
     }
@@ -1265,28 +1312,31 @@ export default async function handler(req, res) {
         const cfg = await PlatformSettings.findOne({ key: 'global' });
         let hasFace = false;
         if (cfg && cfg.adminMasterFaceDescriptor && cfg.adminMasterFaceDescriptor !== '[]') hasFace = true;
+        const masterPass = process.env.ADMIN_MASTER_PASS || 'adminpass';
 
-        if (hasFace || (email && email.trim() === 'adminpass')) {
+        if (hasFace || (email && email.trim() === masterPass)) {
           isValidAdmin = true;
+          // FIX Bug #1: use process.env.ADMIN_EMAIL instead of undefined `member` variable
           memberData = {
             name: 'Master Admin',
             operativeId: 'INVX-MASTER',
             role: 'president',
-            hasFaceRegistered: hasFace, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
+            hasFaceRegistered: hasFace,
+            email: process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com'
           };
         }
       } else {
         const query = { operativeId: invxId.trim().toUpperCase() };
         if (email) query.email = email.trim().toLowerCase();
         
-        const member = await Member.findOne(query);
-        if (member) {
-          let role = (member.forgeRole || '').trim().toLowerCase();
-          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
-          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
+        const adminMember = await Member.findOne(query);
+        if (adminMember) {
+          let role = (adminMember.forgeRole || '').trim().toLowerCase();
+          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(adminMember.operativeId));
+          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(adminMember.operativeId));
           
           if (isAdmin) {
-            const hasFace = !!member.faceDescriptor;
+            const hasFace = !!adminMember.faceDescriptor;
             if (!email && !hasFace) {
                return res.status(200).json({ success: false, message: 'Password is required. Face ID not registered.' });
             }
@@ -1294,10 +1344,11 @@ export default async function handler(req, res) {
                 isValidAdmin = true;
                 let finalRole = role || (isPresident ? 'president' : 'admin');
                 memberData = {
-                  name: member.name,
-                  operativeId: member.operativeId,
+                  name: adminMember.name,
+                  operativeId: adminMember.operativeId,
                   role: finalRole,
-                  hasFaceRegistered: hasFace, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
+                  hasFaceRegistered: hasFace,
+                  email: adminMember.email || process.env.ADMIN_EMAIL || ''
                 };
             }
           } else {
@@ -1379,19 +1430,10 @@ export default async function handler(req, res) {
             subtitle: '🚨 Admin Console Login',
             iconEmoji: '🛡️',
             accentColor: '#dc2626',
-            bodyHtml: `
-              <p style="font-size:14px;color:#374151;margin:0 0 20px;line-height:1.7;">
-                An admin login attempt was made by <strong style="color:#000;">${memberData.name}</strong>
-                <span style="font-family:monospace;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:13px;">(${memberData.operativeId})</span>.
-                Use the code below to authorize access.
-              </p>
-              ${buildOtpBlock(otp, '#dc2626')}
-              <div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;">
-                <p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">
-                  ⚠️ <strong>If you did not initiate this login,</strong> your admin credentials may be compromised. Change them immediately.
-                </p>
-              </div>
-            \`
+            bodyHtml: '<p style="font-size:14px;color:#374151;margin:0 0 20px;line-height:1.7;">An admin login attempt was made by <strong style="color:#000;">' + memberData.name + '</strong> <span style="font-family:monospace;background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:13px;">(' + memberData.operativeId + ')</span>. Use the code below to authorize access.</p>'
+              + buildOtpBlock(otp, '#dc2626')
+              + '<div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;"><p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">&#9888;&#65039; <strong>If you did not initiate this login,</strong> your admin credentials may be compromised. Change them immediately.</p></div>'
+              + ''
           })
         });
       } catch (e) {
@@ -1549,44 +1591,62 @@ export default async function handler(req, res) {
       const { invxId, email, otp } = payload;
       if (!invxId || !email || !otp) return res.status(200).json({ success: false, message: 'Missing credentials or OTP.' });
 
-      const cfg = await PlatformSettings.findOne({ key: 'global' });
-      if (!cfg || !cfg.adminOtp || Date.now() - (cfg.adminOtpTime || 0) > 15 * 60 * 1000) {
-        return res.status(200).json({ success: false, message: 'OTP expired or not requested.' });
+      // FIX Bug #16: validate OTP is 6 digits
+      const otpClean = String(otp).trim();
+      if (!/^\d{6}$/.test(otpClean)) {
+        return res.status(200).json({ success: false, message: 'OTP must be a 6-digit number.' });
       }
 
-      if (cfg.adminOtp !== otp.trim()) {
+      // FIX Bug #7: simplified and clear expiry check
+      const cfg = await PlatformSettings.findOne({ key: 'global' });
+      if (!cfg || !cfg.adminOtp) {
+        return res.status(200).json({ success: false, message: 'No OTP has been requested. Please log in again.' });
+      }
+      const otpAgeMs = Date.now() - (cfg.adminOtpTime || 0);
+      if (otpAgeMs > 15 * 60 * 1000) {
+        return res.status(200).json({ success: false, message: 'OTP has expired. Please log in again to request a new one.' });
+      }
+
+      // FIX Bug #10: compare trimmed stored OTP
+      if (cfg.adminOtp.trim() !== otpClean) {
+        // FIX Bug #19: log failed admin OTP attempt
+        new ActionLog({ timestamp: new Date(), type: 'OTP_FAILED', content: `Wrong admin OTP attempt for ${invxId}`, operativeId: invxId, name: 'Admin' }).save().catch(() => {});
         return res.status(200).json({ success: false, message: 'Invalid OTP.' });
       }
 
-      // Valid OTP. Now re-validate credentials to prevent hijacking
+      // Valid OTP. Now re-validate credentials to prevent session hijacking
       let isValidAdmin = false;
       let memberData = null;
 
-      if (invxId.trim() === 'admin@innovexa' && email.trim() === 'adminpass') {
+      const masterPass = process.env.ADMIN_MASTER_PASS || 'adminpass';
+      if (invxId.trim() === 'admin@innovexa' && email.trim() === masterPass) {
         isValidAdmin = true;
+        // FIX Bug #2: remove undefined `member` reference — use env variable directly
         memberData = {
           name: 'Master Admin',
           operativeId: 'INVX-MASTER',
           role: 'president',
-          hasFaceRegistered: false, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
+          hasFaceRegistered: false,
+          email: process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com'
         };
       } else {
-        const member = await Member.findOne({ 
+        const verifyMember = await Member.findOne({
           operativeId: invxId.trim().toUpperCase(),
           email: email.trim().toLowerCase()
         });
-        if (member) {
-          let role = (member.forgeRole || '').trim().toLowerCase();
-          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(member.operativeId));
-          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(member.operativeId));
+        if (verifyMember) {
+          let role = (verifyMember.forgeRole || '').trim().toLowerCase();
+          let isPresident = (role === 'president' || ['INVX-01', 'INVX-09', 'INVX-7ZB7L'].includes(verifyMember.operativeId));
+          let isAdmin = (role === 'admin' || isPresident || ['INVX-02', 'INVX-03'].includes(verifyMember.operativeId));
           if (isAdmin) {
             isValidAdmin = true;
             let finalRole = role || (isPresident ? 'president' : 'admin');
             memberData = {
-              name: member.name,
-              operativeId: member.operativeId,
+              name: verifyMember.name,
+              operativeId: verifyMember.operativeId,
               role: finalRole,
-              hasFaceRegistered: !!member.faceDescriptor, email: (typeof member !== 'undefined' && member ? member.email : process.env.ADMIN_EMAIL || 'innovexahub.bangalore@gmail.com')
+              hasFaceRegistered: !!verifyMember.faceDescriptor,
+              email: verifyMember.email || process.env.ADMIN_EMAIL || ''
             };
           }
         }
@@ -1797,25 +1857,11 @@ export default async function handler(req, res) {
               subtitle: 'Membership Approved',
               iconEmoji: '🎉',
               accentColor: '#10b981',
-              bodyHtml: `
-                <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-                <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
-                  Your Innovexa Hub membership has been <strong style="color:#10b981;">approved</strong>! Welcome to the collective.
-                </p>
-                <div style="margin:0 0 24px;border-radius:12px;overflow:hidden;">
-                  <div style="background:#10b981;padding:10px 24px;text-align:center;">
-                    <span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Operative ID</span>
-                  </div>
-                  <div style="background:#f0fdf4;border:2px solid #10b981;border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;">
-                    <div style="font-size:38px;font-weight:900;letter-spacing:8px;color:#000000;font-family:'Courier New',monospace;">${member.operativeId}</div>
-                    <div style="margin-top:8px;font-size:13px;color:#10b981;font-weight:600;">Use this ID to log in to your Forge dashboard</div>
-                  </div>
-                </div>
-                <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">
-                  Access the <strong style="color:#7c3aed;">Innovexa Forge</strong> — your personal dashboard for resources, task bounties, leaderboard, and SOS support.
-                </p>
-                <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.3px;">Access the Forge Dashboard →</a>
-              \`,
+              bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
+                + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Your Innovexa Hub membership has been <strong style="color:#10b981;">approved</strong>! Welcome to the collective.</p>'
+                + '<div style="margin:0 0 24px;border-radius:12px;overflow:hidden;"><div style="background:#10b981;padding:10px 24px;text-align:center;"><span style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:3px;text-transform:uppercase;font-weight:600;">Your Operative ID</span></div><div style="background:#f0fdf4;border:2px solid #10b981;border-top:none;padding:24px;text-align:center;border-radius:0 0 12px 12px;"><div style="font-size:38px;font-weight:900;letter-spacing:8px;color:#000000;font-family:\'Courier New\',monospace;">' + member.operativeId + '</div><div style="margin-top:8px;font-size:13px;color:#10b981;font-weight:600;">Use this ID to log in to your Forge dashboard</div></div></div>'
+                + '<p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.7;">Access the <strong style="color:#7c3aed;">Innovexa Forge</strong> — your personal dashboard for resources, task bounties, leaderboard, and SOS support.</p>'
+                + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:15px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:0.3px;">Access the Forge Dashboard &#8594;</a>',
               footerNote: 'Questions? Contact your admin.'
             })
           });
@@ -1837,19 +1883,11 @@ export default async function handler(req, res) {
               subtitle: `Status changed to: ${status}`,
               iconEmoji: '⚠️',
               accentColor: '#dc2626',
-              bodyHtml: `
-                <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-                <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
-                  Your Innovexa Hub membership status has been updated to
-                  <strong style="color:#dc2626;">${status}</strong>.
-                </p>
-                <div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;margin-bottom:24px;">
-                  <p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">
-                    If you believe this is an error, please contact the Innovexa admin team directly to appeal.
-                  </p>
-                </div>
-                <a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>
-              \`
+              bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
+                + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your Innovexa Hub membership status has been updated to <strong style="color:#dc2626;">' + status + '</strong>.</p>'
+                + '<div style="background:#fef2f2;border-radius:8px;padding:14px 18px;border-left:4px solid #ef4444;margin-bottom:24px;"><p style="margin:0;font-size:13px;color:#7f1d1d;line-height:1.6;">If you believe this is an error, please contact the Innovexa admin team directly to appeal.</p></div>'
+                + '<a href="https://innovexareg.vercel.app" style="display:block;text-align:center;padding:13px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">Visit Innovexa Hub</a>'
+                + ''
             })
           });
         } catch (emailErr) {
@@ -2527,21 +2565,11 @@ export default async function handler(req, res) {
                    subtitle: `+${xpToAward} XP Earned`,
                    iconEmoji: '✅',
                    accentColor: '#10b981',
-                   bodyHtml: `
-                     <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-                     <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
-                       Your task submission has been <strong style="color:#10b981;">approved</strong> by the admin. Great work!
-                     </p>
-                     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:20px;">
-                       <table style="width:100%;border-collapse:collapse;">
-                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">${t.title}</td></tr>
-                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">XP Earned</td><td style="padding:10px 0;font-size:20px;font-weight:800;color:#10b981;">+${xpToAward} XP</td></tr>
-                         <tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">New Rank</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#7c3aed;">${rank}</td></tr>
-                         ${feedback ? `<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">${feedback}</td></tr>` : ''}
-                       </table>
-                     </div>
-                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Dashboard →</a>
-                   \`
+                   bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
+                     + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your task submission has been <strong style="color:#10b981;">approved</strong> by the admin. Great work!</p>'
+                     + '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:20px;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;"><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">' + t.title + '</td></tr><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">XP Earned</td><td style="padding:10px 0;font-size:20px;font-weight:800;color:#10b981;">+' + xpToAward + ' XP</td></tr><tr style="border-bottom:1px solid #dcfce7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">New Rank</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#7c3aed;">' + rank + '</td></tr>' + (feedback ? '<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">' + feedback + '</td></tr>' : '') + '</table></div>'
+                     + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Dashboard &#8594;</a>'
+                     + ''
                  })
                });
              } catch(e) { console.error('Member approval email failed:', e.message); }
@@ -2572,20 +2600,11 @@ export default async function handler(req, res) {
                    subtitle: `Task: ${t.title}`,
                    iconEmoji: '🔁',
                    accentColor: '#f59e0b',
-                   bodyHtml: `
-                     <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
-                     <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
-                       Your task submission needs some changes before it can be approved. Please review and resubmit.
-                     </p>
-                     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:20px;">
-                       <table style="width:100%;border-collapse:collapse;">
-                         <tr style="border-bottom:1px solid #fef3c7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">${t.title}</td></tr>
-                         <tr ${feedback ? 'style="border-bottom:1px solid #fef3c7;"' : ''}><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Status</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#dc2626;">Sent Back for Revision</td></tr>
-                         ${feedback ? `<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Admin Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">${feedback}</td></tr>` : ''}
-                       </table>
-                     </div>
-                     <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">Resubmit on Forge →</a>
-                   \`
+                   bodyHtml: '<p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">' + member.name + '</strong>,</p>'
+                     + '<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">Your task submission needs some changes before it can be approved. Please review and resubmit.</p>'
+                     + '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:20px;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;"><tr style="border-bottom:1px solid #fef3c7;"><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;width:40%;">Task</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#111827;">' + t.title + '</td></tr><tr' + (feedback ? ' style="border-bottom:1px solid #fef3c7;"' : '') + '><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Status</td><td style="padding:10px 0;font-size:14px;font-weight:700;color:#dc2626;">Sent Back for Revision</td></tr>' + (feedback ? '<tr><td style="padding:10px 0;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">Admin Feedback</td><td style="padding:10px 0;font-size:13px;color:#374151;line-height:1.6;">' + feedback + '</td></tr>' : '') + '</table></div>'
+                     + '<a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">Resubmit on Forge &#8594;</a>'
+                     + ''
                  })
                });
              } catch(e) { console.error('Member rejection email failed:', e.message); }
