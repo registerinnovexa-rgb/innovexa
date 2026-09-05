@@ -1038,6 +1038,52 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, data: activeAdmins });
     }
 
+    if (action === 'admin_get_presence_list') {
+      const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const activeAdmins = await AdminPresence.find({ lastPing: { $gte: fiveMinsAgo } }).lean();
+      return res.status(200).json({ success: true, admins: activeAdmins });
+    }
+
+    // ── Sub-Task 7: System Health & Maintenance Scheduler ─────────────────────
+    if (action === 'admin_system_health') {
+      // DB health: try a simple count
+      let dbStatus = 'error';
+      let totalMembers = 0;
+      try {
+        totalMembers = await Member.countDocuments({});
+        dbStatus = 'ok';
+      } catch(e) { dbStatus = 'error'; }
+
+      // Count recent errors from ActionLog (last 24h, types containing 'ERROR' or 'FAIL')
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentErrors = await ActionLog.countDocuments({
+        timestamp: { $gte: oneDayAgo },
+        type: { $in: ['API_ERROR', 'EMAIL_FAILED', 'TASK_ERROR', 'AUTH_FAILED'] }
+      });
+
+      return res.status(200).json({ success: true, dbStatus, totalMembers, recentErrors });
+    }
+
+    if (action === 'admin_schedule_maintenance') {
+      const { scheduledAt, duration, message } = payload;
+      if (!scheduledAt) return res.status(400).json({ success: false, message: 'scheduledAt required' });
+      let settings = await PlatformSettings.findOne({ key: 'global' });
+      if (!settings) settings = await PlatformSettings.create({ key: 'global' });
+      settings.scheduledMaintenance = {
+        scheduledAt: new Date(scheduledAt),
+        durationMinutes: parseInt(duration) || 60,
+        message: message || 'Scheduled maintenance. Back shortly!'
+      };
+      await settings.save();
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'MAINTENANCE_SCHEDULED',
+        content: `Maintenance scheduled for ${scheduledAt} (${duration} min): ${message}`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: 'Maintenance window scheduled' });
+    }
+
     // ADMIN: Get Platform Settings
     if (action === 'admin_get_settings') {
       let settings = await PlatformSettings.findOne({ key: 'global' });
@@ -2369,7 +2415,7 @@ export default async function handler(req, res) {
     // Admin creates tasks via 'admin_create_task' — stored in Task collection
     // These show up as bounties in the forge/bounties view
     if (action === 'admin_create_task') {
-      const { title, description, xp, difficulty, assignedTo } = payload;
+      const { title, description, xp, difficulty, assignedTo, expiresAt } = payload;
       const t = new Task({
         taskId: 'TSK-' + Date.now(),
         timestamp: new Date(),
@@ -2378,7 +2424,8 @@ export default async function handler(req, res) {
         difficulty: difficulty || 'Easy',
         status: 'Open',
         assignedTo: assignedTo || 'Open',
-        submitLink: '', feedback: ''
+        submitLink: '', feedback: '',
+        expiresAt: expiresAt ? new Date(expiresAt) : null
       });
       await t.save();
       const log = new ActionLog({
@@ -2398,7 +2445,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Bounty deployed!' });
     }
     if (action === 'admin_edit_task') {
-       const { taskId, title, description, xp, difficulty, assignedTo, status } = payload;
+       const { taskId, title, description, xp, difficulty, assignedTo, status, expiresAt } = payload;
        const t = await Task.findOne({ taskId });
        if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
        if (title !== undefined) t.title = title;
@@ -2407,6 +2454,7 @@ export default async function handler(req, res) {
        if (difficulty !== undefined) t.difficulty = difficulty;
        if (assignedTo !== undefined) t.assignedTo = assignedTo;
        if (status !== undefined) t.status = status;
+       if (expiresAt !== undefined) t.expiresAt = expiresAt ? new Date(expiresAt) : null;
        await t.save();
        
        await notifyAdmin({
@@ -2685,6 +2733,111 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Status updated.' });
     }
 
+    // ── Sub-Task 5: Unified Requests Queue ──────────────────────────────────
+    if (action === 'admin_get_requests') {
+      const [docs, certs] = await Promise.all([
+        DocRequest.find({}).sort({ timestamp: -1 }).lean(),
+        CertReq.find({}).sort({ timestamp: -1 }).lean()
+      ]);
+      // Attach member email to each request
+      const allOpIds = [...docs.map(d => d.operativeId), ...certs.map(c => c.operativeId)].filter(Boolean);
+      const memberMap = {};
+      if (allOpIds.length) {
+        const members = await Member.find({ operativeId: { $in: allOpIds } }, 'operativeId email name').lean();
+        members.forEach(m => { memberMap[m.operativeId] = m; });
+      }
+      const enriched = [
+        ...docs.map(d => ({ ...d, reqType: 'Document', memberEmail: memberMap[d.operativeId]?.email || '', memberName: memberMap[d.operativeId]?.name || d.name || '' })),
+        ...certs.map(c => ({ ...c, reqType: 'Certificate', memberEmail: memberMap[c.operativeId]?.email || '', memberName: memberMap[c.operativeId]?.name || c.name || '' }))
+      ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      return res.status(200).json({ success: true, requests: enriched });
+    }
+
+    if (action === 'admin_approve_request') {
+      const { requestId, reqType, adminNote } = payload;
+      let req;
+      if (reqType === 'Document') {
+        req = await DocRequest.findOne({ requestId });
+        if (req) { req.status = 'Approved'; if (adminNote) req.adminNote = adminNote; await req.save(); }
+      } else {
+        req = await CertReq.findOne({ requestId });
+        if (req) { req.status = 'Approved'; if (adminNote) req.adminNote = adminNote; await req.save(); }
+      }
+      if (!req) return res.status(200).json({ success: false, message: 'Request not found' });
+      // Email member
+      const member = req.operativeId ? await Member.findOne({ operativeId: req.operativeId }) : null;
+      if (member && member.email && process.env.EMAIL_USER) {
+        try {
+          await transporter.sendMail({
+            from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+            to: member.email,
+            subject: `✅ ${reqType} Request Approved`,
+            html: buildEmail({
+              title: `${reqType} Request Approved`,
+              iconEmoji: '✅',
+              accentColor: '#10b981',
+              bodyHtml: `<p style="font-size:15px;color:#374151;">Hi <strong>${member.name}</strong>, your ${reqType.toLowerCase()} request has been <strong style="color:#10b981;">approved</strong>.${adminNote ? ` Admin note: <em>${adminNote}</em>` : ''}</p>`
+            })
+          });
+        } catch(e) { console.error('Request approval email error', e.message); }
+      }
+      const log = new ActionLog({ timestamp: new Date(), type: 'REQUEST_APPROVED', content: `${reqType} request ${requestId} approved`, operativeId: req.operativeId || 'ADMIN', name: req.name || 'Unknown' });
+      await log.save();
+      return res.status(200).json({ success: true, message: `${reqType} request approved` });
+    }
+
+    if (action === 'admin_reject_request') {
+      const { requestId, reqType, reason } = payload;
+      let req;
+      if (reqType === 'Document') {
+        req = await DocRequest.findOne({ requestId });
+        if (req) { req.status = 'Rejected'; if (reason) req.adminNote = reason; await req.save(); }
+      } else {
+        req = await CertReq.findOne({ requestId });
+        if (req) { req.status = 'Rejected'; if (reason) req.adminNote = reason; await req.save(); }
+      }
+      if (!req) return res.status(200).json({ success: false, message: 'Request not found' });
+      // Email member
+      const member = req.operativeId ? await Member.findOne({ operativeId: req.operativeId }) : null;
+      if (member && member.email && process.env.EMAIL_USER) {
+        try {
+          await transporter.sendMail({
+            from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+            to: member.email,
+            subject: `❌ ${reqType} Request Rejected`,
+            html: buildEmail({
+              title: `${reqType} Request Rejected`,
+              iconEmoji: '❌',
+              accentColor: '#dc2626',
+              bodyHtml: `<p style="font-size:15px;color:#374151;">Hi <strong>${member.name}</strong>, your ${reqType.toLowerCase()} request has been <strong style="color:#dc2626;">rejected</strong>.${reason ? ` Reason: <em>${reason}</em>` : ''}</p>`
+            })
+          });
+        } catch(e) { console.error('Request rejection email error', e.message); }
+      }
+      const log = new ActionLog({ timestamp: new Date(), type: 'REQUEST_REJECTED', content: `${reqType} request ${requestId} rejected`, operativeId: req.operativeId || 'ADMIN', name: req.name || 'Unknown' });
+      await log.save();
+      return res.status(200).json({ success: true, message: `${reqType} request rejected` });
+    }
+
+    if (action === 'admin_bulk_approve_requests') {
+      const { requests } = payload; // [{ requestId, reqType }]
+      if (!requests || !requests.length) return res.status(400).json({ success: false, message: 'No requests provided' });
+      let approved = 0;
+      for (const { requestId, reqType } of requests) {
+        try {
+          if (reqType === 'Document') {
+            await DocRequest.findOneAndUpdate({ requestId }, { status: 'Approved' });
+          } else {
+            await CertReq.findOneAndUpdate({ requestId }, { status: 'Approved' });
+          }
+          approved++;
+        } catch(e) { console.error('Bulk approve error for', requestId, e.message); }
+      }
+      const log = new ActionLog({ timestamp: new Date(), type: 'REQUESTS_BULK_APPROVED', content: `Bulk approved ${approved} requests`, operativeId: 'ADMIN', name: 'System Admin' });
+      await log.save();
+      return res.status(200).json({ success: true, message: `${approved} requests approved` });
+    }
+
     // -------------------------------------------------------------
     // SESSIONS (Creation & Management)
     // -------------------------------------------------------------
@@ -2806,6 +2959,451 @@ export default async function handler(req, res) {
       // We store the image directly as a base64 string since MongoDB can handle up to 16MB
       const dataUrl = `data:${mimeType};base64,${imageData}`;
       return res.status(200).json({ success: true, url: dataUrl });
+    }
+
+    // ── ANALYTICS & INSIGHTS ─────────────────────────────────────────────────
+    if (action === 'admin_analytics') {
+      const { range = 'all' } = payload;
+
+      // Date boundary for filtering
+      let fromDate = null;
+      if (range === '30d')  fromDate = new Date(Date.now() - 30  * 24 * 60 * 60 * 1000);
+      if (range === '90d')  fromDate = new Date(Date.now() - 90  * 24 * 60 * 60 * 1000);
+
+      // ── 1. Member registration trend (groups by creation date via ObjectId timestamp) ───
+      const memberDateFilter = fromDate
+        ? [{ $addFields: { _createdAt: { $toDate: '$_id' } } }, { $match: { _createdAt: { $gte: fromDate } } }]
+        : [{ $addFields: { _createdAt: { $toDate: '$_id' } } }];
+
+      const [weeklyRaw, monthlyRaw] = await Promise.all([
+        Member.aggregate([
+          ...memberDateFilter,
+          { $group: {
+              _id: { $dateToString: { format: '%Y-W%V', date: '$_createdAt' } },
+              count: { $sum: 1 }
+          }},
+          { $sort: { '_id': 1 } },
+          { $limit: 12 }
+        ]),
+        Member.aggregate([
+          ...memberDateFilter,
+          { $group: {
+              _id: { $dateToString: { format: '%Y-%m', date: '$_createdAt' } },
+              count: { $sum: 1 }
+          }},
+          { $sort: { '_id': 1 } },
+          { $limit: 12 }
+        ])
+      ]);
+
+      // ── 2. XP distribution per rank tier ─────────────────────────────────
+      const xpByRank = await Member.aggregate([
+        { $group: {
+            _id: { $ifNull: ['$rank', 'Unranked'] },
+            totalXP:  { $sum: '$xp' },
+            count:    { $sum: 1 }
+        }},
+        { $sort: { totalXP: -1 } }
+      ]);
+
+      // ── 3. Task status funnel ─────────────────────────────────────────────
+      const taskMatchStage = fromDate && { $match: { timestamp: { $gte: fromDate } } };
+      const taskFunnelPipeline = [
+        ...(taskMatchStage ? [taskMatchStage] : []),
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ];
+      const taskStatusRaw = await Task.aggregate(taskFunnelPipeline);
+      const taskFunnel = { Created: 0, Assigned: 0, Submitted: 0, Approved: 0 };
+      taskStatusRaw.forEach(t => {
+        const s = (t._id || '').toLowerCase();
+        if (s === 'open' || s === 'created')       taskFunnel.Created   += t.count;
+        else if (s === 'assigned')                  taskFunnel.Assigned  += t.count;
+        else if (s === 'submitted' || s === 'under review') taskFunnel.Submitted += t.count;
+        else if (s === 'completed' || s === 'approved')     taskFunnel.Approved  += t.count;
+      });
+
+      // ── 4. Per-session attendance totals (last 10 sessions) ──────────────
+      const recentSessions = await Session.find({}).sort({ timestamp: -1 }).limit(10).lean();
+      const sessionAttendance = await Promise.all(
+        recentSessions.map(async (s) => {
+          const count = await Attendance.countDocuments({ sessionId: s.sessionId, status: { $in: ['Attended', 'Present', 'Verified'] } });
+          return { sessionId: s.sessionId, title: s.title || s.sessionId, date: s.date || '', count };
+        })
+      );
+
+      // ── 5. Top 10 members by XP ───────────────────────────────────────────
+      const top10 = await Member.find({ xp: { $gt: 0 } })
+        .sort({ xp: -1 })
+        .limit(10)
+        .select('name operativeId xp rank squad forgeAccess')
+        .lean();
+
+      // ── 6. Pending action counts ──────────────────────────────────────────
+      const [pendingApprovals, pendingDocs, pendingCerts] = await Promise.all([
+        Member.countDocuments({ status: { $regex: /pending/i } }),
+        DocRequest.countDocuments({ status: { $regex: /pending/i } }),
+        CertReq.countDocuments({ status: { $regex: /pending/i } })
+      ]);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          growth: { weekly: weeklyRaw, monthly: monthlyRaw },
+          xpByRank,
+          taskFunnel,
+          sessionAttendance: sessionAttendance.reverse(), // chronological order
+          top10,
+          pendingActions: { approvals: pendingApprovals, docs: pendingDocs, certs: pendingCerts }
+        }
+      });
+    }
+
+    // ── ADMIN: Get Member Activity ────────────────────────────────────────────
+    if (action === 'admin_get_member_activity') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+      const opId = operativeId.trim().toUpperCase();
+
+      const [logs, tasks, attendance] = await Promise.all([
+        ActionLog.find({ operativeId: opId }).sort({ timestamp: -1 }).limit(20).lean(),
+        Task.find({ $or: [{ assignedTo: opId }, { submitLink: { $exists: true } }] }).sort({ timestamp: -1 }).lean(),
+        Attendance.find({ operativeId: opId }).sort({ timestamp: -1 }).lean()
+      ]);
+
+      // Derive XP events from ActionLog (types that carry xp/rank changes)
+      const xpEvents = logs.filter(l => ['XP_AWARDED', 'RANK_UP', 'BOUNTY_COMPLETED', 'TASK_COMPLETED'].includes(l.type));
+
+      return res.status(200).json({ success: true, data: { logs, tasks, attendance, xpEvents } });
+    }
+
+    // ── ADMIN: Set Member Note ────────────────────────────────────────────────
+    if (action === 'admin_set_member_note') {
+      const { operativeId, note } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      member.adminNote = note || '';
+      await member.save();
+
+      await new ActionLog({
+        timestamp: new Date(), type: 'ADMIN_NOTE_SET',
+        content: 'Admin note updated',
+        operativeId: member.operativeId, name: member.name
+      }).save();
+
+      return res.status(200).json({ success: true, message: 'Note saved.' });
+    }
+
+    // ── ADMIN: Suspend Member ─────────────────────────────────────────────────
+    if (action === 'admin_suspend_member') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      member.status = 'Suspended';
+      await member.save();
+
+      await new ActionLog({
+        timestamp: new Date(), type: 'MEMBER_SUSPENDED',
+        content: 'Member suspended by admin',
+        operativeId: member.operativeId, name: member.name
+      }).save();
+
+      await notifyAdmin({
+        type: 'STATUS_CHANGE', operativeId: member.operativeId,
+        name: member.name, detail: 'Member suspended by admin.', urgent: true
+      });
+
+      return res.status(200).json({ success: true, message: 'Member suspended.' });
+    }
+
+    // ── ADMIN: Delete Member ──────────────────────────────────────────────────
+    if (action === 'admin_delete_member') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      const { operativeId: opId, name } = member;
+      await member.deleteOne();
+
+      await new ActionLog({
+        timestamp: new Date(), type: 'MEMBER_DELETED',
+        content: `Member hard-deleted by admin (was: ${name})`,
+        operativeId: opId, name
+      }).save();
+
+      await notifyAdmin({
+        type: 'STATUS_CHANGE', operativeId: opId,
+        name, detail: 'Member permanently deleted by admin.', urgent: true
+      });
+
+      return res.status(200).json({ success: true, message: 'Member deleted.' });
+    }
+
+    // ── ADMIN: Reset Member OTP ───────────────────────────────────────────────
+    if (action === 'admin_reset_member_otp') {
+      const { operativeId } = payload;
+      if (!operativeId) return res.status(200).json({ success: false, message: 'Missing operativeId.' });
+
+      const member = await Member.findOne({ operativeId: operativeId.trim().toUpperCase() });
+      if (!member) return res.status(200).json({ success: false, message: 'Member not found.' });
+
+      member.otp = undefined;
+      member.otpTime = undefined;
+      member.otpAttempts = 0;
+      await member.save();
+
+      // Also clear any RegistrationOTP documents for this operative
+      await RegistrationOTP.deleteMany({ operativeId: member.operativeId });
+
+      await new ActionLog({
+        timestamp: new Date(), type: 'OTP_RESET',
+        content: 'OTP/session state reset by admin',
+        operativeId: member.operativeId, name: member.name
+      }).save();
+
+      return res.status(200).json({ success: true, message: 'OTP state reset.' });
+    }
+
+    // ── FORGE OPS: Archive Task ──────────────────────────────────────────────
+    if (action === 'admin_archive_task') {
+      const { taskId } = payload;
+      const t = await Task.findOne({ taskId });
+      if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+      t.status = 'Archived';
+      t.archivedAt = new Date();
+      await t.save();
+      await new ActionLog({
+        timestamp: new Date(), type: 'TASK_ARCHIVED',
+        content: `Task archived: ${t.title}`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      }).save();
+      return res.status(200).json({ success: true, message: 'Task archived.' });
+    }
+
+    // ── FORGE OPS: Clone Task ────────────────────────────────────────────────
+    if (action === 'admin_clone_task') {
+      const { taskId } = payload;
+      const t = await Task.findOne({ taskId }).lean();
+      if (!t) return res.status(200).json({ success: false, message: 'Task not found.' });
+      const clone = new Task({
+        taskId: 'TSK-' + Date.now(),
+        timestamp: new Date(),
+        title: t.title + ' (Copy)',
+        description: t.description,
+        xp: t.xp,
+        difficulty: t.difficulty,
+        status: 'Open',
+        assignedTo: 'Open',
+        submitLink: '',
+        feedback: '',
+        expiresAt: t.expiresAt || null,
+        order: 0
+      });
+      await clone.save();
+      await new ActionLog({
+        timestamp: new Date(), type: 'TASK_CLONED',
+        content: `Task cloned: "${t.title}" → "${clone.title}"`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      }).save();
+      return res.status(200).json({ success: true, message: 'Task cloned.', taskId: clone.taskId });
+    }
+
+    // ── FORGE OPS: Reorder Tasks ─────────────────────────────────────────────
+    if (action === 'admin_reorder_tasks') {
+      const { tasks } = payload; // [{ taskId, order }]
+      if (!Array.isArray(tasks)) return res.status(200).json({ success: false, message: 'tasks array required.' });
+      await Promise.all(tasks.map(({ taskId, order }) =>
+        Task.updateOne({ taskId }, { $set: { order: parseInt(order) || 0 } })
+      ));
+      return res.status(200).json({ success: true, message: 'Tasks reordered.' });
+    }
+
+    // ── FORGE OPS: XP Budget ─────────────────────────────────────────────────
+    if (action === 'admin_get_xp_budget') {
+      const [activeTasks, members, pendingCount] = await Promise.all([
+        Task.find({ status: { $ne: 'Archived' } }, 'xp').lean(),
+        Member.find({}, 'xp').lean(),
+        Task.countDocuments({ status: 'Submitted' })
+      ]);
+      const totalXpInActiveTasks = activeTasks.reduce((s, t) => s + (parseInt(t.xp) || 0), 0);
+      const totalXpAwarded = members.reduce((s, m) => s + (parseInt(m.xp) || 0), 0);
+      return res.status(200).json({
+        success: true,
+        totalXpInActiveTasks,
+        totalXpAwarded,
+        pendingSubmissions: pendingCount
+      });
+    }
+
+    // ── Sub-Task 4: Sessions & Events Control Center ────────────────────────
+
+    if (action === 'admin_get_session_analytics') {
+      const { sessionId } = payload;
+      if (!sessionId) return res.status(400).json({ success: false, message: 'sessionId required' });
+      const session = await Session.findOne({ sessionId }).lean();
+      if (!session) return res.status(200).json({ success: false, message: 'Session not found' });
+
+      const attendanceStatuses = ['Attended', 'Present', 'Verified', 'Checked-In'];
+      const [allAttendance, feedback] = await Promise.all([
+        Attendance.find({ sessionId }).lean(),
+        Feedback.find({ eventId: sessionId }).lean()
+      ]);
+      const attended = allAttendance.filter(a => attendanceStatuses.includes(a.status));
+
+      // Rank breakdown: look up each attendee's rank
+      const operativeIds = attended.map(a => a.operativeId).filter(Boolean);
+      const members = operativeIds.length
+        ? await Member.find({ operativeId: { $in: operativeIds } }, 'operativeId rank').lean()
+        : [];
+      const rankMap = {};
+      members.forEach(m => { rankMap[m.operativeId] = m.rank || 'Unknown'; });
+      const rankBreakdown = {};
+      operativeIds.forEach(id => {
+        const r = rankMap[id] || 'Unknown';
+        rankBreakdown[r] = (rankBreakdown[r] || 0) + 1;
+      });
+
+      const totalAttendees = allAttendance.length;
+      const checkedIn = attended.length;
+      const attendanceRate = totalAttendees > 0 ? Math.round((checkedIn / totalAttendees) * 100) : 0;
+      const avgFeedback = feedback.length
+        ? (feedback.reduce((s, f) => s + (f.rating || 0), 0) / feedback.length).toFixed(1)
+        : null;
+
+      return res.status(200).json({
+        success: true,
+        session,
+        totalAttendees,
+        checkedIn,
+        attendanceRate,
+        avgFeedback,
+        feedbackCount: feedback.length,
+        rankBreakdown
+      });
+    }
+
+    if (action === 'admin_create_recurring_session') {
+      const { title, date, location, description, link, coverUrl, imageUrls, allowedOperatives, recurrence, recurrenceCount, eventType } = payload;
+      if (!title || !date || !recurrence || recurrence === 'none') {
+        return res.status(400).json({ success: false, message: 'title, date, and recurrence (weekly/monthly) required' });
+      }
+      const count = Math.min(parseInt(recurrenceCount) || 4, 52); // cap at 52 occurrences
+      const created = [];
+      let baseDate = new Date(date);
+      for (let i = 0; i < count; i++) {
+        const d = new Date(baseDate);
+        if (i > 0) {
+          if (recurrence === 'weekly') d.setDate(d.getDate() + 7 * i);
+          else if (recurrence === 'monthly') d.setMonth(d.getMonth() + i);
+        }
+        const isoDate = d.toISOString().slice(0, 10);
+        const s = new Session({
+          sessionId: 'EVT-' + Date.now() + '-' + i,
+          timestamp: new Date(),
+          title: count > 1 ? `${title} #${i + 1}` : title,
+          date: isoDate,
+          location: location || '',
+          description: description || '',
+          link: link || '',
+          status: 'Upcoming',
+          coverUrl: coverUrl || '',
+          imageUrls: imageUrls || [],
+          allowedOperatives: allowedOperatives || [],
+          recurrence,
+          recurrenceCount: count,
+          eventType: eventType || 'Session'
+        });
+        await s.save();
+        created.push(s.sessionId);
+      }
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'SESSION_RECURRING_CREATED',
+        content: `Admin created ${count} recurring sessions: "${title}" (${recurrence})`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: `${count} recurring sessions created`, sessionIds: created });
+    }
+
+    if (action === 'admin_update_session_status') {
+      const { sessionId, status } = payload;
+      const allowed = ['Upcoming', 'Live', 'Completed', 'Cancelled'];
+      if (!sessionId || !allowed.includes(status)) {
+        return res.status(400).json({ success: false, message: 'sessionId and valid status required' });
+      }
+      const s = await Session.findOne({ sessionId });
+      if (!s) return res.status(200).json({ success: false, message: 'Session not found' });
+      s.status = status;
+      await s.save();
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'SESSION_STATUS_UPDATED',
+        content: `Session "${s.title}" marked as ${status}`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: `Session status set to ${status}` });
+    }
+
+    if (action === 'admin_bulk_send_certificates') {
+      const { sessionId } = payload;
+      if (!sessionId) return res.status(400).json({ success: false, message: 'sessionId required' });
+      const session = await Session.findOne({ sessionId }).lean();
+      if (!session) return res.status(200).json({ success: false, message: 'Session not found' });
+
+      const attendanceStatuses = ['Attended', 'Present', 'Verified', 'Checked-In'];
+      const attended = await Attendance.find({ sessionId, status: { $in: attendanceStatuses } }).lean();
+      if (!attended.length) return res.status(200).json({ success: false, message: 'No confirmed attendees found' });
+
+      const operativeIds = attended.map(a => a.operativeId).filter(Boolean);
+      const members = await Member.find({ operativeId: { $in: operativeIds }, email: { $exists: true, $ne: '' } }).lean();
+
+      let sent = 0, failed = 0;
+      for (const member of members) {
+        try {
+          await transporter.sendMail({
+            from: `"Innovexa Hub" <${process.env.EMAIL_USER}>`,
+            to: member.email,
+            subject: `🏅 Certificate of Participation — ${session.title}`,
+            html: buildEmail({
+              title: 'Certificate of Participation',
+              subtitle: session.title,
+              iconEmoji: '🏅',
+              accentColor: '#7c3aed',
+              bodyHtml: `
+                <p style="font-size:15px;color:#374151;margin:0 0 8px;">Hi <strong style="color:#000;">${member.name}</strong>,</p>
+                <p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">
+                  Thank you for participating in <strong style="color:#7c3aed;">${session.title}</strong> on ${session.date}.
+                  Your dedication to learning and growth within the Innovexa community is recognized and celebrated!
+                </p>
+                <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:20px;margin-bottom:20px;text-align:center;">
+                  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Issued to</div>
+                  <div style="font-size:20px;font-weight:800;color:#000;">${member.name}</div>
+                  <div style="font-size:12px;color:#6b7280;margin-top:4px;">Operative ID: ${member.operativeId}</div>
+                </div>
+                <a href="https://innovexareg.vercel.app/forge.html" style="display:block;text-align:center;padding:14px 24px;background:#000000;color:#fff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:700;">View Your Forge Profile →</a>
+              `
+            })
+          });
+          sent++;
+        } catch(e) {
+          console.error('Cert email failed for', member.email, e.message);
+          failed++;
+        }
+      }
+      const log = new ActionLog({
+        timestamp: new Date(), type: 'CERTIFICATES_DISPATCHED',
+        content: `Bulk certificates sent for "${session.title}" — ${sent} sent, ${failed} failed`,
+        operativeId: 'ADMIN', name: 'System Admin'
+      });
+      await log.save();
+      return res.status(200).json({ success: true, message: `Certificates dispatched: ${sent} sent, ${failed} failed`, sent, failed });
     }
 
     return res.status(200).json({ success: false, message: 'Unknown or unmigrated action: ' + action });

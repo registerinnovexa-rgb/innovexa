@@ -175,9 +175,42 @@
     .status-open     { background: #e0f2fe; color: #0369a1; }
     .status-review   { background: #f1f5f9; color: #334155; }
 
-    .badge-confirmed { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#dcfce7; color:#059669; border-radius:var(--radius-sm); }
-    .badge-rejected  { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fee2e2; color:#b91c1c; border-radius:var(--radius-sm); }
-    .badge-pending   { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fef9c3; color:#b45309; border-radius:var(--radius-sm); }
+    .badge-confirmed  { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#dcfce7; color:#059669; border-radius:var(--radius-sm); cursor:pointer; }
+    .badge-rejected   { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fee2e2; color:#b91c1c; border-radius:var(--radius-sm); cursor:pointer; }
+    .badge-pending    { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fef9c3; color:#b45309; border-radius:var(--radius-sm); cursor:pointer; }
+    .badge-suspended  { display:inline-block; padding:4px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; background:#fce7f3; color:#9d174d; border-radius:var(--radius-sm); cursor:pointer; }
+
+    /* Member detail slide-in panel */
+    #memberSlidePanel {
+      position:fixed; top:0; right:0; width:680px; max-width:100vw; height:100vh;
+      background:var(--bg1); border-left:1px solid var(--border);
+      box-shadow:-4px 0 32px rgba(0,0,0,0.35);
+      transform:translateX(100%); transition:transform 0.28s cubic-bezier(.4,0,0,1);
+      z-index:1100; display:flex; flex-direction:column; overflow:hidden;
+    }
+    #memberSlidePanel.open { transform:translateX(0); }
+    #slidePanelOverlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.45);
+      z-index:1099; display:none;
+    }
+    #slidePanelOverlay.open { display:block; }
+    .slide-panel-tabs { display:flex; border-bottom:1px solid var(--border); padding:0 20px; background:var(--bg2); flex-shrink:0; }
+    .slide-panel-tab {
+      padding:14px 18px; font-size:13px; font-weight:600; cursor:pointer;
+      color:var(--text3); border-bottom:2px solid transparent; transition:color 0.15s, border-color 0.15s;
+      white-space:nowrap;
+    }
+    .slide-panel-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .slide-tab-content { display:none; }
+    .slide-tab-content.active { display:block; }
+    .danger-zone { border:1px solid rgba(220,38,38,0.4); border-radius:8px; padding:16px 20px; background:rgba(220,38,38,0.05); }
+    .danger-zone-title { color:#dc2626; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+
+    /* Member filter bar */
+    #memberFilterBar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 0 8px; }
+    #memberFilterBar select, #memberFilterBar input { background:var(--bg3); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 10px; font-size:13px; }
+    #memberFilterBar .btn-clear-filters { padding:6px 12px; font-size:12px; background:transparent; border:1px solid var(--border2); color:var(--text3); border-radius:6px; cursor:pointer; }
+    #memberFilterBar .btn-clear-filters:hover { color:var(--text); border-color:var(--border); }
 
     /* ── Action Buttons ── */
     .btn-sm {
@@ -296,10 +329,75 @@
     
     .bounty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
 
+    /* ── Kanban Board ── */
+    .kanban-col {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px; min-height: 120px;
+    }
+    .kanban-col.drag-over { outline: 2px dashed var(--accent); }
+    .kanban-col-header {
+      font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
+      padding: 6px 10px; border-radius: 8px; margin-bottom: 12px;
+    }
+    .kanban-cards { display: flex; flex-direction: column; gap: 10px; }
+    .kanban-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; cursor: grab; transition: box-shadow 0.15s;
+    }
+    .kanban-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    .kanban-card.dragging { opacity: 0.4; }
+    .kanban-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .kanban-card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .kanban-card-actions { display: flex; gap: 6px; }
+    .kanban-card-actions button {
+      flex: 1; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+      border: none; cursor: pointer;
+    }
+
     .diff-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
     .diff-easy { background: rgba(16,185,129,0.15); color: #34d399; }
     .diff-medium { background: rgba(245,158,11,0.15); color: #fbbf24; }
     .diff-hard { background: rgba(239,68,68,0.15); color: #f87171; }
+
+    /* ── Sessions Calendar & Analytics ── */
+    .sessions-view-toggle { display:flex; gap:8px; margin-bottom:18px; }
+    .sessions-view-btn { padding:8px 18px; background:var(--bg2); border:1px solid var(--border); border-radius:20px; font-size:13px; font-weight:600; color:var(--text3); cursor:pointer; transition:all 0.2s; font-family:var(--font-b); }
+    .sessions-view-btn.active { background:var(--accent); color:#fff; border-color:#000; }
+    .session-calendar { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:24px; }
+    .cal-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .cal-nav-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:6px 14px; cursor:pointer; font-size:14px; font-weight:700; transition:background 0.15s; }
+    .cal-nav-btn:hover { background:var(--accent); color:#fff; }
+    .cal-month-label { font-size:18px; font-weight:800; flex:1; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .cal-day-header { text-align:center; font-size:11px; font-weight:700; color:var(--text3); padding:6px 0; text-transform:uppercase; letter-spacing:0.5px; }
+    .cal-cell { min-height:72px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:6px; position:relative; transition:background 0.15s; }
+    .cal-cell.today { border-color:var(--accent); background:rgba(37,99,235,0.07); }
+    .cal-cell.other-month { opacity:0.35; }
+    .cal-cell-date { font-size:12px; font-weight:700; color:var(--text3); margin-bottom:4px; }
+    .cal-event-chip { font-size:10px; font-weight:700; padding:2px 6px; border-radius:5px; margin-bottom:2px; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:block; transition:opacity 0.15s; }
+    .cal-event-chip:hover { opacity:0.75; }
+    .cal-event-upcoming { background:rgba(37,99,235,0.18); color:#2563eb; }
+    .cal-event-live { background:rgba(16,185,129,0.18); color:#10b981; }
+    .cal-event-completed { background:rgba(107,114,128,0.18); color:#6b7280; }
+    .cal-event-cancelled { background:rgba(220,38,38,0.18); color:#dc2626; }
+    .session-analytics-panel { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:20px; }
+    .session-analytics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin-bottom:18px; }
+    .session-stat-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; }
+    .session-stat-val { font-size:26px; font-weight:800; }
+    .session-stat-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+    .session-status-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+    .session-status-btn { padding:7px 16px; border-radius:20px; font-size:12px; font-weight:700; border:2px solid; cursor:pointer; transition:all 0.2s; background:transparent; }
+    .session-status-btn.upcoming { border-color:#2563eb; color:#2563eb; }
+    .session-status-btn.upcoming.active-s, .session-status-btn.upcoming:hover { background:#2563eb; color:#fff; }
+    .session-status-btn.live { border-color:#10b981; color:#10b981; }
+    .session-status-btn.live.active-s, .session-status-btn.live:hover { background:#10b981; color:#fff; }
+    .session-status-btn.completed { border-color:#6b7280; color:#6b7280; }
+    .session-status-btn.completed.active-s, .session-status-btn.completed:hover { background:#6b7280; color:#fff; }
+    .session-status-btn.cancelled { border-color:#dc2626; color:#dc2626; }
+    .session-status-btn.cancelled.active-s, .session-status-btn.cancelled:hover { background:#dc2626; color:#fff; }
+    .live-counter-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); border:1px solid #10b981; color:#10b981; border-radius:20px; padding:4px 14px; font-size:13px; font-weight:700; }
+    .live-dot { width:8px; height:8px; background:#10b981; border-radius:50%; animation:pulse-dot 1.2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
     .xp-orb {
       display: inline-flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -434,6 +532,61 @@
     .data-table th:first-child { border-top-left-radius: 8px; }
     .data-table th:last-child { border-top-right-radius: 8px; }
 
+    /* ── Analytics Section ── */
+    .analytics-section { margin-top: 32px; }
+    .analytics-section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .analytics-section-header h2 { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; }
+    .analytics-range-bar { display: flex; gap: 6px; background: var(--bg3); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+    .range-btn {
+      padding: 6px 14px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; color: var(--text3); background: transparent; transition: all 0.2s; font-family: var(--font-b);
+    }
+    .range-btn:hover { color: var(--text); }
+    .range-btn.active { background: #fff; color: var(--accent); box-shadow: var(--shadow-sm); }
+    .analytics-charts-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;
+    }
+    @media (max-width: 900px) { .analytics-charts-grid { grid-template-columns: 1fr; } }
+    .analytics-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow-sm);
+    }
+    .analytics-card-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+    }
+    .analytics-card-title { font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
+    .analytics-bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .analytics-bottom-grid { grid-template-columns: 1fr; } }
+    .pending-actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .pending-badge {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 18px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg3);
+      gap: 6px; text-align: center;
+    }
+    .pending-badge-count { font-size: 28px; font-weight: 800; line-height: 1; }
+    .pending-badge-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .top-ops-list { display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; padding-right: 4px; }
+    .top-ops-list::-webkit-scrollbar { width: 4px; }
+    .top-ops-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    .top-op-row {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border-radius: 8px; background: var(--bg3); transition: background 0.2s;
+    }
+    .top-op-row:hover { background: var(--bg); }
+    .top-op-rank { font-size: 12px; font-weight: 700; color: var(--text3); width: 20px; text-align: center; flex-shrink: 0; }
+    .top-op-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top-op-xp { font-size: 12px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .top-op-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--blue-bg); color: var(--blue); white-space: nowrap; }
+    .growth-toggle { display: flex; gap: 4px; }
+    .growth-toggle-btn {
+      padding: 3px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 11px;
+      font-weight: 600; cursor: pointer; background: transparent; color: var(--text3); font-family: var(--font-b); transition: all 0.15s;
+    }
+    .growth-toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #analyticsLoading { display: flex; align-items: center; justify-content: center; padding: 60px 0; gap: 12px; color: var(--text3); font-size: 14px; }
 </style>
 
 
@@ -596,17 +749,32 @@
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       Members
     </button>
-    <button class="sidebar-btn" onclick="switchAdminTab('forgeOps')" id="navForgeOps">
+    <button class="sidebar-btn" onclick="switchAdminTab('forgeOps')" id="navForgeOps" style="position:relative;">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
       Forge Ops
+      <span id="forgeReviewBadge" style="display:none;position:absolute;top:6px;right:8px;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.4;"></span>
     </button>
     <button class="sidebar-btn" onclick="switchAdminTab('sessions')" id="navSessions">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
       Sessions & Ops
     </button>
-    
-    
-    
+
+    <button class="sidebar-btn" onclick="switchAdminTab('requests')" id="navRequests" style="position:relative;">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Requests
+      <span id="requestsBadge" style="display:none;position:absolute;top:6px;right:8px;background:#d97706;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.4;"></span>
+    </button>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('surveillance')" id="navSurveillance">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Audit Log
+    </button>
+
+    <button class="sidebar-btn" onclick="switchAdminTab('commsHub')" id="navCommsHub">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+      Communications
+    </button>
+
     <button class="sidebar-btn" onclick="switchAdminTab('sysSettings')" id="navSysSettings">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       System Settings
@@ -619,6 +787,129 @@
 
   <!-- Main Content -->
   <div class="main-content">
+
+    <!-- ── COMMUNICATIONS HUB TAB ── -->
+    <div class="tab-content" id="tabCommsHub">
+      <div class="section-header" style="margin-bottom:24px;">
+        <h2 style="font-size:24px;font-weight:800;">Communications Hub</h2>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div class="sub-tabs" style="margin-bottom:24px;" id="commsSubTabs">
+        <button class="sub-tab-btn active" onclick="switchCommsTab('email')" id="commsTabEmail">📧 Email Blast</button>
+        <button class="sub-tab-btn" onclick="switchCommsTab('announcement')" id="commsTabAnnouncement">📢 Announcement</button>
+        <button class="sub-tab-btn" onclick="switchCommsTab('whatsapp')" id="commsTabWhatsapp">💬 WhatsApp</button>
+        <button class="sub-tab-btn" onclick="switchCommsTab('history')" id="commsTabHistory">📋 History</button>
+      </div>
+
+      <!-- EMAIL BLAST -->
+      <div id="commsEmailPanel">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Subject</label>
+              <input type="text" id="commsSubject" placeholder="Email subject line…" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Message Body</label>
+              <textarea id="commsBody" rows="8" placeholder="Write your message here…" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;resize:vertical;"></textarea>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Audience</label>
+              <select id="commsAudience" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+                <option value="all">All Members</option>
+                <option value="confirmed">Confirmed Members Only</option>
+                <option value="forge">Forge Access Members</option>
+                <option value="pending">Pending Approvals</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Use Template (Optional)</label>
+              <select id="commsTemplate" onchange="loadCommsTemplate()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+                <option value="">— Custom Message —</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Schedule Send (Optional)</label>
+              <input type="datetime-local" id="commsScheduleAt" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+              <div style="font-size:11px;color:var(--text3);margin-top:4px;">Leave blank to send immediately</div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+              <button onclick="sendCommsEmail()" style="padding:11px 24px;background:var(--accent);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;flex:1;">📧 Send Email</button>
+              <button onclick="previewAudienceCount()" style="padding:11px 18px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;cursor:pointer;">👁 Preview Count</button>
+            </div>
+            <div id="commsEmailStatus" style="font-size:13px;color:var(--text3);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENT -->
+      <div id="commsAnnouncementPanel" style="display:none;">
+        <div style="max-width:600px;display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Title</label>
+            <input type="text" id="annTitle" placeholder="Announcement title…" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Body</label>
+            <textarea id="annBody" rows="5" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;resize:vertical;"></textarea>
+          </div>
+          <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="annPinned" style="width:16px;height:16px;accent-color:var(--accent);">
+              📌 Pin this announcement
+            </label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label style="font-size:11px;font-weight:700;color:var(--text3);">Expires</label>
+              <input type="date" id="annExpiry" style="padding:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;">
+            </div>
+          </div>
+          <button onclick="publishAnnouncement()" style="padding:11px 24px;background:var(--accent);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;align-self:flex-start;">📢 Publish Announcement</button>
+          <div id="annStatus" style="font-size:13px;color:var(--text3);"></div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP GENERATOR -->
+      <div id="commsWhatsappPanel" style="display:none;">
+        <div style="max-width:600px;display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Event / Session Name</label>
+            <input type="text" id="waEventName" placeholder="e.g. Forge Session #5" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Date &amp; Time</label>
+            <input type="text" id="waDateTime" placeholder="e.g. Saturday, 15 June 2025 at 3:00 PM" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Venue</label>
+            <input type="text" id="waVenue" placeholder="e.g. Lab 3, Block B" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Extra Notes</label>
+            <textarea id="waExtra" rows="3" placeholder="e.g. Bring your laptops! Register by 5 PM." style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;resize:vertical;"></textarea>
+          </div>
+          <button onclick="generateWaText()" style="padding:11px 24px;background:#25d366;border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;align-self:flex-start;">💬 Generate Message</button>
+          <div id="waOutput" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;">Generated Message</div>
+            <pre id="waText" style="white-space:pre-wrap;font-size:13px;margin:0;color:var(--text);font-family:inherit;"></pre>
+            <button onclick="copyWaText()" style="margin-top:10px;padding:8px 18px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;cursor:pointer;">📋 Copy to Clipboard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="commsHistoryPanel" style="display:none;">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Type</th><th>Subject / Title</th><th>Audience</th><th>Sent To</th></tr></thead>
+            <tbody id="commsHistoryBody"><tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text3);">Load history to view broadcasts.</td></tr></tbody>
+          </table>
+        </div>
+        <button onclick="loadCommsHistory()" style="margin-top:12px;padding:9px 20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;cursor:pointer;">↻ Load History</button>
+      </div>
+    </div>
 
     <!-- ── SYSTEM SETTINGS TAB ── -->
     <div class="tab-content" id="tabSysSettings">
@@ -683,6 +974,84 @@
       </div>
 
       <div id="settingsStatus" style="margin-top:20px;font-size:13px;font-weight:600;min-height:20px;"></div>
+
+      <!-- ── SYSTEM HEALTH PANEL ── -->
+      <div style="margin-top:32px;">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+          🩺 System Health
+          <button onclick="loadSystemHealth()" style="margin-left:10px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:11px;cursor:pointer;">↻ Refresh</button>
+        </h3>
+        <div id="sysHealthPanel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;">
+          <div class="admin-card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;" id="sysHealthDbIcon">⏳</div>
+            <div style="font-size:14px;font-weight:700;" id="sysHealthDbStatus">Checking…</div>
+            <div style="font-size:11px;color:var(--text3);">MongoDB</div>
+          </div>
+          <div class="admin-card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;" id="sysHealthApiIcon">⏳</div>
+            <div style="font-size:14px;font-weight:700;" id="sysHealthApiStatus">Checking…</div>
+            <div style="font-size:11px;color:var(--text3);">API Latency</div>
+          </div>
+          <div class="admin-card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">📝</div>
+            <div style="font-size:22px;font-weight:800;color:#dc2626;" id="sysHealthErrors">—</div>
+            <div style="font-size:11px;color:var(--text3);">Recent Errors (24h)</div>
+          </div>
+          <div class="admin-card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:6px;">👥</div>
+            <div style="font-size:22px;font-weight:800;color:#10b981;" id="sysHealthMembers">—</div>
+            <div style="font-size:11px;color:var(--text3);">Total Members</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WEBHOOK TEST TOOL ── -->
+      <div style="margin-top:32px;">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">🔗 Webhook Test Tool</h3>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Webhook URL</label>
+              <input type="url" id="webhookTestUrl" placeholder="https://example.com/webhook" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Event Type</label>
+              <select id="webhookTestEvent" style="padding:11px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+                <option value="test">test</option>
+                <option value="member.approved">member.approved</option>
+                <option value="task.completed">task.completed</option>
+                <option value="session.live">session.live</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="fireWebhookTest()" style="padding:10px 24px;background:var(--accent);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;align-self:flex-start;">🚀 Fire Test Payload</button>
+          <div id="webhookTestResult" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <!-- ── MAINTENANCE SCHEDULER ── -->
+      <div style="margin-top:32px;margin-bottom:8px;">
+        <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;">🔧 Maintenance Scheduler</h3>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Schedule Maintenance At</label>
+              <input type="datetime-local" id="maintScheduleAt" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Duration (minutes)</label>
+              <input type="number" id="maintDuration" value="60" min="5" max="1440" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Notice Message (shown to users)</label>
+            <input type="text" id="maintMessage" placeholder="Scheduled maintenance. Back shortly!" style="width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;box-sizing:border-box;font-size:13px;">
+          </div>
+          <button onclick="scheduleMaintenanceWindow()" style="padding:10px 24px;background:#d97706;border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;align-self:flex-start;">📅 Schedule Maintenance</button>
+          <div id="maintScheduleStatus" style="font-size:13px;color:var(--text3);"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── RANK CONFIG TAB ── -->
@@ -801,6 +1170,113 @@
         </div>
 
       </div>
+
+      <!-- ── ANALYTICS & INSIGHTS SECTION ── -->
+      <div class="analytics-section" id="analyticsSection">
+        <div class="analytics-section-header">
+          <h2>Analytics &amp; Insights</h2>
+          <div class="analytics-range-bar">
+            <button class="range-btn active" data-range="all"  onclick="setAnalyticsRange('all')">All Time</button>
+            <button class="range-btn"         data-range="90d"  onclick="setAnalyticsRange('90d')">Last 90 Days</button>
+            <button class="range-btn"         data-range="30d"  onclick="setAnalyticsRange('30d')">Last 30 Days</button>
+          </div>
+        </div>
+
+        <div id="analyticsLoading">
+          <div class="spinner" style="border-top-color:var(--accent);"></div> Loading analytics...
+        </div>
+
+        <div id="analyticsContent" style="display:none;">
+          <!-- Four Charts Grid -->
+          <div class="analytics-charts-grid">
+            <!-- 1. Member Growth -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">Member Growth</span>
+                <div class="growth-toggle">
+                  <button class="growth-toggle-btn active" id="btnGrowthWeekly" onclick="switchGrowthView('weekly')">Weekly</button>
+                  <button class="growth-toggle-btn"        id="btnGrowthMonthly" onclick="switchGrowthView('monthly')">Monthly</button>
+                </div>
+              </div>
+              <div style="position:relative; height:200px;">
+                <canvas id="growthChart"></canvas>
+              </div>
+            </div>
+
+            <!-- 2. XP Distribution -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">XP by Rank Tier</span>
+              </div>
+              <div style="position:relative; height:200px;">
+                <canvas id="xpRankChart"></canvas>
+              </div>
+            </div>
+
+            <!-- 3. Task Funnel -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">Task Completion Funnel</span>
+              </div>
+              <div style="position:relative; height:200px;">
+                <canvas id="taskFunnelChart"></canvas>
+              </div>
+            </div>
+
+            <!-- 4. Event Attendance -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">Session Attendance</span>
+              </div>
+              <div style="position:relative; height:200px;">
+                <canvas id="attendanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom row: Top Operatives + Pending Actions -->
+          <div class="analytics-bottom-grid">
+            <!-- Top Operatives -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">Top Operatives</span>
+                <span style="font-size:11px; color:var(--text3); font-weight:600;">By XP</span>
+              </div>
+              <div class="top-ops-list" id="topOpsList">
+                <p style="color:var(--text3); font-size:13px; text-align:center; padding:20px 0;">Loading...</p>
+              </div>
+            </div>
+
+            <!-- Pending Actions -->
+            <div class="analytics-card">
+              <div class="analytics-card-header">
+                <span class="analytics-card-title">Pending Actions</span>
+              </div>
+              <div class="pending-actions-grid">
+                <div class="pending-badge">
+                  <div class="pending-badge-count" id="pendingApprovalsCount" style="color:var(--yellow);">—</div>
+                  <div class="pending-badge-label">Approvals</div>
+                </div>
+                <div class="pending-badge">
+                  <div class="pending-badge-count" id="pendingDocsCount" style="color:var(--blue);">—</div>
+                  <div class="pending-badge-label">Doc Requests</div>
+                </div>
+                <div class="pending-badge">
+                  <div class="pending-badge-count" id="pendingCertsCount" style="color:var(--green);">—</div>
+                  <div class="pending-badge-label">Cert Requests</div>
+                </div>
+              </div>
+              <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+                <p style="font-size:12px; color:var(--text3); margin:0; line-height:1.6;">
+                  Review pending items in their respective tabs to keep workflows moving.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ── END ANALYTICS ── -->
+
     </div>
 
   <!-- ── ROLE MANAGEMENT TAB ── -->
@@ -814,13 +1290,59 @@
         <div style="font-size:13px; color:var(--text3); margin-top:4px;">Manage operative clearance, bounties, and progression frameworks.</div>
       </div>
     </div>
-    
+
+    <!-- XP Budget Panel -->
+    <div id="xpBudgetPanel" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px;">
+      <div class="admin-card" style="padding:18px; margin:0; display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Active Task XP Pool</div>
+        <div id="xpBudgetActive" style="font-size:28px; font-weight:800; color:#2563eb;">—</div>
+        <div style="font-size:11px; color:var(--text3);">XP across non-archived tasks</div>
+      </div>
+      <div class="admin-card" style="padding:18px; margin:0; display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">XP Already Awarded</div>
+        <div id="xpBudgetAwarded" style="font-size:28px; font-weight:800; color:#10b981;">—</div>
+        <div style="font-size:11px; color:var(--text3);">Total XP held by all members</div>
+      </div>
+      <div class="admin-card" style="padding:18px; margin:0; display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3);">Pending Reviews</div>
+        <div id="xpBudgetPending" style="font-size:28px; font-weight:800; color:#d97706;">—</div>
+        <div style="font-size:11px; color:var(--text3);">Submissions awaiting approval</div>
+      </div>
+    </div>
+
     <!-- Segmented Control Bar for Sub-Tabs -->
-    <div class="segmented-control" style="display:inline-flex; gap:4px; padding:4px; background:#f1f5f9; border-radius:10px; margin-bottom:24px; border:1px solid #e2e8f0; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);">
-      <button class="seg-btn active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Clearance</button>
-      <button class="seg-btn" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
-      <button class="seg-btn" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions</button>
-      <button class="seg-btn" id="fNavResources" onclick="switchForgeSubTab('resources')">Resources</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div class="segmented-control" style="display:inline-flex; gap:4px; padding:4px; background:#f1f5f9; border-radius:10px; border:1px solid #e2e8f0; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);">
+        <button class="seg-btn active" id="fNavAccess" onclick="switchForgeSubTab('access')">Access & Clearance</button>
+        <button class="seg-btn" id="fNavBounties" onclick="switchForgeSubTab('bounties')">Bounty Board</button>
+        <button class="seg-btn" id="fNavReviews" onclick="switchForgeSubTab('reviews')">Submissions <span id="reviewsNavBadge" style="display:none;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px;"></span></button>
+        <button class="seg-btn" id="fNavResources" onclick="switchForgeSubTab('resources')">Resources</button>
+      </div>
+      <!-- View toggle: only shown in Bounty Board sub-tab -->
+      <div id="forgeViewToggle" style="display:none; gap:4px; padding:4px; background:#f1f5f9; border-radius:10px; border:1px solid #e2e8f0; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05);">
+        <button class="seg-btn active" id="viewBtnList" onclick="setForgeView('list')" title="List View">☰ List</button>
+        <button class="seg-btn" id="viewBtnKanban" onclick="setForgeView('kanban')" title="Kanban View">⊞ Kanban</button>
+      </div>
+    </div>
+
+    <!-- Task Filter Bar (shown in Bounty Board sub-tab) -->
+    <div id="forgeFilterBar" style="display:none; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:18px; gap:10px; flex-wrap:wrap; align-items:center;">
+      <select id="filterDifficulty" onchange="applyForgeFilters()" style="padding:7px 10px; border-radius:7px; border:1px solid var(--border); background:var(--bg3); color:var(--text); font-size:13px;">
+        <option value="all">All Difficulties</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <select id="filterStatus" onchange="applyForgeFilters()" style="padding:7px 10px; border-radius:7px; border:1px solid var(--border); background:var(--bg3); color:var(--text); font-size:13px;">
+        <option value="all">All Statuses</option>
+        <option value="Open">Open</option>
+        <option value="Assigned">Assigned</option>
+        <option value="Submitted">Submitted</option>
+        <option value="Completed">Completed</option>
+        <option value="Archived">Archived</option>
+      </select>
+      <input type="text" id="filterAssignee" placeholder="🔍 Filter by assignee ID…" oninput="applyForgeFilters()" style="padding:7px 10px; border-radius:7px; border:1px solid var(--border); background:var(--bg3); color:var(--text); font-size:13px; min-width:180px;">
+      <button onclick="clearForgeFilters()" style="padding:7px 14px; border-radius:7px; border:1px solid var(--border); background:transparent; color:var(--text3); font-size:13px; cursor:pointer;">✕ Clear</button>
     </div>
 
     <!-- Sub-tab: Access Management -->
@@ -888,13 +1410,43 @@
           <div class="form-group" style="flex:1;"><label>Difficulty</label><select id="tkDiff" onchange="autoCalcXP()"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
         </div>
         <div class="form-group"><label>Assign To (Comma-separated IDs, or 'Open')</label><input type="text" id="tkAssign" value="Open" placeholder="e.g. INVX-09, INVX-12 or Open" list="operativeList"></div>
+        <div class="form-group"><label>Expiry Date (optional)</label><input type="datetime-local" id="tkExpiresAt"></div>
         <button class="btn-primary" onclick="adminCreateTask()">Deploy Task</button>
         <button class="btn-sm" style="background:var(--bg2); color:var(--text);" onclick="closeBountyDrawer()">Cancel</button>
       </div>
 
-      <div class="admin-card">
-        <h3>Active Bounties</h3>
-        <div id="forgeTasksBody" style="margin-top:12px;"></div>
+      <!-- List view -->
+      <div id="forgeListView">
+        <div class="admin-card">
+          <h3>Active Bounties</h3>
+          <div id="forgeTasksBody" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Kanban view -->
+      <div id="forgeKanbanView" style="display:none;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; align-items:start;">
+          <div class="kanban-col" id="kCol_Open" data-status="Open" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'Open')">
+            <div class="kanban-col-header" style="background:#2563eb22; color:#2563eb;">⬜ Open</div>
+            <div class="kanban-cards" id="kCards_Open"></div>
+          </div>
+          <div class="kanban-col" id="kCol_Assigned" data-status="Assigned" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'Assigned')">
+            <div class="kanban-col-header" style="background:#06b6d422; color:#06b6d4;">🔵 In Progress</div>
+            <div class="kanban-cards" id="kCards_Assigned"></div>
+          </div>
+          <div class="kanban-col" id="kCol_Submitted" data-status="Submitted" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'Submitted')">
+            <div class="kanban-col-header" style="background:#d9770622; color:#d97706;">📤 Under Review</div>
+            <div class="kanban-cards" id="kCards_Submitted"></div>
+          </div>
+          <div class="kanban-col" id="kCol_Completed" data-status="Completed" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'Completed')">
+            <div class="kanban-col-header" style="background:#10b98122; color:#10b981;">✅ Completed</div>
+            <div class="kanban-cards" id="kCards_Completed"></div>
+          </div>
+          <div class="kanban-col" id="kCol_Archived" data-status="Archived" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'Archived')">
+            <div class="kanban-col-header" style="background:#6b728022; color:#6b7280;">🗄 Archived</div>
+            <div class="kanban-cards" id="kCards_Archived"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -913,6 +1465,7 @@
           </div>
         </div>
         <div class="form-group"><label>Assign To (Comma-separated IDs)</label><input type="text" id="editTkAssign" list="operativeList" placeholder="e.g. INVX-09, INVX-12 or Open"></div>
+        <div class="form-group"><label>Expiry Date (optional)</label><input type="datetime-local" id="editTkExpiresAt"></div>
         <div style="display:flex; gap:10px; margin-top:8px;">
           <button class="btn-primary" onclick="adminSaveEdit()">Save Changes</button>
           <button class="btn-sm" style="background:var(--bg3); color:var(--text);" onclick="closeEditModal()">Cancel</button>
@@ -923,8 +1476,18 @@
     <!-- Sub-tab: Submissions Queue -->
     <div id="fTabReviews" class="forge-subtab" style="display:none;">
       <div class="admin-card">
-        <h3>Submissions Queue</h3>
-        <p style="margin-bottom:12px;">Tasks submitted by operatives that require your approval.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+          <div>
+            <h3 style="margin:0;">Submissions Queue</h3>
+            <p style="margin:4px 0 0; color:var(--text3); font-size:13px;">Tasks submitted by operatives that require your approval.</p>
+          </div>
+          <div id="batchReviewBar" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span style="font-size:13px; color:var(--text2);"><span id="batchSelectedCount">0</span> selected</span>
+            <input type="text" id="batchFeedbackInput" placeholder="Shared feedback (optional)…" style="padding:7px 10px; border-radius:7px; border:1px solid var(--border); background:var(--bg3); color:var(--text); font-size:12px; min-width:200px;">
+            <button onclick="batchReview('Completed')" style="padding:7px 14px; background:#10b981; color:#fff; border:none; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer;">✅ Approve Selected</button>
+            <button onclick="batchReview('Open')" style="padding:7px 14px; background:#dc2626; color:#fff; border:none; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer;">❌ Reject Selected</button>
+          </div>
+        </div>
         <div id="forgeReviewsContainer">
           <p style="color:var(--text3);padding:20px 0;">Click this tab to load submissions...</p>
         </div>
@@ -940,23 +1503,50 @@
           <select id="memberDetailSelect" class="search-box" style="width:200px;cursor:pointer;background:var(--bg3);font-weight:600;" onchange="loadMemberDetailView()">
             <option value="">Select user</option>
           </select>
-          <select id="memberStatusFilter" class="search-box" style="width:160px;cursor:pointer;" onchange="applyMemberFilters()">
-            <option value="all">All Members</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Current Members</option>
-          </select>
-          <input type="text" id="memberSearch" class="search-box" placeholder="Search by name or email..." oninput="applyMemberFilters()">
           <button class="btn-add" onclick="exportMembersCSV()">⬇ Export CSV</button>
           <button class="btn-add" onclick="broadcastEmail()" style="background:var(--blue)">✉️ Broadcast</button>
         </div>
       </div>
-      
+
+      <!-- Enhanced Filter Bar -->
+      <div id="memberFilterBar">
+        <input type="text" id="memberSearch" placeholder="🔍 Search name, email, operative ID…" oninput="applyMemberFilters()" style="min-width:220px;flex:1;">
+        <select id="memberStatusFilter" onchange="applyMemberFilters()">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="suspended">Suspended</option>
+        </select>
+        <select id="memberRankFilter" onchange="applyMemberFilters()">
+          <option value="all">All Ranks</option>
+          <option value="Apprentice">Apprentice</option>
+          <option value="Operative">Operative</option>
+          <option value="Specialist">Specialist</option>
+          <option value="Agent">Agent</option>
+          <option value="Commander">Commander</option>
+          <option value="Director">Director</option>
+        </select>
+        <select id="memberForgeFilter" onchange="applyMemberFilters()">
+          <option value="all">All Forge Access</option>
+          <option value="yes">Forge: Yes</option>
+          <option value="no">Forge: No</option>
+        </select>
+        <button class="btn-clear-filters" onclick="clearMemberFilters()">✕ Clear</button>
+      </div>
+
       <!-- Bulk Actions Bar -->
-      <div id="bulkActions" style="display:none; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); padding:10px 15px; border-radius:8px; margin-bottom:15px; align-items:center; gap:15px; flex-wrap:wrap;">
+      <div id="bulkActions" style="display:none; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); padding:10px 15px; border-radius:8px; margin-bottom:10px; align-items:center; gap:12px; flex-wrap:wrap;">
         <span style="font-size:13px; font-weight:600;"><span id="selectedCount">0</span> selected</span>
-        <button class="btn-sm btn-approve" onclick="bulkUpdate('Confirmed')">✓ Approve Selected</button>
-        <button class="btn-sm btn-reject" onclick="bulkUpdate('Pending')">↩ Revoke Selected</button>
-        <button class="btn-sm" style="background:var(--accent);color:#fff;" onclick="bulkGenerateIDCards()">🪪 Bulk Generate ID Cards</button>
+        <select id="bulkActionSelect" class="search-box" style="width:200px;background:var(--bg3);">
+          <option value="approve">✓ Approve Selected</option>
+          <option value="revoke">↩ Revoke Selected</option>
+          <option value="suspend">⛔ Suspend Selected</option>
+          <option value="export">⬇ Export Selected CSV</option>
+          <option value="idcards">🪪 Generate ID Cards</option>
+          <option value="email">✉️ Email Selected</option>
+        </select>
+        <button class="btn-sm btn-approve" onclick="applyBulkAction()">Apply</button>
+        <button class="btn-sm" style="background:transparent;border:1px solid var(--border2);color:var(--text3);" onclick="clearMemberSelection()">Clear</button>
       </div>
 
       <div id="membersLoading" class="loading"><div class="spinner"></div> Loading members...</div>
@@ -1065,34 +1655,374 @@
     
     <!-- ── EVENTS TAB ── -->
     <div class="tab-content" id="tabSessions">
-      <div class="section-header">
+      <div class="section-header" style="margin-bottom:18px;">
         <h2 style="font-size:24px;font-weight:800">Events & Operations</h2>
-        <button class="btn-add" onclick="openCreateSessionModal()">+ Create Session</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="btn-add" onclick="openCreateSessionModal()">+ Create Session</button>
+          <button class="btn-add" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);" onclick="openRecurringSessionModal()">↻ Recurring</button>
+        </div>
       </div>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Cover</th>
-              <th>Session Title</th>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="sessionsListTbody">
-            <tr><td colspan="6" style="text-align:center;padding:40px;">Loading sessions...</td></tr>
-          </tbody>
-        </table>
+
+      <!-- View toggle -->
+      <div class="sessions-view-toggle">
+        <button class="sessions-view-btn active" id="sessViewBtnList" onclick="setSessionView('list')">☰ List</button>
+        <button class="sessions-view-btn" id="sessViewBtnCalendar" onclick="setSessionView('calendar')">📅 Calendar</button>
+      </div>
+
+      <!-- Session Analytics Panel (shown when a session is selected) -->
+      <div id="sessionAnalyticsPanel" class="session-analytics-panel" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Session Analytics</div>
+            <div id="sessAnalyticsTitle" style="font-size:18px;font-weight:800;">—</div>
+            <div id="sessAnalyticsDate" style="font-size:13px;color:var(--text3);margin-top:2px;">—</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div id="sessLiveCounterWrap" style="display:none;" class="live-counter-badge">
+              <span class="live-dot"></span>
+              <span id="sessLiveCount">0</span> checked in
+            </div>
+            <button onclick="closeSessionAnalytics()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:12px;">✕ Close</button>
+          </div>
+        </div>
+        <!-- Status buttons -->
+        <div class="session-status-bar" id="sessStatusBar">
+          <button class="session-status-btn upcoming" onclick="updateSessionStatus('Upcoming')">⬜ Upcoming</button>
+          <button class="session-status-btn live" onclick="updateSessionStatus('Live')">🟢 Go Live</button>
+          <button class="session-status-btn completed" onclick="updateSessionStatus('Completed')">✅ Completed</button>
+          <button class="session-status-btn cancelled" onclick="updateSessionStatus('Cancelled')">🚫 Cancel</button>
+        </div>
+        <!-- Stats row -->
+        <div class="session-analytics-grid">
+          <div class="session-stat-card">
+            <div class="session-stat-val" id="sessStatAttendance" style="color:#2563eb;">—</div>
+            <div class="session-stat-label">Attendance %</div>
+          </div>
+          <div class="session-stat-card">
+            <div class="session-stat-val" id="sessStatCheckedIn" style="color:#10b981;">—</div>
+            <div class="session-stat-label">Checked In</div>
+          </div>
+          <div class="session-stat-card">
+            <div class="session-stat-val" id="sessStatFeedback" style="color:#f59e0b;">—</div>
+            <div class="session-stat-label">Avg Feedback</div>
+          </div>
+          <div class="session-stat-card">
+            <div class="session-stat-val" id="sessStatFeedbackCount" style="color:#6b7280;">—</div>
+            <div class="session-stat-label">Responses</div>
+          </div>
+        </div>
+        <!-- Rank breakdown -->
+        <div id="sessRankBreakdown" style="margin-bottom:14px;"></div>
+        <!-- Bulk cert button -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="bulkSendCertificates()" style="padding:9px 20px;background:#7c3aed;border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">🏅 Send Certificates to All Attendees</button>
+          <button onclick="openSessionDash(_currentAnalyticsSessionId)" style="padding:9px 20px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">📊 Open Full Dashboard</button>
+        </div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div id="sessionsListView">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Session Title</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsListTbody">
+              <tr><td colspan="6" style="text-align:center;padding:40px;">Loading sessions...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CALENDAR VIEW -->
+      <div id="sessionsCalendarView" style="display:none;" class="session-calendar">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calPrevMonth()">‹</button>
+          <span class="cal-month-label" id="calMonthLabel">—</span>
+          <button class="cal-nav-btn" onclick="calNextMonth()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid">
+          <!-- Day headers -->
+          <div class="cal-day-header">Sun</div>
+          <div class="cal-day-header">Mon</div>
+          <div class="cal-day-header">Tue</div>
+          <div class="cal-day-header">Wed</div>
+          <div class="cal-day-header">Thu</div>
+          <div class="cal-day-header">Fri</div>
+          <div class="cal-day-header">Sat</div>
+        </div>
+        <div id="calCells" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <!-- Recurring Session Modal -->
+    <div class="modal-overlay" id="modalRecurringSession">
+      <div class="modal-box" style="max-width:560px;padding:32px;">
+        <h2 style="color:var(--accent2);margin-bottom:20px;font-size:20px;border-bottom:1px solid var(--border);padding-bottom:14px;">↻ Create Recurring Sessions</h2>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Session Title</label>
+            <input type="text" id="recTitle" placeholder="e.g. Weekly Dev Sync" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Start Date</label>
+              <input type="date" id="recDate" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Location</label>
+              <input type="text" id="recLocation" placeholder="Room / Online" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Recurrence</label>
+              <select id="recFrequency" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;">
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Occurrences</label>
+              <input type="number" id="recCount" value="4" min="2" max="52" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Description</label>
+            <textarea id="recDesc" rows="3" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;box-sizing:border-box;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:18px;">
+          <button class="btn-cancel" onclick="document.getElementById('modalRecurringSession').classList.remove('open')">Cancel</button>
+          <button class="btn-save" onclick="submitRecurringSessions(this)">Create Sessions</button>
+        </div>
       </div>
     </div>
     
     <!-- ── COMMS & ALERTS TAB ── -->
 
     <!-- ── SURVEILLANCE & LOGS TAB ── -->
+    <div class="tab-content" id="tabSurveillance">
+      <div class="section-header" style="margin-bottom:20px;">
+        <h2 style="font-size:24px;font-weight:800;">Audit Log</h2>
+        <button onclick="exportAuditCsv()" style="padding:9px 18px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">⬇ Export CSV</button>
+      </div>
+
+      <!-- Admin Presence Widget -->
+      <div id="adminPresenceWidget" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:0.5px;">Online Admins:</span>
+        <div id="adminPresenceList" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- Filter / Search Bar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+        <input type="text" id="logSearchInput" placeholder="Search by ID, name, or action…" oninput="filterLogs()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;min-width:220px;flex:1;">
+        <select id="logTypeFilter" onchange="filterLogs()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+          <option value="">All Types</option>
+          <option value="REGISTRATION">Registration</option>
+          <option value="STATUS_UPDATED">Status Change</option>
+          <option value="TASK_COMPLETED">Task Completed</option>
+          <option value="TASK_SUBMITTED">Task Submitted</option>
+          <option value="TASK_RECALLED">Task Recalled</option>
+          <option value="LOGIN">Login</option>
+          <option value="BROADCAST">Broadcast</option>
+          <option value="SOS_CREATED">SOS</option>
+          <option value="REQUEST_APPROVED">Request Approved</option>
+          <option value="REQUEST_REJECTED">Request Rejected</option>
+        </select>
+        <input type="date" id="logDateFrom" onchange="filterLogs()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;" title="From date">
+        <input type="date" id="logDateTo" onchange="filterLogs()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;" title="To date">
+        <button onclick="clearLogFilters()" style="padding:9px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;cursor:pointer;">✕ Clear</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Operative ID</th>
+              <th>Name</th>
+              <th>Action</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="logsTbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;">Fetching logs from mainframe...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:16px;align-items:center;">
+        <button id="logLoadMoreBtn" onclick="loadMoreLogs()" style="padding:9px 24px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;cursor:pointer;display:none;">Load More</button>
+        <span id="logCountLabel" style="font-size:12px;color:var(--text3);"></span>
+      </div>
+    </div>
+
+    <!-- ── REQUESTS TAB ── -->
+    <div class="tab-content" id="tabRequests">
+      <div class="section-header" style="margin-bottom:20px;">
+        <h2 style="font-size:24px;font-weight:800;">Document & Certificate Requests</h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="bulkApproveRequests()" style="padding:9px 18px;background:var(--green,#10b981);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✅ Approve Selected</button>
+          <button onclick="bulkRejectRequests()" style="padding:9px 18px;background:var(--red,#dc2626);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">❌ Reject Selected</button>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+        <select id="reqTypeFilter" onchange="applyRequestFilters()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+          <option value="">All Types</option>
+          <option value="Document">Document</option>
+          <option value="Certificate">Certificate</option>
+        </select>
+        <select id="reqStatusFilter" onchange="applyRequestFilters()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-family:var(--font-b);">
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Dispatched">Dispatched</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+        <input type="text" id="reqSearch" placeholder="Search by name or ID…" oninput="applyRequestFilters()" style="padding:9px 14px;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;min-width:200px;">
+        <button onclick="clearRequestFilters()" style="padding:9px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;cursor:pointer;">✕ Clear</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="reqSelectAll" onchange="toggleAllRequestCheckboxes(this)"></th>
+              <th>Type</th>
+              <th>Operative</th>
+              <th>Details</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="requestsTableBody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3);">Loading requests…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Request Detail Side Panel -->
+      <div id="reqDetailOverlay" onclick="closeRequestDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;backdrop-filter:blur(4px);"></div>
+      <div id="reqDetailPanel" style="display:none;position:fixed;top:0;right:0;width:420px;height:100%;background:var(--bg);border-left:1px solid var(--border);z-index:3001;overflow-y:auto;padding:24px;box-shadow:-10px 0 30px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-size:16px;font-weight:800;">Request Detail</div>
+          <button onclick="closeRequestDetail()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;">✕</button>
+        </div>
+        <div id="reqDetailContent"></div>
+      </div>
+    </div>
 
   </div> <!-- Close main-content -->
+
+<!-- ════════ MEMBER SLIDE-IN PANEL ════════ -->
+<div id="slidePanelOverlay" onclick="closeMemberSlidePanel()"></div>
+<div id="memberSlidePanel">
+  <!-- Panel Header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);">
+    <div>
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Member Dossier</div>
+      <div id="slidePanelName" style="font-size:18px;font-weight:800;">—</div>
+      <div id="slidePanelOpId" style="font-size:12px;font-family:monospace;color:var(--accent);margin-top:2px;">—</div>
+    </div>
+    <button onclick="closeMemberSlidePanel()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;">✕ Close</button>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="slide-panel-tabs">
+    <div class="slide-panel-tab active" onclick="switchSlideTab('profile')" id="slideTabProfile">Profile</div>
+    <div class="slide-panel-tab" onclick="switchSlideTab('activity')" id="slideTabActivity">Activity</div>
+    <div class="slide-panel-tab" onclick="switchSlideTab('tasks')" id="slideTabTasks">Tasks</div>
+    <div class="slide-panel-tab" onclick="switchSlideTab('attendance')" id="slideTabAttendance">Attendance</div>
+  </div>
+
+  <!-- Tab Bodies -->
+  <div style="flex:1;overflow-y:auto;padding:20px;" class="custom-scroll">
+
+    <!-- ── PROFILE TAB ── -->
+    <div id="slideContentProfile" class="slide-tab-content active">
+      <div style="display:grid;grid-template-columns:130px 1fr;gap:16px;margin-bottom:20px;align-items:start;">
+        <!-- Photo -->
+        <div style="text-align:center;">
+          <div style="width:120px;height:120px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+            <img id="slidePanelPhoto" src="" style="width:100%;height:100%;object-fit:cover;display:none;" />
+            <span id="slidePanelPhotoPlaceholder" style="font-size:36px;">👤</span>
+          </div>
+          <div id="slidePanelStatusBadge" style="margin-top:4px;"></div>
+        </div>
+        <!-- Key fields -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Email</div><div id="slideEmail" style="font-size:13px;font-weight:600;word-break:break-all;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Phone</div><div id="slidePhone" style="font-size:13px;font-weight:600;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">College</div><div id="slideCollege" style="font-size:13px;font-weight:600;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Branch / Year</div><div id="slideBranchYear" style="font-size:13px;font-weight:600;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Rank</div><div id="slideRank" style="font-size:13px;font-weight:600;color:var(--accent);">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Squad</div><div id="slideSquad" style="font-size:13px;font-weight:600;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">XP</div><div id="slideXP" style="font-size:13px;font-weight:700;color:#f59e0b;">—</div></div>
+          <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Forge Access</div><div id="slideForgeAccess" style="font-size:13px;font-weight:600;">—</div></div>
+        </div>
+      </div>
+
+      <!-- Admin Note -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Admin Note (Internal)</label>
+        <textarea id="slideAdminNote" rows="3" placeholder="Internal note — not visible to member…" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;resize:vertical;box-sizing:border-box;"></textarea>
+        <button onclick="saveAdminNote()" style="margin-top:6px;padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Save Note</button>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <div class="danger-zone-title">⚠ Danger Zone</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="suspendMemberAction()" style="padding:8px 16px;background:transparent;border:1px solid #f59e0b;color:#f59e0b;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">⛔ Suspend Member</button>
+          <button onclick="resetMemberOTPAction()" style="padding:8px 16px;background:transparent;border:1px solid #3b82f6;color:#3b82f6;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">🔑 Reset OTP / Session</button>
+          <button onclick="deleteMemberAction()" style="padding:8px 16px;background:#dc2626;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">🗑 Delete Member</button>
+        </div>
+      </div>
+    </div><!-- /profile tab -->
+
+    <!-- ── ACTIVITY TAB ── -->
+    <div id="slideContentActivity" class="slide-tab-content">
+      <div id="slideActivityLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading activity…</div>
+      <div id="slideActivityList" style="display:none;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Last 20 actions (newest first)</div>
+        <div id="slideActivityTimeline"></div>
+      </div>
+    </div>
+
+    <!-- ── TASKS TAB ── -->
+    <div id="slideContentTasks" class="slide-tab-content">
+      <div id="slideTasksLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading tasks…</div>
+      <div id="slideTasksList" style="display:none;">
+        <table class="data-table" style="font-size:13px;">
+          <thead><tr><th>Title</th><th>XP</th><th>Difficulty</th><th>Status</th></tr></thead>
+          <tbody id="slideTasksBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ATTENDANCE TAB ── -->
+    <div id="slideContentAttendance" class="slide-tab-content">
+      <div id="slideAttendanceLoading" style="text-align:center;padding:30px;color:var(--text3);">Loading attendance…</div>
+      <div id="slideAttendanceList" style="display:none;">
+        <table class="data-table" style="font-size:13px;">
+          <thead><tr><th>Session</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="slideAttendanceBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /scrollable body -->
+</div><!-- /memberSlidePanel -->
 
 <!-- ════════ MODAL ════════ -->
 
@@ -1495,13 +2425,20 @@ async function apiWrite(op, payload) {
       admin_grant_forge_access: ['adminMembers'],
       admin_set_role:           ['adminMembers'],
       admin_update_profile:     ['adminMembers', 'admin_get_member_detail'],
+      admin_suspend_member:     ['adminMembers'],
+      admin_delete_member:      ['adminMembers'],
+      admin_reset_member_otp:   ['adminMembers'],
+      admin_set_member_note:    ['adminMembers'],
       admin_create_task:        ['admin_get_tasks'],
       admin_review_task:        ['admin_get_tasks'],
       admin_edit_task:          ['admin_get_tasks'],
       admin_delete_task:        ['admin_get_tasks'],
-      admin_create_session:       ['admin_get_sessions'],
-      admin_edit_session:         ['admin_get_sessions'],
-      admin_delete_session:       ['admin_get_sessions'],
+      admin_archive_task:       ['admin_get_tasks'],
+      admin_clone_task:         ['admin_get_tasks'],
+      admin_reorder_tasks:      ['admin_get_tasks'],
+      admin_create_session:     ['admin_get_sessions'],
+      admin_edit_session:       ['admin_get_sessions'],
+      admin_delete_session:     ['admin_get_sessions'],
       addAsset:                 ['assets'],
       borrowAsset:              ['assets'],
       returnAsset:              ['assets'],
@@ -1509,7 +2446,7 @@ async function apiWrite(op, payload) {
       certApprove:              ['certreqs'],
       addEvent:                 ['events'],
       editEvent:                ['events'],
-      deleteSession:              ['events'],
+      deleteSession:            ['events'],
     };
     (cacheMap[op] || []).forEach(a => invalidateCache(a));
     return result;
@@ -1520,11 +2457,13 @@ async function apiWrite(op, payload) {
 }
 
 
-function statusBadge(s) {
+function statusBadge(s, email) {
   const st = (s||'').toLowerCase();
-  if (st.includes('confirmed')) return `<span class="badge badge-confirmed">Confirmed</span>`;
-  if (st.includes('reject'))    return `<span class="badge badge-rejected">Rejected</span>`;
-  return `<span class="badge badge-pending">${escHtml(s||'Pending')}</span>`;
+  const onclick = email ? ` onclick="cycleStatus('${encodeURIComponent(email)}')" title="Click to cycle status"` : '';
+  if (st.includes('confirmed')) return `<span class="badge badge-confirmed"${onclick}>Confirmed</span>`;
+  if (st.includes('reject'))    return `<span class="badge badge-rejected"${onclick}>Rejected</span>`;
+  if (st.includes('suspend'))   return `<span class="badge badge-suspended"${onclick}>Suspended</span>`;
+  return `<span class="badge badge-pending"${onclick}>${escHtml(s||'Pending')}</span>`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1922,7 +2861,16 @@ async function switchForgeSubTab(subTab) {
       populateOperativeDatalist();
     } catch(e) { console.error('Failed to load members for Forge Ops', e); }
   }
-  
+
+  // Load XP budget on every Forge Ops sub-tab switch
+  loadXpBudget();
+
+  // Show/hide view toggle and filter bar only for Bounty Board
+  const viewToggle  = document.getElementById('forgeViewToggle');
+  const filterBar   = document.getElementById('forgeFilterBar');
+  if (viewToggle) viewToggle.style.display = subTab === 'bounties' ? 'flex' : 'none';
+  if (filterBar)  filterBar.style.display  = subTab === 'bounties' ? 'flex' : 'none';
+
   if (subTab === 'access') {
     document.getElementById('fTabAccess').style.display = 'block';
     document.getElementById('fNavAccess').classList.add('active');
@@ -2002,18 +2950,20 @@ async function adminCreateTask() {
   const xp = document.getElementById('tkXP').value;
   const difficulty = document.getElementById('tkDiff').value;
   const assignedTo = document.getElementById('tkAssign').value.trim();
+  const expiresAt = document.getElementById('tkExpiresAt').value || null;
 
   if (!title || !desc) return showToast('Title and Description are required.', 'error');
   
   try {
     showToast('Deploying bounty...', 'info');
-    await apiWrite('admin_create_task', { title, description: desc, xp, difficulty, assignedTo });
+    await apiWrite('admin_create_task', { title, description: desc, xp, difficulty, assignedTo, expiresAt });
     showToast('Bounty deployed!', 'success');
     closeBountyDrawer();
     document.getElementById('tkTitle').value = '';
     mdeCreate.value('');
     document.getElementById('tkXP').value = '100';
     document.getElementById('tkAssign').value = 'Open';
+    document.getElementById('tkExpiresAt').value = '';
     invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -2038,14 +2988,18 @@ async function loadForgeTasks(isSilent = false) {
 function renderForgeTasks() {
   const container = document.getElementById('forgeTasksBody');
   if (!cachedTasks) return;
-  const tasks = cachedTasks.filter(t => t.status === 'Open' || t.status === 'Assigned');
+  // Use filtered tasks; default filter shows Open/Assigned if no status filter active
+  const allFiltered = _filteredTasks();
+  const tasks = _forgeFilters.status !== 'all'
+    ? allFiltered
+    : allFiltered.filter(t => t.status === 'Open' || t.status === 'Assigned');
   
   if (tasks.length === 0) {
     container.innerHTML = `
       <div style="text-align:center; padding:40px 20px; background:var(--bg3); border-radius:12px; border:1px dashed var(--border); margin-top:20px;">
         <span style="font-size:24px; display:block; margin-bottom:8px;">🎯</span>
-        <div style="color:var(--text); font-weight:600;">No Active Bounties</div>
-        <div style="color:var(--text3); font-size:13px; margin-top:4px;">Create a new bounty to deploy it to the field.</div>
+        <div style="color:var(--text); font-weight:600;">No Bounties Match Filters</div>
+        <div style="color:var(--text3); font-size:13px; margin-top:4px;">Try adjusting your filters or create a new bounty.</div>
       </div>
     `;
     return;
@@ -2067,10 +3021,13 @@ function renderForgeTasks() {
         <div style="margin-bottom:12px;">
           <span class="diff-badge ${diffClass}">${t.difficulty || 'Easy'}</span>
           <span style="font-size:12px; color:var(--text3); margin-left:8px;">Assignee: ${t.assignedTo === 'Open' ? 'Anyone' : escHtml(t.assignedTo)}</span>
+          ${t.expiresAt ? `<span style="font-size:11px;color:#d97706;margin-left:6px;">⏰ Exp: ${new Date(t.expiresAt).toLocaleDateString()}</span>` : ''}
         </div>
         <p style="font-size:13px; color:var(--text2); margin-bottom:16px;">${parseMarkdown(t.description)}</p>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn-sm" style="background:var(--bg3); color:var(--text); flex:1;" onclick="openEditModal('${t.taskId}')">✏ Edit</button>
+          <button class="btn-sm" style="background:rgba(37,99,235,0.12); color:#2563eb; flex:1;" onclick="adminCloneTask('${t.taskId}')">⧉ Clone</button>
+          <button class="btn-sm" style="background:rgba(107,114,128,0.12); color:#6b7280; flex:1;" onclick="adminArchiveTask('${t.taskId}')">🗄 Archive</button>
           <button class="btn-sm btn-reject" style="flex:1;" onclick="adminDeleteTask('${t.taskId}')">🗑 Delete</button>
         </div>
       </div>
@@ -2078,6 +3035,9 @@ function renderForgeTasks() {
   });
   html += '</div>';
   container.innerHTML = html;
+
+  // Also refresh kanban if it is visible
+  if (_forgeView === 'kanban') renderKanban();
 }
 
 function renderForgeReviews() {
@@ -2104,7 +3064,10 @@ function renderForgeReviews() {
     html += `
       <div style="background:var(--bg2);padding:20px;border-radius:12px;margin-bottom:14px;border:1px solid var(--border);border-left:3px solid #f59e0b;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <h4 style="margin:0;font-size:15px;">${escHtml(t.title)}</h4>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="checkbox" class="review-select-cb" data-taskid="${t.taskId}" onchange="updateBatchReviewBar()" style="width:15px;height:15px;cursor:pointer;accent-color:#2563eb;">
+            <h4 style="margin:0;font-size:15px;">${escHtml(t.title)}</h4>
+          </div>
           <span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">📤 AWAITING REVIEW</span>
         </div>
         <div style="display:flex;gap:16px;font-size:12px;color:var(--text3);margin-bottom:12px;flex-wrap:wrap;">
@@ -2130,6 +3093,8 @@ function renderForgeReviews() {
       </div>`;
   });
   container.innerHTML = html;
+  // Reset batch bar after re-render
+  updateBatchReviewBar();
 }
 
 async function adminReviewTask(taskId, status) {
@@ -2143,6 +3108,7 @@ async function adminReviewTask(taskId, status) {
     await apiWrite('admin_review_task', { taskId, status, feedback });
     showToast(status === 'Completed' ? 'Approved! XP granted.' : 'Rejected. Sent back.', 'success');
     invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+    loadXpBudget();
   } catch(e) { showToast('Network error. Try again.', 'error'); }
 }
 
@@ -2158,6 +3124,9 @@ function openEditModal(taskId) {
   document.getElementById('editTkAssign').value = t.assignedTo;
   const diffSel = document.getElementById('editTkDiff');
   for (let o of diffSel.options) o.selected = (o.value === t.difficulty);
+  // Populate expiresAt
+  const expEl = document.getElementById('editTkExpiresAt');
+  if (expEl) expEl.value = t.expiresAt ? new Date(t.expiresAt).toISOString().slice(0,16) : '';
   const modal = document.getElementById('editBountyModal');
   modal.style.display = 'flex';
 }
@@ -2173,10 +3142,11 @@ async function adminSaveEdit() {
   const xp          = document.getElementById('editTkXP').value;
   const difficulty  = document.getElementById('editTkDiff').value;
   const assignedTo  = document.getElementById('editTkAssign').value.trim();
+  const expiresAt   = (document.getElementById('editTkExpiresAt') || {}).value || null;
   if (!title) return showToast('Title is required.', 'error');
 
   try {
-    await apiWrite('admin_edit_task', { taskId, title, description, xp, difficulty, assignedTo });
+    await apiWrite('admin_edit_task', { taskId, title, description, xp, difficulty, assignedTo, expiresAt });
     closeEditModal();
     showToast('Bounty updated!', 'success');
     invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
@@ -2191,6 +3161,203 @@ async function adminDeleteTask(taskId) {
     showToast('Bounty deleted.', 'success');
     invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
   } catch(e) { showToast('Network error. Try again.', 'error'); }
+}
+
+// ── XP Budget ────────────────────────────────────────────────────
+async function loadXpBudget() {
+  try {
+    const data = await apiGet('admin_get_xp_budget', {}, { forceRefresh: true });
+    if (data && data.success) {
+      document.getElementById('xpBudgetActive').textContent  = (data.totalXpInActiveTasks || 0).toLocaleString() + ' XP';
+      document.getElementById('xpBudgetAwarded').textContent = (data.totalXpAwarded || 0).toLocaleString() + ' XP';
+      document.getElementById('xpBudgetPending').textContent = data.pendingSubmissions || 0;
+      // Update sidebar badge + reviews nav badge
+      const pending = data.pendingSubmissions || 0;
+      const sideBadge = document.getElementById('forgeReviewBadge');
+      if (sideBadge) { sideBadge.textContent = pending > 0 ? pending : ''; sideBadge.style.display = pending > 0 ? 'inline-block' : 'none'; }
+      const navBadge = document.getElementById('reviewsNavBadge');
+      if (navBadge) { navBadge.textContent = pending > 0 ? pending : ''; navBadge.style.display = pending > 0 ? 'inline' : 'none'; }
+    }
+  } catch(e) { console.error('loadXpBudget error', e); }
+}
+
+// ── View Toggle (List / Kanban) ───────────────────────────────────
+let _forgeView = 'list';
+
+function setForgeView(view) {
+  _forgeView = view;
+  document.getElementById('forgeListView').style.display  = view === 'list'   ? '' : 'none';
+  document.getElementById('forgeKanbanView').style.display = view === 'kanban' ? '' : 'none';
+  document.getElementById('viewBtnList').classList.toggle('active',   view === 'list');
+  document.getElementById('viewBtnKanban').classList.toggle('active', view === 'kanban');
+  if (view === 'kanban') renderKanban();
+}
+
+// ── Task Filters ──────────────────────────────────────────────────
+let _forgeFilters = { difficulty: 'all', status: 'all', assignee: '' };
+
+function applyForgeFilters() {
+  _forgeFilters.difficulty = document.getElementById('filterDifficulty').value;
+  _forgeFilters.status     = document.getElementById('filterStatus').value;
+  _forgeFilters.assignee   = (document.getElementById('filterAssignee').value || '').toLowerCase();
+  if (_forgeView === 'list') renderForgeTasks();
+  else renderKanban();
+}
+
+function clearForgeFilters() {
+  document.getElementById('filterDifficulty').value = 'all';
+  document.getElementById('filterStatus').value = 'all';
+  document.getElementById('filterAssignee').value = '';
+  _forgeFilters = { difficulty: 'all', status: 'all', assignee: '' };
+  if (_forgeView === 'list') renderForgeTasks();
+  else renderKanban();
+}
+
+function _filteredTasks() {
+  return (cachedTasks || []).filter(t => {
+    if (_forgeFilters.difficulty !== 'all' && t.difficulty !== _forgeFilters.difficulty) return false;
+    if (_forgeFilters.status !== 'all' && t.status !== _forgeFilters.status) return false;
+    if (_forgeFilters.assignee && !(t.assignedTo || '').toLowerCase().includes(_forgeFilters.assignee)) return false;
+    return true;
+  });
+}
+
+// ── Kanban Rendering ──────────────────────────────────────────────
+function renderKanban() {
+  const columns = ['Open', 'Assigned', 'Submitted', 'Completed', 'Archived'];
+  const tasks = _filteredTasks();
+  columns.forEach(status => {
+    const col = document.getElementById('kCards_' + status);
+    if (!col) return;
+    const colTasks = tasks.filter(t => t.status === status).sort((a,b) => (a.order||0) - (b.order||0));
+    if (colTasks.length === 0) {
+      col.innerHTML = '<div style="text-align:center;padding:16px 8px;color:var(--text3);font-size:12px;">Drop tasks here</div>';
+      return;
+    }
+    let html = '';
+    colTasks.forEach(t => {
+      let diffClass = 'diff-easy';
+      if (t.difficulty === 'Medium') diffClass = 'diff-medium';
+      if (t.difficulty === 'Hard')   diffClass = 'diff-hard';
+      html += `
+        <div class="kanban-card" draggable="true"
+          data-taskid="${t.taskId}"
+          ondragstart="kanbanDragStart(event,'${t.taskId}')"
+          ondragend="kanbanDragEnd(event)">
+          <div class="kanban-card-title">${escHtml(t.title)}</div>
+          <div class="kanban-card-meta">
+            <span class="xp-orb" style="font-size:11px;padding:2px 8px;">${t.xp} XP</span>
+            <span class="diff-badge ${diffClass}" style="padding:2px 8px;font-size:10px;">${t.difficulty||'Easy'}</span>
+            ${t.assignedTo && t.assignedTo !== 'Open' ? `<span style="font-size:11px;color:var(--text3);">👤 ${escHtml(t.assignedTo)}</span>` : ''}
+          </div>
+          <div class="kanban-card-actions">
+            <button style="background:var(--bg2);color:var(--text);" onclick="openEditModal('${t.taskId}')">✏ Edit</button>
+            <button style="background:rgba(37,99,235,0.12);color:#2563eb;" onclick="adminCloneTask('${t.taskId}')">⧉ Clone</button>
+            <button style="background:rgba(107,114,128,0.15);color:#6b7280;" onclick="adminArchiveTask('${t.taskId}')">🗄</button>
+          </div>
+        </div>`;
+    });
+    col.innerHTML = html;
+  });
+}
+
+// ── HTML5 Drag-and-Drop for Kanban ────────────────────────────────
+let _dragTaskId = null;
+
+function kanbanDragStart(event, taskId) {
+  _dragTaskId = taskId;
+  event.target.classList.add('dragging');
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', taskId);
+}
+
+function kanbanDragEnd(event) {
+  event.target.classList.remove('dragging');
+  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+}
+
+async function kanbanDrop(event, targetStatus) {
+  event.preventDefault();
+  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+  const taskId = _dragTaskId || event.dataTransfer.getData('text/plain');
+  if (!taskId) return;
+  _dragTaskId = null;
+  const t = (cachedTasks || []).find(x => x.taskId === taskId);
+  if (!t || t.status === targetStatus) return;
+
+  // Optimistic update
+  t.status = targetStatus;
+  if (targetStatus === 'Archived') t.archivedAt = new Date().toISOString();
+  renderKanban();
+
+  try {
+    if (targetStatus === 'Archived') {
+      await apiWrite('admin_archive_task', { taskId });
+    } else {
+      await apiWrite('admin_edit_task', { taskId, status: targetStatus });
+    }
+    showToast('Task moved to ' + targetStatus, 'success');
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+    loadXpBudget();
+  } catch(e) {
+    showToast('Move failed. Try again.', 'error');
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+  }
+}
+
+// ── Archive & Clone Task ──────────────────────────────────────────
+async function adminArchiveTask(taskId) {
+  const t = adminTasks.find(x => x.taskId === taskId);
+  if (!confirm('Archive "' + (t ? t.title : taskId) + '"?')) return;
+  try {
+    await apiWrite('admin_archive_task', { taskId });
+    showToast('Task archived.', 'success');
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+    loadXpBudget();
+  } catch(e) { showToast('Error. Try again.', 'error'); }
+}
+
+async function adminCloneTask(taskId) {
+  const t = adminTasks.find(x => x.taskId === taskId);
+  if (!confirm('Clone "' + (t ? t.title : taskId) + '"?')) return;
+  try {
+    await apiWrite('admin_clone_task', { taskId });
+    showToast('Task cloned!', 'success');
+    invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+    loadXpBudget();
+  } catch(e) { showToast('Error. Try again.', 'error'); }
+}
+
+// ── Batch Review ──────────────────────────────────────────────────
+function _getSelectedReviewIds() {
+  return Array.from(document.querySelectorAll('.review-select-cb:checked')).map(cb => cb.dataset.taskid);
+}
+
+function updateBatchReviewBar() {
+  const ids = _getSelectedReviewIds();
+  const bar = document.getElementById('batchReviewBar');
+  const cnt = document.getElementById('batchSelectedCount');
+  if (bar) { bar.style.display = ids.length > 0 ? 'flex' : 'none'; }
+  if (cnt) cnt.textContent = ids.length;
+}
+
+async function batchReview(status) {
+  const ids = _getSelectedReviewIds();
+  if (ids.length === 0) return showToast('Select at least one submission.', 'error');
+  const feedback = (document.getElementById('batchFeedbackInput') || {}).value || '';
+  const label = status === 'Completed' ? 'Approve' : 'Reject';
+  if (!confirm(`${label} ${ids.length} selected submission(s)?`)) return;
+  showToast(`Processing ${ids.length} review(s)…`, 'info');
+  let ok = 0, fail = 0;
+  for (const taskId of ids) {
+    try {
+      await apiWrite('admin_review_task', { taskId, status, feedback });
+      ok++;
+    } catch(e) { fail++; }
+  }
+  showToast(`Done: ${ok} ${label.toLowerCase()}d${fail > 0 ? ', ' + fail + ' failed' : ''}.`, ok > 0 ? 'success' : 'error');
+  invalidateAndRefresh('admin_get_tasks', loadForgeTasks);
+  loadXpBudget();
 }
 
 function switchAdminTab(tab) {
@@ -2213,9 +3380,11 @@ function switchAdminTab(tab) {
   if (tab === 'members') loadMembers();
   if (tab === 'forgeOps') switchForgeSubTab('access');
   if (tab === 'sessions' || tab === 'events') loadSessions();
+  if (tab === 'requests') loadRequestsTab();
   if (tab === 'surveillance') loadAuditLogs();
   if (tab === 'comms') { /* Comms tab requires no initial fetch */ }
-  if (tab === 'sysSettings') loadSettings();
+  if (tab === 'commsHub') initCommsHub();
+  if (tab === 'sysSettings') { loadSettings(); loadSystemHealth(); }
   if (tab === 'rankConfig') loadRankConfig();
   if (tab === 'emailTemplates') loadEmailTemplates();
   if (tab === 'taxonomies') loadTaxonomies();
@@ -3422,79 +4591,459 @@ function startAdminPresencePing() {
 
 // ══════════════════════════════════════════════════════════════════════════════ END PHASE 4
 
+// ══════════════════════════════════════════════════════════════
+// SUB-TASK 6: Audit Log & Activity Monitor
+// ══════════════════════════════════════════════════════════════
+
 let allAuditLogs = [];
+let _logPage = 0;
+const LOG_PAGE_SIZE = 100;
+
+const LOG_TYPE_META = {
+  SYSTEM:                    { color: '#2563eb', emoji: '⚙️' },
+  BROADCAST:                 { color: '#2563eb', emoji: '📢' },
+  USER_ACTION:               { color: '#10b981', emoji: '👤' },
+  WARNING:                   { color: '#dc2626', emoji: '⚠️' },
+  TASK_SUBMITTED:            { color: '#10b981', emoji: '📤' },
+  TASK_COMPLETED:            { color: '#10b981', emoji: '✅' },
+  TASK_CREATED:              { color: '#2563eb', emoji: '📋' },
+  TASK_RECALLED:             { color: '#f97316', emoji: '↩️' },
+  TASK_UPDATED:              { color: '#d97706', emoji: '✏️' },
+  TASK_DELETED:              { color: '#dc2626', emoji: '🗑' },
+  LOGIN:                     { color: '#60a5fa', emoji: '🔓' },
+  REGISTRATION:              { color: '#a855f7', emoji: '🆕' },
+  STATUS_UPDATED:            { color: '#f59e0b', emoji: '🔄' },
+  ROLE_UPDATED:              { color: '#f59e0b', emoji: '⚙️' },
+  SOS_CREATED:               { color: '#ef4444', emoji: '🆘' },
+  SOS_RESOLVED:              { color: '#10b981', emoji: '✔️' },
+  BOUNTY_CLAIMED:            { color: '#fbbf24', emoji: '🎯' },
+  BOUNTY_COMPLETED:          { color: '#fbbf24', emoji: '🏆' },
+  BOUNTY_POSTED:             { color: '#6b7280', emoji: '📋' },
+  STATUS_CHECK:              { color: '#71717a', emoji: '👁' },
+  MEMBER_SUSPENDED:          { color: '#dc2626', emoji: '⛔' },
+  MEMBER_DELETED:            { color: '#dc2626', emoji: '🗑' },
+  MEMBER_NOTE_SET:           { color: '#6b7280', emoji: '📝' },
+  OTP_RESET:                 { color: '#2563eb', emoji: '🔑' },
+  REQUEST_APPROVED:          { color: '#10b981', emoji: '✅' },
+  REQUEST_REJECTED:          { color: '#dc2626', emoji: '❌' },
+  REQUESTS_BULK_APPROVED:    { color: '#10b981', emoji: '✅✅' },
+  SESSION_STATUS_UPDATED:    { color: '#06b6d4', emoji: '🎪' },
+  SESSION_RECURRING_CREATED: { color: '#06b6d4', emoji: '↻' },
+  CERTIFICATES_DISPATCHED:   { color: '#7c3aed', emoji: '🏅' },
+};
+
+function _logBadge(logType) {
+  const meta = LOG_TYPE_META[logType];
+  if (meta) return { color: meta.color, badge: meta.emoji + ' ' + logType };
+  return { color: 'var(--text3)', badge: logType || 'UNKNOWN' };
+}
 
 async function loadAuditLogs(isSilent = false) {
   const tbody = document.getElementById('logsTbody');
   if (!isSilent) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;">Fetching logs from mainframe...</td></tr>';
-  
+  _logPage = 0;
   try {
-    const res = await apiGet('admin_get_audit_logs');
+    const res = await apiGet('admin_get_audit_logs', {}, { forceRefresh: true });
     if (res.success) {
       allAuditLogs = res.logs || [];
-      renderAuditLogs(allAuditLogs);
+      filterLogs();
+      loadAdminPresence();
     } else {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);">${res.message}</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#dc2626;">' + (res.message || 'Error') + '</td></tr>';
     }
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);">Network Error.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#dc2626;">Network Error.</td></tr>';
   }
-}
-
-function renderAuditLogs(logs) {
-  const tbody = document.getElementById('logsTbody');
-  if (!logs.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3);">No logs found.</td></tr>';
-    return;
-  }
-  
-  let html = '';
-  for (const log of logs) {
-    const dt = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Unknown';
-    // Backend stores type as 'type' (not 'actionType') and content as 'content' (not 'description')
-    const logType = log.type || log.actionType || '';
-    const logDesc = log.content || log.description || '';
-    let typeColor = 'var(--text)';
-    let typeBadge = logType;
-    if (logType === 'SYSTEM' || logType === 'BROADCAST') { typeColor = 'var(--blue)'; }
-    else if (logType === 'USER_ACTION') { typeColor = 'var(--green)'; }
-    else if (logType === 'WARNING') { typeColor = 'var(--red)'; }
-    else if (logType === 'TASK_SUBMITTED') { typeColor = '#10b981'; typeBadge = '📤 TASK SUBMITTED'; }
-    else if (logType === 'TASK_COMPLETED') { typeColor = '#10b981'; typeBadge = '✅ TASK COMPLETED'; }
-    else if (logType === 'TASK_RECALLED') { typeColor = '#f97316'; typeBadge = '↩️ TASK RECALLED'; }
-    else if (logType === 'LOGIN') { typeColor = '#60a5fa'; typeBadge = '🔓 LOGIN'; }
-    else if (logType === 'REGISTRATION') { typeColor = '#a855f7'; typeBadge = '🆕 REGISTRATION'; }
-    else if (logType === 'STATUS_UPDATED') { typeColor = '#f59e0b'; typeBadge = '🔄 STATUS CHANGE'; }
-    else if (logType === 'ROLE_UPDATED') { typeColor = '#f59e0b'; typeBadge = '⚙️ ROLE UPDATED'; }
-    else if (logType === 'SOS_CREATED') { typeColor = '#ef4444'; typeBadge = '🆘 SOS'; }
-    else if (logType === 'SOS_RESOLVED') { typeColor = '#10b981'; typeBadge = '✔️ SOS RESOLVED'; }
-    else if (logType === 'BOUNTY_CLAIMED') { typeColor = '#fbbf24'; typeBadge = '🎯 BOUNTY CLAIMED'; }
-    else if (logType === 'BOUNTY_COMPLETED') { typeColor = '#fbbf24'; typeBadge = '🏆 BOUNTY DONE'; }
-    else if (logType === 'BOUNTY_POSTED') { typeColor = '#000000'; typeBadge = '📋 BOUNTY POSTED'; }
-    else if (logType === 'STATUS_CHECK') { typeColor = '#71717a'; typeBadge = '👁 STATUS CHECK'; }
-    
-    html += `
-      <tr>
-        <td style="font-size:12px;color:var(--text3);">${dt}</td>
-        <td style="font-family:var(--font-m); color:var(--accent2);">${escHtml(log.operativeId || '-')}</td>
-        <td>${escHtml(log.name || '-')}</td>
-        <td style="color:${typeColor}; font-weight:bold; font-size:11px; white-space:nowrap;">${typeBadge}</td>
-        <td style="font-size:13px;">${escHtml(logDesc)}</td>
-      </tr>
-    `;
-  }
-  tbody.innerHTML = html;
 }
 
 function filterLogs() {
-  const query = document.getElementById('logSearchInput').value.toLowerCase();
-  const filtered = allAuditLogs.filter(L =>
-    String(L.operativeId || '').toLowerCase().includes(query) ||
-    String(L.name || '').toLowerCase().includes(query) ||
-    String(L.content || L.description || '').toLowerCase().includes(query) ||
-    String(L.type || L.actionType || '').toLowerCase().includes(query)
-  );
-  renderAuditLogs(filtered);
+  const query = (document.getElementById('logSearchInput') ? document.getElementById('logSearchInput').value : '').toLowerCase();
+  const typeF = (document.getElementById('logTypeFilter') ? document.getElementById('logTypeFilter').value : '').toUpperCase();
+  const fromD = document.getElementById('logDateFrom') ? document.getElementById('logDateFrom').value : '';
+  const toD = document.getElementById('logDateTo') ? document.getElementById('logDateTo').value : '';
+  const fromTs = fromD ? new Date(fromD).getTime() : 0;
+  const toTs = toD ? new Date(toD + 'T23:59:59').getTime() : Infinity;
+
+  const filtered = allAuditLogs.filter(function(L) {
+    if (typeF && (L.type || '').toUpperCase() !== typeF) return false;
+    if (fromTs || toTs < Infinity) {
+      const t = L.timestamp ? new Date(L.timestamp).getTime() : 0;
+      if (t < fromTs || t > toTs) return false;
+    }
+    if (query) {
+      const hay = [L.operativeId, L.name, L.content, L.description, L.type].map(function(v){ return (v || '').toLowerCase(); }).join(' ');
+      if (hay.indexOf(query) === -1) return false;
+    }
+    return true;
+  });
+
+  _logPage = 0;
+  renderAuditLogsPage(filtered, 0);
+  var countEl = document.getElementById('logCountLabel');
+  if (countEl) countEl.textContent = filtered.length + ' entries';
+  var btn = document.getElementById('logLoadMoreBtn');
+  if (btn) btn.style.display = filtered.length > LOG_PAGE_SIZE ? '' : 'none';
+  window._filteredAuditLogs = filtered;
+}
+
+function clearLogFilters() {
+  ['logSearchInput','logTypeFilter','logDateFrom','logDateTo'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  filterLogs();
+}
+
+function renderAuditLogsPage(logs, page) {
+  const tbody = document.getElementById('logsTbody');
+  if (!tbody) return;
+  const slice = logs.slice(0, (page + 1) * LOG_PAGE_SIZE);
+  if (!slice.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text3);">No logs found.</td></tr>';
+    return;
+  }
+  let html = '';
+  for (const log of slice) {
+    const dt = log.timestamp ? new Date(log.timestamp).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' }) : 'Unknown';
+    const logType = log.type || log.actionType || '';
+    const logDesc = log.content || log.description || '';
+    const lb = _logBadge(logType);
+    const safeJson = escHtml(JSON.stringify(log));
+    html += '<tr style="cursor:pointer;" onclick="openLogDetail(this)" data-log=\'' + safeJson.replace(/'/g, '&#39;') + '\' title="Click for detail">'
+      + '<td style="font-size:12px;color:var(--text3);white-space:nowrap;">' + dt + '</td>'
+      + '<td style="font-family:monospace;font-size:12px;color:var(--accent2);">' + escHtml(log.operativeId || '—') + '</td>'
+      + '<td style="font-size:13px;">' + escHtml(log.name || '—') + '</td>'
+      + '<td style="font-size:11px;font-weight:700;white-space:nowrap;color:' + lb.color + ';">' + lb.badge + '</td>'
+      + '<td style="font-size:13px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(logDesc) + '</td>'
+      + '</tr>';
+  }
+  tbody.innerHTML = html;
+  var btn = document.getElementById('logLoadMoreBtn');
+  if (btn) btn.style.display = logs.length > (page + 1) * LOG_PAGE_SIZE ? '' : 'none';
+}
+
+function renderAuditLogs(logs) { renderAuditLogsPage(logs, 0); }
+
+function loadMoreLogs() {
+  _logPage++;
+  renderAuditLogsPage(window._filteredAuditLogs || allAuditLogs, _logPage);
+}
+
+function openLogDetail(row) {
+  try {
+    const raw = row.getAttribute('data-log');
+    const log = JSON.parse(raw);
+    const lb = _logBadge(log.type || '');
+    const dt = log.timestamp ? new Date(log.timestamp).toLocaleString('en-IN') : 'Unknown';
+    const html = '<div style="display:flex;flex-direction:column;gap:14px;">'
+      + '<div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);">'
+      + '<div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Action Type</div>'
+      + '<div style="font-size:15px;font-weight:800;color:' + lb.color + ';">' + escHtml(log.type || 'Unknown') + '</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+      + '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Operative</div><div style="font-size:13px;font-weight:700;font-family:monospace;color:var(--accent);">' + escHtml(log.operativeId || '—') + '</div></div>'
+      + '<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;">Name</div><div style="font-size:13px;font-weight:700;">' + escHtml(log.name || '—') + '</div></div>'
+      + '</div>'
+      + '<div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Details</div><div style="font-size:13px;background:var(--bg3);padding:10px;border-radius:8px;">' + escHtml(log.content || log.description || '—') + '</div></div>'
+      + '<div style="font-size:11px;color:var(--text3);">Timestamp: ' + dt + '</div>'
+      + '</div>';
+    const panel = document.getElementById('reqDetailPanel');
+    const overlay = document.getElementById('reqDetailOverlay');
+    if (panel) {
+      document.getElementById('reqDetailContent').innerHTML = html;
+      panel.style.display = '';
+      overlay.style.display = '';
+    }
+  } catch(e) { console.error('openLogDetail error', e); }
+}
+
+async function loadAdminPresence() {
+  try {
+    const data = await apiWrite('admin_get_presence_list', {});
+    const list = document.getElementById('adminPresenceList');
+    if (!list) return;
+    if (!data.success || !data.admins || !data.admins.length) {
+      list.innerHTML = '<span style="font-size:12px;color:var(--text3);">No other admins online</span>';
+      return;
+    }
+    list.innerHTML = data.admins.map(a =>
+      '<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,0.12);border:1px solid #10b981;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;">'
+      + '<span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block;"></span>'
+      + escHtml(a.adminId || a.name || 'Admin')
+      + '</span>'
+    ).join('');
+  } catch(e) { /* silent */ }
+}
+
+function exportAuditCsv() {
+  const logs = window._filteredAuditLogs || allAuditLogs;
+  if (!logs.length) { showToast('No logs to export', 'error'); return; }
+  const header = ['Timestamp','OperativeID','Name','ActionType','Details'];
+  const rows = logs.map(l => [
+    l.timestamp ? new Date(l.timestamp).toISOString() : '',
+    l.operativeId || '',
+    l.name || '',
+    l.type || l.actionType || '',
+    (l.content || l.description || '').replace(/"/g, '""')
+  ].map(v => '"' + v + '"').join(','));
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'audit_log_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + logs.length + ' log entries', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUB-TASK 7: System Health & Platform Settings Upgrade
+// ══════════════════════════════════════════════════════════════
+
+async function loadSystemHealth() {
+  const t0 = Date.now();
+  try {
+    // Measure API latency by calling a cheap endpoint
+    await apiGet('count', {}, { forceRefresh: true });
+    const latency = Date.now() - t0;
+    document.getElementById('sysHealthApiIcon').textContent = latency < 500 ? '✅' : latency < 1500 ? '⚠️' : '❌';
+    document.getElementById('sysHealthApiStatus').textContent = latency + ' ms';
+    document.getElementById('sysHealthApiStatus').style.color = latency < 500 ? '#10b981' : latency < 1500 ? '#d97706' : '#dc2626';
+  } catch(e) {
+    document.getElementById('sysHealthApiIcon').textContent = '❌';
+    document.getElementById('sysHealthApiStatus').textContent = 'Unreachable';
+  }
+  try {
+    const data = await apiWrite('admin_system_health', {});
+    if (data.success) {
+      const dbOk = data.dbStatus === 'ok';
+      document.getElementById('sysHealthDbIcon').textContent = dbOk ? '✅' : '❌';
+      document.getElementById('sysHealthDbStatus').textContent = dbOk ? 'Connected' : 'Error';
+      document.getElementById('sysHealthDbStatus').style.color = dbOk ? '#10b981' : '#dc2626';
+      document.getElementById('sysHealthErrors').textContent = data.recentErrors ?? '—';
+      document.getElementById('sysHealthMembers').textContent = data.totalMembers ?? '—';
+    }
+  } catch(e) {
+    document.getElementById('sysHealthDbIcon').textContent = '⚠️';
+    document.getElementById('sysHealthDbStatus').textContent = 'Check failed';
+  }
+}
+
+async function fireWebhookTest() {
+  const url = document.getElementById('webhookTestUrl').value.trim();
+  const eventType = document.getElementById('webhookTestEvent').value;
+  if (!url) { showToast('Enter a webhook URL first', 'error'); return; }
+  const resultEl = document.getElementById('webhookTestResult');
+  resultEl.style.display = '';
+  resultEl.textContent = 'Firing test…';
+  try {
+    const data = await apiWrite('admin_test_webhook', { url, eventType });
+    resultEl.textContent = JSON.stringify(data, null, 2);
+    showToast(data.success ? 'Webhook test sent!' : 'Test failed: ' + data.message, data.success ? 'success' : 'error');
+  } catch(e) {
+    resultEl.textContent = 'Error: ' + e.message;
+    showToast('Webhook test error', 'error');
+  }
+}
+
+async function scheduleMaintenanceWindow() {
+  const scheduledAt = document.getElementById('maintScheduleAt').value;
+  const duration = parseInt(document.getElementById('maintDuration').value) || 60;
+  const message = document.getElementById('maintMessage').value.trim() || 'Scheduled maintenance. Back shortly!';
+  if (!scheduledAt) { showToast('Select a schedule time', 'error'); return; }
+  try {
+    const data = await apiWrite('admin_schedule_maintenance', { scheduledAt, duration, message });
+    const statusEl = document.getElementById('maintScheduleStatus');
+    if (data.success) {
+      statusEl.textContent = '✅ Maintenance scheduled for ' + new Date(scheduledAt).toLocaleString('en-IN');
+      statusEl.style.color = '#10b981';
+      showToast('Maintenance scheduled!', 'success');
+    } else {
+      statusEl.textContent = '❌ ' + (data.message || 'Failed');
+      statusEl.style.color = '#dc2626';
+    }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUB-TASK 8: Notification Center & Communication Hub
+// ══════════════════════════════════════════════════════════════
+
+let _commsEmailTemplates = [];
+
+async function initCommsHub() {
+  // Load templates for selector
+  try {
+    const data = await apiGet('admin_get_email_templates');
+    _commsEmailTemplates = data.templates || [];
+    const sel = document.getElementById('commsTemplate');
+    if (sel) {
+      sel.innerHTML = '<option value="">— Custom Message —</option>'
+        + _commsEmailTemplates.map(t => `<option value="${escHtml(t.key || t._id)}">${escHtml(t.subject || t.key || t._id)}</option>`).join('');
+    }
+  } catch(e) { /* silent */ }
+}
+
+function switchCommsTab(tab) {
+  ['email','announcement','whatsapp','history'].forEach(t => {
+    const panel = document.getElementById('comms' + t.charAt(0).toUpperCase() + t.slice(1) + 'Panel');
+    const btn = document.getElementById('commsTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  // Fix panel IDs: commsEmailPanel, commsAnnouncementPanel, commsWhatsappPanel, commsHistoryPanel
+  ['email','announcement','whatsapp','history'].forEach(t => {
+    const id = 'comms' + t.charAt(0).toUpperCase() + t.slice(1) + 'Panel';
+    const el = document.getElementById(id);
+    if (el) el.style.display = t === tab ? '' : 'none';
+    const btnId = 'commsTab' + t.charAt(0).toUpperCase() + t.slice(1);
+    const btnEl = document.getElementById(btnId);
+    if (btnEl) btnEl.classList.toggle('active', t === tab);
+  });
+}
+
+function loadCommsTemplate() {
+  const key = document.getElementById('commsTemplate').value;
+  if (!key) return;
+  const tpl = _commsEmailTemplates.find(t => (t.key || t._id) === key);
+  if (!tpl) return;
+  if (tpl.subject) document.getElementById('commsSubject').value = tpl.subject;
+  if (tpl.html || tpl.body) {
+    // Strip HTML tags for textarea
+    const stripped = (tpl.html || tpl.body).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    document.getElementById('commsBody').value = stripped;
+  }
+}
+
+async function previewAudienceCount() {
+  const audience = document.getElementById('commsAudience').value;
+  try {
+    const membersData = await apiGet('adminMembers');
+    const members = membersData.members || [];
+    let emails = [];
+    if (audience === 'all') emails = members.map(m => m.email).filter(Boolean);
+    else if (audience === 'confirmed') emails = members.filter(m => m.status === 'Confirmed').map(m => m.email).filter(Boolean);
+    else if (audience === 'forge') emails = members.filter(m => m.forgeAccess).map(m => m.email).filter(Boolean);
+    else if (audience === 'pending') emails = members.filter(m => m.status === 'Pending').map(m => m.email).filter(Boolean);
+    const statusEl = document.getElementById('commsEmailStatus');
+    statusEl.textContent = '👥 Audience: ' + emails.length + ' recipient' + (emails.length !== 1 ? 's' : '');
+    statusEl.style.color = 'var(--accent)';
+  } catch(e) { showToast('Error fetching member list', 'error'); }
+}
+
+async function sendCommsEmail() {
+  const subject = document.getElementById('commsSubject').value.trim();
+  const body = document.getElementById('commsBody').value.trim();
+  const audience = document.getElementById('commsAudience').value;
+  const scheduleAt = document.getElementById('commsScheduleAt').value;
+  if (!subject || !body) { showToast('Subject and message body are required', 'error'); return; }
+  if (!confirm('Send this email to the selected audience?')) return;
+
+  const statusEl = document.getElementById('commsEmailStatus');
+  statusEl.textContent = 'Sending…';
+  try {
+    // Collect emails for audience
+    const membersData = await apiGet('adminMembers');
+    const members = membersData.members || [];
+    let emails = [];
+    if (audience === 'all') emails = members.map(m => m.email).filter(Boolean);
+    else if (audience === 'confirmed') emails = members.filter(m => m.status === 'Confirmed').map(m => m.email).filter(Boolean);
+    else if (audience === 'forge') emails = members.filter(m => m.forgeAccess).map(m => m.email).filter(Boolean);
+    else if (audience === 'pending') emails = members.filter(m => m.status === 'Pending').map(m => m.email).filter(Boolean);
+
+    if (!emails.length) { showToast('No members in this audience segment', 'error'); statusEl.textContent = ''; return; }
+
+    const payload = { subject, body, emails, audience, scheduleAt: scheduleAt || null };
+    const data = await apiWrite('admin_send_broadcast', payload);
+    if (data.success) {
+      showToast(data.message || 'Email sent!', 'success');
+      statusEl.textContent = '✅ ' + (data.message || 'Sent to ' + emails.length + ' members');
+      statusEl.style.color = '#10b981';
+      document.getElementById('commsSubject').value = '';
+      document.getElementById('commsBody').value = '';
+      document.getElementById('commsScheduleAt').value = '';
+    } else {
+      showToast(data.message || 'Failed', 'error');
+      statusEl.textContent = '❌ ' + data.message;
+      statusEl.style.color = '#dc2626';
+    }
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+    statusEl.textContent = '❌ Error: ' + e.message;
+  }
+}
+
+async function publishAnnouncement() {
+  const title = document.getElementById('annTitle').value.trim();
+  const body = document.getElementById('annBody').value.trim();
+  const pinned = document.getElementById('annPinned').checked;
+  const expiry = document.getElementById('annExpiry').value;
+  if (!title || !body) { showToast('Title and body are required', 'error'); return; }
+  try {
+    const data = await apiWrite('admin_create_announcement', { title, content: body, pinned, expiresAt: expiry || null, published: true });
+    const statusEl = document.getElementById('annStatus');
+    if (data.success) {
+      showToast('Announcement published!', 'success');
+      statusEl.textContent = '✅ Announcement published';
+      statusEl.style.color = '#10b981';
+      document.getElementById('annTitle').value = '';
+      document.getElementById('annBody').value = '';
+      document.getElementById('annPinned').checked = false;
+      document.getElementById('annExpiry').value = '';
+    } else {
+      showToast(data.message || 'Failed', 'error');
+    }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+function generateWaText() {
+  const event = document.getElementById('waEventName').value.trim();
+  const datetime = document.getElementById('waDateTime').value.trim();
+  const venue = document.getElementById('waVenue').value.trim();
+  const extra = document.getElementById('waExtra').value.trim();
+  if (!event) { showToast('Enter the event name first', 'error'); return; }
+  const msg = '🚀 *INNOVEXA HUB — ' + event.toUpperCase() + '*\n\n'
+    + (datetime ? '📅 *Date & Time:* ' + datetime + '\n' : '')
+    + (venue ? '📍 *Venue:* ' + venue + '\n' : '')
+    + '\nHey Operatives! 👋\n\n'
+    + 'You are invited to *' + event + '*. '
+    + (extra ? '\n\n📌 ' + extra + '\n' : '')
+    + '\n\nSee you there! 💪\n— Innovexa Hub Team';
+  document.getElementById('waText').textContent = msg;
+  document.getElementById('waOutput').style.display = '';
+}
+
+function copyWaText() {
+  const text = document.getElementById('waText').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!', 'success')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Copied!', 'success');
+  });
+}
+
+async function loadCommsHistory() {
+  const tbody = document.getElementById('commsHistoryBody');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">Loading…</td></tr>';
+  try {
+    const data = await apiGet('admin_get_broadcasts', {}, { forceRefresh: true });
+    const broadcasts = data.data || data.broadcasts || [];
+    if (!broadcasts.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text3);">No broadcast history found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = broadcasts.map(b => {
+      const dt = b.timestamp ? new Date(b.timestamp).toLocaleDateString('en-IN', { dateStyle:'medium' }) : '—';
+      return '<tr>'
+        + '<td style="font-size:12px;color:var(--text3);">' + dt + '</td>'
+        + '<td><span style="background:rgba(37,99,235,0.12);color:#2563eb;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;">' + escHtml(b.type || 'Broadcast') + '</span></td>'
+        + '<td style="font-size:13px;font-weight:600;">' + escHtml(b.subject || b.title || '—') + '</td>'
+        + '<td style="font-size:12px;color:var(--text3);">' + escHtml(b.audience || 'All') + '</td>'
+        + '<td style="font-size:13px;font-weight:700;">' + (b.recipientCount || '—') + '</td>'
+        + '</tr>';
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#dc2626;padding:20px;text-align:center;">' + escHtml(e.message) + '</td></tr>';
+  }
 }
 
 async function adminSendBroadcast() {
@@ -3767,7 +5316,290 @@ async function loadOverview(isSilent = false) {
     }
     
     drawCharts(members);
+    // Kick off analytics load alongside overview (non-blocking)
+    loadAnalytics();
   } catch(e) { console.error("Error loading overview:", e); }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ANALYTICS & INSIGHTS
+// ══════════════════════════════════════════════════════════════
+let _analyticsRange = 'all';
+let _analyticsData  = null;
+let _growthView     = 'weekly'; // 'weekly' | 'monthly'
+
+// Chart instances — destroyed and recreated on each render
+let _chartGrowth    = null;
+let _chartXpRank    = null;
+let _chartTaskFunnel = null;
+let _chartAttendance = null;
+
+const RANK_COLORS = {
+  'Apprentice': '#06b6d4',
+  'Operative':  '#2563eb',
+  'Specialist': '#10b981',
+  'Elite':      '#d97706',
+  'Vanguard':   '#7c3aed',
+  'Commander':  '#dc2626',
+};
+
+function _rankColor(rank) {
+  return RANK_COLORS[rank] || '#64748b';
+}
+
+function setAnalyticsRange(range) {
+  _analyticsRange = range;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+  invalidateCache('admin_analytics', { range });
+  loadAnalytics(true);
+}
+
+function switchGrowthView(view) {
+  _growthView = view;
+  document.getElementById('btnGrowthWeekly').classList.toggle('active', view === 'weekly');
+  document.getElementById('btnGrowthMonthly').classList.toggle('active', view === 'monthly');
+  if (_analyticsData) _renderGrowthChart(_analyticsData.growth);
+}
+
+async function loadAnalytics(forceRefresh = false) {
+  const loadEl    = document.getElementById('analyticsLoading');
+  const contentEl = document.getElementById('analyticsContent');
+  if (!loadEl || !contentEl) return;
+
+  if (!forceRefresh && _analyticsData) {
+    // Already have data — just re-render
+    _renderAnalytics(_analyticsData);
+    return;
+  }
+
+  loadEl.style.display = 'flex';
+  contentEl.style.display = 'none';
+
+  try {
+    const res = await apiGet('admin_analytics', { range: _analyticsRange }, { forceRefresh });
+    if (!res || !res.success) throw new Error(res && res.message ? res.message : 'Analytics fetch failed');
+    _analyticsData = res.data;
+    _renderAnalytics(_analyticsData);
+  } catch(e) {
+    console.error('loadAnalytics error:', e);
+    loadEl.innerHTML = '<p style="color:var(--red);font-size:13px;">Failed to load analytics. <button class="btn-sm" style="margin-left:8px;" onclick="loadAnalytics(true)">Retry</button></p>';
+    return;
+  }
+
+  loadEl.style.display = 'none';
+  contentEl.style.display = 'block';
+}
+
+function _renderAnalytics(data) {
+  if (!data) return;
+  const loadEl    = document.getElementById('analyticsLoading');
+  const contentEl = document.getElementById('analyticsContent');
+  if (loadEl) loadEl.style.display = 'none';
+  if (contentEl) contentEl.style.display = 'block';
+
+  _renderGrowthChart(data.growth);
+  _renderXpRankChart(data.xpByRank);
+  _renderTaskFunnelChart(data.taskFunnel);
+  _renderAttendanceChart(data.sessionAttendance);
+  _renderTopOps(data.top10);
+  _renderPendingBadges(data.pendingActions);
+}
+
+function _chartDefaults() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: '#1e293b', titleColor: '#f1f5f9', bodyColor: '#94a3b8', cornerRadius: 6, padding: 10 }
+    }
+  };
+}
+
+function _renderGrowthChart(growth) {
+  if (!window.Chart || !growth) return;
+  const ctx = document.getElementById('growthChart');
+  if (!ctx) return;
+  if (_chartGrowth) { _chartGrowth.destroy(); _chartGrowth = null; }
+
+  const series = _growthView === 'weekly' ? (growth.weekly || []) : (growth.monthly || []);
+  const labels = series.map(d => d._id || '');
+  const counts = series.map(d => d.count || 0);
+
+  _chartGrowth = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'New Members',
+        data: counts,
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37,99,235,0.12)',
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#2563eb',
+        fill: true,
+        tension: 0.35
+      }]
+    },
+    options: {
+      ..._chartDefaults(),
+      plugins: {
+        ..._chartDefaults().plugins,
+        legend: { display: true, labels: { color: '#64748b', font: { size: 11 } } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#64748b', stepSize: 1 }, grid: { color: '#f1f5f9' } },
+        x: { ticks: { color: '#64748b', maxRotation: 45, font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function _renderXpRankChart(xpByRank) {
+  if (!window.Chart || !xpByRank) return;
+  const ctx = document.getElementById('xpRankChart');
+  if (!ctx) return;
+  if (_chartXpRank) { _chartXpRank.destroy(); _chartXpRank = null; }
+
+  const labels = xpByRank.map(r => r._id || 'Unranked');
+  const values = xpByRank.map(r => r.totalXP || 0);
+  const colors = labels.map(l => _rankColor(l));
+
+  _chartXpRank = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Total XP',
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      ..._chartDefaults(),
+      plugins: {
+        ..._chartDefaults().plugins,
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#64748b' }, grid: { color: '#f1f5f9' } },
+        x: { ticks: { color: '#64748b', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function _renderTaskFunnelChart(taskFunnel) {
+  if (!window.Chart || !taskFunnel) return;
+  const ctx = document.getElementById('taskFunnelChart');
+  if (!ctx) return;
+  if (_chartTaskFunnel) { _chartTaskFunnel.destroy(); _chartTaskFunnel = null; }
+
+  const labels = ['Created', 'Assigned', 'Submitted', 'Approved'];
+  const values = labels.map(k => taskFunnel[k] || 0);
+  const funnelColors = ['#06b6d4', '#2563eb', '#d97706', '#10b981'];
+
+  _chartTaskFunnel = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tasks',
+        data: values,
+        backgroundColor: funnelColors,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      ..._chartDefaults(),
+      indexAxis: 'y',
+      plugins: {
+        ..._chartDefaults().plugins,
+        legend: { display: false }
+      },
+      scales: {
+        x: { beginAtZero: true, ticks: { color: '#64748b', stepSize: 1 }, grid: { color: '#f1f5f9' } },
+        y: { ticks: { color: '#64748b', font: { size: 12 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function _renderAttendanceChart(sessionAttendance) {
+  if (!window.Chart || !sessionAttendance) return;
+  const ctx = document.getElementById('attendanceChart');
+  if (!ctx) return;
+  if (_chartAttendance) { _chartAttendance.destroy(); _chartAttendance = null; }
+
+  const labels = sessionAttendance.map(s => {
+    const t = (s.title || s.sessionId || '').slice(0, 20);
+    return s.date ? `${t} (${s.date})` : t;
+  });
+  const counts = sessionAttendance.map(s => s.count || 0);
+
+  _chartAttendance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Attendees',
+        data: counts,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.12)',
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#10b981',
+        fill: true,
+        tension: 0.35
+      }]
+    },
+    options: {
+      ..._chartDefaults(),
+      plugins: {
+        ..._chartDefaults().plugins,
+        legend: { display: true, labels: { color: '#64748b', font: { size: 11 } } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#64748b', stepSize: 1 }, grid: { color: '#f1f5f9' } },
+        x: { ticks: { color: '#64748b', maxRotation: 45, font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function _renderTopOps(top10) {
+  const el = document.getElementById('topOpsList');
+  if (!el) return;
+  if (!top10 || top10.length === 0) {
+    el.innerHTML = '<p style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No data yet.</p>';
+    return;
+  }
+  el.innerHTML = top10.map((m, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+    const rankLabel = m.rank || 'Recruit';
+    return `
+      <div class="top-op-row">
+        <span class="top-op-rank">${medal || (i + 1)}</span>
+        <span class="top-op-name" title="${escHtml(m.operativeId || '')}">${escHtml(m.name || m.operativeId || '—')}</span>
+        <span class="top-op-badge">${escHtml(rankLabel)}</span>
+        <span class="top-op-xp">${(m.xp || 0).toLocaleString()} XP</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function _renderPendingBadges(pendingActions) {
+  if (!pendingActions) return;
+  const pa = document.getElementById('pendingApprovalsCount');
+  const pd = document.getElementById('pendingDocsCount');
+  const pc = document.getElementById('pendingCertsCount');
+  if (pa) pa.textContent = pendingActions.approvals ?? '—';
+  if (pd) pd.textContent = pendingActions.docs ?? '—';
+  if (pc) pc.textContent = pendingActions.certs ?? '—';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -3882,19 +5714,20 @@ function renderMembersHTML(members) {
     const mData = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
     const isConfirmed = (m.status||'').trim().toLowerCase().includes('confirmed');
     const emailSafe = encodeURIComponent(m.email || '');
+    const opIdSafe  = encodeURIComponent(m.operativeId || '');
     return `
     <tr>
       <td><input type="checkbox" class="member-checkbox" value="${escHtml(m.email)}" onchange="updateBulkActions()"></td>
-      <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openProfileModal('${mData}')">${escHtml(m.operativeId || '—')}</strong></td>
-      <td style="color:var(--text);cursor:pointer;" onclick="openProfileModal('${mData}')">${escHtml(m.name)}</td>
+      <td><strong style="color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="openMemberSlidePanel('${opIdSafe}')">${escHtml(m.operativeId || '—')}</strong></td>
+      <td style="color:var(--text);cursor:pointer;" onclick="openMemberSlidePanel('${opIdSafe}')">${escHtml(m.name)}</td>
       <td style="font-size:13px;color:var(--text2);">${escHtml(m.email)}</td>
       <td style="font-size:13px;color:var(--text2);">${escHtml(m.phone)}</td>
-      <td>${statusBadge(m.status)}</td>
+      <td>${statusBadge(m.status, m.email)}</td>
       <td>
         <div class="btn-actions">
           ${!isConfirmed ? `<button class="btn-sm btn-approve" onclick="updateStatus('${emailSafe}','Confirmed')">✓ Approve</button>` : ''}
           ${isConfirmed ? `<button class="btn-sm btn-reject" onclick="updateStatus('${emailSafe}','Pending')">↩ Revoke</button>` : ''}
-          <button class="btn-sm" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);" onclick="openProfileModal('${mData}')">👤 View</button>
+          <button class="btn-sm" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);" onclick="openMemberSlidePanel('${opIdSafe}')">🔍 Open</button>
         </div>
       </td>
     </tr>
@@ -3921,22 +5754,26 @@ function updateBulkActions() {
   }
 }
 
+// Legacy shim — kept so any residual references still work
 async function bulkUpdate(status) {
+  await _bulkStatusUpdate(status);
+}
+
+async function _bulkStatusUpdate(status) {
   const checkboxes = document.querySelectorAll('.member-checkbox:checked');
   if (checkboxes.length === 0) return;
-  
+
   if (!confirm(`Are you sure you want to mark ${checkboxes.length} members as ${status}?`)) return;
-  
+
   document.getElementById('bulkActions').style.pointerEvents = 'none';
   document.getElementById('bulkActions').style.opacity = '0.5';
   showToast(`Updating ${checkboxes.length} members...`, 'info');
-  
+
   try {
     const promises = Array.from(checkboxes).map(cb => {
       const email = decodeURIComponent(cb.value);
       return apiWrite('updateStatus', { email, status });
     });
-    
     await Promise.all(promises);
     showToast('Bulk update successful!');
     invalidateAndRefresh('adminMembers', loadMembers);
@@ -3947,6 +5784,55 @@ async function bulkUpdate(status) {
     document.getElementById('bulkActions').style.pointerEvents = 'auto';
     document.getElementById('bulkActions').style.opacity = '1';
   }
+}
+
+async function applyBulkAction() {
+  const action = document.getElementById('bulkActionSelect').value;
+  const checkboxes = document.querySelectorAll('.member-checkbox:checked');
+  if (checkboxes.length === 0) { showToast('No members selected.', 'error'); return; }
+
+  const emails = Array.from(checkboxes).map(cb => decodeURIComponent(cb.value));
+
+  if (action === 'approve') {
+    await _bulkStatusUpdate('Confirmed');
+  } else if (action === 'revoke') {
+    await _bulkStatusUpdate('Pending');
+  } else if (action === 'suspend') {
+    if (!confirm(`Suspend ${checkboxes.length} member(s)?`)) return;
+    showToast(`Suspending ${checkboxes.length} members…`, 'info');
+    try {
+      const ops = emails.map(email => {
+        const m = cachedMembers.find(x => x.email === email);
+        if (!m || !m.operativeId) return Promise.resolve();
+        return apiWrite('admin_suspend_member', { operativeId: m.operativeId });
+      });
+      await Promise.all(ops);
+      showToast('Members suspended.');
+      invalidateAndRefresh('adminMembers', loadMembers);
+    } catch(e) { showToast('Error suspending members.', 'error'); }
+  } else if (action === 'export') {
+    // Export only selected members
+    const selectedMembers = cachedMembers.filter(m => emails.includes(m.email));
+    if (!selectedMembers.length) { showToast('Nothing to export.', 'error'); return; }
+    const headers = ['Operative ID','Name','Email','Phone','Year','Branch','Status','Rank'];
+    const rows = selectedMembers.map(m => [m.operativeId||'',m.name||'',m.email||'',m.phone||'',m.year||'',m.branch||'',m.status||'',m.rank||'']);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','))].join('\n');
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csvContent));
+    link.setAttribute('download', 'innovexa_selected_members.csv');
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    showToast(`Exported ${selectedMembers.length} members.`);
+  } else if (action === 'idcards') {
+    bulkGenerateIDCards();
+  } else if (action === 'email') {
+    broadcastEmail();
+  }
+}
+
+function clearMemberSelection() {
+  document.querySelectorAll('.member-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('selectAllMembers').checked = false;
+  updateBulkActions();
 }
 
 const EMAIL_TEMPLATES = {
@@ -4624,36 +6510,67 @@ async function generateIDCard(encodedData, autoSave = true) {
 async function bulkGenerateIDCards() {
   const checkboxes = document.querySelectorAll('.member-checkbox:checked');
   if (checkboxes.length === 0) return;
-  
+
   showToast(`Generating ${checkboxes.length} ID cards...`, 'info');
   let fullHtml = '';
-  
+
   checkboxes.forEach(cb => {
-    const rowIndex = cb.value;
-    const m = currentFilteredMembers.find(member => member.rowIndex == rowIndex);
+    const email = decodeURIComponent(cb.value);
+    const m = cachedMembers.find(member => member.email === email);
     if (!m) return;
     fullHtml += getIDCardHTML(m);
   });
-  
+
   printIDCards(fullHtml);
   showToast('Bulk ID generation complete!');
 }
 
 
 function applyMemberFilters() {
-  const q = document.getElementById('memberSearch').value.toLowerCase();
+  const q            = (document.getElementById('memberSearch').value || '').toLowerCase();
   const statusFilter = document.getElementById('memberStatusFilter').value;
-  
+  const rankFilter   = document.getElementById('memberRankFilter')   ? document.getElementById('memberRankFilter').value   : 'all';
+  const forgeFilter  = document.getElementById('memberForgeFilter')  ? document.getElementById('memberForgeFilter').value  : 'all';
+
   let filtered = cachedMembers.filter(m => {
-    const matchesQuery = String(m.name||'').toLowerCase().includes(q) || String(m.email||'').toLowerCase().includes(q) || String(m.operativeId||'').toLowerCase().includes(q);
+    // Full-text search across name, email, operativeId
+    if (q) {
+      const matchesQuery = String(m.name||'').toLowerCase().includes(q)
+        || String(m.email||'').toLowerCase().includes(q)
+        || String(m.operativeId||'').toLowerCase().includes(q);
+      if (!matchesQuery) return false;
+    }
+
+    // Status filter
     const mStatus = (m.status||'').trim().toLowerCase();
-    
-    if (statusFilter === 'pending' && mStatus !== 'pending') return false;
-    if (statusFilter === 'confirmed' && !mStatus.includes('confirmed')) return false;
-    return matchesQuery;
+    if (statusFilter === 'pending'   && mStatus !== 'pending')             return false;
+    if (statusFilter === 'confirmed' && !mStatus.includes('confirmed'))    return false;
+    if (statusFilter === 'suspended' && !mStatus.includes('suspend'))      return false;
+
+    // Rank filter
+    if (rankFilter !== 'all' && (m.rank||'') !== rankFilter) return false;
+
+    // Forge access filter
+    const fa = (m.forgeAccess||'').toLowerCase();
+    if (forgeFilter === 'yes' && !['yes','granted','active'].includes(fa)) return false;
+    if (forgeFilter === 'no'  && ['yes','granted','active'].includes(fa))  return false;
+
+    return true;
   });
-  
+
   renderMembers(filtered);
+}
+
+function clearMemberFilters() {
+  const s = document.getElementById('memberSearch');
+  const sf = document.getElementById('memberStatusFilter');
+  const rf = document.getElementById('memberRankFilter');
+  const ff = document.getElementById('memberForgeFilter');
+  if (s)  s.value  = '';
+  if (sf) sf.value = 'all';
+  if (rf) rf.value = 'all';
+  if (ff) ff.value = 'all';
+  applyMemberFilters();
 }
 
 function exportMembersCSV() {
@@ -4703,6 +6620,253 @@ async function updateStatus(emailEncoded, status) {
     console.error('updateStatus error:', e);
     showToast('Network error updating status', 'error');
   }
+}
+
+// ── Inline Status Cycle ─────────────────────────────────────────────────────
+const STATUS_CYCLE = ['Pending', 'Confirmed', 'Suspended'];
+async function cycleStatus(emailEncoded) {
+  const email = decodeURIComponent(emailEncoded);
+  const member = cachedMembers.find(m => m.email === email);
+  if (!member) return;
+  const idx = STATUS_CYCLE.indexOf(member.status);
+  const nextStatus = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+  if (!confirm(`Change status of ${member.name} to "${nextStatus}"?`)) return;
+
+  // Optimistic UI: update cachedMembers immediately
+  member.status = nextStatus;
+  renderMembers(currentFilteredMembers.map(m => m.email === email ? member : m));
+
+  try {
+    if (nextStatus === 'Suspended') {
+      await apiWrite('admin_suspend_member', { operativeId: member.operativeId });
+    } else {
+      await apiWrite('updateStatus', { email, status: nextStatus });
+    }
+    showToast(`Status → ${nextStatus}`, 'success');
+    invalidateAndRefresh('adminMembers', loadMembers);
+    invalidateAndRefresh('adminMembers', loadOverview);
+  } catch(e) {
+    showToast('Failed to update status.', 'error');
+    invalidateAndRefresh('adminMembers', loadMembers);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MEMBER SLIDE PANEL
+// ══════════════════════════════════════════════════════════════
+let _slidePanelOpId = null;
+
+function openMemberSlidePanel(opIdEncoded) {
+  const opId = decodeURIComponent(opIdEncoded);
+  _slidePanelOpId = opId;
+
+  const member = cachedMembers.find(m => m.operativeId === opId);
+
+  // Reset to profile tab
+  switchSlideTab('profile');
+
+  // Populate header
+  document.getElementById('slidePanelName').textContent  = member ? member.name : opId;
+  document.getElementById('slidePanelOpId').textContent  = opId;
+
+  if (member) {
+    // Photo
+    const photo = document.getElementById('slidePanelPhoto');
+    const placeholder = document.getElementById('slidePanelPhotoPlaceholder');
+    if (member.photoUrl && member.photoUrl.length > 50) {
+      photo.src = member.photoUrl;
+      photo.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else {
+      photo.style.display = 'none';
+      photo.src = '';
+      placeholder.style.display = 'block';
+    }
+
+    // Status badge
+    document.getElementById('slidePanelStatusBadge').innerHTML = statusBadge(member.status);
+
+    // Fields
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    set('slideEmail',      member.email);
+    set('slidePhone',      member.phone);
+    set('slideCollege',    member.college);
+    set('slideBranchYear', [member.branch, member.year].filter(Boolean).join(' · '));
+    set('slideRank',       member.rank);
+    set('slideSquad',      member.squad);
+    set('slideXP',         (member.xp || 0) + ' XP');
+    set('slideForgeAccess', member.forgeAccess || '—');
+
+    // Admin note
+    const noteEl = document.getElementById('slideAdminNote');
+    if (noteEl) noteEl.value = member.adminNote || '';
+  }
+
+  // Clear activity/tasks/attendance until tab is clicked
+  ['slideActivityLoading','slideTasksLoading','slideAttendanceLoading'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'block';
+  });
+  ['slideActivityList','slideTasksList','slideAttendanceList'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+
+  // Open panel
+  document.getElementById('memberSlidePanel').classList.add('open');
+  document.getElementById('slidePanelOverlay').classList.add('open');
+}
+
+function closeMemberSlidePanel() {
+  document.getElementById('memberSlidePanel').classList.remove('open');
+  document.getElementById('slidePanelOverlay').classList.remove('open');
+  _slidePanelOpId = null;
+}
+
+function switchSlideTab(tab) {
+  const tabs = ['profile','activity','tasks','attendance'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('slideTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    const content = document.getElementById('slideContent' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) btn.classList.toggle('active', t === tab);
+    if (content) content.classList.toggle('active', t === tab);
+  });
+  // Lazy-load data only when switching to a data tab
+  if ((tab === 'activity' || tab === 'tasks' || tab === 'attendance') && _slidePanelOpId) {
+    loadSlidePanelActivity(_slidePanelOpId);
+  }
+}
+
+async function loadSlidePanelActivity(opId) {
+  const alreadyLoaded = document.getElementById('slideActivityList').style.display === 'block';
+  if (alreadyLoaded) return; // avoid re-fetching on repeated tab clicks
+
+  try {
+    const res = await apiGet('admin_get_member_activity', { operativeId: opId }, { forceRefresh: true });
+    if (!res.success) { showToast(res.message || 'Failed to load activity.', 'error'); return; }
+    const { logs, tasks, attendance } = res.data || {};
+
+    // ── Activity ──
+    const timeline = document.getElementById('slideActivityTimeline');
+    const icons = { LOGIN:'🔓', TASK_SUBMITTED:'📤', TASK_COMPLETED:'✅', SOS_CREATED:'🆘',
+      BOUNTY_COMPLETED:'🏆', STATUS_UPDATED:'🔄', ROLE_UPDATED:'⚙️', OTP_RESET:'🔑',
+      MEMBER_SUSPENDED:'⛔', ADMIN_NOTE_SET:'📝', XP_AWARDED:'⭐', RANK_UP:'🏅' };
+    if (logs && logs.length > 0) {
+      timeline.innerHTML = logs.map(l => {
+        const icon = icons[l.type] || '📋';
+        const ts = l.timestamp ? new Date(l.timestamp).toLocaleString() : '';
+        return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:18px;flex-shrink:0;">${icon}</div>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:600;">${escHtml(l.type||'')}</div>
+            <div style="font-size:12px;color:var(--text2);">${escHtml(l.content||'')}</div>
+            <div style="font-size:11px;color:var(--text3);">${escHtml(ts)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      timeline.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0;">No activity logs found.</div>';
+    }
+    document.getElementById('slideActivityLoading').style.display = 'none';
+    document.getElementById('slideActivityList').style.display = 'block';
+
+    // ── Tasks ──
+    const tasksBody = document.getElementById('slideTasksBody');
+    if (tasks && tasks.length > 0) {
+      tasksBody.innerHTML = tasks.map(t => {
+        const sc = t.status === 'Completed' ? 'var(--green)' : (t.status === 'Submitted' ? 'var(--blue)' : 'var(--accent)');
+        return `<tr>
+          <td><strong>${escHtml(t.title||'')}</strong></td>
+          <td style="color:#f59e0b;">${t.xp||0} XP</td>
+          <td style="color:var(--text3);font-size:12px;">${escHtml(t.difficulty||'—')}</td>
+          <td><span style="color:${sc};font-weight:600;font-size:11px;">${escHtml(t.status||'')}</span></td>
+        </tr>`;
+      }).join('');
+    } else {
+      tasksBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:16px;">No tasks found.</td></tr>';
+    }
+    document.getElementById('slideTasksLoading').style.display = 'none';
+    document.getElementById('slideTasksList').style.display = 'block';
+
+    // ── Attendance ──
+    const attendanceBody = document.getElementById('slideAttendanceBody');
+    if (attendance && attendance.length > 0) {
+      attendanceBody.innerHTML = attendance.map(a => {
+        const ts = a.timestamp ? new Date(a.timestamp).toLocaleDateString() : '—';
+        const sc = (a.status||'').toLowerCase().includes('attend') ? 'var(--green)' : 'var(--text3)';
+        return `<tr>
+          <td style="font-family:monospace;font-size:12px;">${escHtml(a.sessionId||'—')}</td>
+          <td><span style="color:${sc};font-weight:600;">${escHtml(a.status||'—')}</span></td>
+          <td style="color:var(--text3);">${escHtml(ts)}</td>
+        </tr>`;
+      }).join('');
+    } else {
+      attendanceBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:16px;">No attendance records found.</td></tr>';
+    }
+    document.getElementById('slideAttendanceLoading').style.display = 'none';
+    document.getElementById('slideAttendanceList').style.display = 'block';
+  } catch(e) {
+    showToast('Error loading activity: ' + e.message, 'error');
+  }
+}
+
+// ── Danger Zone Actions ──────────────────────────────────────────────────────
+async function saveAdminNote() {
+  if (!_slidePanelOpId) return;
+  const note = document.getElementById('slideAdminNote').value;
+  try {
+    const res = await apiWrite('admin_set_member_note', { operativeId: _slidePanelOpId, note });
+    if (res.success) {
+      showToast('Note saved.', 'success');
+      // Update cached member
+      const m = cachedMembers.find(x => x.operativeId === _slidePanelOpId);
+      if (m) m.adminNote = note;
+    } else {
+      showToast(res.message || 'Failed to save note.', 'error');
+    }
+  } catch(e) { showToast('Error saving note.', 'error'); }
+}
+
+async function suspendMemberAction() {
+  if (!_slidePanelOpId) return;
+  const member = cachedMembers.find(m => m.operativeId === _slidePanelOpId);
+  const name = member ? member.name : _slidePanelOpId;
+  if (!confirm(`Suspend member "${name}"? Their status will be set to Suspended.`)) return;
+  try {
+    const res = await apiWrite('admin_suspend_member', { operativeId: _slidePanelOpId });
+    if (res.success) {
+      showToast('Member suspended.', 'success');
+      if (member) { member.status = 'Suspended'; document.getElementById('slidePanelStatusBadge').innerHTML = statusBadge('Suspended'); }
+      invalidateAndRefresh('adminMembers', loadMembers);
+    } else { showToast(res.message || 'Failed.', 'error'); }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function resetMemberOTPAction() {
+  if (!_slidePanelOpId) return;
+  const member = cachedMembers.find(m => m.operativeId === _slidePanelOpId);
+  const name = member ? member.name : _slidePanelOpId;
+  if (!confirm(`Reset OTP/session state for "${name}"?`)) return;
+  try {
+    const res = await apiWrite('admin_reset_member_otp', { operativeId: _slidePanelOpId });
+    if (res.success) { showToast('OTP state reset.', 'success'); }
+    else { showToast(res.message || 'Failed.', 'error'); }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteMemberAction() {
+  if (!_slidePanelOpId) return;
+  const member = cachedMembers.find(m => m.operativeId === _slidePanelOpId);
+  const name = member ? member.name : _slidePanelOpId;
+  if (!confirm(`⚠️ PERMANENTLY DELETE member "${name}" (${_slidePanelOpId})?\n\nThis cannot be undone.`)) return;
+  if (!confirm(`Final confirmation: delete "${name}"?`)) return;
+  try {
+    const res = await apiWrite('admin_delete_member', { operativeId: _slidePanelOpId });
+    if (res.success) {
+      showToast('Member deleted.', 'success');
+      closeMemberSlidePanel();
+      invalidateAndRefresh('adminMembers', loadMembers);
+      invalidateAndRefresh('adminMembers', loadOverview);
+    } else { showToast(res.message || 'Failed.', 'error'); }
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -5639,6 +7803,192 @@ async function certReqAction(rowIndex, status) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// SUB-TASK 5: Document & Certificate Request Workflow
+// ══════════════════════════════════════════════════════════════
+
+let _cachedRequests = [];
+let _filteredRequests = [];
+
+async function loadRequestsTab(isSilent = false) {
+  const tbody = document.getElementById('requestsTableBody');
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3);">Loading requests…</td></tr>';
+  try {
+    const data = await apiGet('admin_get_requests', {}, { forceRefresh: true });
+    if (!data.success) throw new Error(data.message || 'Failed');
+    _cachedRequests = data.requests || [];
+    applyRequestFilters();
+    // Update sidebar badge
+    const pendingCount = _cachedRequests.filter(r => (r.status || '').toLowerCase() === 'pending').length;
+    const badge = document.getElementById('requestsBadge');
+    if (badge) {
+      if (pendingCount > 0) { badge.textContent = pendingCount; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    }
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#dc2626;padding:20px;">${escHtml(e.message)}</td></tr>`;
+  }
+}
+
+function applyRequestFilters() {
+  const typeF = (document.getElementById('reqTypeFilter')?.value || '').toLowerCase();
+  const statusF = (document.getElementById('reqStatusFilter')?.value || '').toLowerCase();
+  const search = (document.getElementById('reqSearch')?.value || '').toLowerCase();
+  _filteredRequests = _cachedRequests.filter(r => {
+    if (typeF && (r.reqType || '').toLowerCase() !== typeF) return false;
+    if (statusF && (r.status || '').toLowerCase() !== statusF) return false;
+    if (search) {
+      const haystack = [(r.name || ''), (r.memberName || ''), (r.operativeId || ''), (r.requestId || '')].join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+  renderRequestsTable(_filteredRequests);
+}
+
+function clearRequestFilters() {
+  ['reqTypeFilter','reqStatusFilter'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const srch = document.getElementById('reqSearch'); if (srch) srch.value = '';
+  applyRequestFilters();
+}
+
+function renderRequestsTable(requests) {
+  const tbody = document.getElementById('requestsTableBody');
+  if (!tbody) return;
+  if (!requests.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3);">No requests found.</td></tr>';
+    return;
+  }
+  const statusColors = { Pending: '#d97706', Approved: '#10b981', Dispatched: '#2563eb', Rejected: '#dc2626' };
+  tbody.innerHTML = requests.map(r => {
+    const sc = statusColors[r.status] || '#6b7280';
+    const typeBg = r.reqType === 'Document' ? 'rgba(37,99,235,0.12)' : 'rgba(124,58,237,0.12)';
+    const typeColor = r.reqType === 'Document' ? '#2563eb' : '#7c3aed';
+    const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+    const detail = r.reqType === 'Document' ? (r.docType || '—') : (r.eventType || '—');
+    const isPending = (r.status || '').toLowerCase() === 'pending';
+    return `<tr>
+      <td><input type="checkbox" class="req-checkbox" value="${escHtml(r.requestId)}" data-type="${escHtml(r.reqType)}"></td>
+      <td><span style="background:${typeBg};color:${typeColor};padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;">${escHtml(r.reqType)}</span></td>
+      <td>
+        <div style="font-weight:700;font-size:13px;">${escHtml(r.memberName || r.name || '—')}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:monospace;">${escHtml(r.operativeId || '—')}</div>
+      </td>
+      <td style="font-size:13px;color:var(--text3);">${escHtml(detail)}</td>
+      <td style="font-size:12px;color:var(--text3);">${dateStr}</td>
+      <td><span style="background:${sc}22;color:${sc};padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;">${escHtml(r.status || 'Pending')}</span></td>
+      <td>
+        <div class="btn-actions">
+          <button class="btn-sm" style="background:var(--bg3);color:var(--text);" onclick="openRequestDetail('${escHtml(r.requestId)}')">👁 Detail</button>
+          ${isPending ? `<button class="btn-sm btn-approve" onclick="approveOneRequest('${escHtml(r.requestId)}','${escHtml(r.reqType)}')">✓ Approve</button>
+          <button class="btn-sm btn-reject" onclick="rejectOneRequest('${escHtml(r.requestId)}','${escHtml(r.reqType)}')">✕ Reject</button>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleAllRequestCheckboxes(master) {
+  document.querySelectorAll('.req-checkbox').forEach(cb => { cb.checked = master.checked; });
+}
+
+function _getSelectedRequests() {
+  return [...document.querySelectorAll('.req-checkbox:checked')].map(cb => ({
+    requestId: cb.value, reqType: cb.dataset.type
+  }));
+}
+
+async function approveOneRequest(requestId, reqType) {
+  if (!confirm(`Approve this ${reqType} request?`)) return;
+  try {
+    const data = await apiWrite('admin_approve_request', { requestId, reqType });
+    showToast(data.message || 'Approved', data.success ? 'success' : 'error');
+    if (data.success) loadRequestsTab(true);
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function rejectOneRequest(requestId, reqType) {
+  const reason = prompt('Rejection reason (optional):') || '';
+  try {
+    const data = await apiWrite('admin_reject_request', { requestId, reqType, reason });
+    showToast(data.message || 'Rejected', data.success ? 'success' : 'error');
+    if (data.success) loadRequestsTab(true);
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function bulkApproveRequests() {
+  const selected = _getSelectedRequests();
+  if (!selected.length) { showToast('Select at least one request first', 'error'); return; }
+  if (!confirm(`Approve ${selected.length} selected request(s)?`)) return;
+  try {
+    const data = await apiWrite('admin_bulk_approve_requests', { requests: selected });
+    showToast(data.message || 'Done', data.success ? 'success' : 'error');
+    if (data.success) loadRequestsTab(true);
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function bulkRejectRequests() {
+  const selected = _getSelectedRequests();
+  if (!selected.length) { showToast('Select at least one request first', 'error'); return; }
+  const reason = prompt(`Rejection reason for ${selected.length} request(s) (optional):`) || '';
+  const results = await Promise.allSettled(selected.map(({ requestId, reqType }) =>
+    apiWrite('admin_reject_request', { requestId, reqType, reason })
+  ));
+  const done = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+  showToast(`${done}/${selected.length} requests rejected`, 'success');
+  loadRequestsTab(true);
+}
+
+function openRequestDetail(requestId) {
+  const r = _cachedRequests.find(req => req.requestId === requestId);
+  if (!r) return;
+  const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleString('en-IN') : '—';
+  const sc = { Pending: '#d97706', Approved: '#10b981', Dispatched: '#2563eb', Rejected: '#dc2626' }[r.status] || '#6b7280';
+  document.getElementById('reqDetailContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Request ID</div>
+        <div style="font-family:monospace;font-size:13px;font-weight:700;">${escHtml(r.requestId)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Type</div>
+          <div style="font-size:14px;font-weight:700;">${escHtml(r.reqType)}</div>
+        </div>
+        <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;">Status</div>
+          <div style="font-size:14px;font-weight:700;color:${sc};">${escHtml(r.status || 'Pending')}</div>
+        </div>
+      </div>
+      <div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Member</div>
+        <div style="font-size:15px;font-weight:800;">${escHtml(r.memberName || r.name || '—')}</div>
+        <div style="font-size:12px;color:var(--accent);font-family:monospace;margin-top:2px;">${escHtml(r.operativeId || '—')}</div>
+        ${r.memberEmail ? `<div style="font-size:12px;color:var(--text3);margin-top:2px;">${escHtml(r.memberEmail)}</div>` : ''}
+      </div>
+      <div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">${r.reqType === 'Document' ? 'Document Type' : 'Event Type'}</div>
+        <div style="font-size:14px;font-weight:600;">${escHtml(r.docType || r.eventType || '—')}</div>
+      </div>
+      ${r.purpose ? `<div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Purpose</div><div style="font-size:13px;">${escHtml(r.purpose)}</div></div>` : ''}
+      ${r.adminNote ? `<div style="padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;">Admin Note</div><div style="font-size:13px;color:#d97706;">${escHtml(r.adminNote)}</div></div>` : ''}
+      <div style="font-size:12px;color:var(--text3);">Submitted: ${dateStr}</div>
+      ${(r.status || 'Pending') === 'Pending' ? `
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button onclick="approveOneRequest('${escHtml(r.requestId)}','${escHtml(r.reqType)}')" style="flex:1;padding:10px;background:#10b981;border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">✅ Approve</button>
+          <button onclick="rejectOneRequest('${escHtml(r.requestId)}','${escHtml(r.reqType)}')" style="flex:1;padding:10px;background:#dc2626;border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">❌ Reject</button>
+        </div>` : ''}
+    </div>
+  `;
+  document.getElementById('reqDetailOverlay').style.display = '';
+  document.getElementById('reqDetailPanel').style.display = '';
+}
+
+function closeRequestDetail() {
+  document.getElementById('reqDetailOverlay').style.display = 'none';
+  document.getElementById('reqDetailPanel').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════════
 //  NEW UI JS & RESOURCES
 // ══════════════════════════════════════════════════════════════
 function autoCalcXP() {
@@ -5913,6 +8263,311 @@ async function loadSessions(isSilent = false) {
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px;">${e.message}</td></tr>`;
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SUB-TASK 4: Sessions Calendar, Analytics & Control Center
+// ══════════════════════════════════════════════════════════════
+
+let _sessionView = 'list';
+let _calYear = new Date().getFullYear();
+let _calMonth = new Date().getMonth(); // 0-based
+let _currentAnalyticsSessionId = null;
+let _livePollingInterval = null;
+
+// ── View Toggle ───────────────────────────────────────────────
+function setSessionView(view) {
+  _sessionView = view;
+  document.getElementById('sessionsListView').style.display = view === 'list' ? '' : 'none';
+  document.getElementById('sessionsCalendarView').style.display = view === 'calendar' ? '' : 'none';
+  document.getElementById('sessViewBtnList').classList.toggle('active', view === 'list');
+  document.getElementById('sessViewBtnCalendar').classList.toggle('active', view === 'calendar');
+  if (view === 'calendar') renderCalendar();
+}
+
+// ── Calendar ──────────────────────────────────────────────────
+function calPrevMonth() {
+  _calMonth--;
+  if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+  renderCalendar();
+}
+function calNextMonth() {
+  _calMonth++;
+  if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = MONTHS[_calMonth] + ' ' + _calYear;
+
+  const firstDay = new Date(_calYear, _calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(_calYear, _calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(_calYear, _calMonth, 0).getDate();
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+  // Build date → events map from currentEvents
+  const eventsByDate = {};
+  (currentEvents || []).forEach(ev => {
+    if (!ev.date) return;
+    const d = ev.date.slice(0, 10); // YYYY-MM-DD
+    if (!eventsByDate[d]) eventsByDate[d] = [];
+    eventsByDate[d].push(ev);
+  });
+
+  const cells = document.getElementById('calCells');
+  cells.innerHTML = '';
+
+  // Prev-month filler days
+  for (let i = 0; i < firstDay; i++) {
+    const d = daysInPrev - firstDay + 1 + i;
+    cells.insertAdjacentHTML('beforeend', `<div class="cal-cell other-month"><div class="cal-cell-date">${d}</div></div>`);
+  }
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = _calYear + '-' + String(_calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isToday = dateStr === todayStr;
+    const evs = eventsByDate[dateStr] || [];
+    const chipsHtml = evs.slice(0, 3).map(ev => {
+      const cls = 'cal-event-' + (ev.status || 'upcoming').toLowerCase().replace(/[^a-z]/g, '');
+      const safeTitle = escHtml((ev.title || '').slice(0, 22));
+      const sid = escHtml(ev.sessionId || '');
+      return `<span class="cal-event-chip ${cls}" onclick="openSessionAnalytics('${sid}')" title="${safeTitle}">${safeTitle}</span>`;
+    }).join('');
+    const moreHtml = evs.length > 3 ? `<span style="font-size:10px;color:var(--text3);">+${evs.length - 3} more</span>` : '';
+    cells.insertAdjacentHTML('beforeend', `
+      <div class="cal-cell${isToday ? ' today' : ''}">
+        <div class="cal-cell-date">${d}</div>
+        ${chipsHtml}${moreHtml}
+      </div>
+    `);
+  }
+  // Next-month filler days
+  const totalCells = firstDay + daysInMonth;
+  const remainder = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= remainder; d++) {
+    cells.insertAdjacentHTML('beforeend', `<div class="cal-cell other-month"><div class="cal-cell-date">${d}</div></div>`);
+  }
+}
+
+// ── Session Analytics Panel ───────────────────────────────────
+async function openSessionAnalytics(sessionId) {
+  _currentAnalyticsSessionId = sessionId;
+  const panel = document.getElementById('sessionAnalyticsPanel');
+  panel.style.display = '';
+
+  // Reset to loading state
+  document.getElementById('sessAnalyticsTitle').textContent = 'Loading…';
+  document.getElementById('sessAnalyticsDate').textContent = '';
+  ['sessStatAttendance','sessStatCheckedIn','sessStatFeedback','sessStatFeedbackCount'].forEach(id => {
+    document.getElementById(id).textContent = '…';
+  });
+  document.getElementById('sessRankBreakdown').innerHTML = '';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const data = await apiWrite('admin_get_session_analytics', { sessionId });
+    if (!data.success) { showToast(data.message || 'Failed to load analytics', 'error'); return; }
+
+    document.getElementById('sessAnalyticsTitle').textContent = data.session.title || sessionId;
+    document.getElementById('sessAnalyticsDate').textContent = data.session.date || '';
+    document.getElementById('sessStatAttendance').textContent = data.attendanceRate + '%';
+    document.getElementById('sessStatCheckedIn').textContent = data.checkedIn;
+    document.getElementById('sessStatFeedback').textContent = data.avgFeedback !== null ? data.avgFeedback + ' ★' : 'N/A';
+    document.getElementById('sessStatFeedbackCount').textContent = data.feedbackCount;
+
+    // Rank breakdown pills
+    const rb = data.rankBreakdown || {};
+    const rbHtml = Object.entries(rb).map(([rank, count]) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;margin:0 4px 4px 0;">
+        ${escHtml(rank)} <span style="color:var(--accent);">${count}</span>
+      </span>`
+    ).join('');
+    document.getElementById('sessRankBreakdown').innerHTML = rbHtml
+      ? `<div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;">Rank Breakdown</div>${rbHtml}`
+      : '';
+
+    // Mark active status button
+    const currentStatus = (data.session.status || 'Upcoming').toLowerCase();
+    document.querySelectorAll('#sessStatusBar .session-status-btn').forEach(btn => btn.classList.remove('active-s'));
+    const activeBtn = document.querySelector(`.session-status-btn.${currentStatus}`);
+    if (activeBtn) activeBtn.classList.add('active-s');
+
+    // Start live polling if session is live
+    _startLivePollingIfNeeded(data.session.status, sessionId);
+
+  } catch(e) {
+    showToast('Analytics error: ' + e.message, 'error');
+  }
+}
+
+function closeSessionAnalytics() {
+  document.getElementById('sessionAnalyticsPanel').style.display = 'none';
+  _stopLivePolling();
+  _currentAnalyticsSessionId = null;
+}
+
+// ── Live Counter Polling ──────────────────────────────────────
+function _startLivePollingIfNeeded(status, sessionId) {
+  _stopLivePolling();
+  const wrap = document.getElementById('sessLiveCounterWrap');
+  if (status === 'Live') {
+    wrap.style.display = '';
+    _pollLiveCount(sessionId); // immediate poll
+    _livePollingInterval = setInterval(() => _pollLiveCount(sessionId), 10000);
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+async function _pollLiveCount(sessionId) {
+  try {
+    const data = await apiWrite('admin_get_session_analytics', { sessionId });
+    if (data.success) {
+      document.getElementById('sessLiveCount').textContent = data.checkedIn;
+    }
+  } catch(e) { /* silent */ }
+}
+function _stopLivePolling() {
+  if (_livePollingInterval) { clearInterval(_livePollingInterval); _livePollingInterval = null; }
+  const wrap = document.getElementById('sessLiveCounterWrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+// ── Session Status Update ─────────────────────────────────────
+async function updateSessionStatus(newStatus) {
+  if (!_currentAnalyticsSessionId) return;
+  if (!confirm(`Mark this session as "${newStatus}"?`)) return;
+  try {
+    const data = await apiWrite('admin_update_session_status', { sessionId: _currentAnalyticsSessionId, status: newStatus });
+    if (!data.success) { showToast(data.message || 'Update failed', 'error'); return; }
+    showToast(`Session marked as ${newStatus}`, 'success');
+    // Update active button
+    document.querySelectorAll('#sessStatusBar .session-status-btn').forEach(btn => btn.classList.remove('active-s'));
+    const activeBtn = document.querySelector(`.session-status-btn.${newStatus.toLowerCase()}`);
+    if (activeBtn) activeBtn.classList.add('active-s');
+    // Update in local cache
+    const ev = (currentEvents || []).find(e => e.sessionId === _currentAnalyticsSessionId);
+    if (ev) ev.status = newStatus;
+    if (_sessionView === 'calendar') renderCalendar();
+    _startLivePollingIfNeeded(newStatus, _currentAnalyticsSessionId);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Bulk Certificate Dispatch ─────────────────────────────────
+async function bulkSendCertificates() {
+  if (!_currentAnalyticsSessionId) return;
+  if (!confirm('Send participation certificates to ALL confirmed attendees of this session?')) return;
+  try {
+    showToast('Dispatching certificates…', 'info');
+    const data = await apiWrite('admin_bulk_send_certificates', { sessionId: _currentAnalyticsSessionId });
+    if (data.success) showToast(data.message || 'Certificates sent!', 'success');
+    else showToast(data.message || 'Failed', 'error');
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Recurring Sessions ────────────────────────────────────────
+function openRecurringSessionModal() {
+  document.getElementById('modalRecurringSession').classList.add('open');
+  // Set default date to today
+  document.getElementById('recDate').value = new Date().toISOString().slice(0, 10);
+}
+
+async function submitRecurringSessions(btn) {
+  const title = document.getElementById('recTitle').value.trim();
+  const date = document.getElementById('recDate').value;
+  const location = document.getElementById('recLocation').value.trim();
+  const recurrence = document.getElementById('recFrequency').value;
+  const recurrenceCount = parseInt(document.getElementById('recCount').value) || 4;
+  const description = document.getElementById('recDesc').value.trim();
+
+  if (!title || !date) { showToast('Title and start date are required', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  try {
+    const data = await apiWrite('admin_create_recurring_session', { title, date, location, recurrence, recurrenceCount, description });
+    if (!data.success) { showToast(data.message || 'Failed', 'error'); return; }
+    showToast(data.message || 'Recurring sessions created!', 'success');
+    document.getElementById('modalRecurringSession').classList.remove('open');
+    // Reset form
+    ['recTitle','recLocation','recDesc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('recCount').value = 4;
+    // Refresh sessions list
+    invalidateAndRefresh('admin_get_sessions', loadSessions);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Sessions';
+  }
+}
+
+// Add "Analytics" button to the sessions list table rows
+// Patch renderSessions to inject an "Analytics" button alongside existing buttons
+const _origLoadSessions = loadSessions;
+// Override: we extend the row rendering in loadSessions to add Analytics button
+// This is done by monkey-patching after the tbody is built — we hook into the existing logic.
+// The loadSessions function already uses innerHTML += — we add via post-processing.
+// Instead we override by replacing the tbody fill section:
+async function loadSessions(isSilent = false) {
+  const tbody = document.getElementById('sessionsListTbody');
+  if (!isSilent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Fetching operations...</td></tr>';
+
+  try {
+    const res = await apiGet('admin_get_sessions');
+    if (!res.success) throw new Error(res.message);
+    currentEvents = res.sessions || res.events || res.data || [];
+    tbody.innerHTML = '';
+
+    if (currentEvents.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text3);">No events initialized.</td></tr>';
+      if (_sessionView === 'calendar') renderCalendar();
+      return;
+    }
+
+    const statusColors = { Upcoming: '#2563eb', Live: '#10b981', Completed: '#6b7280', Cancelled: '#dc2626' };
+    currentEvents.forEach(e => {
+      const imgCell = e.coverUrl
+        ? `<img src="${escHtml(e.coverUrl)}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'">`
+        : `<div style="width:64px;height:48px;border-radius:6px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;">🖼️</div>`;
+      const typeLabel = e.eventType === 'Session' ? '<span style="background:rgba(0,0,0,0.08);color:#000000;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Session</span>' : '<span style="background:rgba(16,185,129,0.12);color:#34d399;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;">Public</span>';
+      const statusColor = statusColors[e.status] || '#6b7280';
+      const statusBadgeHtml = `<span style="background:${statusColor}22;color:${statusColor};padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;">${escHtml(e.status || 'Upcoming')}</span>`;
+      tbody.innerHTML += `
+        <tr>
+          <td>${imgCell}</td>
+          <td><strong style="color:var(--accent2)">${escHtml(e.title)}</strong></td>
+          <td>${escHtml(e.date)}</td>
+          <td>${typeLabel}</td>
+          <td>${statusBadgeHtml}</td>
+          <td>
+            <div class="btn-actions">
+              <button class="btn-sm btn-edit" onclick="openSessionDash('${e.sessionId}')">Dashboard</button>
+              <button class="btn-sm" style="background:rgba(37,99,235,0.12);color:#2563eb;" onclick="openSessionAnalytics('${e.sessionId}')">📊 Analytics</button>
+              <button class="btn-sm btn-outline" style="border-color:var(--border2); color:var(--text2);" onclick="openEditEventModal('${e.sessionId}')">Edit</button>
+              <button class="btn-sm" style="background:var(--bg3); color:var(--text);" onclick="viewFeedback('${e.sessionId}', '${escHtml(e.title)}')">Feedback</button>
+              <button class="btn-sm btn-reject" onclick="deleteSession('${e.sessionId}')">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    if (_sessionView === 'calendar') renderCalendar();
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--red);padding:20px;">${e.message}</td></tr>`;
+  }
+}
+
+// Register new write ops in cache invalidation map
+if (typeof _apiWriteInvalidationMap !== 'undefined') {
+  _apiWriteInvalidationMap['admin_update_session_status']   = ['admin_get_sessions'];
+  _apiWriteInvalidationMap['admin_create_recurring_session'] = ['admin_get_sessions'];
+  _apiWriteInvalidationMap['admin_bulk_send_certificates']  = [];
 }
 
 // ══ MULTI-IMAGE UPLOAD FOR EVENTS ══════════════════════════════

@@ -32,6 +32,7 @@ const MemberSchema = new mongoose.Schema({
   loginCount: { type: Number, default: 0 },
   lastLoginTime: String,
   faceDescriptor: String,
+  adminNote: { type: String, default: '' },
 });
 
 export const Member = mongoose.models.Member || mongoose.model('Member', MemberSchema);
@@ -56,7 +57,10 @@ const TaskSchema = new mongoose.Schema({
   status: { type: String, default: 'Open' },
   assignedTo: String,
   submitLink: String,
-  feedback: String
+  feedback: String,
+  expiresAt: { type: Date, default: null },
+  archivedAt: { type: Date, default: null },
+  order: { type: Number, default: 0 }
 });
 
 export const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
@@ -82,10 +86,12 @@ const SessionSchema = new mongoose.Schema({
   location: String,
   description: String,
   link: String,
-  status: { type: String, default: 'Upcoming' },
+  status: { type: String, default: 'Upcoming' }, // Upcoming | Live | Completed | Cancelled
   coverUrl: String,
   imageUrls: [String],
-  allowedOperatives: [String] // targeted sessions
+  allowedOperatives: [String], // targeted sessions
+  recurrence: { type: String, default: 'none' }, // none | weekly | monthly
+  recurrenceCount: { type: Number, default: 1 }  // how many occurrences to generate
 });
 
 export const Session = mongoose.models.Session || mongoose.model('Session', SessionSchema);
