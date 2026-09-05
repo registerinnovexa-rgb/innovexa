@@ -3,7 +3,7 @@
 // and fires hook functions that individual pages define to apply them.
 (async function() {
   try {
-    const res = await fetch('https://innovexa-backend-x57p.onrender.com/api/backend?action=get_site_config');
+    const res = await fetch('/api/backend?action=get_site_config');
     if (!res.ok) return;
     const data = await res.json();
     if (!data.success) return;
